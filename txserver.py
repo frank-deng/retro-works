@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 '''
-A simple telnet server for Linux, written in Python3.
+A simple UCDOS TX server for Linux, written in Python3.
 
-Usage: telnetd.py [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2] ...
+Usage: txserver.py [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2] ...
 '''
 
 import os, sys, time, subprocess, pty, fcntl, socket, select, getopt;
 
-LOGIN_CMD = ['/usr/bin/txlogin.py'];
+LOGIN_CMD = ['/home/frank/devel/fun-ucdos/txlogin.py'];
 ENVIRON = {}
 HOST_PORT = ('', 23);
 
