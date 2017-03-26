@@ -23,9 +23,8 @@ txout = tx.TX();
 if __name__ == '__main__':
     try:
         while True:
-            txout.write('按Enter键进入特显模式……');
+            txout.write('按Enter键进入特显模式……\r\n');
             char = ord(getch());
-            txout.write(str(char)+'\r\n');
             if (13 == char):
                 p = subprocess.Popen(['/home/frank/devel/fun-ucdos/palette.py']);
                 p.wait();
