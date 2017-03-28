@@ -23,17 +23,17 @@ txout = tx.TX();
 if __name__ == '__main__':
     try:
         while True:
+            p = subprocess.Popen(['./palette.py']);
+            p.wait();
+            txout.write([
+                tx.Mode(3),
+                tx.ShowCursor(),
+                tx.ShowBar(),
+                tx.Clrscr(),
+            ]);
             txout.write('按Enter键进入特显模式……\r\n');
-            char = ord(getch());
-            if (13 == char):
-                p = subprocess.Popen(['/home/frank/devel/fun-ucdos/palette.py']);
-                p.wait();
-                txout.write([
-                    tx.Mode(3),
-                    tx.ShowCursor(),
-                    tx.ShowBar(),
-                    tx.Clrscr(),
-                ]);
+            while (13 != ord(getch()):
+                txout.write('按Enter键进入特显模式……\r\n');
     except KeyboardInterrupt:
         pass;
     exit(0);

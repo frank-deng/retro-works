@@ -93,9 +93,6 @@ def UnprotectPalette():
 def CopyScreen(x0,y0,x1,y1,x2,y2):
     return 'MI%d,%d,%d,%d,%d,%d'%(x0,y0,x1,y1,x2,y2);
 
-def StopMusic():
-    return 'SE';
-
 def Pause():
     return 'WA';
 
@@ -114,8 +111,56 @@ def ShowBar():
 def HideBar():
     return 'KB1,0';
 
+def Text(text, attr):
+    attrstr = '';
+    for name in attr:
+        if name == 'x':
+            attrstr += '-%d'%(attr[name]);
+        elif name == 'y':
+            attrstr += '|%d'%(attr[name]);
+        elif name == 'style':
+            attrstr += '@%s'%(attr[name]);
+        elif name == 'size':
+            attrstr += '@%d,%d'%(attr[name][0], attr[name][1]);
+        elif name == 'font':
+            attrstr += '=%s'%(attr[name]);
+        elif name == 'fontSize':
+            style = attr.get('fontStyle');
+            if style == 'thin':
+                attrstr += '#%d|'%(attr[name]);
+            elif style == 'fat':
+                attrstr += '#%d-'%(attr[name]);
+            else:
+                attrstr += '#%d+'%(attr[name]);
+        elif name == 'lineSpace':
+            attrstr += '&%d'%(attr[name]);
+        elif name == 'charSpace':
+            attrstr += '^%d'%(attr[name]);
+        elif name == 'fg':
+            attrstr += '(%d'%(attr[name]);
+        elif name == 'bg':
+            if attr[name] == None:
+                attrstr += '%1';
+            else:
+                attrstr += '%%0(%d'%(attr[name]);
+
+    subchar = {
+        '#':'＃', '%':'％', '&':'＆',
+        '(':'（', ')':'）', '+':'＋',
+        ',':'，', '-':'－', '=':'＝',
+        '@':'＠', '[':'［', ']':'］',
+        '^':'＾', '{':'｛', '|':'｜',
+        '}':'｝',
+    };
+    for k in subchar:
+        text = text.replace(k, subchar[k]);
+    return '{%s%s}'%(attr,text);
+
 def Music(notes):
     return 'SO'+notes;
+
+def StopMusic():
+    return 'SE';
 
 class TX:
     __out = None;

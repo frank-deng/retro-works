@@ -2,8 +2,6 @@
 
 '''
 A simple UCDOS TX server for Linux, written in Python3.
-
-Usage: txserver.py [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2] ...
 '''
 
 import os, sys, time, subprocess, pty, fcntl, socket, select, getopt;
@@ -13,7 +11,7 @@ ENVIRON = {}
 HOST_PORT = ('', 2333);
 
 try:
-    options, args = getopt.getopt(sys.argv[1:], "hP:E:");
+    options, args = getopt.getopt(sys.argv[1:], "hP:");
     for name, value in options:
         if name == '-h':
             raise Exception;
@@ -23,7 +21,7 @@ try:
             envname, envval = value.split('=');
             ENVIRON[envname] = envval;
 except:
-    sys.stderr.write('Usage: %s [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2] ...\n'%sys.argv[0]);
+    sys.stderr.write('Usage: %s [-P port]\n'%sys.argv[0]);
     exit(1);
 
 class Terminal:
