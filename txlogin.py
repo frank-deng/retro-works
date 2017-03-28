@@ -29,10 +29,10 @@ if __name__ == '__main__':
                 p = subprocess.Popen(['/home/frank/devel/fun-ucdos/palette.py']);
                 p.wait();
                 txout.write([
-                    tx.M(3),
+                    tx.Mode(3),
                     tx.ShowCursor(),
                     tx.ShowBar(),
-                    tx.CL(),
+                    tx.Clrscr(),
                 ]);
     except KeyboardInterrupt:
         pass;

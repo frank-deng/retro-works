@@ -3,8 +3,8 @@
 import sys, time, tx;
 txInstance = tx.TX();
 txInstance.write([
-    tx.M(10),
-    tx.CL(),
+    tx.Mode(10),
+    tx.Clrscr(),
     tx.HideCursor(),
     tx.HideBar(),
 ]);
@@ -14,14 +14,14 @@ for p in range(0,256):
     col = p % (640 / width);
     row = int(p * width / 640);
     txInstance.write([
-        tx.CO(p),
-        tx.B(col*width, row*height, (col+1)*width-1, (row+1)*height-1),
+        tx.Color(p),
+        tx.Rect(col*width, row*height, (col+1)*width-1, (row+1)*height-1, True),
     ]);
 txInstance.write([
-    tx.WA(),
-    tx.M(3),
+    tx.Pause(),
+    tx.Mode(3),
     tx.ShowCursor(),
     tx.ShowBar(),
-    tx.CL(),
+    tx.Clrscr(),
 ]);
 

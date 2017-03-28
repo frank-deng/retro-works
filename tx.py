@@ -1,92 +1,105 @@
 import os, sys;
-def M(mode):
+
+def Mode(mode):
     return 'M%d'%mode;
 
-def CL(n=None):
-    if (n):
-        return 'CL%d'%n;
-    else:
-        return 'CL';
+def Clrscr(n=None):
+    return 'CL';
 
-def CO(n):
+def Color(n):
     return 'CO%d'%n;
 
-def SC(n):
-    return 'SC%d'%n;
+def EnableXORMode():
+    return 'X1';
 
-def X(n=False):
-    if (n):
-        return 'X1';
-    else:
-        return 'X0';
+def DisableXORMode():
+    return 'X0';
 
-def ST(n):
-    return 'SC%d'%n;
+def SetStyle(n):
+    return 'ST%d'%n;
 
-def DS(data):
-    return 'DS'+','.join([int(n) for n in data]);
+def SetPattern(data):
+    return 'ST13DS'+','.join([int(n) for n in data]);
 
-def D(x,y):
+def Dot(x,y):
     return 'D%d,%d'%(x,y);
 
-def L(x0,y0,x1,y1):
+def Line(x0,y0,x1,y1):
     return 'L%d,%d,%d,%d'%(x0,y0,x1,y1);
 
-def LT(x,y):
+def LineTo(x,y):
     return 'LT%d,%d'%(x,y);
 
-def R(x0,y0,x1,y1):
-    return 'R%d,%d,%d,%d'%(x0,y0,x1,y1);
+def Rect(x0,y0,x1,y1,fill=False):
+	if fill:
+        return 'B%d,%d,%d,%d'%(x0,y0,x1,y1);
+	else:
+        return 'R%d,%d,%d,%d'%(x0,y0,x1,y1);
 
-def B(x0,y0,x1,y1):
-    return 'B%d,%d,%d,%d'%(x0,y0,x1,y1);
+def Circle(x,y,r,fill=False):
+    if fill:
+    	return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,0,360,r,r,2);
+    else:
+        return 'C%d,%d,%d'%(x,y,r);
+        
+def Arc(x,y,r,s,e):
+	return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,0);
+	
+def Sector(x,y,r,s,e,fill=False):
+	if fill:
+	    return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,2);
+	else:
+		return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,1);
 
-def C(x,y,r):
-    return 'C%d,%d,%d'%(x,y,r);
+def Ellipse(x,y,a,b,fill=False):
+	if fill:
+        return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,0,360,a,b,2);
+	else:
+        return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,0,360,a,b,0);
 
-def E(x,y,a,b,c,d,e):
-    return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,a,b,c,d,e);
+def EllipticalArc(x,y,a,b,s,e):
+	return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,a,b,0);
 
-def F(x,y,c):
+def EllipticalSector(x,y,a,b,s,e,fill=False):
+	if fill:
+        return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,a,b,2);
+	else:
+        return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,a,b,1);
+
+def Fill(x,y,c):
     return 'F%d,%d,%d'%(x,y,c);
 
-def SA(x0,y0,x1,y1,f):
-    return 'SA%d,%d,%d,%d,%s'%(x0,y0,x1,y1,f);
-
-def RE(x,y,f):
+def RenderPCX(x,y,f):
     return 'RE%d,%d,%s'%(x,y,f);
 
-def RP(x,y,w,h,f):
-    return 'RP%d,%d,%d,%d,%s'%(x,y,w,h,f);
-
-def RF(x,y,w,h,f):
+def RenderPCXScaled(x,y,w,h,f):
     return 'RF%d,%d,%d,%d,%s'%(x,y,w,h,f);
 
-def PM(mode):
+def SetPCXRenderMode(mode):
     return 'PM%d'%mode;
 
-def PP(n=True):
-    if n:
-        return 'PP1';
-    else:
-        return 'PP0';
+def ProtectBasicPalette():
+    return 'PP1';
 
-def SP(n=True):
-    if n:
-        return 'SP1';
-    else:
-        return 'SP0';
+def UnprotectBasicPalette():
+    return 'PP0';
 
-def MI(x0,y0,x1,y1,x2,y2):
+def ProtectPalette():
+    return 'SP0';
+
+def UnprotectPalette():
+    return 'SP1';
+
+def MoveImage(x0,y0,x1,y1,x2,y2):
     return 'MI%d,%d,%d,%d,%d,%d'%(x0,y0,x1,y1,x2,y2);
 
 def StopMusic():
     return 'SE';
 
-def WA():
+def Pause():
     return 'WA';
 
-def CursorSpeed(n):
+def SetCursorSpeed(n):
     return 'CU0,%d'%n;
 
 def ShowCursor():
