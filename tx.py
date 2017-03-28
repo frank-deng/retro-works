@@ -1,4 +1,4 @@
-import os, sys;
+import os, sys, threading;
 
 def Mode(mode):
     return 'M%d'%mode;
@@ -164,11 +164,14 @@ def StopMusic():
 
 class TX:
     __out = None;
-    def __init__(__self, out = sys.stdout):
-        __self.__out = out.fileno();
-    def write(__self, data):
+    __mutex = threading.Lock();
+    def __init__(self, out = sys.stdout):
+        self.__out = out.fileno();
+    def write(self, data):
+        self.__mutex.acquire();
         if (isinstance(data, (list,tuple))):
-            os.write(__self.__out, ('\x0E['+''.join(data)+']').encode('GBK'));
+            os.write(self.__out, ('\x0E['+''.join(data)+']').encode('GBK'));
         elif (isinstance(data, str)):
-            os.write(__self.__out, data.encode('GBK'));
+            os.write(self.__out, data.encode('GBK'));
+        self.__mutex.release();
 
