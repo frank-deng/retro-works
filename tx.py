@@ -123,7 +123,7 @@ def Text(text, attr):
         elif name == 'size':
             attrstr += '@%d,%d'%(attr[name][0], attr[name][1]);
         elif name == 'font':
-            attrstr += '=%s'%(attr[name]);
+            attrstr += '=%d'%(attr[name]);
         elif name == 'fontSize':
             style = attr.get('fontStyle');
             if style == 'thin':
@@ -154,7 +154,7 @@ def Text(text, attr):
     };
     for k in subchar:
         text = text.replace(k, subchar[k]);
-    return '{%s%s}'%(attr,text);
+    return '{%s%s}'%(attrstr,text);
 
 def Music(notes):
     return 'SO'+notes;
