@@ -90,7 +90,7 @@ def ProtectPalette():
 def UnprotectPalette():
     return 'SP1';
 
-def MoveImage(x0,y0,x1,y1,x2,y2):
+def CopyScreen(x0,y0,x1,y1,x2,y2):
     return 'MI%d,%d,%d,%d,%d,%d'%(x0,y0,x1,y1,x2,y2);
 
 def StopMusic():
