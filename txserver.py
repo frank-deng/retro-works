@@ -8,9 +8,9 @@ Usage: txserver.py [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2]
 
 import os, sys, time, subprocess, pty, fcntl, socket, select, getopt;
 
-LOGIN_CMD = ['/home/frank/devel/fun-ucdos/txlogin.py'];
+LOGIN_CMD = ['./txlogin.py'];
 ENVIRON = {}
-HOST_PORT = ('', 23);
+HOST_PORT = ('', 2333);
 
 try:
     options, args = getopt.getopt(sys.argv[1:], "hP:E:");
