@@ -31,39 +31,39 @@ def LineTo(x,y):
     return 'LT%d,%d'%(x,y);
 
 def Rect(x0,y0,x1,y1,fill=False):
-	if fill:
+    if fill:
         return 'B%d,%d,%d,%d'%(x0,y0,x1,y1);
-	else:
+    else:
         return 'R%d,%d,%d,%d'%(x0,y0,x1,y1);
 
 def Circle(x,y,r,fill=False):
     if fill:
-    	return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,0,360,r,r,2);
+        return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,0,360,r,r,2);
     else:
         return 'C%d,%d,%d'%(x,y,r);
         
 def Arc(x,y,r,s,e):
-	return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,0);
-	
+    return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,0);
+    
 def Sector(x,y,r,s,e,fill=False):
-	if fill:
-	    return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,2);
-	else:
-		return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,1);
+    if fill:
+        return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,2);
+    else:
+        return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,r,r,1);
 
 def Ellipse(x,y,a,b,fill=False):
-	if fill:
+    if fill:
         return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,0,360,a,b,2);
-	else:
+    else:
         return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,0,360,a,b,0);
 
 def EllipticalArc(x,y,a,b,s,e):
-	return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,a,b,0);
+    return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,a,b,0);
 
 def EllipticalSector(x,y,a,b,s,e,fill=False):
-	if fill:
+    if fill:
         return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,a,b,2);
-	else:
+    else:
         return 'E%d,%d,%d,%d,%d,%d,%d'%(x,y,s,e,a,b,1);
 
 def Fill(x,y,c):
