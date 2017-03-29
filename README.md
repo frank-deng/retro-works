@@ -25,3 +25,12 @@ Notes
 	imgmount -t hdd 2 /path/to/hdd.img -size 512,63,16,X -fs none
 	boot -l c
 
+### Some Useful Keyboard Codes
+
+* `\r`: Enter
+* `\x1B`: Esc
+* `\x00H`: Up
+* `\x00P`: Down
+* `\x00K`: Left
+* `\x00M`: Right
+

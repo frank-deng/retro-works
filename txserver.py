@@ -7,6 +7,7 @@ A simple UCDOS TX server for Linux, written in Python3.
 import os, sys, time, subprocess, pty, fcntl, socket, select, getopt;
 
 LOGIN_CMD = ['./txlogin.py'];
+#LOGIN_CMD = ['./getch_test.py'];
 ENVIRON = {}
 HOST_PORT = ('', 2333);
 
