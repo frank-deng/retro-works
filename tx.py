@@ -75,6 +75,9 @@ def RenderPCX(x,y,f):
 def RenderPCXScaled(x,y,w,h,f):
     return 'RF%d,%d,%d,%d,%s'%(x,y,w,h,f);
 
+def SavePCX(x,y,w,h,f):
+    return 'SA%d,%d,%d,%d,%s'%(x,y,w,h,f);
+
 def SetPCXRenderMode(mode):
     return 'PM%d'%mode;
 
