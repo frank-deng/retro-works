@@ -13,7 +13,7 @@ class TXLogin:
         },
         {
             'name':'系统信息',
-            'exec':['./sysinfo.py'],
+            'exec':['./txsysinfo.py'],
             'key': '2',
         },
     ];
@@ -51,9 +51,10 @@ class TXLogin:
         cnt = 0;
         for item in self.__menu:
             self.__tx.write([
-                TX.Text('%2d. %s'%(cnt+1, item['name']), {
-                    'x':120,
-                    'y':136+cnt*18,
+                TX.DrawButton(120, 136+cnt*30, 200, 25),
+                TX.Text('%2d.%s'%(cnt+1, item['name']), {
+                    'x':126,
+                    'y':136+cnt*30+5,
                     'size':(16,16),
                     'font':0,
                     'fg':0,
@@ -63,8 +64,11 @@ class TXLogin:
             cnt+=1;
 
     def __exec(self, exe):
-        p = subprocess.Popen(exe);
-        p.wait();
+        try:
+            p = subprocess.Popen(exe);
+            p.wait();
+        except Exception:
+            pass;
 
     def __exit(self):
         self.__tx.write([
@@ -82,9 +86,9 @@ class TXLogin:
             for item in self.__menu:
                 if ch == item['key']:
                     self.__exec(item['exec']);
-                break;
-            self.__drawHeader();
-            self.__drawMenu();
+                    self.__drawHeader();
+                    self.__drawMenu();
+                    break;
             ch = getch();
         self.__exit();
 
