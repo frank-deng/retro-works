@@ -8,6 +8,19 @@ tx.write([
     TX.HideCursor(),
     TX.HideBar(),
 ]);
+
+size = 46;
+for i in range(32):
+    x = (i % 4) * size*3.5;
+    y = int(i / 4) * (size+4);
+    tx.write([
+    	TX.Text('??%d'%i, {
+    	    'x':x, 'y':y, 'size':(size,size),
+    	    'font':i, 'fg':15, 'bg':None
+        }),
+    ]);
+tx.write([TX.Pause()]);
+
 width = 40;
 height = 30;
 for p in range(0,256):
