@@ -7,13 +7,13 @@ class TXLogin:
     __tx = None;
     __menu = [
         {
-            'name':'调色板测试',
-            'exec':['./palette.py'],
+            'name':'特显演示',
+            'exec':['./txdemo.py'],
             'key': '1',
         },
         {
-            'name':'字体测试',
-            'exec':['./fonts.py'],
+            'name':'系统信息',
+            'exec':['./sysinfo.py'],
             'key': '2',
         },
     ];
