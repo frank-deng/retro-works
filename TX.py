@@ -165,6 +165,27 @@ def Music(notes):
 def StopMusic():
     return 'SE';
 
+def DrawButton(x,y,w,h):
+    return ''.join([
+        Color(0),
+        Line(x+1,y,x+w-1,y),
+        Line(x+1,y+h,x+w-1,y+h),
+        Line(x,y+1,x,y+h-1),
+        Line(x+w,y+1,x+w,y+h-1),
+        Color(15),
+        Line(x+w-1,y+1,x+1,y+1),
+        Line(x+1,y+1,x+1,y+h-1),
+        Line(x+w-2,y+2,x+2,y+2),
+        Line(x+2,y+2,x+2,y+h-2),
+        Color(8),
+        Line(x+1,y+h-1,x+w-1,y+h-1),
+        Line(x+w-1,y+h-1,x+w-1,y+1),
+        Line(x+2,y+h-2,x+w-2,y+h-2),
+        Line(x+w-2,y+h-2,x+w-2,y+2),
+        Color(7),
+        Rect(x+3,y+3,x+w-3,y+h-3,True),
+    ]);
+
 class TX:
     __out = None;
     __mutex = threading.Lock();
