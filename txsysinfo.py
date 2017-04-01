@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import TX, sysinfo, time, kbhit;
+import TX, sysinfo, time, kbhit, threading;
+tx = TX.TX();
 
 class Graph:
     __lastData = None;
@@ -70,10 +71,28 @@ class Graph:
             x -= unit;
         self.__drawGraph();
 
+class ShowClockThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self);
+    def quit(self):
+        self.__running = False;
+    def run(self):
+        global tx;
+        self.__running = True;
+        while (self.__running):
+            tx.write([
+                TX.Color(0),
+                TX.Text(time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time())), {
+                    'x':372, 'y':2, 'size':(24,24),
+                    'font':0, 'fg':0, 'bg':1, 'charSpace':0,
+                }),
+                TX.Color(1),
+            ]);
+            time.sleep(0.5);
+
 if __name__ == '__main__':
     running = True;
     kbhit.init();
-    tx = TX.TX();
     tx.write([
         TX.Clrscr(),
         TX.HideCursor(),
@@ -91,6 +110,8 @@ if __name__ == '__main__':
     graphGpuTemp = Graph(324, 47, 312, 158, [0.5]);
     graphCpuUsage = Graph(4, 232, 312, 158, [0.5]);
     graphMemUsage = Graph(324, 232, 312, 158, [0.5]);
+    showClockThread = ShowClockThread();
+    showClockThread.start();
 
     try:
         while running:
@@ -99,12 +120,12 @@ if __name__ == '__main__':
                 tx.write([
                     TX.Color(0),
                     TX.Text(' 开机时间', {
-                        'x':320, 'y':2, 'size':(12,12),
-                        'font':0, 'fg':0, 'bg':1
+                        'x':120, 'y':2, 'size':(12,12),
+                        'font':0, 'fg':0, 'bg':1, 'charSpace':0,
                     }),
                     TX.Text(result['boot_time'].strftime(' %Y-%m-%d %H:%M:%S'), {
-                        'x':320, 'y':16, 'size':(12,12),
-                        'font':0, 'fg':0, 'bg':1
+                        'x':120, 'y':16, 'size':(12,12),
+                        'font':0, 'fg':0, 'bg':1, 'charSpace':0,
                     }),
                     TX.Color(1),
                 ]);
@@ -153,6 +174,7 @@ if __name__ == '__main__':
         TX.ShowBar(),
         TX.Clrscr(),
     ]);
+    showClockThread.quit();
     kbhit.restore();
     exit(0);
 
