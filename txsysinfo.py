@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
 
-import TX, sysinfo, time, threading;
-from getch import getch;
-
-running = True;
-def kbdmgr():
-    global running;
-    while running:
-        ch = getch();
-        if '\x1B' == ch:
-            running = False;
+import TX, sysinfo, time, kbhit;
 
 if __name__ == '__main__':
+    running = True;
+    kbhit.init();
     tx = TX.TX();
     tx.write([
         TX.Clrscr(),
@@ -26,19 +19,17 @@ if __name__ == '__main__':
         TX.Color(0),
     ]);
 
-    t = threading.Thread(target=kbdmgr);
-    t.start();
     try:
         while running:
             result = sysinfo.SysInfo().fetch();
             tx.write([
                 TX.Text('开机时间', {
                     'x':1, 'y':36, 'size':(16,16),
-                    'font':0, 'fg':7, 'bg':0
+                    'font':0, 'fg':1, 'bg':0
                 }),
                 TX.Text(result['boot_time'].strftime(' %Y-%m-%dT%H:%M:%S'), {
                     'x':100, 'y':36, 'size':(16,16),
-                    'font':0, 'fg':7, 'bg':0
+                    'font':0, 'fg':1, 'bg':0
                 }),
             ]);
             offset = 18;
@@ -90,9 +81,11 @@ if __name__ == '__main__':
                     }),
                 ]);
                 offset += 18;
-            time.sleep(1);
+            if (kbhit.kbhit() and '\x1b' == kbhit.getch()):
+                running = False;
+            else:
+                time.sleep(1);
     except KeyboardInterrupt:
-        running = False;
         pass;
 
     tx.write([
@@ -100,6 +93,6 @@ if __name__ == '__main__':
         TX.ShowBar(),
         TX.Clrscr(),
     ]);
-    t.join();
+    kbhit.restore();
     exit(0);
 
