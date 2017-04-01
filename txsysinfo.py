@@ -14,15 +14,16 @@ def kbdmgr():
 if __name__ == '__main__':
     tx = TX.TX();
     tx.write([
-        TX.Mode(10),
         TX.Clrscr(),
         TX.HideCursor(),
         TX.HideBar(),
         TX.Text('系统信息', {
     	    'x':1, 'y':3, 'size':(24,24),
-    	    'font':2, 'fg':7, 'bg':None
+    	    'font':2, 'fg':1, 'bg':None
         }),
+        TX.Color(1),
         TX.Rect(0,30,640,33,True),
+        TX.Color(0),
     ]);
 
     t = threading.Thread(target=kbdmgr);
@@ -45,11 +46,11 @@ if __name__ == '__main__':
                 tx.write([
                     TX.Text('CPU温度', {
                         'x':1, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                     TX.Text(' %d℃'%(result['cpu_temp'])+'    ', {
                         'x':100, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                 ]);
                 offset += 18;
@@ -57,11 +58,11 @@ if __name__ == '__main__':
                 tx.write([
                     TX.Text('GPU温度', {
                         'x':1, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                     TX.Text(' %d℃'%(result['gpu_temp'])+'    ', {
                         'x':100, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                 ]);
                 offset += 18;
@@ -69,11 +70,11 @@ if __name__ == '__main__':
                 tx.write([
                     TX.Text('CPU使用率', {
                         'x':1, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                     TX.Text(' %.1f%%'%(result['cpu_usage']['overall'] * 100)+'    ', {
                         'x':100, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                 ]);
                 offset += 18;
@@ -81,11 +82,11 @@ if __name__ == '__main__':
                 tx.write([
                     TX.Text('内存使用率', {
                         'x':1, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                     TX.Text(' %.1f%%'%(result['mem_usage'] * 100)+'    ', {
                         'x':100, 'y':36+offset, 'size':(16,16),
-                        'font':0, 'fg':7, 'bg':0
+                        'font':0, 'fg':1, 'bg':0
                     }),
                 ]);
                 offset += 18;
@@ -95,7 +96,6 @@ if __name__ == '__main__':
         pass;
 
     tx.write([
-        TX.Mode(3),
         TX.ShowCursor(),
         TX.ShowBar(),
         TX.Clrscr(),

@@ -26,23 +26,16 @@ class TXLogin:
 
     def __drawHeader(self):
         self.__tx.write([
-            TX.Mode(10),
             TX.Clrscr(),
             TX.HideCursor(),
             TX.HideBar(),
-            TX.Color(3),
-            TX.Rect(0,0,640,480,True),
-        ]);
-        self.__tx.write([
-            TX.RenderPCX(0,0,'C:\PCX\MENU.PCX'),
-        ]);
-        self.__tx.write([
+            TX.Color(0), TX.Rect(0,0,640,400,True),
             TX.Text('欢迎使用特显终端', {
                 'x':124,
                 'y':34,
-                'size':(32,32),
+                'size':(24,24),
                 'font':2,
-                'fg':0,
+                'fg':1,
                 'bg':None,
             }),
         ]);
@@ -51,13 +44,13 @@ class TXLogin:
         cnt = 0;
         for item in self.__menu:
             self.__tx.write([
-                TX.DrawButton(120, 136+cnt*30, 200, 25),
+                #TX.DrawButton(120, 136+cnt*30, 200, 25),
                 TX.Text('%2d.%s'%(cnt+1, item['name']), {
                     'x':126,
                     'y':136+cnt*30+5,
                     'size':(16,16),
                     'font':0,
-                    'fg':0,
+                    'fg':1,
                     'bg':None,
                 }),
             ]);
@@ -72,7 +65,7 @@ class TXLogin:
 
     def __exit(self):
         self.__tx.write([
-            TX.Mode(3),
+            TX.Color(0), TX.Rect(0,0,640,348,True),
             TX.ShowCursor(),
             TX.ShowBar(),
             TX.Clrscr(),

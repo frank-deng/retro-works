@@ -3,7 +3,6 @@
 import sys, time, TX, getch;
 tx = TX.TX();
 tx.write([
-    TX.Mode(10),
     TX.Clrscr(),
     TX.HideCursor(),
     TX.HideBar(),
@@ -32,7 +31,6 @@ for p in range(0,256):
     ]);
 getch.getch();
 tx.write([
-    TX.Mode(3),
     TX.ShowCursor(),
     TX.ShowBar(),
     TX.Clrscr(),
