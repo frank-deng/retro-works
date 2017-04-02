@@ -74,7 +74,7 @@ class ShowClockThread(threading.Thread):
             TX.Color(0),
             TX.Text(time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time())), {
                 'x':372, 'y':2, 'size':(24,24),
-                'font':0, 'fg':0, 'bg':1, 'charSpace':0,
+                'font':0, 'fg':0, 'bg':None, 'charSpace':0,
             }),
             TX.Color(1),
         ]);
@@ -105,7 +105,7 @@ class TXSysinfoView:
             TX.Color(1), TX.Rect(0,0,640,28,True),
             TX.Text('系统信息', {
                 'x':4, 'y':2, 'size':(24,24),
-                'font':2, 'fg':0, 'bg':None
+                'font':0, 'fg':0, 'bg':None
             }),
             TX.Color(0),
         ]);
@@ -129,11 +129,11 @@ class TXSysinfoView:
                 TX.Color(0),
                 TX.Text(' 开机时间', {
                     'x':120, 'y':2, 'size':(12,12),
-                    'font':0, 'fg':0, 'bg':1, 'charSpace':0,
+                    'font':0, 'fg':0, 'bg':None, 'charSpace':0,
                 }),
                 TX.Text(result['boot_time'].strftime(' %Y-%m-%d %H:%M:%S'), {
                     'x':120, 'y':16, 'size':(12,12),
-                    'font':0, 'fg':0, 'bg':1, 'charSpace':0,
+                    'font':0, 'fg':0, 'bg':None, 'charSpace':0,
                 }),
                 TX.Color(1),
             ]);
@@ -141,7 +141,7 @@ class TXSysinfoView:
             tx.write([
                 TX.Text('CPU温度 %d℃  '%result['cpu_temp'], {
                     'x':4, 'y':30, 'size':(16,16),
-                    'font':0, 'fg':1, 'bg':0
+                    'font':0, 'fg':1, 'bg':None
                 }),
             ]);
             self.__graph['cpuTemp'].update((result['cpu_temp']-30)/80.0, redraw);
@@ -149,7 +149,7 @@ class TXSysinfoView:
             tx.write([
                 TX.Text('GPU温度 %d℃  '%result['gpu_temp'], {
                     'x':324, 'y':30, 'size':(16,16),
-                    'font':0, 'fg':1, 'bg':0
+                    'font':0, 'fg':1, 'bg':None
                 }),
             ]);
             self.__graph['gpuTemp'].update((result['gpu_temp']-30)/80.0, redraw);
@@ -157,7 +157,7 @@ class TXSysinfoView:
             tx.write([
                 TX.Text('CPU使用率 %.1f%%  '%(result['cpu_usage']['overall'] * 100), {
                     'x':4, 'y':215, 'size':(16,16),
-                    'font':0, 'fg':1, 'bg':0
+                    'font':0, 'fg':1, 'bg':None
                 }),
             ]);
             self.__graph['cpuUsage'].update(result['cpu_usage']['overall'], redraw);
@@ -165,7 +165,7 @@ class TXSysinfoView:
             tx.write([
                 TX.Text('内存使用率 %.1f%%  '%(result['mem_usage'] * 100), {
                     'x':324, 'y':215, 'size':(16,16),
-                    'font':0, 'fg':1, 'bg':0
+                    'font':0, 'fg':1, 'bg':None
                 }),
             ]);
             self.__graph['memUsage'].update(result['mem_usage'], redraw);

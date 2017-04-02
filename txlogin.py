@@ -36,6 +36,11 @@ class TXLogin:
             'exec':['./txsysinfo.py'],
             'key': '1',
         },
+        {
+            'name':'飞控中心',
+            'exec':['./txfgfs.py'],
+            'key': '2',
+        },
     ];
 
     def __init__(self, out = None):
@@ -56,11 +61,11 @@ class TXLogin:
             TX.Color(0),
             TX.Text('主菜单', {
                 'x':2, 'y':2, 'size':(24,24),
-                'font':2, 'fg':0, 'bg':None,
+                'font':0, 'fg':0, 'bg':None,
             }),
             TX.Text('按数字键选择功能，Esc键退出特显模式。', {
                 'x':2, 'y':387, 'size':(12,12),
-                'font':2, 'fg':0, 'bg':None,
+                'font':0, 'fg':0, 'bg':None,
             }),
             TX.Color(1), 
         ]);
