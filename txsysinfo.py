@@ -126,7 +126,6 @@ class TXSysinfoView:
             self.__clock.refresh();
         if 'boot_time' in result:
             tx.write([
-                TX.Color(0),
                 TX.Text(' 开机时间', {
                     'x':120, 'y':2, 'size':(12,12),
                     'font':0, 'fg':0, 'bg':None, 'charSpace':0,
@@ -135,7 +134,6 @@ class TXSysinfoView:
                     'x':120, 'y':16, 'size':(12,12),
                     'font':0, 'fg':0, 'bg':None, 'charSpace':0,
                 }),
-                TX.Color(1),
             ]);
         if 'cpu_temp' in result:
             tx.write([

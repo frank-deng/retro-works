@@ -41,6 +41,11 @@ class TXLogin:
             'exec':['./txfgfs.py'],
             'key': '2',
         },
+        {
+            'name':'我的音乐盒',
+            'exec':['./txmusicbox.py', '/home/frank/Musics'],
+            'key': '3',
+        },
     ];
 
     def __init__(self, out = None):

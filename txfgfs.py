@@ -89,9 +89,17 @@ class TXFgfsView:
         if (redraw):
             self.__drawFrame();
             self.__clock.refresh();
+        elif None == data:
+            self.__tx.write([
+                TX.Color(0), TX.Rect(0,29,640,379,True),
+                TX.Text('（没有飞行任务）', {
+                    'x':4, 'y':382, 'size':(16,16),
+                    'font':0, 'fg':0, 'charSpace':0,
+                }),
+            ]);
+            return;
 
         self.__tx.write([
-            TX.Color(1),
             TX.Text('机型', {
                 'x':16, 'y':32, 'size':(16,16),
                 'font':0, 'fg':1, 'charSpace':0,
@@ -107,7 +115,6 @@ class TXFgfsView:
         else:
             dataShow = " %.6fW"%(abs(data['longitude-deg']));
         self.__tx.write([
-            TX.Color(1),
             TX.Text('经度', {
                 'x':17, 'y':80, 'size':(16,16),
                 'font':0, 'fg':1, 'bg':None, 'charSpace':0,
@@ -123,7 +130,6 @@ class TXFgfsView:
         else:
             dataShow = " %.6fS"%(abs(data['latitude-deg']));
         self.__tx.write([
-            TX.Color(1),
             TX.Text('纬度', {
                 'x':213, 'y':80, 'size':(16,16),
                 'font':0, 'fg':1, 'bg':None, 'charSpace':0,
@@ -135,7 +141,6 @@ class TXFgfsView:
         ]);
 
         self.__tx.write([
-            TX.Color(1),
             TX.Text('飞行时间', {
                 'x':17, 'y':128, 'size':(16,16),
                 'font':0, 'fg':1, 'bg':None, 'charSpace':0,
@@ -146,7 +151,6 @@ class TXFgfsView:
             }),
         ]);
         self.__tx.write([
-            TX.Color(1),
             TX.Text('剩余时间', {
                 'x':213, 'y':128, 'size':(16,16),
                 'font':0, 'fg':1, 'bg':None, 'charSpace':0,
@@ -157,7 +161,6 @@ class TXFgfsView:
             }),
         ]);
         self.__tx.write([
-            TX.Color(1),
             TX.Text('总距离', {
                 'x':17, 'y':176, 'size':(16,16),
                 'font':0, 'fg':1, 'bg':None, 'charSpace':0,
@@ -185,21 +188,21 @@ class TXFgfsView:
         ]);
         if data['crashed']:
             self.__tx.write([
-                TX.Text('已坠毁　　', {
+                TX.Text('已坠毁　　　　　', {
                     'x':4, 'y':382, 'size':(16,16),
                     'font':0, 'fg':0, 'bg':None, 'charSpace':0,
                 }),
             ]);
         elif data['paused']:
             self.__tx.write([
-                TX.Text('已暂停　　', {
+                TX.Text('已暂停　　　　　', {
                     'x':4, 'y':382, 'size':(16,16),
                     'font':0, 'fg':0, 'bg':None, 'charSpace':0,
                 }),
             ]);
         else:
             self.__tx.write([
-                TX.Text('飞行中……', {
+                TX.Text('飞行中……　　　', {
                     'x':4, 'y':382, 'size':(16,16),
                     'font':0, 'fg':0, 'bg':None, 'charSpace':0,
                 }),
