@@ -1,20 +1,40 @@
 #!/usr/bin/env python3
 
-import sys, time, TX, subprocess;
+import sys, time, TX, subprocess, threading;
 from getch import getch;
+
+class ShowClockThread(threading.Thread):
+    __running = True;
+    __active = False;
+    def __init__(self, tx):
+        threading.Thread.__init__(self);
+        self.__tx = tx;
+    def __del__(self):
+        self.__running = False;
+    def off(self):
+        self.__active = False;
+    def refresh(self):
+        self.__active = True;
+        self.__tx.write([
+            TX.Color(0),
+            TX.Text(time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time())), {
+                'x':372, 'y':2, 'size':(24,24),
+                'font':0, 'fg':0, 'bg':None, 'charSpace':0,
+            }),
+        ]);
+    def run(self):
+        while (self.__running):
+            if (self.__active):
+                self.refresh();
+                time.sleep(0.5);
 
 class TXLogin:
     __tx = None;
     __menu = [
         {
-            'name':'特显演示',
-            'exec':['./txdemo.py'],
-            'key': '1',
-        },
-        {
             'name':'系统信息',
             'exec':['./txsysinfo.py'],
-            'key': '2',
+            'key': '1',
         },
     ];
 
@@ -23,6 +43,8 @@ class TXLogin:
             self.__tx = TX.TX();
         else:
             self.__tx = TX.TX(out);
+        self.__clock = ShowClockThread(self.__tx);
+        self.__clock.start();
 
     def __drawHeader(self):
         self.__tx.write([
@@ -30,42 +52,46 @@ class TXLogin:
             TX.HideCursor(),
             TX.HideBar(),
             TX.Color(0), TX.Rect(0,0,640,400,True),
-            TX.Text('欢迎使用特显终端', {
-                'x':124,
-                'y':34,
-                'size':(24,24),
-                'font':2,
-                'fg':1,
-                'bg':None,
+            TX.Color(1), TX.Rect(0,0,640,28,True), TX.Rect(0,386,640,400,True),
+            TX.Color(0),
+            TX.Text('主菜单', {
+                'x':2, 'y':2, 'size':(24,24),
+                'font':2, 'fg':0, 'bg':None,
             }),
+            TX.Text('按数字键选择功能，Esc键退出特显模式。', {
+                'x':2, 'y':387, 'size':(12,12),
+                'font':2, 'fg':0, 'bg':None,
+            }),
+            TX.Color(1), 
         ]);
+        self.__clock.refresh();
 
     def __drawMenu(self):
         cnt = 0;
         for item in self.__menu:
             self.__tx.write([
-                #TX.DrawButton(120, 136+cnt*30, 200, 25),
                 TX.Text('%2d.%s'%(cnt+1, item['name']), {
-                    'x':126,
-                    'y':136+cnt*30+5,
-                    'size':(16,16),
-                    'font':0,
-                    'fg':1,
-                    'bg':None,
+                    'x':2, 'y':30+cnt*20+5, 'size':(16,16),
+                    'font':0, 'fg':1, 'bg':None,
                 }),
             ]);
             cnt+=1;
 
     def __exec(self, exe):
+        self.__clock.off();
         try:
             p = subprocess.Popen(exe);
             p.wait();
         except Exception:
             pass;
+        self.__clock.refresh();
+        self.__drawHeader();
+        self.__drawMenu();
 
     def __exit(self):
+        self.__clock.off();
         self.__tx.write([
-            TX.Color(0), TX.Rect(0,0,640,348,True),
+            TX.Color(0), TX.Rect(0,0,640,400,True),
             TX.ShowCursor(),
             TX.ShowBar(),
             TX.Clrscr(),
@@ -79,22 +105,20 @@ class TXLogin:
             for item in self.__menu:
                 if ch == item['key']:
                     self.__exec(item['exec']);
-                    self.__drawHeader();
-                    self.__drawMenu();
                     break;
             ch = getch();
         self.__exit();
 
 tx = TX.TX();
 if __name__ == '__main__':
-    try:
-        txLogin = TXLogin();
-        while True:
+    txLogin = TXLogin();
+    while True:
+        try:
             tx.write('按Enter键进入特显模式……\r\n');
             while getch() != '\r':
                 tx.write('按Enter键进入特显模式……\r\n');
             txLogin.main();
-    except KeyboardInterrupt:
-        pass;
+        except KeyboardInterrupt:
+            pass;
     exit(0);
 

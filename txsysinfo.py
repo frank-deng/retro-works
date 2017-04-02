@@ -79,7 +79,6 @@ class ShowClockThread(threading.Thread):
             TX.Color(1),
         ]);
     def run(self):
-        global tx;
         self.__running = True;
         while (self.__running):
             self.refresh();
@@ -102,8 +101,8 @@ class TXSysinfoView:
             TX.Clrscr(),
             TX.HideCursor(),
             TX.HideBar(),
-            TX.Color(1),
-            TX.Rect(0,0,640,28,True),
+            TX.Color(0), TX.Rect(0,0,640,400,True),
+            TX.Color(1), TX.Rect(0,0,640,28,True),
             TX.Text('系统信息', {
                 'x':4, 'y':2, 'size':(24,24),
                 'font':2, 'fg':0, 'bg':None
