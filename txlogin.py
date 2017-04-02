@@ -26,7 +26,7 @@ class ShowClockThread(threading.Thread):
         while (self.__running):
             if (self.__active):
                 self.refresh();
-                time.sleep(0.5);
+            time.sleep(0.5);
 
 class TXLogin:
     __tx = None;
