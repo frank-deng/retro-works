@@ -37,24 +37,26 @@ def getFlightData():
         return None;
 
 class ShowClockThread(threading.Thread):
+    __lastTime = None;
     def __init__(self, tx):
         threading.Thread.__init__(self);
         self.__tx = tx;
     def quit(self):
         self.__running = False;
     def refresh(self):
-        self.__tx.write([
-            TX.Color(0),
-            TX.Text(time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time())), {
-                'x':372, 'y':2, 'size':(24,24), 'fg':0,
-            }),
-            TX.Color(1),
-        ]);
+        nowTime = time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time()));
+        if (nowTime != self.__lastTime):
+            self.__tx.write([
+                TX.Text(nowTime, {
+                    'x':372, 'y':2, 'size':(24,24), 'fg':0,
+                }),
+            ]);
+        self.__lastTime = nowTime;
     def run(self):
         self.__running = True;
         while (self.__running):
             self.refresh();
-            time.sleep(0.5);
+            time.sleep(0.1);
 
 class TXFgfsView:
     __hasFgData = False;

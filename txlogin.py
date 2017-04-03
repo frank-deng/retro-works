@@ -6,6 +6,7 @@ from getch import getch;
 class ShowClockThread(threading.Thread):
     __running = True;
     __active = False;
+    __lastTime = None;
     def __init__(self, tx):
         threading.Thread.__init__(self);
         self.__tx = tx;
@@ -15,13 +16,15 @@ class ShowClockThread(threading.Thread):
         self.__active = False;
     def refresh(self):
         self.__active = True;
-        self.__tx.write([
-            TX.Color(0),
-            TX.Text(time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time())), {
-                'x':372, 'y':2, 'size':(24,24),
-                'font':0, 'fg':0, 'bg':None, 'charSpace':0,
-            }),
-        ]);
+        nowTime = time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time()));
+        if (nowTime != self.__lastTime):
+            self.__tx.write([
+                TX.Text(nowTime, {
+                    'x':372, 'y':2, 'size':(24,24),
+                    'font':0, 'fg':0, 'bg':None, 'charSpace':0,
+                }),
+            ]);
+        self.__lastTime = nowTime;
     def run(self):
         while (self.__running):
             if (self.__active):

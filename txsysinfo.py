@@ -2,6 +2,28 @@
 
 import TX, sysinfo, time, kbhit, threading;
 
+class ShowClockThread(threading.Thread):
+    __lastTime = None;
+    def __init__(self, tx):
+        threading.Thread.__init__(self);
+        self.__tx = tx;
+    def quit(self):
+        self.__running = False;
+    def refresh(self):
+        nowTime = time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time()));
+        if (nowTime != self.__lastTime):
+            self.__tx.write([
+                TX.Text(nowTime, {
+                    'x':372, 'y':2, 'size':(24,24), 'fg':0,
+                }),
+            ]);
+        self.__lastTime = nowTime;
+    def run(self):
+        self.__running = True;
+        while (self.__running):
+            self.refresh();
+            time.sleep(0.1);
+
 class Graph:
     __lastData = None;
     def __init__(self, tx, x, y, w, h):
@@ -57,24 +79,6 @@ class Graph:
             x -= unit;
         self.__tx.write(txcmds);
         self.__drawFrame();
-
-class ShowClockThread(threading.Thread):
-    def __init__(self, tx):
-        threading.Thread.__init__(self);
-        self.__tx = tx;
-    def quit(self):
-        self.__running = False;
-    def refresh(self):
-        self.__tx.write([
-            TX.Text(time.strftime(' %Y-%m-%d %H:%M:%S', time.localtime(time.time())), {
-                'x':372, 'y':2, 'size':(24,24), 'fg':0,
-            }),
-        ]);
-    def run(self):
-        self.__running = True;
-        while (self.__running):
-            self.refresh();
-            time.sleep(0.5);
 
 class TXSysinfoView:
     __firstUpdate = False;
