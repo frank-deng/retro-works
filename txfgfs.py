@@ -227,7 +227,8 @@ if __name__ == '__main__':
                 time.sleep(1);
     except KeyboardInterrupt:
         pass;
-    view.close();
-    kbhit.restore();
+    finally:
+        view.close();
+        kbhit.restore();
     exit(0);
 

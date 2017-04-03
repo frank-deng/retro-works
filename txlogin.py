@@ -35,19 +35,9 @@ class TXLogin:
     __tx = None;
     __menu = [
         {
-            'name':'系统信息',
-            'exec':['./txsysinfo.py'],
-            'key': '1',
-        },
-        {
             'name':'飞控中心',
             'exec':['./txfgfs.py'],
-            'key': '2',
-        },
-        {
-            'name':'我的音乐盒',
-            'exec':['./txmusicbox.py', '/home/frank/Musics'],
-            'key': '3',
+            'key': '1',
         },
     ];
 
@@ -83,7 +73,7 @@ class TXLogin:
         cnt = 0;
         for item in self.__menu:
             self.__tx.write([
-                TX.Text('%2d.%s'%(cnt+1, item['name']), {
+                TX.Text(' %s.%s'%(item['key'], item['name']), {
                     'x':2, 'y':30+cnt*20+5, 'size':(16,16),
                     'font':0, 'fg':1, 'bg':None,
                 }),
