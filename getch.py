@@ -18,7 +18,9 @@ except ImportError:
                 return ch+sys.stdin.read(1);
             else:
                 return ch;
+        except Exception as e:
+            pass;
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings);
-        return ch;
+        return None;
 

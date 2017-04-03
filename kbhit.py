@@ -16,11 +16,14 @@ def restore():
     termios.tcsetattr(fd, termios.TCSAFLUSH, old_term);
 
 def getch():
-    ch = sys.stdin.read(1);
-    if ch == '\x00' or ord(ch) >= 0xA1:
-        return ch+sys.stdin.read(1);
-    else:
-        return ch;
+    try:
+        ch = sys.stdin.read(1);
+        if ch == '\x00' or ord(ch) >= 0xA1:
+            return ch+sys.stdin.read(1);
+        else:
+            return ch;
+    except Exception as e:
+        return None;
 
 def kbhit():
     dr,dw,de = select([sys.stdin], [], [], 0);
