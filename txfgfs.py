@@ -128,13 +128,13 @@ class TXFgfsView:
 
         if None == fgdata:
             if self.__hasFgData:
-                self.__hadFgData = False;
                 self.__tx.write([
                     TX.Color(0), TX.Rect(0,77,640,379,True),
                     TX.Text('（没有飞行任务）', {
                         'x':4, 'y':382, 'size':(16,16), 'fg':0,
                     }),
                 ]);
+            self.__hadFgData = False;
             return;
         elif None != fgdata and not self.__hasFgData:
             self.__hasFgData = True;
