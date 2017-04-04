@@ -1,40 +1,21 @@
-fun-ucdos
-=========
+Works of Retro Programming
+==========================
 
-Just for fun.
+Some retro programming works for some old platforms.
 
-------
+Old platforms used are as follows:
 
-在DOSBox中使用软盘安装DOS  
-Install DOS from floppy images via DOSBox
+### GW-BASIC
 
-	imgmount -t hdd c /path/to/hdd.img -size 512,63,16,X -fs fat
-	boot /path/to/disk1.img /path/to/disk2.img /path/to/disk3.img
+A simple BASIC environment.
 
-将原始硬盘镜像转换成VDI格式硬盘镜像  
-Convert raw disk image into VDI format image
+### MS-DOS 5.0 + ANSI.SYS + UCDOS
 
-	VBoxManage convertdd source.img destination.vdi --format VDI
+A simple telnet environment with Chinese display and input.
 
-将VDI格式硬盘镜像转换成原始硬盘镜像  
-Convert VDI format HDD image into raw one
+### MS-DOS 5.0 + UCDOS + TX.COM
 
-	VBoxManage clonehd source.vdi destination.img --format RAW
+An environment use `TX.COM` to display Chinese characters in different sizes and styles.
 
-DOSBox中使用硬盘镜像  
-Mount raw disk image and floppy image
-
-	imgmount -t floppy 0 /path/to/floppy.img -fs none
-	imgmount -t hdd 2 /path/to/hdd.img -size 512,63,16,X -fs none
-	boot -l c
-
-一些有用的键盘码  
-Some Useful KeyCodes
-
-* `\r`: Enter
-* `\x1B`: Esc
-* `\x00H`: Up
-* `\x00P`: Down
-* `\x00K`: Left
-* `\x00M`: Right
+`TX.COM` is shipped along with UCDOS. Commands for `TX.COM` are generated at server side, then transmitted via a virtual serial line in DOSBox.
 

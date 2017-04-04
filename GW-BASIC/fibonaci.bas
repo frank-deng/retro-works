@@ -1,0 +1,6 @@
+10 DEFDBL A-Z
+20 A=1:B=1:INPUT "Count: ",N%
+30 FOR I%=1 TO N%
+40 PRINT A,:T=A:A=B:B=B+T
+50 NEXT I%
+60 END
