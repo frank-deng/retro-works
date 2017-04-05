@@ -134,10 +134,10 @@ class TXFgfsView:
                         'x':4, 'y':382, 'size':(16,16), 'fg':0,
                     }),
                 ]);
-            self.__hadFgData = False;
+            self.__hasFgData = False;
             return;
-        elif None != fgdata and not self.__hasFgData:
-            self.__hasFgData = True;
+
+        if not self.__hasFgData:
             self.__tx.write([
                 TX.Text('机型', {
                     'x':12, 'y':80, 'size':(16,16), 'fg':1,
@@ -164,6 +164,7 @@ class TXFgfsView:
                     'x':332, 'y':80+44*3,
                 }),
             ]);
+            self.__hasFgData = True;
 
         if fgdata['longitude-deg'] >= 0:
             fgdata['longitude'] = " %.6fE   "%(abs(fgdata['longitude-deg']));
