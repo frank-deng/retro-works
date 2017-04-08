@@ -78,24 +78,24 @@ class TXGuessnumStatView:
                 'x':72, 'y':32, 'size':(16,16), 'fg':1,
             }),
             TX.Text(' 百分比', {
-                'x':224, 'y':32,
+                'x':640-72, 'y':32,
             }),
+            TX.Line(74, 51, 74, 51+12*20+4),
         ]);
         txcmd = [];
         for i in range(10):
-            txcmd.append(TX.Text(' %d次猜对'%(i+1), {
-                'x':0, 'y':48+i*17, 
+            txcmd.append(TX.Text(' %2d次猜对'%(i+1), {
+                'x':0, 'y':55+i*20, 
             }));
         txcmd.append(TX.Text(' 10次以上', {
-            'x':0, 'y':49+10*17, 
+            'x':0, 'y':55+10*20, 
         }));
-        txcmd.append(TX.Text(' 失败', {
-            'x':0, 'y':49+11*17, 
+        txcmd.append(TX.Text(' 　　失败', {
+            'x':0, 'y':55+11*20, 
         }));
         self.__tx.write(txcmd);
 
     def update(self, proc):
-
         pres = proc.getResult();
         result = [];
         _sum = 0;
@@ -113,6 +113,33 @@ class TXGuessnumStatView:
             else:
                 precent.append(float(n)/float(_sum));
 
+        max_val = max(result);
+
+        self.__tx.write([
+            TX.Color(0),
+            TX.Rect(75, 55, 640-72, 55+20*13,True),
+            TX.Color(1),
+        ]);
+        for i in range(12):
+            txcmd = [
+                TX.Text(' %.2f%%'%(precent[i] * 100), {
+                    'x':640-72, 'y':55+i*20, 'size':(16,16), 'fg':1,
+                }),
+            ];
+            if (result[i]>0):
+                txcmd.append(TX.Rect(75, 55+i*20, (640-75-72)*result[i]/max_val + 75, 55+16+i*20, True));
+
+            text_times = ' %d'%(result[i]);
+            if (result[i]/max_val < 0.5):
+                txcmd.append(TX.Text(text_times, {
+                    'x':(640-75-72)*result[i]/max_val + 75 + 1, 'y':55+i*20+3, 'size':(12,12), 'fg':1,
+                }));
+            else:
+                txcmd.append(TX.Text(text_times, {
+                    'x':(640-75-72)*result[i]/max_val + 75 - 6*len(text_times) - 6, 'y':55+i*20+3, 'size':(12,12), 'fg':0,
+                }));
+            self.__tx.write(txcmd);
+
         if None == proc.getpid():
             self.__tx.write([
                 TX.Text('已停止', {
@@ -125,16 +152,6 @@ class TXGuessnumStatView:
                     'x':4, 'y':382, 'size':(16,16), 'fg':0,
                 })
             ]);
-        for i in range(12):
-            txcmd = [];
-            txcmd.append(TX.Text(' %d'%(result[i]), {
-                'x':72, 'y':49+i*17, 'fg':1,
-            }));
-            txcmd.append(TX.Text(' %.2f%%'%(precent[i] * 100), {
-                'x':224, 'y':49+i*17, 
-            }));
-            self.__tx.write(txcmd);
-            txcmd = [];
 
 if __name__ == '__main__':
     running = True;
