@@ -9,7 +9,7 @@
 
 #include <pthread.h>
 #include <sys/sysinfo.h>
-#include "guessnum.h"
+#include "guessnum-stat.h"
 #define GUESS_CHANCES 12
 
 typedef union{uint64_t n; uint16_t c[4];} cv_t;

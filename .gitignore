@@ -1,2 +1,5 @@
 __pycache__
 *.swp
+*.o
+guessnum
+guessnum.h
