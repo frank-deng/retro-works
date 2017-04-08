@@ -39,6 +39,11 @@ class TXLogin:
             'exec':['./txfgfs.py'],
             'key': '1',
         },
+        {
+            'name':'猜数字控制台',
+            'exec':['./txguessnum.py'],
+            'key': '2',
+        },
     ];
 
     def __init__(self, out = None):
