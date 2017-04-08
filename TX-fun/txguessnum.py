@@ -78,7 +78,7 @@ class TXGuessnumStatView:
                 'x':72, 'y':32, 'size':(16,16), 'fg':1,
             }),
             TX.Text(' 百分比', {
-                'x':300, 'y':32,
+                'x':224, 'y':32,
             }),
         ]);
         txcmd = [];
@@ -127,11 +127,11 @@ class TXGuessnumStatView:
             ]);
         for i in range(12):
             txcmd = [];
-            txcmd.append(TX.Text(' %d'%(result[i+1]), {
+            txcmd.append(TX.Text(' %d'%(result[i]), {
                 'x':72, 'y':49+i*17, 'fg':1,
             }));
-            txcmd.append(TX.Text(' %.2f%%'%(precent[i+1] * 100), {
-                'x':300, 'y':49+i*17, 
+            txcmd.append(TX.Text(' %.2f%%'%(precent[i] * 100), {
+                'x':224, 'y':49+i*17, 
             }));
             self.__tx.write(txcmd);
             txcmd = [];
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     kbhit.init();
     try:
         while running:
-            if (counter % 300) == 0:
+            if (counter % 3000) == 0:
                 view.update(proc);
 
             if kbhit.kbhit():
@@ -161,7 +161,7 @@ if __name__ == '__main__':
                     view.update(proc);
 
             if running:
-                time.sleep(1);
+                time.sleep(0.1);
                 counter += 1;
     except KeyboardInterrupt:
         pass;

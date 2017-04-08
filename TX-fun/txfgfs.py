@@ -217,15 +217,20 @@ if __name__ == '__main__':
     running = True;
     kbhit.init();
     view = TXFgfsView(TX.TX());
+    tick = 0;
     try:
         while running:
-            view.update(sysinfo.SysInfo().fetch(), getFlightData());
+            if (tick % 10 == 0):
+                view.update(sysinfo.SysInfo().fetch(), getFlightData());
+
             if kbhit.kbhit():
                 ch = kbhit.getch();
                 if '\x1b' == ch:
                     running = False;
+
             if (running):
-                time.sleep(1);
+                time.sleep(0.1);
+                tick += 1;
     except KeyboardInterrupt:
         pass;
     finally:
