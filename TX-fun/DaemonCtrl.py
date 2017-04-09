@@ -28,7 +28,7 @@ class DaemonCtrl:
         if pid:
             try:
                 with open(os.path.join('/proc/', str(pid), 'cmdline'), 'r') as cmd:
-                    if (cmd.readline().split('\0')[0] == self.__command[0]):
+                    if (cmd.readline() == '\0'.join(self.__command)+'\0'):
                         procOK = True;
             except FileNotFoundError:
                 pass;

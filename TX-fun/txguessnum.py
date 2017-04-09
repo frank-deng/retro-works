@@ -96,6 +96,19 @@ class TXGuessnumStatView:
         self.__tx.write(txcmd);
 
     def update(self, proc):
+        if None == proc.getpid():
+            self.__tx.write([
+                TX.Text('已停止', {
+                    'x':4, 'y':382, 'size':(16,16), 'fg':0,
+                })
+            ]);
+        else:
+            self.__tx.write([
+                TX.Text('运行中', {
+                    'x':4, 'y':382, 'size':(16,16), 'fg':0,
+                })
+            ]);
+
         pres = proc.getResult();
         result = [];
         _sum = 0;
@@ -139,19 +152,6 @@ class TXGuessnumStatView:
                     'x':(640-75-72)*result[i]/max_val + 75 - 6*len(text_times) - 6, 'y':55+i*20+3, 'size':(12,12), 'fg':0,
                 }));
             self.__tx.write(txcmd);
-
-        if None == proc.getpid():
-            self.__tx.write([
-                TX.Text('已停止', {
-                    'x':4, 'y':382, 'size':(16,16), 'fg':0,
-                })
-            ]);
-        else:
-            self.__tx.write([
-                TX.Text('运行中', {
-                    'x':4, 'y':382, 'size':(16,16), 'fg':0,
-                })
-            ]);
 
 if __name__ == '__main__':
     running = True;
