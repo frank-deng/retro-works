@@ -44,6 +44,11 @@ class TXLogin:
             'exec':['./txguessnum.py'],
             'key': '2',
         },
+        {
+            'name':'2048控制台',
+            'exec':['./tx2048.py'],
+            'key': '3',
+        },
     ];
 
     def __init__(self, out = None):
