@@ -5,7 +5,7 @@ import DaemonCtrl, TX, kbhit;
 
 class AI2048Ctrl(DaemonCtrl.DaemonCtrl):
     __executable = '/usr/local/bin/2048';
-    __dataFile = '/home/frank/.2048.txt';
+    __dataFile = '/home/frank/.2048.log';
     def __init__(self):
         DaemonCtrl.DaemonCtrl.__init__(self, [self.__executable, self.__dataFile]);
 
@@ -15,15 +15,17 @@ class AI2048Ctrl(DaemonCtrl.DaemonCtrl):
         try:
             with open(self.__dataFile, 'r') as f:
                 for row in csv.reader(f):
-                    key = str(row[3]);
+                    if (len(row) != 4):
+                        continue;
+                    key = str(row[2]);
                     if (data.get(key)):
                         data[key] += 1;
                     else:
-                        data[key] = 0;
+                        data[key] = 1;
         except FileNotFoundError:
             pass;
         for k in sorted([int(n) for n in data.keys()]):
-            result.append((k,data[k]));
+            result.append((k,data[str(k)]));
         return result;
 
 class ShowClockThread(threading.Thread):
@@ -74,11 +76,14 @@ class TX2048StatView:
             TX.Color(1),
             TX.Rect(0,0,640,28,True),
             TX.Rect(0,380,640,400,True),
-            TX.Text('2048控制台', {
+            TX.Text('\x002048控制台', {
                 'x':4, 'y':2, 'size':(24,24),
                 'font':0, 'fg':0, 'bg':None, 'charSpace':0,
             }),
-            TX.Text(' 次数', {
+            TX.Text('最大得数', {
+                'x':8, 'y':32, 'size':(16,16), 'fg':1,
+            }),
+            TX.Text(' 出现次数', {
                 'x':72, 'y':32, 'size':(16,16), 'fg':1,
             }),
             TX.Text(' 百分比', {
