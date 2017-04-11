@@ -1,25 +1,13 @@
-TARGET=guessnum-stat
-INSTALLDIR=/usr/local/bin
-CC=gcc
-CFLAGS=-O3
-LD=gcc
-LDFLAGS=-pthread
-LIBS=
-OBJS=guessnum-stat.o
-HEADER=guessnum-stat.h
+guessnum-stat : guessnum-stat.o
+	gcc -O3 -pthread -o $@ $^
 
-${TARGET} : ${OBJS}
-	${LD} ${LDFLAGS} -o ${TARGET} ${OBJS} ${LIBS}
-
-$(OBJS) : $(HEADER)
+guessnum-stat.o : guessnum-stat.c guessnum-stat.h
+	gcc -O3 -pthread -c -o $@ $<
 
 guessnum-stat.h : guessnum-stat.h.php
-	php guessnum-stat.h.php > guessnum-stat.h
+	php $< > $@
 
 .PHONY:clean
 clean:
-	-rm ${OBJS} ${HEADER} ${TARGET}
+	-rm *.o guessnum-stat guessnum-stat.h
 
-.PHONY:install
-install:
-	-cp ${TARGET} ${INSTALLDIR}
