@@ -54,27 +54,30 @@ inline uint64_t guess(){
 	return times;
 }
 
+typedef struct {
+	pthread_t tid;
+	uint64_t stat[GUESS_CHANCES + 1];
+} thread_data_t;
 typedef enum{
 	ACTION_NORMAL,
 	ACTION_RECORD,
 	ACTION_QUIT,
 }action_t;
 action_t action = ACTION_NORMAL;
-void action_quit(int sig){
-	action = ACTION_QUIT;
-}
-void action_record(int sig){
-	action = ACTION_RECORD;
-}
-
-typedef struct {
-	pthread_t tid;
-	uint64_t stat[GUESS_CHANCES + 1];
-} thread_data_t;
 static pthread_mutex_t report_mutex = PTHREAD_MUTEX_INITIALIZER;
 uint64_t mstat[GUESS_CHANCES + 1];
 char *filename;
 
+void action_quit(int sig){
+	pthread_mutex_lock(&report_mutex);
+	action = ACTION_QUIT;
+	pthread_mutex_unlock(&report_mutex);
+}
+void action_record(int sig){
+	pthread_mutex_lock(&report_mutex);
+	action = ACTION_RECORD;
+	pthread_mutex_unlock(&report_mutex);
+}
 int read_file(char *filename, uint64_t *stat){
 	FILE *fp; int i;
 	char num[100] = "\0";
@@ -108,14 +111,16 @@ void report_stat(uint64_t *stat) {
 	pthread_mutex_lock(&report_mutex);
 	for (i = 0; i < GUESS_CHANCES + 1; i++) {
 		mstat[i] += stat[i];
-	   	stat[i] = 0;
+		stat[i] = 0;
 	}
 	write_file(filename, mstat);
+	if (action != ACTION_QUIT) {
+		action = ACTION_NORMAL;
+	}
 	pthread_mutex_unlock(&report_mutex);
 }
 void* thread_main(void *data){
 	while (action != ACTION_QUIT) {
-		action = ACTION_NORMAL;
 		while (action == ACTION_NORMAL) {
 			(((thread_data_t*)data)->stat)[guess()]++;
 		}
