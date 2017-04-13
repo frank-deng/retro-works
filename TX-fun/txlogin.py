@@ -35,18 +35,18 @@ class TXLogin:
     __tx = None;
     __menu = [
         {
-            'name':'飞控中心',
-            'exec':['./txfgfs.py'],
+            'name': '飞控中心',
+            'exec': ['txfgfs.py'],
             'key': '1',
         },
         {
-            'name':'猜数字控制台',
-            'exec':['./txguessnum.py'],
+            'name': '猜数字控制台',
+            'exec': ['txguessnum.py'],
             'key': '2',
         },
         {
             'name':'2048控制台',
-            'exec':['./tx2048.py'],
+            'exec': ['tx2048.py'],
             'key': '3',
         },
     ];
