@@ -29,7 +29,7 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 telnet-site
 -----------
 
-一个简单的telnet站点，使用[w3m](http://w3m.sourceforge.net)浏览器在字符界面下显示HTML页面。
+一个简单的telnet站点，使用[w3m](http://w3m.sourceforge.net)浏览器在字符界面下显示HTML页面。  
 A simple site designed for console-based browser [w3m](http://w3m.sourceforge.net), which makes it works like an old-school telnet BBS site.
 
 DOSBox模拟的客户端硬件  
