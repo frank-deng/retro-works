@@ -51,7 +51,7 @@ class Terminal:
         self.__startProc();
 
     def __startProc(self):
-        global ENVIRON;
+        global args;
         env = os.environ.copy();
         env.update(args.environ);
         self.__proc = subprocess.Popen(args.login,
