@@ -6,25 +6,49 @@ A simple telnet server for Linux, written in Python3.
 Usage: telnetd.py [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2] ...
 '''
 
-import os, sys, time, subprocess, pty, fcntl, socket, select, getopt;
+import os, sys, time, subprocess, pty, fcntl, socket, select, argparse;
 
-LOGIN_CMD = ['/bin/login'];
-ENVIRON = {}
-HOST_PORT = ('', 23);
+class EnvironParser(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        environ = getattr(namespace, self.dest);
+        e = values.split('=');
+        if len(e) < 2:
+            parser.error('Invalid format detected when specifing environment variable.');
+        key = e[0];
+        value = '='.join(e[1:]);
+        environ[key] = value;
+        setattr(namespace, self.dest, environ);
 
-try:
-    options, args = getopt.getopt(sys.argv[1:], "hP:E:");
-    for name, value in options:
-        if name == '-h':
-            raise Exception;
-        if name == '-P':
-            HOST_PORT = ('', int(value));
-        if name == '-E':
-            envname, envval = value.split('=');
-            ENVIRON[envname] = envval;
-except:
-    sys.stderr.write('Usage: %s [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2] ...\n'%sys.argv[0]);
-    exit(1);
+parser = argparse.ArgumentParser();
+parser.add_argument(
+    '--host',
+    '-H',
+    help='Specify host for the telnet server.',
+    default=''
+);
+parser.add_argument(
+    '--port',
+    '-P',
+    help='Specify port for the telnet server.',
+    type=int,
+    default=23
+);
+parser.add_argument(
+    '--environ',
+    '-E',
+    action=EnvironParser,
+    help='Specify environment variable for the login program.',
+    default={}
+);
+parser.add_argument(
+    '--login',
+    '-L',
+    nargs=argparse.REMAINDER,
+    help='Specify login program.',
+    default=['/bin/login', '-p']
+);
+args = parser.parse_args();
+print(args);
 
 class Terminal:
     __active = False;
@@ -36,7 +60,7 @@ class Terminal:
     def __startProc(self):
         global ENVIRON;
         env = os.environ.copy();
-        env.update(ENVIRON);
+        env.update(args.environ);
         self.__proc = subprocess.Popen(LOGIN_CMD,
             stdin = self.__slave, stdout = self.__slave, stderr = self.__slave,
             env = env, close_fds = True);
@@ -70,7 +94,7 @@ try:
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
     server.setblocking(0);
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
-    server.bind(HOST_PORT);
+    server.bind((args.host, args.port));
     server.listen(5);
     inputs.append(server);
 except OSError as e:
@@ -78,7 +102,7 @@ except OSError as e:
     exit(1);
 
 try:
-    while inputs:
+    while True:
         time.sleep(0.1);
         readable, writable, exceptional = select.select(inputs, outputs, inputs);
         for s in readable:
