@@ -123,7 +123,7 @@ try:
         for s in writable:
             try:
                 s.sendall(terms[str(s.fileno())].read());
-            except BrokenPipeError:
+            except (BrokenPipeError, KeyError):
                 if str(s.fileno()) in terms:
                     terms.pop(str(s.fileno())).close();
                 if s in inputs:
