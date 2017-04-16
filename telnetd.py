@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-'''
-A simple telnet server for Linux, written in Python3.
-
-Usage: telnetd.py [-P port] [-E ENVIRON_NAME1=VALUE1] [-E ENVIRON_NAME2=VALUE2] ...
-'''
-
 import os, sys, time, subprocess, pty, fcntl, socket, select, argparse;
 
 class EnvironParser(argparse.Action):
@@ -48,7 +42,6 @@ parser.add_argument(
     default=['/bin/login', '-p']
 );
 args = parser.parse_args();
-print(args);
 
 class Terminal:
     __active = False;
@@ -61,7 +54,7 @@ class Terminal:
         global ENVIRON;
         env = os.environ.copy();
         env.update(args.environ);
-        self.__proc = subprocess.Popen(LOGIN_CMD,
+        self.__proc = subprocess.Popen(args.login,
             stdin = self.__slave, stdout = self.__slave, stderr = self.__slave,
             env = env, close_fds = True);
 
@@ -118,9 +111,11 @@ try:
                         terms[str(s.fileno())].write(data);
                         if s not in outputs:
                             outputs.append(s);
-                except ConnectionResetError:
-                    terms.pop(str(s.fileno())).close();
-                    inputs.remove(s);
+                except (ConnectionResetError, KeyError):
+                    if str(s.fileno()) in terms:
+                        terms.pop(str(s.fileno())).close();
+                    if s in inputs:
+                        inputs.remove(s);
                     if s in outputs:
                         outputs.remove(s);
                     s.close();
@@ -129,15 +124,19 @@ try:
             try:
                 s.sendall(terms[str(s.fileno())].read());
             except BrokenPipeError:
-                terms.pop(str(s.fileno())).close();
-                inputs.remove(s);
+                if str(s.fileno()) in terms:
+                    terms.pop(str(s.fileno())).close();
+                if s in inputs:
+                    inputs.remove(s);
                 if s in outputs:
                     outputs.remove(s);
                 s.close();
 
         for s in exceptional:
-            terms.pop(str(s.fileno())).close();
-            inputs.remove(s);
+            if str(s.fileno()) in terms:
+                terms.pop().close();
+            if s in inputs:
+                inputs.remove(s);
             if s in outputs:
                 outputs.remove(s);
             s.close();

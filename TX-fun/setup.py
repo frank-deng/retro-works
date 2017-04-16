@@ -14,6 +14,6 @@ setup(
     platforms = ['Linux'],
     package_dir = {'TX-fun':'.'},
     py_modules = ['TX', 'getch', 'kbhit', 'DaemonCtrl'],
-    scripts = ['txserver.py', 'txlogin.py', 'tx2048.py', 'txguessnum.py', 'txfgfs.py']
+    scripts = ['txlogin.py', 'tx2048.py', 'txguessnum.py', 'txfgfs.py']
 );
 
