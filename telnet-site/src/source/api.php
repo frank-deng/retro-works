@@ -130,9 +130,9 @@ function newsGetChannelName($channelId = false) {
 function newsGetList($channel = false, $page = 1, $keyword = false) {
 	$params = Array(
 		'page' => $page,
-		'needHtml' => 1,
+		'needHtml' => 0,
 		'needContent' => 0,
-		'needAllList' => 0,
+		'needAllList' => 1,
 		'maxResult' => 19,
 	);
 	if ($channel && preg_match('/^[A-Za-z0-9]+$/', $channel)) {
@@ -164,7 +164,12 @@ function newsProcessList(&$data){
 					}
 				}
 			}
-			$content['html'] = preg_replace('/\<img[^\>]*\>/', '', $content['html']);
+			$content['html'] = '';
+			foreach ($content['allList'] as $line){
+				if (is_string($line)) {
+					$content['html'] .= '<p>'.htmlspecialchars($line).'</p>';
+				}
+			}
 			$content['key'] = $data['contentlist'][$idx]['key'] = md5($content['title'].$content['source'].$content['pubDate'].$content['html']);
 
 			//Check if record exists
@@ -223,9 +228,9 @@ function getIndexPageData($city) {
 	$requestArr = array(
 		'news' => showAPIMakeRequest('http://route.showapi.com/109-35', Array(
 			'page' => 1,
-			'needHtml' => 1,
+			'needHtml' => 0,
 			'needContent' => 0,
-			'needAllList' => 0,
+			'needAllList' => 1,
 			'maxResult' => 10,
 			'showapi_timestamp' => date('YmdHis'),
 		)),
