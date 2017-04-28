@@ -127,6 +127,8 @@ class TXGuessnumStatView:
                 precent.append(float(n)/float(_sum));
 
         max_val = max(result);
+        if (max_val == 0):
+            max_val = 0.0001;
 
         self.__tx.write([
             TX.Color(0),
