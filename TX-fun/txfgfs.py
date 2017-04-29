@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 FG_DATA_URL='http://localhost:5410/json/fgreport/';
-FG_CRASHED_URL='http://localhost:5410/json/sim/crashed';
-FG_FREEZE_STATE_URL='http://localhost:5410/json/sim/freeze/master';
 
 import time, threading;
 import httplib2, json, sysinfo;
@@ -11,27 +9,11 @@ import kbhit, TX;
 def getFlightData():
     try:
         result = {};
-        h = httplib2.Http();
-
+        h = httplib2.Http(timeout=0.8);
         resp, content = h.request(FG_DATA_URL);
         data = json.loads(content.decode('UTF-8'));
         for item in data['children']:
             result[item['name']] = item['value'];
-
-        resp, content = h.request(FG_FREEZE_STATE_URL);
-        data = json.loads(content.decode('UTF-8'));
-        if data.get('value'):
-            result['paused'] = True;
-        else:
-            result['paused'] = False;
-
-        resp, content = h.request(FG_CRASHED_URL);
-        data = json.loads(content.decode('UTF-8'));
-        if data.get('value'):
-            result['crashed'] = True;
-        else:
-            result['crashed'] = False;
-
         return result;
     except Exception as e:
         return None;
