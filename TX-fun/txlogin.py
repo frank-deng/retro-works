@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys, time, TX, subprocess, threading;
+import sys, time, TX, subprocess, threading, kbhit;
 from getch import getch;
 
 class ShowClockThread(threading.Thread):
@@ -10,7 +10,7 @@ class ShowClockThread(threading.Thread):
     def __init__(self, tx):
         threading.Thread.__init__(self);
         self.__tx = tx;
-    def __del__(self):
+    def shutdown(self):
         self.__running = False;
     def off(self):
         self.__active = False;
@@ -113,25 +113,41 @@ class TXLogin:
     def main(self):
         self.__drawHeader();
         self.__drawMenu();
-        ch = getch();
+        ch = '\x00';
         while ch != '\x1B':
+            ch = getch();
             for item in self.__menu:
                 if ch == item['key']:
                     self.__exec(item['exec']);
                     break;
-            ch = getch();
         self.__exit();
+
+    def shutdown(self):
+        self.__clock.shutdown();
 
 tx = TX.TX();
 if __name__ == '__main__':
     txLogin = TXLogin();
-    while True:
-        try:
+    kbhit.init();
+    running = True;
+    tick = timeout = 300;
+    try:
+        while running:
             tx.write('按Enter键进入特显模式……\r\n');
-            while getch() != '\r':
-                tx.write('按Enter键进入特显模式……\r\n');
-            txLogin.main();
-        except KeyboardInterrupt:
-            pass;
+            while (not kbhit.kbhit()) and tick > 0:
+                time.sleep(0.1);
+                tick -= 1;
+
+            if (tick <= 0):
+                running = False;
+            else:
+                tick = timeout;
+                ch = kbhit.getch();
+                if ch == '\n':
+                    txLogin.main();
+    except KeyboardInterrupt:
+        pass;
+    finally:
+        txLogin.shutdown();
     exit(0);
 
