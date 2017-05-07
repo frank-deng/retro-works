@@ -6,6 +6,7 @@ if (!defined('IN_SITE')) {
 return array(
 	'About' => 'Powered by: <a href="http://www.showapi.com">易源接口</a>&nbsp;<a href="http://www.heweather.com">和风全球天气</a>',
 	'_sep' => '｜',
+	'_point' => '·',
 	
 	'Index' => '首页',
 	'OK' => '确定',
@@ -99,5 +100,10 @@ return array(
 	'Message Send Success' => '发送成功',
 	'Message Send Failed' => '发送失败',
 	'Send' => '发送',
+
+	'Movie Rank' => '电影票房排行榜',
+	'Daily Rank' => '单日票房',
+	'Weekend Rank' => '周末票房',
+	'Weekly Rank' => '单周票房',
 );
 

@@ -220,9 +220,37 @@ function getWeatherInfo($city) {
 		return false;
 	}
 }
+function processMovieRank($daily, $weekly, $weekend){
+	$result = array();
+	if ($daily && isset($daily['showapi_res_body']['ret_code']) && $daily['showapi_res_body']['ret_code'] == 0) {
+		$result['daily'] = $daily['showapi_res_body']['datalist'];
+		usort($result['daily'], function($a, $b){
+			return $a['Rank'] > $b['Rank'];
+		});
+	} else {
+		return false;
+	}
+	if ($weekly && isset($weekly['showapi_res_body']['ret_code']) && $weekly['showapi_res_body']['ret_code'] == 0) {
+		$result['weekly'] = $weekly['showapi_res_body']['datalist'];
+		usort($result['weekly'], function($a, $b){
+			return $a['Rank'] > $b['Rank'];
+		});
+	} else {
+		return false;
+	}
+	if ($weekend && isset($weekend['showapi_res_body']['ret_code']) && $weekend['showapi_res_body']['ret_code'] == 0) {
+		$result['weekend'] = $weekend['showapi_res_body']['datalist'];
+		usort($result['weekend'], function($a, $b){
+			return $a['MovieRank'] > $b['MovieRank'];
+		});
+	} else {
+		return false;
+	}
+	return $result;
+}
 function getIndexPageData($city) {
 	global $_G;
-	$result = array('weather' => false, 'news' => false, 'jokes' => false);
+	$result = array('weather' => false, 'news' => false, 'jokes' => false, 'movieRank' => false);
 
 	//Fetch data
 	$requestArr = array(
@@ -239,6 +267,9 @@ function getIndexPageData($city) {
 			'maxResult' => 10,
 			'showapi_timestamp' => date('YmdHis'),
 		)),
+		'movieRankWeekly' => showAPIMakeRequest('http://route.showapi.com/578-1'),
+		'movieRankDaily' => showAPIMakeRequest('http://route.showapi.com/578-2'),
+		'movieRankWeekend' => showAPIMakeRequest('http://route.showapi.com/578-3'),
 	);
 	if ($city) {
 		$requestArr['weather'] = array(
@@ -261,6 +292,10 @@ function getIndexPageData($city) {
 	}
 	if ($city && $jsonArr['weather']['HeWeather5'][0]['status'] == 'ok') {
 		$result['weather'] = $jsonArr['weather']['HeWeather5'][0];
+	}
+	$movieRank = processMovieRank($jsonArr['movieRankDaily'], $jsonArr['movieRankWeekly'], $jsonArr['movieRankWeekend']);
+	if ($movieRank) {
+		$result['movieRank'] = $movieRank;
 	}
 
 	return $result;

@@ -10,6 +10,7 @@ $articles = getArticles();
 $indexData = getIndexPageData(isset($_COOKIE['city']) ? htmlspecialchars($_COOKIE['city']) : false);
 $weatherData = $indexData['weather'];
 $news = $indexData['news'];
+$movieRank = $indexData['movieRank'];
 $jokes = $indexData['jokes'];
 
 ?><!DOCTYPE html>
@@ -43,8 +44,7 @@ $jokes = $indexData['jokes'];
 				<a href='weather.php?action=setcity'><?='['.lang('Change City').']'?></a>
 			</td></tr>
 			<tr><td colspan='2'>
-				<hr/>
-				<div><?=lang('Up To Date')?>&nbsp;<a href='news.php'><?=lang('More')?>&gt;&gt;</a></div>
+				<hr/><div><b><?=lang('Up To Date')?></b>&nbsp;<a href='news.php'><?=lang('More')?>&gt;&gt;</a></div>
 				<?php if ($news) { ?>
 					<ul>
 						<?php for($i = 0; $i < 10; $i++) { ?>
@@ -54,9 +54,36 @@ $jokes = $indexData['jokes'];
 				<?php } else { ?>
 					<p><?=lang('No News')?></p>
 				<?php } ?>
-				<hr/>
+
+				<?php if ($movieRank) { ?>
+					<hr/><div><b><?=lang('Movie Rank')?></b></div>
+					<table width='100%'>
+						<tr>
+							<th align='left' width='33%'><b><?=lang('Daily Rank')?></b></th>
+							<th align='left' width='33%'><b><?=lang('Weekend Rank')?></b></th>
+							<th align='left' width='33%'><b><?=lang('Weekly Rank')?></b></th>
+						</tr>
+						<tr>
+							<td>
+								<?php foreach ($movieRank['daily'] as $item) { ?>
+									<div><?=lang('_point')?><?=$item['MovieName']?></div>
+								<?php } ?>
+							</td>
+							<td>
+								<?php foreach ($movieRank['weekend'] as $item) { ?>
+									<div><?=lang('_point')?><?=$item['MovieName']?></div>
+								<?php } ?>
+							</td>
+							<td>
+								<?php foreach ($movieRank['weekly'] as $item) { ?>
+									<div><?=lang('_point')?><?=$item['MovieName']?></div>
+								<?php } ?>
+							</td>
+						</tr>
+					</table>
+				<?php } ?>
 				
-				<div><?=lang('Jokes Collection')?>&nbsp;<a href='jokes.php'><?=lang('More')?>&gt;&gt;</a></div>
+				<hr/><div><b><?=lang('Jokes Collection')?></b>&nbsp;<a href='jokes.php'><?=lang('More')?>&gt;&gt;</a></div>
 				<table width='100%'><tr>
 					<td valign='top'>
 						<?php if ($jokes) { ?>
@@ -79,9 +106,8 @@ $jokes = $indexData['jokes'];
 						<?php } ?>
 					</td>
 				</tr></table>
-				<hr/>
 
-				<div><?=lang('My Space')?>&nbsp;<a href='articles.php'><?=lang('More')?>&gt;&gt;</a></div>
+				<hr/><div><b><?=lang('My Space')?></b>&nbsp;<a href='articles.php'><?=lang('More')?>&gt;&gt;</a></div>
 				<ul>
 					<?php for($i = 0; $i < 10; $i++) { ?>
 						<?php if (!isset($articles[$i])) { break; } ?>
@@ -89,8 +115,7 @@ $jokes = $indexData['jokes'];
 					<?php } ?>
 				</ul>
 				
-				<hr/>
-				<div><?=lang('About');?></div>
+				<hr/><div><?=lang('About');?></div>
 			</td></tr>
 		</table>
 	</body>
