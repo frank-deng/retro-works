@@ -63,9 +63,14 @@ Add `zh_CN.GB2312` into `/etc/locale.gen`, then run `sudo locale-gen`.
 Install package `ncurses-term`
 
 	sudo apt-get install ncurses-term
+	
+创建`user`用户
+Add user with username `user`
+	
+	sudo adduser user
 
-在`~/.bashrc`中加上以下内容：  
-Add the following lines into `~/.bashrc`:
+在`/home/user/.bashrc`中加上以下内容：  
+Add the following lines into `/home/user/.bashrc`:
 
 	export TERM='ansi43m';
 	export LINES=25;
@@ -76,16 +81,16 @@ Add the following lines into `~/.bashrc`:
 	w3m -no-mouse
 	exit
 
-对`w3m`浏览器作如下设置：  
-Setup `w3m` with the settings below:
+登录`user`用户，然后对`w3m`浏览器作如下设置：  
+Login as user `user`, then setup `w3m` with the settings below:
 
 * Run external viewer in the background: No
 * Use combining characters: No
 * Use double width for some Unicode characters: Yes
 * Charset conversion when loading: Yes
 
-将`keymap`文件复制到`~/.w3m`目录中，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
-Copy file `keymap` to folder `~/.w3m` to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
+将`keymap`文件复制到`/home/user/.w3m`目录中，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
+Copy file `keymap` to folder `/home/user/.w3m` to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
