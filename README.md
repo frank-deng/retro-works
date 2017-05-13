@@ -99,7 +99,7 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 
 ### DOSBox客户端使用方法
 
-输入以下命令打开串口终端程序
+输入以下命令打开串口终端程序  
 Run serial terminal program with the following command
 
 	NRDTERM -A -M19200,N,8,1 COM1:
