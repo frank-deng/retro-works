@@ -34,7 +34,7 @@ class ShowClockThread(threading.Thread):
         if (nowTime != self.__lastTime):
             self.__tx.write([
                 TX.Text(nowTime, {
-                    'x':396, 'y':2, 'size':(24,24), 'fg':0,
+                    'x':640-160-2, 'y':1, 'size':(16,16), 'fg':0,
                 }),
             ]);
         self.__lastTime = nowTime;
@@ -45,7 +45,7 @@ class ShowClockThread(threading.Thread):
             time.sleep(0.1);
 
 class TXGuessnumStatView:
-    __hasFgData = False;
+    __topOffset = 46;
     def __init__(self, tx):
         self.__tx = tx;
         self.__drawFrame();
@@ -68,30 +68,30 @@ class TXGuessnumStatView:
             TX.Color(0),
             TX.Rect(0,0,640,400,True),
             TX.Color(1),
-            TX.Rect(0,0,640,28,True),
+            TX.Rect(0,0,640,18,True),
             TX.Rect(0,380,640,400,True),
             TX.Text('猜数字控制台', {
-                'x':4, 'y':2, 'size':(24,24),
+                'x':4, 'y':1, 'size':(16,16),
                 'font':0, 'fg':0, 'bg':None, 'charSpace':0,
             }),
             TX.Text(' 次数', {
-                'x':72, 'y':32, 'size':(16,16), 'fg':1,
+                'x':72, 'y':24, 'size':(16,16), 'fg':1,
             }),
             TX.Text(' 百分比', {
-                'x':640-72, 'y':32,
+                'x':640-72, 'y':24,
             }),
-            TX.Line(74, 51, 74, 51+12*20+4),
+            TX.Rect(74, self.__topOffset-2, 74, self.__topOffset+12*20),
         ]);
         txcmd = [];
         for i in range(10):
             txcmd.append(TX.Text(' %2d次猜对'%(i+1), {
-                'x':0, 'y':55+i*20, 
+                'x':0, 'y':self.__topOffset+i*20+1, 
             }));
         txcmd.append(TX.Text(' 10次以上', {
-            'x':0, 'y':55+10*20, 
+            'x':0, 'y':self.__topOffset+10*20+1, 
         }));
         txcmd.append(TX.Text(' 　　失败', {
-            'x':0, 'y':55+11*20, 
+            'x':0, 'y':self.__topOffset+11*20+1, 
         }));
         self.__tx.write(txcmd);
 
@@ -138,20 +138,20 @@ class TXGuessnumStatView:
         for i in range(12):
             txcmd = [
                 TX.Text(' %.2f%%'%(precent[i] * 100), {
-                    'x':640-72, 'y':55+i*20, 'size':(16,16), 'fg':1,
+                    'x':640-72, 'y':self.__topOffset+i*20+1, 'size':(16,16), 'fg':1,
                 }),
             ];
             if (result[i]>0):
-                txcmd.append(TX.Rect(75, 55+i*20, (640-75-72)*result[i]/max_val + 75, 55+16+i*20, True));
+                txcmd.append(TX.Rect(75, self.__topOffset+i*20, (640-75-72)*result[i]/max_val + 75, self.__topOffset+16+i*20, True));
 
-            text_times = ' %d'%(result[i]);
+            text_times = '\x00%d'%(result[i]);
             if (result[i]/max_val < 0.5):
                 txcmd.append(TX.Text(text_times, {
-                    'x':(640-75-72)*result[i]/max_val + 75 + 1, 'y':55+i*20+3, 'size':(12,12), 'fg':1,
+                    'x':(640-75-72)*result[i]/max_val + 75 + 4, 'y':self.__topOffset+i*20+1, 'size':(16,16), 'fg':1,
                 }));
             else:
                 txcmd.append(TX.Text(text_times, {
-                    'x':(640-75-72)*result[i]/max_val + 75 - 6*len(text_times) - 6, 'y':55+i*20+3, 'size':(12,12), 'fg':0,
+                    'x':(640-75-72)*result[i]/max_val + 75 + 4 - 8*(len(text_times)), 'y':self.__topOffset+i*20+1, 'size':(16,16), 'fg':0,
                 }));
             self.__tx.write(txcmd);
 

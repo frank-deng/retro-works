@@ -20,7 +20,7 @@ class ShowClockThread(threading.Thread):
         if (nowTime != self.__lastTime):
             self.__tx.write([
                 TX.Text(nowTime, {
-                    'x':396, 'y':2, 'size':(24,24),
+                    'x':640-160-2, 'y':1, 'size':(16,16),
                     'font':0, 'fg':0, 'bg':None, 'charSpace':0,
                 }),
             ]);
@@ -65,14 +65,14 @@ class TXLogin:
             TX.HideCursor(),
             TX.HideBar(),
             TX.Color(0), TX.Rect(0,0,640,400,True),
-            TX.Color(1), TX.Rect(0,0,640,28,True), TX.Rect(0,386,640,400,True),
+            TX.Color(1), TX.Rect(0,0,640,18,True), TX.Rect(0,382,640,400,True),
             TX.Color(0),
             TX.Text('主菜单', {
-                'x':2, 'y':2, 'size':(24,24),
+                'x':2, 'y':1, 'size':(16,16),
                 'font':0, 'fg':0, 'bg':None,
             }),
             TX.Text('按数字键选择功能，Esc键退出特显模式。', {
-                'x':2, 'y':387, 'size':(12,12),
+                'x':2, 'y':383, 'size':(16,16),
                 'font':0, 'fg':0, 'bg':None,
             }),
             TX.Color(1), 
@@ -84,7 +84,7 @@ class TXLogin:
         for item in self.__menu:
             self.__tx.write([
                 TX.Text(' %s.%s'%(item['key'], item['name']), {
-                    'x':2, 'y':30+cnt*20+5, 'size':(16,16),
+                    'x':2, 'y':20+cnt*20+5, 'size':(16,16),
                     'font':0, 'fg':1, 'bg':None,
                 }),
             ]);
