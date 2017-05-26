@@ -74,6 +74,8 @@ if ($from || $to) {
 					<?=lang('Query Failed')?>
 				<?php } ?>
 			</p>
+		<?php } else { ?>
+			<p>&nbsp;</p>
 		<?php } ?>
 		<h2><hr/><?=lang('Realtime Exchange Rate')?></h2>
 		<table>

@@ -46,7 +46,7 @@ Client side software
 * MS-DOS 5.0
 * ANSI.SYS
 * UCDOS 7.0
-* NRDTERM.EXE
+* COMTOOL.COM
 
 ### 截图欣赏 Screenshots
 
@@ -59,10 +59,10 @@ Client side software
 在`/etc/locale.gen`中加上`zh_CN.GB2312`，然后运行`sudo locale-gen`。  
 Add `zh_CN.GB2312` into `/etc/locale.gen`, then run `sudo locale-gen`.
 
-安装`ncurses-term`软件包  
-Install package `ncurses-term`
+安装需要的软件包  
+Install package needed
 
-	sudo apt-get install ncurses-term
+	sudo apt-get install ncurses-term tcpser
 	
 创建`user`用户
 Add user with username `user`
@@ -92,20 +92,21 @@ Login as user `user`, then setup `w3m` with the settings below:
 将`keymap`文件复制到`/home/user/.w3m`目录中，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
 Copy file `keymap` to folder `/home/user/.w3m` to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
 
-在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`：  
+在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和[`tcpser`](http://www.jbrain.com/pub/linux/serial/)：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
 
-	@reboot root    /usr/local/bin/telnetd.py -E TERM=ansi43m -E LANG=zh_CN.GB2312 -E LC_ALL=zh_CN.GB2312 -E LINES=25 -E COLUMNS=80
+	@reboot root    /usr/local/bin/telnetd.py -E TERM=ansi43m -E LANG=zh_CN.GB2312 -E LC_ALL=zh_CN.GB2312 -E LINES=25 -E COLUMNS=80 -E ERASECHAR=010
+	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:23"
 
 ### DOSBox客户端使用方法
 
 输入以下命令打开串口终端程序  
 Run serial terminal program with the following command
 
-	NRDTERM -A -M19200,N,8,1 COM1:
+	COMTOOL.COM 1 ^b6
 
-在串口终端中输入`ATDT127000000001`连接telnet站点，然后按`Enter`进入登录界面。  
-Input `ATDT127000000001` in the serial terminal, then press `Enter` to open login panel.
+在串口终端中输入`ATDT92163`连接telnet站点，然后按`Enter`进入登录界面。  
+Input `ATDT92163` in the serial terminal, then press `Enter` to open login panel.
 
 
 TX-console
@@ -124,7 +125,7 @@ Applications available
 DOSBox模拟的客户端硬件  
 Client side hardware emulated by DOSBox
 
-* Old 386 platform
+* Old 286 platform
 * Hercules Monochrome display
 * Floppy drive only
 * Virtual serial line connection
