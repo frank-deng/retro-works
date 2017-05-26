@@ -38,7 +38,7 @@ Client side hardware emulated by DOSBox
 * Old 386 platform
 * VGA display
 * Floppy drive only
-* Virtual serial modem with Hayes command set
+* Virtual serial line connected to modem emulated by [`tcpser`](http://www.jbrain.com/pub/linux/serial/)
 
 客户端使用的软件  
 Client side software
@@ -46,7 +46,7 @@ Client side software
 * MS-DOS 5.0
 * ANSI.SYS
 * UCDOS 7.0
-* COMTOOL.COM
+* NRDTERM.EXE
 
 ### 截图欣赏 Screenshots
 
@@ -92,7 +92,7 @@ Login as user `user`, then setup `w3m` with the settings below:
 将`keymap`文件复制到`/home/user/.w3m`目录中，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
 Copy file `keymap` to folder `/home/user/.w3m` to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
 
-在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和[`tcpser`](http://www.jbrain.com/pub/linux/serial/)：  
+在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
 
 	@reboot root    /usr/local/bin/telnetd.py -E TERM=ansi43m -E LANG=zh_CN.GB2312 -E LC_ALL=zh_CN.GB2312 -E LINES=25 -E COLUMNS=80 -E ERASECHAR=010
@@ -103,7 +103,7 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 输入以下命令打开串口终端程序  
 Run serial terminal program with the following command
 
-	COMTOOL.COM 1 ^b6
+	NRDTERM -A -M2400,N,8,1 COM1:
 
 在串口终端中输入`ATDT92163`连接telnet站点，然后按`Enter`进入登录界面。  
 Input `ATDT92163` in the serial terminal, then press `Enter` to open login panel.
