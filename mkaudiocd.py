@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
-import sys, subprocess, os, multiprocessing, magic, tempfile;
-files = sys.argv[1:];
+import sys, subprocess, os, multiprocessing, magic, tempfile, getopt;
+OUTPUT_CUE='audiocd.cue';
+OUTPUT_AUDIO='audiocd.wav';
+
+opts, args = getopt.getopt(sys.argv[1:], 'o:');
+for k,v in opts:
+    if (k == '-o'):
+        OUTPUT_CUE = v+'.cue';
+        OUTPUT_AUDIO = v+'.wav';
+
+files = args;
 tempfiles = [];
 
 mime = magic.open(magic.MIME);
@@ -16,7 +25,6 @@ for i in range(len(files)):
             files[i] = tf.name;
 mime.close();
 
-OUTPUT_AUDIO='audiocd.wav';
 pwav = subprocess.Popen(['/usr/bin/shntool', 'join'] + files + ['-o', 'wav', '-O', 'always']);
 pcue = subprocess.Popen(
     ['/usr/bin/shntool', 'cue']+files,
@@ -26,7 +34,7 @@ pcue = subprocess.Popen(
 );
 stdout, stderr = pcue.communicate();
 sys.stderr.write(stderr.decode('UTF-8'));
-with open('audiocd.cue', 'w') as f:
+with open(OUTPUT_CUE, 'w') as f:
     f.write(stdout.decode('UTF-8').replace('joined.wav', OUTPUT_AUDIO).replace('WAVE', 'BINARY'));
 pwav.wait();
 os.rename('joined.wav', OUTPUT_AUDIO);
