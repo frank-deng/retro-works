@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import sys, time, TX, subprocess, threading, kbhit;
+import sys, time, subprocess, threading;
+import kbhit, sysinfo, TX;
 from getch import getch;
 
 class ShowClockThread(threading.Thread):
@@ -29,7 +30,48 @@ class ShowClockThread(threading.Thread):
         while (self.__running):
             if (self.__active):
                 self.refresh();
-            time.sleep(0.5);
+            time.sleep(0.1);
+
+class ShowSysinfoThread(threading.Thread):
+    __running = True;
+    __active = False;
+    __sysinfo = None;
+    def __init__(self, tx):
+        threading.Thread.__init__(self);
+        self.__tx = tx;
+        self.__sysinfo = sysinfo.SysInfo();
+    def shutdown(self):
+        self.__running = False;
+    def off(self):
+        self.__active = False;
+    def refresh(self):
+        if (not self.__active):
+            self.__tx.write([
+                TX.Text('CPU温度：       GPU温度：       CPU使用率：        内存使用率：', {
+                    'x':8, 'y':400-36, 'size':(16,16), 'font':0, 'fg':1, 'bg':None, 'charSpace':0,
+                }),
+            ]);
+        self.__active = True;
+        sysdata = self.__sysinfo.fetch();
+        self.__tx.write([
+            TX.Text('\x00%d℃  '%sysdata['cpu_temp'], {
+                'x':8+8*9, 'y':400-36, 'size':(16,16), 'font':0, 'fg':1, 'bg':None, 'charSpace':0,
+            }),
+            TX.Text('\x00%d℃  '%sysdata['gpu_temp'], {
+                'x':8+8*(9+7+9), 'y':400-36,
+            }),
+            TX.Text('\x00%.1f%%  '%(sysdata['cpu_usage']['overall'] * 100), {
+                'x':8+8*(9+7+9+7+11), 'y':400-36,
+            }),
+            TX.Text('\x00%.1f%%  '%(sysdata['mem_usage'] * 100), {
+                'x':8+8*(9+7+9+7+11+8+12), 'y':400-36,
+            }),
+        ]);
+    def run(self):
+        while (self.__running):
+            if (self.__active):
+                self.refresh();
+            time.sleep(1);
 
 class TXLogin:
     __tx = None;
@@ -57,7 +99,9 @@ class TXLogin:
         else:
             self.__tx = TX.TX(out);
         self.__clock = ShowClockThread(self.__tx);
+        self.__sysinfo = ShowSysinfoThread(self.__tx);
         self.__clock.start();
+        self.__sysinfo.start();
 
     def __drawHeader(self):
         self.__tx.write([
@@ -78,6 +122,7 @@ class TXLogin:
             TX.Color(1), 
         ]);
         self.__clock.refresh();
+        self.__sysinfo.refresh();
 
     def __drawMenu(self):
         cnt = 0;
@@ -92,17 +137,20 @@ class TXLogin:
 
     def __exec(self, exe):
         self.__clock.off();
+        self.__sysinfo.off();
         try:
             p = subprocess.Popen(exe);
             p.wait();
         except Exception:
             pass;
-        self.__clock.refresh();
         self.__drawHeader();
         self.__drawMenu();
+        self.__clock.refresh();
+        self.__sysinfo.refresh();
 
     def __exit(self):
         self.__clock.off();
+        self.__sysinfo.off();
         self.__tx.write([
             TX.Color(0), TX.Rect(0,0,640,400,True),
             TX.ShowCursor(),
@@ -124,6 +172,7 @@ class TXLogin:
 
     def shutdown(self):
         self.__clock.shutdown();
+        self.__sysinfo.shutdown();
 
 tx = TX.TX();
 if __name__ == '__main__':

@@ -64,21 +64,21 @@ $jokes = $indexData['jokes'];
 							<th align='left' width='33%'><b><?=lang('Weekly Rank')?></b></th>
 						</tr>
 						<tr>
-							<td>
+							<td><ol>
 								<?php foreach ($movieRank['daily'] as $item) { ?>
-									<div><?=lang('_point')?><?=$item['MovieName']?></div>
+									<li><?=$item['MovieName']?></li>
 								<?php } ?>
-							</td>
-							<td>
+							</ol></td>
+							<td><ol>
 								<?php foreach ($movieRank['weekend'] as $item) { ?>
-									<div><?=lang('_point')?><?=$item['MovieName']?></div>
+									<li><?=$item['MovieName']?></li>
 								<?php } ?>
-							</td>
-							<td>
+							</ol></td>
+							<td><ol>
 								<?php foreach ($movieRank['weekly'] as $item) { ?>
-									<div><?=lang('_point')?><?=$item['MovieName']?></div>
+									<li><?=$item['MovieName']?></li>
 								<?php } ?>
-							</td>
+							</ol></td>
 						</tr>
 					</table>
 				<?php } ?>

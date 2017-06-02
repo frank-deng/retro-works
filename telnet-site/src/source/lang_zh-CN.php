@@ -102,8 +102,8 @@ return array(
 	'Send' => '发送',
 
 	'Movie Rank' => '电影票房排行榜',
-	'Daily Rank' => '　单日票房',
-	'Weekend Rank' => '　周末票房',
-	'Weekly Rank' => '　单周票房',
+	'Daily Rank' => '　　单日票房',
+	'Weekend Rank' => '　　周末票房',
+	'Weekly Rank' => '　　单周票房',
 );
 

@@ -3,7 +3,7 @@
 FG_DATA_URL='http://localhost:5410/json/fgreport/';
 
 import time, threading;
-import httplib2, json, sysinfo;
+import httplib2, json;
 import kbhit, TX;
 
 def getFlightData():
@@ -66,52 +66,24 @@ class TXFgfsView:
             TX.Color(1),
             TX.Rect(0,0,640,18,True),
             TX.Rect(0,380,640,400,True),
-            TX.Rect(4,60,636,60),
             TX.Text('飞控中心', {
                 'x':4, 'y':1, 'size':(16,16),
                 'font':0, 'fg':0, 'bg':None, 'charSpace':0,
-            }),
-            TX.Text('CPU温度', {
-                'x':8, 'y':22, 'size':(16,16), 'fg':1,
-            }),
-            TX.Text('GPU温度', {
-                'x':140+8, 'y':22,
-            }),
-            TX.Text('CPU使用率', {
-                'x':140*2+8, 'y':22,
-            }),
-            TX.Text('内存使用率', {
-                'x':140*3+8, 'y':22,
             }),
             TX.Text('（没有飞行任务）', {
                 'x':4, 'y':382, 'fg':0,
             }),
         ]);
 
-    def update(self, sysdata, fgdata, redraw = False):
+    def update(self, fgdata, redraw = False):
         if (redraw):
             self.__drawFrame();
             self.__clock.refresh();
 
-        self.__tx.write([
-            TX.Text(' %d℃  '%sysdata['cpu_temp'], {
-                'x':0, 'y':40, 'size':(16,16), 'fg':1,
-            }),
-            TX.Text(' %d℃  '%sysdata['gpu_temp'], {
-                'x':140, 'y':40,
-            }),
-            TX.Text(' %.1f%%  '%(sysdata['cpu_usage']['overall'] * 100), {
-                'x':140*2, 'y':40,
-            }),
-            TX.Text(' %.1f%%  '%(sysdata['mem_usage'] * 100), {
-                'x':140*3, 'y':40,
-            }),
-        ]);
-
         if None == fgdata:
             if self.__hasFgData:
                 self.__tx.write([
-                    TX.Color(0), TX.Rect(0,77,640,379,True),
+                    TX.Color(0), TX.Rect(0,20,640,379,True),
                     TX.Text('（没有飞行任务）', {
                         'x':4, 'y':382, 'size':(16,16), 'fg':0,
                     }),
@@ -119,7 +91,7 @@ class TXFgfsView:
             self.__hasFgData = False;
             return;
 
-        top_offset = 68;
+        top_offset = 24;
         line_height = 40;
         col_width = 120;
         if not self.__hasFgData:
@@ -149,6 +121,7 @@ class TXFgfsView:
                     'x':col_width*2+8, 'y':top_offset+line_height*2,
                 }),
             ]);
+
             self.__hasFgData = True;
 
         if fgdata['longitude-deg'] >= 0:
@@ -206,7 +179,7 @@ if __name__ == '__main__':
     try:
         while running:
             if (tick % 10 == 0):
-                view.update(sysinfo.SysInfo().fetch(), getFlightData());
+                view.update(getFlightData());
 
             if kbhit.kbhit():
                 ch = kbhit.getch();
