@@ -1,0 +1,11 @@
+100 DATA 1,1,&H300,0,&H300,0,&H300,0,&H300,0,&H300,&H3000,&Hffff,&Hfcff,&H300,0,&Hc00,&Hc0,&Hc00,&Hc0,&Hc00,&H30,&H3000,&H30,&H3000,&Hc,&Hc000,&H3,&H3,&Hfc00,&H3c,&H3000,0,0
+101 DATA 17,1,&H300,&H3,&H330,&H3003,&Hff0c,&Hfcff,&H303,&H3,&H3c0,&Hc003,&Hf3c,&Hf0ff,&Hc0c,&Hc000,&Hcf00,&Hc0ff,&Hc03,&Hc000,&Hf0c,&Hc0ff,&Hfc,&H30,&Hff0f,&Hfcff,&Hc,&H30,&Hc,&Hcf,&Hf0c,&Hfc00,&Hf00c,&H3000
+102 DATA 33,1,0,&Hc000,&Hf03f,&Hf00f,&H3f00,&Hf0,&Hcc00,&H3,&Hc03,&Hc3,&Hc03,&Hc3,&H3c03,&Hc3,&Hcc03,&Hc3,&Hc0f,&Hc3,&Hcf3,&Hc3,&Hc03,&Hc3,&Hc03,&Hc3,&H3003,&Hc0cc,&H3303,&Hfcfc,&Hc033,&H300c,&Hc,0
+103 DATA 49,1,&Hc,&H3000,&H3f0c,&Hfcff,&H300c,&H3000,&H300c,&H3030,&Hf00c,&H3030,&H30cf,&H3030,&H3fcc,&Hf0ff,&H30cc,&H3030,&H300c,&H3030,&H300c,&H30cc,&H300c,&H30c3,&H330c,&Hf000,&H3c33,&Hf000,&Hf030,&H3000,&H3fc0,&Hf0ff,&H3000,&H3000
+104 DATA 65,1,&H300,0,&H300,&Hc000,&Hff3f,&Hf0ff,&H300,0,&H300,&H3,&Hff03,&Hc0ff,&H3,&H3,&Hff03,&Hff,&H3,&H3,&Hff03,&Hff,&H3,&H3,&Hff03,&Hff,&H3,&H3,&H3,&H3003,&Hffff,&Hfcff,0,0
+105 DATA 81,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,&Hf,0,&Hf,0,&H3,0,&Hc,0
+106 DATA 97,1,&Hc000,0,&Hc000,&H3,&Hc000,&Hf,&Hc000,&H30,&Hc000,&Hc0,&Hc300,0,&Hc000,&H3000,&Hffff,&Hfcff,&Hc300,0,&Hc300,0,&Hc000,&Hc0,&Hc000,&H30,&Hc000,&Hc,&Hc300,&Hf003,&Hfc00,&Hc000,&Hc000,0
+107 DATA 113,1,&H30,&H3000,&Hff0f,&Hfcff,&H3,&Hc000,0,&Hc000,&Hc0,&Hc030,&H3f3c,&Hc0fc,&H300c,&Hc030,&Hf000,&Hc030,&H3003,&Hc030,&H300c,&Hc030,&H3ffc,&Hc0f0,&H300c,&Hc030,&Hc,&Hc000,&Hc,&Hc000,&Hc,&Hc00c,&Hc,&H3
+108 DATA 129,1,&Hc000,&Hc,&Hc000,&H300c,&Hffff,&Hfcff,&Hc300,&Hc,&H330,&Hc0ff,&Hf0c,&H3,&H300c,&Hcc,&Hc0,&H30,&Hc330,&Hcf,&Hc03,&Hfc00,&Hff0c,&Hf0ff,&Hcfc,&Hc000,&Hc0c,&Hc000,&Hc0c,&Hc000,&Hf0c,&Hc0ff,&Hc0c,&Hc000
+109 DATA 145,1,0,&H3,&Hff03,&Hc0ff,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&Hff03,&Hff,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&H3,&Hff03,&Hff,&H3,&H3,0,0
+110 DATA 161,1,0,&H3000,&Hff3f,&Hfcff,&H30,&H3000,&Hff30,&H30fc,&Hc030,&H300c,&Hff30,&H30fc,&H30,&H3000,&Hff33,&H30ff,&H33,&H3003,&H333,&H3003,&H333,&H3003,&Hc33,&H30c3,&H3030,&H3030,&Hc030,&H300c,&Hff3f,&Hf0ff,&H30,&H3000
