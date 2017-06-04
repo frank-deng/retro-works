@@ -27,6 +27,8 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 
 ![Graph](http://frank-deng.github.io/retro-works/Graph.png)
 
+![Chinese Demo](http://frank-deng.github.io/retro-works/Chinese.png)
+
 
 telnet-site
 -----------
