@@ -39,9 +39,8 @@ A simple site designed for console-based browser [w3m](http://w3m.sourceforge.ne
 DOSBox模拟的客户端硬件  
 Client side hardware emulated by DOSBox
 
-* Old 386 platform
-* VGA display
-* Floppy drive only
+* Old 486 platform
+* S3 864 video card
 * Virtual serial line connected to modem emulated by [`tcpser`](http://www.jbrain.com/pub/linux/serial/)
 
 客户端使用的软件  
@@ -107,51 +106,10 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 输入以下命令打开串口终端程序  
 Run serial terminal program with the following command
 
-	NRDTERM -A -M2400,N,8,1 COM1:
+	NRDTERM -A -M19200,N,8,1 COM1:
 
 在串口终端中输入`ATDT92163`连接telnet站点，然后按`Enter`进入登录界面。  
 Input `ATDT92163` in the serial terminal, then press `Enter` to open login panel.
-
-
-TX-console
-----------
-
-使用UCDOS自带的特显程序`TX.COM`，以显示不同字体和字号的中文，并绘制一些简单的图表。  
-An environment use `TX.COM` (Special Display) shipped along with UCDOS to display Chinese characters in different sizes and fonts, as well as drawing some simple graphs.
-
-可用的程序  
-Applications available
-
-* 飞控中心 (Flight Information Center)
-* 猜数字控制台 (Control center for Bulls and Cows AI)
-* 2048控制台 (Control center for 2048 AI)
-
-DOSBox模拟的客户端硬件  
-Client side hardware emulated by DOSBox
-
-* Old 286 platform
-* Hercules Monochrome display
-* Floppy drive only
-* Virtual serial line connection
-
-客户端使用的软件  
-Client side software
-
-* MS-DOS 5.0
-* UCDOS 7.0
-* COMTOOL.COM
-
-### 截图欣赏 Screenshots
-
-![Startup](http://frank-deng.github.io/retro-works/startup-tx.png)
-
-![Main Menu](http://frank-deng.github.io/retro-works/menu.png)
-
-![Flight Control Center](http://frank-deng.github.io/retro-works/fgfs.png)
-
-![Bulls and Cows AI](http://frank-deng.github.io/retro-works/guessnum-console.png)
-
-![2048](http://frank-deng.github.io/retro-works/2048-console.png)
 
 
 Notes 
