@@ -19,4 +19,6 @@ keymap	ESC-s	NULL
 keymap	S	NULL
 keymap	E	NULL
 keymap	ESC-e	NULL
-keymap	M	NULL
+keymap	ESC-a	NULL
+keymap	ESC-b	NULL
+keymap	q	ABORT

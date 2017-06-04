@@ -21,13 +21,14 @@ class LoginManager():
     __password = '';
     __action = 0;
     __proc = None;
-    def shutdown(self):
-        if (None != self.__proc):
-            self.__proc.kill();
 
     def welcome(self):
         os.write(stdout, '*** 欢迎光临我的信息港 ***\r\n'.encode('GB2312'));
         os.write(stdout, '\r\n用户名：'.encode('GB2312'));
+
+    def shutdown(self):
+        if (None != self.__proc):
+            self.__proc.kill();
 
     def launch(self):
         if (self.__username in users and self.__password == users[self.__username]):
@@ -38,22 +39,24 @@ class LoginManager():
             self.__proc.wait();
             self.__proc = None;
         else:
-            #os.write(stdout, ('%s %s\r\n'%(self.__username, self.__password)).encode('GB2312'));
             os.write(stdout, '登录失败！\r\n\r\n'.encode('GB2312'));
         self.welcome();
-        self.__action = 0;
+        self.__action = 1;
         self.__username = '';
         self.__password = '';
 
     def input(self, char):
         if ("\n" == char):
             if self.__action == 0:
-                os.write(stdout, '\r\n密　码：'.encode('GB2312'));
                 self.__action = 1;
+                self.welcome();
             elif self.__action == 1:
+                os.write(stdout, '\r\n密　码：'.encode('GB2312'));
+                self.__action = 2;
+            elif self.__action == 2:
                 os.write(stdout, b'\r\n');
                 self.launch();
-        elif (self.__action == 0):
+        elif (self.__action == 1):
             if (char in ('\x7F', '\x08')):
                 if (len(self.__username) > 0):
                     self.__username = self.__username[0:-1];
@@ -61,7 +64,7 @@ class LoginManager():
             else:
                 self.__username += char;
                 os.write(stdout, char.encode('ascii'));
-        elif (self.__action == 1):
+        elif (self.__action == 2):
             if (char in ('\x7F', '\x08')):
                 if (len(self.__password) > 0):
                     self.__password = self.__password[0:-1];
@@ -75,7 +78,6 @@ if __name__ == '__main__':
     running = True;
     tick = timeout = 300;
     loginManager = LoginManager();
-    loginManager.welcome();
     try:
         while running:
             while (not kbhit.kbhit()) and tick > 0:
