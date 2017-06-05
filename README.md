@@ -67,39 +67,16 @@ Install package needed
 
 	sudo apt-get install ncurses-term tcpser
 	
-创建`user`用户
-Add user with username `user`
-	
-	sudo adduser user
+将`telnetd.py`和`mylogin.py`复制到`/usr/local/bin`目录中。  
+Copy `telnetd.py` and `mylogin.py` to directory `/usr/local/bin`.
 
-在`/home/user/.bashrc`中加上以下内容：  
-Add the following lines into `/home/user/.bashrc`:
-
-	export TERM='ansi43m';
-	export LINES=25;
-	export COLUMNS=80;
-	export LC_ALL=zh_CN.GB2312
-	export LANG=zh_CN.GB2312
-	export WWW_HOME='http://127.0.0.1'
-	w3m -no-mouse
-	exit
-
-登录`user`用户，然后对`w3m`浏览器作如下设置：  
-Login as user `user`, then setup `w3m` with the settings below:
-
-* Run external viewer in the background: No
-* Use combining characters: No
-* Use double width for some Unicode characters: Yes
-* Charset conversion when loading: Yes
-* External Browser: `w3m -dump`
-
-将`keymap`文件复制到`/home/user/.w3m`目录中，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
-Copy file `keymap` to folder `/home/user/.w3m` to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
+将`config`文件和`keymap`文件复制到`~/.w3m`目录中，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
+Copy file `config` and `keymap` to folder `~/.w3m` to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
 
-	@reboot root    /usr/local/bin/telnetd.py -E TERM=ansi43m -E LANG=zh_CN.GB2312 -E LC_ALL=zh_CN.GB2312 -E LINES=25 -E COLUMNS=80 -E ERASECHAR=010
+	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/mylogin.py
 	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:23"
 
 ### DOSBox客户端使用方法
