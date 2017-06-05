@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys, os, time, subprocess, kbhit;
+import sys, os, time, subprocess;
 
 users = {
     'user' : 'user'
@@ -16,10 +16,37 @@ env_custom = {
 }
 stdout = sys.stdout.fileno();
 
+import termios;
+from select import select;
+class Kbhit:
+    def __init__(self):
+        self.__fd = sys.stdin.fileno();
+        self.__new_term = termios.tcgetattr(self.__fd);
+        self.__old_term = termios.tcgetattr(self.__fd);
+        self.__new_term[3] = (self.__new_term[3] & ~termios.ICANON & ~termios.ECHO);
+        termios.tcsetattr(self.__fd, termios.TCSAFLUSH, self.__new_term);
+
+    def restore(self):
+        termios.tcsetattr(self.__fd, termios.TCSAFLUSH, self.__old_term);
+
+    def kbhit(self):
+        dr,dw,de = select([sys.stdin], [], [], 0);
+        return len(dr)>0;
+
+    def getch(self):
+        try:
+            ch = sys.stdin.read(1);
+            if ch == '\x00' or ord(ch) >= 0xA1:
+                return ch+sys.stdin.read(1);
+            else:
+                return ch;
+        except Exception as e:
+            return None;
+
 class LoginManager():
     __username = '';
     __password = '';
-    __action = 0;
+    __action = 1;
     __proc = None;
 
     def welcome(self):
@@ -39,7 +66,7 @@ class LoginManager():
             self.__proc.wait();
             self.__proc = None;
         else:
-            os.write(stdout, '登录失败！\r\n\r\n'.encode('GB2312'));
+            os.write(stdout, '\r\n登录失败！\r\n\r\n'.encode('GB2312'));
         self.welcome();
         self.__action = 1;
         self.__username = '';
@@ -47,10 +74,7 @@ class LoginManager():
 
     def input(self, char):
         if ("\n" == char):
-            if self.__action == 0:
-                self.__action = 1;
-                self.welcome();
-            elif self.__action == 1:
+            if self.__action == 1:
                 os.write(stdout, '\r\n密　码：'.encode('GB2312'));
                 self.__action = 2;
             elif self.__action == 2:
@@ -74,10 +98,11 @@ class LoginManager():
                 os.write(stdout, b'*');
 
 if __name__ == '__main__':
-    kbhit.init();
+    kbhit = Kbhit();
     running = True;
     tick = timeout = 300;
     loginManager = LoginManager();
+    loginManager.welcome();
     try:
         while running:
             while (not kbhit.kbhit()) and tick > 0:

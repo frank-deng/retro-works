@@ -1,5 +1,9 @@
 __pycache__
 *.swp
 *.o
+*.COM
+*.com
 guessnum
 guessnum.h
+articles
+DOC

@@ -21,4 +21,5 @@ keymap	E	NULL
 keymap	ESC-e	NULL
 keymap	ESC-a	NULL
 keymap	ESC-b	NULL
-keymap	q	ABORT
+keymap	q	NULL
+keymap	Q	ABORT
