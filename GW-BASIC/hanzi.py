@@ -2,14 +2,17 @@
 
 import sys, struct, argparse;
 
-class PositionParser(argparse.Action):
+class TextDispParser(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
+    	text_all = getattr(namespace, self.dest);
         try:
-            x,y = values.split(',');
+            pos,text = values.split(':');
+            x,y = pos.split(',');
             x,y = int(x),int(y);
         except Exception as e:
             parser.error('Invalid position format.');
-        setattr(namespace, self.dest, (x,y));
+        text_all.append({'pos':(x,y), 'text':text});
+        setattr(namespace, self.dest, text_all);
 
 argParser = argparse.ArgumentParser();
 argParser.add_argument(
@@ -19,31 +22,55 @@ argParser.add_argument(
     default='HZK16.FON'
 );
 argParser.add_argument(
-    'position',
-    action=PositionParser,
-    help='Specify position to display text.'
+    '-o',
+    help='Output file.'
 );
 argParser.add_argument(
-    'text',
-    help='Chinese text to display.'
+    'textdisp',
+    action=TextDispParser,
+    help='Chinese text to display, in the format of X,Y:TEXT.',
+    default=[]
 );
-args = argParser.parse_args();
 
-with open(args.font, 'rb') as hzk16:
-    x, y = args.position;
-    count = 0;
-    for char in args.text:
-        gbcode = char.encode('GB2312', 'ignore');
-        if (len(gbcode) != 2):
-            continue;
-        quwei = (gbcode[0]-0xA1, gbcode[1]-0xA1);
-        gdata = [];
-        hzk16.seek((quwei[0]*94+quwei[1])*32);
-        for n in struct.unpack('H'*16, hzk16.read(32)):
-            if (n):
-                gdata.append('&H%x'%n);
-            else:
-                gdata.append('0');
-        sys.stdout.write('%d DATA %d,%d,%s\r\n'%(100+count*10, x+count*16, y, ','.join(gdata)));
-        count += 1;
-
+class TextDataMaker:
+	def __init__(self, font, output = sys.stdout):
+		self.__font = open(font, 'rb');
+		self.__lineSpace = 10;
+		self.__line = 100;
+		self.__out = output;
+	
+	def __enter__(self):
+        return self;
+	
+	def __exit__(self, exc_type, exc_value, traceback):
+		self.__font.close();
+		
+	def output(self, x, y, text):
+		count = 0;
+		for char in text:
+            gbcode = char.encode('GB2312', 'ignore');
+            if (len(gbcode) != 2):
+                continue;
+            quwei = (gbcode[0]-0xA1, gbcode[1]-0xA1);
+            gdata = [];
+            self.__font.seek((quwei[0]*94+quwei[1])*32);
+            for n in struct.unpack('H'*16, self.__font.read(32)):
+                if (n):
+                    gdata.append('&H%x'%n);
+                else:
+                    gdata.append('0');
+            self.__out.write('%d DATA %d,%d,%s\r\n'%(self.__line, x+count*16, y, ','.join(gdata)));
+            self.__line += self.__lineSpace;
+            count += 1;
+        
+if __name__ == '__main__':
+	args = argParser.parse_args();
+	out = sys.stdout;
+	if args.o:
+	    out = open(args.o, 'w');
+	textDataMaker = TextDataMaker(args.font);
+	for item in args.textdisp:
+	    textDataMaker.output(item['pos'][0], item['pos'][1], item['text']):
+	if args.o:
+	    out.close();
+	exit(0);
