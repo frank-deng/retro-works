@@ -72,10 +72,12 @@ function processJokes(&$data){
 	try{
 		$db = new PDO($_G['config']['dbcache']['conn'], $_G['config']['dbcache']['user'], $_G['config']['dbcache']['password']);
 		foreach($data['contentlist'] as $idx => $content) {
+			$id = md5($content['title'].$content['text'].$content['ct']);
+			$data['contentlist'][$idx]['id'] = $id;
 			$stmt_i = $db->prepare('REPLACE INTO showapi_jokes (ckey, cdata) VALUES (:key, :content)');
-			$stmt_i->bindValue('key', $content['id']);
+			$stmt_i->bindValue('key', $id);
 			$stmt_i->bindValue('content', serialize(array(
-				'id' => $content['id'],
+				'id' => $id,
 				'title' => $content['title'],
 				'text' => $content['text'],
 				'ct' => $content['ct'],
