@@ -48,10 +48,6 @@ if __name__ == '__main__':
         while (not kbhit.kbhit()):
             pass;
         ch = kbhit.getch();
-        os.write(stdout, '请按任意键返回。'.encode('GB2312'));
-        while (not kbhit.kbhit()):
-            pass;
-        ch = kbhit.getch();
     finally:
         kbhit.restore();
     exit(0);
