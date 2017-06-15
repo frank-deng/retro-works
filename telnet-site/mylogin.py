@@ -14,7 +14,6 @@ env_custom = {
     'COLUMNS' : '80',
     'WWW_HOME' : 'http://127.0.0.1:8080',
 }
-stdout = sys.stdout.fileno();
 
 import termios;
 from select import select;
@@ -25,8 +24,11 @@ class Kbhit:
         self.__old_term = termios.tcgetattr(self.__fd);
         self.__new_term[3] = (self.__new_term[3] & ~termios.ICANON & ~termios.ECHO);
         termios.tcsetattr(self.__fd, termios.TCSAFLUSH, self.__new_term);
-
-    def restore(self):
+        
+    def __enter__(self):
+        return self;
+    
+    def __exit__(self, exc_type, exc_value, traceback):
         termios.tcsetattr(self.__fd, termios.TCSAFLUSH, self.__old_term);
 
     def kbhit(self):
@@ -42,85 +44,114 @@ class Kbhit:
                 return ch;
         except Exception as e:
             return None;
+            
+class TimeoutException(Exception):
+	def __init__(self, timeout=0);
+	    self.timeout = timeout;
+	    self.message = 'No user input within %d seconds'%timeout;
+            
+class ConsoleManager(Kbhit):
+	__out = sys.stdout.fileno();
+	def __init__(self):
+		Kbhit.__init__(self);
+		
+	def __enter__(self):
+        return self;
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+    	Kbhit.__exit__(self);
+    
+    def readln(self, password=False, maxlength=None, timeout=None):
+        running = True;
+        input = '';
+        while running:
+        	try:
+        	    tick = 0;
+                while (not self.kbhit()):
+                    time.sleep(0.1);
+                    tick += 1;
+                    if (tick >= timeout*10):
+                        raise TimeoutException(timeout);
+            
+                ch = kbhit.getch();
+                if (None == ch):
+            	    pass;
+                elif (ch in ('\x7F', '\x08')):
+                    if (len(input) > 0):
+                        input = input[0:-1];
+                        self.write(b"\x1b[D \x1b[D");
+                elif ("\n" == ch):
+                	self.writeln(b'');
+                	running = False;
+                else:
+                    input += ch;
+                    if password:
+                    	self.write(b'*');
+                    else:
+                        self.write(char.encode('ascii'));
+            except KeyboardInterrupt:
+                pass;
+        return input;
+        
+    def write(self, text):
+    	os.write(self.__out, text);
+    
+    def writeln(self, text):
+    	os.write(self.__out, text+b'\r\n');
 
-class LoginManager():
-    __username = '';
-    __password = '';
-    __action = 1;
+class LoginManager(ConsoleManager):
     __proc = None;
+    def __init__(self):
+        ConsoleManager.__init__(self);
+		
+	def __enter__(self):
+        return self;
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+    	if (None != self.__proc):
+    	    self.__proc.kill();
+    	InputManager.__exit__(self);
 
-    def welcome(self):
-        os.write(stdout, '*** 欢迎光临我的信息港 ***\r\n'.encode('GB2312'));
-        os.write(stdout, '\r\n用户名：'.encode('GB2312'));
-
-    def shutdown(self):
-        if (None != self.__proc):
-            self.__proc.kill();
-
-    def launch(self):
+    def __login(self):
+        self.writeln('*** 欢迎光临我的信息港 ***'.encode('GB2312'));
+        self.writeln(b'');
+        self.write('用户名：'.encode('GB2312'));
+        username = self.readln(timeout=60);
+        self.write('密　码：'.encode('GB2312'));
+        password = self.readln(password=True,timeout=60);
         if (self.__username in users and self.__password == users[self.__username]):
-            os.write(stdout, '登录成功！\r\n'.encode('GB2312'));
-            env = os.environ.copy();
-            env.update(env_custom);
-            self.__proc = subprocess.Popen(['w3m', '-no-mouse'], env = env);
-            self.__proc.wait();
-            self.__proc = None;
+            self.writeln('登录成功！'.encode('GB2312'));
+            return True;
         else:
-            os.write(stdout, '\r\n登录失败！\r\n\r\n'.encode('GB2312'));
-        self.welcome();
-        self.__action = 1;
-        self.__username = '';
-        self.__password = '';
+        	self.writeln('登录失败！'.encode('GB2312'));
+            self.writeln(b'');
+        	return False;
 
-    def input(self, char):
-        if ("\n" == char):
-            if self.__action == 1:
-                os.write(stdout, '\r\n密　码：'.encode('GB2312'));
-                self.__action = 2;
-            elif self.__action == 2:
-                os.write(stdout, b'\r\n');
-                self.launch();
-        elif (self.__action == 1):
-            if (char in ('\x7F', '\x08')):
-                if (len(self.__username) > 0):
-                    self.__username = self.__username[0:-1];
-                    os.write(stdout, b"\x1b[D \x1b[D");
-            else:
-                self.__username += char;
-                os.write(stdout, char.encode('ascii'));
-        elif (self.__action == 2):
-            if (char in ('\x7F', '\x08')):
-                if (len(self.__password) > 0):
-                    self.__password = self.__password[0:-1];
-                    os.write(stdout, b"\x1b[D \x1b[D");
-            else:
-                self.__password += char;
-                os.write(stdout, b'*');
+    def __launch(self):
+        env = os.environ.copy();
+        env.update(env_custom);
+        self.__proc = subprocess.Popen(['w3m', '-no-mouse'], env = env);
+        self.__proc.wait();
+        self.__proc = None;
+    
+    def run(self):
+    	try:
+    	    while True:
+    	        try:
+    	            if self.__login():
+    	                self.__launch();
+                except TimeoutException as e:
+                	raise e;
+                except Exception as e:
+                	print(str(e));
+                    time.sleep(3);
+    
+        except TimeoutException as e:
+        	self.writeln(('%d秒内无用户输入，退出。'%(e.timeout)).encode('GB2312'));
+            self.writeln(b'');
 
 if __name__ == '__main__':
-    kbhit = Kbhit();
-    running = True;
-    tick = timeout = 300;
     loginManager = LoginManager();
-    loginManager.welcome();
-    try:
-        while running:
-            while (not kbhit.kbhit()) and tick > 0:
-                try:
-                    time.sleep(0.1);
-                    tick -= 1;
-                except KeyboardInterrupt:
-                    pass;
-
-            if (tick <= 0):
-                running = False;
-            else:
-                tick = timeout;
-                ch = kbhit.getch();
-                loginManager.input(ch);
-        os.write(stdout, b"\r\n\r\n");
-    finally:
-        kbhit.restore();
-        loginManager.shutdown();
+    loginManager.run();
     exit(0);
 
