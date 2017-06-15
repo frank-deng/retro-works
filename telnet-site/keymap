@@ -22,4 +22,7 @@ keymap	ESC-e	NULL
 keymap	ESC-a	NULL
 keymap	ESC-b	NULL
 keymap	q	NULL
+keymap  U   NULL
+keymap  ESC-u   NULL
+
 keymap	Q	ABORT
