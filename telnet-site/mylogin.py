@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys, os, time, subprocess;
+import sys, os, time, subprocess, atexit;
 
 users = {
     'user' : 'user'
@@ -24,11 +24,9 @@ class Kbhit:
         self.__old_term = termios.tcgetattr(self.__fd);
         self.__new_term[3] = (self.__new_term[3] & ~termios.ICANON & ~termios.ECHO);
         termios.tcsetattr(self.__fd, termios.TCSAFLUSH, self.__new_term);
+        atexit.register(self.restore);
         
-    def __enter__(self):
-        return self;
-    
-    def __exit__(self, exc_type, exc_value, traceback):
+    def restore(self):
         termios.tcsetattr(self.__fd, termios.TCSAFLUSH, self.__old_term);
 
     def kbhit(self):
@@ -46,7 +44,7 @@ class Kbhit:
             return None;
             
 class TimeoutException(Exception):
-    def __init__(self, timeout=0);
+    def __init__(self, timeout=0):
         self.timeout = timeout;
         self.message = 'No user input within %d seconds'%timeout;
             
@@ -54,16 +52,11 @@ class ConsoleManager(Kbhit):
     __out = sys.stdout.fileno();
     def __init__(self, encoding = 'UTF-8'):
         Kbhit.__init__(self);
-        
-    def __enter__(self):
-        return self;
-    
-    def __exit__(self, exc_type, exc_value, traceback):
-        Kbhit.__exit__(self);
+        self.__encoding = encoding;
     
     def readln(self, password=False, maxlength=None, timeout=None):
         running = True;
-        input = '';
+        _input = '';
         while running:
             try:
                 tick = 0;
@@ -73,53 +66,57 @@ class ConsoleManager(Kbhit):
                     if (tick >= timeout*10):
                         raise TimeoutException(timeout);
             
-                ch = kbhit.getch();
+                ch = self.getch();
                 if (None == ch):
                     pass;
                 elif (ch in ('\x7F', '\x08')):
-                    if (len(input) > 0):
-                        input = input[0:-1];
+                    if (len(_input) > 0):
+                        input = _input[0:-1];
                         self.write(b"\x1b[D \x1b[D");
                 elif ("\n" == ch):
                     self.writeln(b'');
                     running = False;
                 else:
-                    input += ch;
+                    _input += ch;
                     if password:
                         self.write(b'*');
                     else:
-                        self.write(char.encode('ascii'));
+                        self.write(ch.encode('ascii'));
             except KeyboardInterrupt:
                 pass;
-        return input;
+        return _input;
         
     def write(self, text):
-        os.write(self.__out, text.encode(self.__encoding, 'ignore'));
+        if (isinstance(text, str)):
+            os.write(self.__out, text.encode(self.__encoding, 'ignore'));
+        else:
+            os.write(self.__out, text);
     
     def writeln(self, text):
-        os.write(self.__out, text.encode(self.__encoding, 'ignore')+b'\r\n');
+        if (isinstance(text, str)):
+            os.write(self.__out, text.encode(self.__encoding, 'ignore')+b'\r\n');
+        else:
+            os.write(self.__out, text+b'\r\n');
 
 class LoginManager(ConsoleManager):
     __proc = None;
-    def __init__(self, encoding = 'UTF-8'):
+    def __init__(self, encoding = 'UTF-8', timeout = 60):
         ConsoleManager.__init__(self, encoding);
-        
-    def __enter__(self):
-        return self;
+        self.__timeout = timeout;
+        atexit.register(self.shutdown);
     
-    def __exit__(self, exc_type, exc_value, traceback):
+    def shutdown(self):
         if (None != self.__proc):
             self.__proc.kill();
-        InputManager.__exit__(self);
 
     def __login(self):
         self.writeln('*** 欢迎光临我的信息港 ***');
         self.writeln(b'');
         self.write('用户名：');
-        username = self.readln(timeout=60);
+        username = self.readln(timeout=self.__timeout, maxlength=40);
         self.write('密　码：');
-        password = self.readln(password=True,timeout=60);
-        if (self.__username in users and self.__password == users[self.__username]):
+        password = self.readln(password=True, timeout=self.__timeout, maxlength=40);
+        if (username in users and password == users[username]):
             self.writeln('登录成功！');
             return True;
         else:
@@ -145,13 +142,13 @@ class LoginManager(ConsoleManager):
                 except Exception as e:
                     print(str(e));
                     time.sleep(3);
-    
         except TimeoutException as e:
+            self.writeln(b'');
             self.writeln('%d秒内无用户输入，退出。'%(e.timeout));
             self.writeln(b'');
 
 if __name__ == '__main__':
-    loginManager = LoginManager();
+    loginManager = LoginManager(encoding='GB2312');
     loginManager.run();
     exit(0);
 
