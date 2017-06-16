@@ -71,12 +71,12 @@ class ConsoleManager(Kbhit):
                     pass;
                 elif (ch in ('\x7F', '\x08')):
                     if (len(_input) > 0):
-                        input = _input[0:-1];
+                        _input = _input[0:-1];
                         self.write(b"\x1b[D \x1b[D");
                 elif ("\n" == ch):
                     self.writeln(b'');
                     running = False;
-                elif (maxlength == None or len(input) < maxlength):
+                elif (maxlength == None or len(_input) < maxlength):
                     _input += ch;
                     if password:
                         self.write(b'*');
