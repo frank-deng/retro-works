@@ -76,7 +76,7 @@ class ConsoleManager(Kbhit):
                 elif ("\n" == ch):
                     self.writeln(b'');
                     running = False;
-                else:
+                elif (maxlength == None or len(input) < maxlength):
                     _input += ch;
                     if password:
                         self.write(b'*');
@@ -100,9 +100,10 @@ class ConsoleManager(Kbhit):
 
 class LoginManager(ConsoleManager):
     __proc = None;
-    def __init__(self, encoding = 'UTF-8', timeout = 60):
+    def __init__(self, encoding = 'UTF-8', timeout = 60, nextLoginDelay = 3):
         ConsoleManager.__init__(self, encoding);
         self.__timeout = timeout;
+        self.__nextLoginDelay = nextLoginDelay;
         atexit.register(self.shutdown);
     
     def shutdown(self):
@@ -122,6 +123,7 @@ class LoginManager(ConsoleManager):
         else:
             self.writeln('登录失败！');
             self.writeln(b'');
+            time.sleep(self.__nextLoginDelay);
             return False;
 
     def __launch(self):
