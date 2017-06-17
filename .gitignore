@@ -7,9 +7,9 @@ guessnum
 guessnum.h
 articles
 DOC
-ie3-site/_posts/*
-ie3-site/_site/*
 ie3-site/images/*
 ie3-site/musics/*
+ie3-site/_posts/*
 ie3-site/_data/*
-ie3-site/_sitegb/*
+ie3-site/_site/*
+ie3-site/*.zip

@@ -8,7 +8,9 @@
 # Build settings
 markdown: kramdown
 permalink: none
+post_dirs: false
 
 # Multi Language
 gems: ['jekyll-paginate']
 
+exclude: ['build.sh', 'site.zip']
