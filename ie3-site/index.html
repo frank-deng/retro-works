@@ -1,0 +1,16 @@
+---
+---
+<html>
+	<head>
+		<title>{{site.data.common.siteTitle}}</title>
+		<link rel='stylesheet' type='style/css' href='css/style.css'>
+	</head>
+	<body>
+		<h1>{{site.data.common.siteTitle}}</h1>
+		<ul>
+			{% for post in site.posts %}
+			<li><a href='{{ post.url }}'>{{post.title}}</a></li>
+			{% endfor %}
+		</ul>
+	</body>
+</html>
