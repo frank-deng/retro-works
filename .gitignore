@@ -13,3 +13,5 @@ ie3-site/_posts/*
 ie3-site/_data/*
 ie3-site/_site/*
 ie3-site/*.zip
+ie3-site/*.iso
+ie3-site/*.img

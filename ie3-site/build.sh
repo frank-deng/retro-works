@@ -8,11 +8,4 @@ for fname in $(ls *.html); do
 done;
 rm *.html &>/dev/null
 cd ..
-
-SITEDIR=$(date +%y%m%d)
-mkdir $SITEDIR
-cp -aR _site/* $SITEDIR
-rm site.zip &>/dev/null
-zip -r $SITEDIR $SITEDIR/*
-rm -r $SITEDIR
-
+genisoimage -o mysite.iso -V MYSITE _site/

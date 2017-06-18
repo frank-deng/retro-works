@@ -15,5 +15,5 @@ kramdown:
 # Multi Language
 gems: ['jekyll-paginate']
 
-exclude: ['build.sh', '*.zip']
+exclude: ['build.sh', '*.zip', '*.img', '*.iso']
 
