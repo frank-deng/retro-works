@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, sys, subprocess;
+import os, sys, subprocess, time, tempfile, urllib.request;
 
 import termios;
 from select import select;
@@ -29,25 +29,26 @@ class Kbhit:
         except Exception as e:
             return None;
 
+def readkey(keys = None):
+    key = None;
+    while True:
+        while (not kbhit.kbhit()):
+            time.sleep(0.1);
+        key = kbhit.getch();
+        if (None == keys or (key in keys)):
+            break;
+    return key;
+
 if __name__ == '__main__':
     kbhit = Kbhit();
     try:
         stdout = sys.stdout.fileno();
+        downloadURL = sys.argv[1];
         os.write(stdout, '请打开您的终端上的文本捕获功能，然后按Enter键继续。\r\n'.encode('GB2312'));
-
-        while True:
-            while (not kbhit.kbhit()):
-                pass;
-            ch = kbhit.getch();
-            if (ch == "\n"):
-                break;
-
-        p = subprocess.Popen(['w3m', '-dump', sys.argv[1]]);
+        readkey(('\n',));
+        p = subprocess.Popen(['w3m', '-dump', downloadURL]);
         p.wait();
-
-        while (not kbhit.kbhit()):
-            pass;
-        ch = kbhit.getch();
+        readkey();
     finally:
         kbhit.restore();
     exit(0);

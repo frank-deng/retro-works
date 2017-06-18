@@ -9,8 +9,11 @@
 markdown: kramdown
 permalink: none
 post_dirs: false
+kramdown:
+    parse_block_html: true
 
 # Multi Language
 gems: ['jekyll-paginate']
 
-exclude: ['build.sh', 'site.zip']
+exclude: ['build.sh', '*.zip']
+

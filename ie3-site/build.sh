@@ -13,6 +13,6 @@ SITEDIR=$(date +%y%m%d)
 mkdir $SITEDIR
 cp -aR _site/* $SITEDIR
 rm site.zip &>/dev/null
-zip -r site $SITEDIR/*
+zip -r $SITEDIR $SITEDIR/*
 rm -r $SITEDIR
 

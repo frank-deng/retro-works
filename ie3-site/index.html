@@ -3,10 +3,10 @@
 <html>
 	<head>
 		<title>{{site.data.common.siteTitle}}</title>
-		<link rel='stylesheet' type='style/css' href='css/style.css'>
 	</head>
 	<body>
-		<h1>{{site.data.common.siteTitle}}</h1>
+		<h1><center><font face='黑体'>{{site.data.common.siteTitle}}</font></center></h1>
+		<hr>
 		<ul>
 			{% for post in site.posts %}
 			<li><a href='{{post.id}}.htm'>{{post.title}}</a></li>
@@ -14,3 +14,4 @@
 		</ul>
 	</body>
 </html>
+
