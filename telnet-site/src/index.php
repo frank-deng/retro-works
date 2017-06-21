@@ -64,17 +64,17 @@ $jokes = $indexData['jokes'];
 							<th align='left' width='33%'><b><?=lang('Weekly Rank')?></b></th>
 						</tr>
 						<tr>
-							<td><ol>
+							<td valign='top'><ol>
 								<?php foreach ($movieRank['daily'] as $item) { ?>
 									<li><?=$item['MovieName']?></li>
 								<?php } ?>
 							</ol></td>
-							<td><ol>
+							<td valign='top'><ol>
 								<?php foreach ($movieRank['weekend'] as $item) { ?>
 									<li><?=$item['MovieName']?></li>
 								<?php } ?>
 							</ol></td>
-							<td><ol>
+							<td valign='top'><ol>
 								<?php foreach ($movieRank['weekly'] as $item) { ?>
 									<li><?=$item['MovieName']?></li>
 								<?php } ?>
@@ -85,7 +85,7 @@ $jokes = $indexData['jokes'];
 				
 				<hr/><div><b><?=lang('Jokes Collection')?></b>&nbsp;<a href='jokes.php'><?=lang('More')?>&gt;&gt;</a></div>
 				<table width='100%'><tr>
-					<td valign='top'>
+					<td valign='top' width='50%'>
 						<?php if ($jokes) { ?>
 							<ul>
 								<?php for($i = 0; $i < 5; $i++) { ?>
@@ -96,7 +96,7 @@ $jokes = $indexData['jokes'];
 							<?=lang('No Jokes')?>
 						<?php } ?>
 					</td>
-					<td valign='top'>
+					<td valign='top' width='50%'>
 						<?php if ($jokes) { ?>
 							<ul>
 								<?php for($i = 5; $i < 10; $i++) { ?>
