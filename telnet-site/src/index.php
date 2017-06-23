@@ -26,7 +26,6 @@ $jokes = $indexData['jokes'];
 				<td width='60%' align='right'><?=lang('_sep')?><!--
 					--><a href='dict.php'><?=lang('Dictionary')?></a><?=lang('_sep')?><!--
 					--><a href='currency.php'><?=lang('Currency Exchange')?></a><?=lang('_sep')?><!--
-					--><a href='message.php'><?=lang('Send Message')?></a><?=lang('_sep')?><!--
 				--></td>
 			</tr>
 			<tr><td colspan='2'>
