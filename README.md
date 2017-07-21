@@ -59,6 +59,8 @@ Client side software
 
 ![](http://frank-deng.github.io/retro-works/Telnet%202.png)
 
+![](http://frank-deng.github.io/retro-works/Telnet%203.png)
+
 ### Linux服务器端配置 Linux Server Configuration
 
 在`/etc/locale.gen`中加上`zh_CN.GB2312`，然后运行`sudo locale-gen`。  
