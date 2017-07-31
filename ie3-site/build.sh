@@ -8,6 +8,11 @@ for fname in $(ls *.html); do
 done;
 rm *.html &>/dev/null
 find . -iname \*.jpg -exec mogrify -resize '600x300>' {} \;
+find . -iname \*.png | while read filepng; do
+	filejpg="${filepng%.*}.jpg";
+	convert "${filepng}" -resize '600x300>' -background "#FFFFFF" -flatten "${filejpg}"
+	rm "${filepng}"
+done;
 cd ..
 
 TARGET='myspace.img';
