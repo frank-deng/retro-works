@@ -1,6 +1,7 @@
 import json, urllib, httplib2, hashlib;
 import config;
 from collections import OrderedDict;
+import xml.dom.minidom as minidom;
 
 def fetchJSON(url, headers = None, body = None):
     http = httplib2.Http(timeout = config.REQUEST_TIMEOUT);
@@ -41,7 +42,6 @@ def showAPIFetchJSON(url, params = {}):
         sign += key+str(params[key]);
     sign += config.SHOWAPI_SECRET;
     params['showapi_sign'] = hashlib.md5(sign.encode('UTF-8')).hexdigest();
-    print(sign, params);
     try:
         data = fetchJSON(url, body=params);
     except Exception as e:
@@ -72,5 +72,37 @@ def doCurrencyExchange(f, t, a):
     try:
         return data['money'];
     except KeyError:
+        return None;
+
+def queryDictionary(word):
+    http = httplib2.Http(timeout = config.REQUEST_TIMEOUT);
+    word = word.replace('\r', '').replace('\n', '');
+    try:
+        resp,content = http.request(
+            'http://fy.webxml.com.cn/webservices/EnglishChinese.asmx/Translator',
+            'POST',
+            body='wordKey='+urllib.parse.quote(word.encode('UTF-8')),
+            headers={'content-type': 'application/x-www-form-urlencoded'}
+        );
+        dom = minidom.parseString(content.decode('UTF-8'));
+        root = dom.documentElement;
+        translation = root.getElementsByTagName('Translation')[0].firstChild.data;
+        if ('Not Found' == translation):
+            return 'Not Found';
+        result = {
+            'trans':translation,
+            'sentence':[],
+            'refer':[],
+        }
+        for sentence in root.getElementsByTagName('Sentence'):
+            result['sentence'].append({
+                'orig':sentence.getElementsByTagName('Orig')[0].firstChild.data,
+                'trans':sentence.getElementsByTagName('Trans')[0].firstChild.data,
+            });
+        for refer in root.getElementsByTagName('Refer'):
+            result['refer'].append(refer.getElementsByTagName('Rel')[0].firstChild.data);
+        return result;
+    except Exception as e:
+        print(e);
         return None;
 

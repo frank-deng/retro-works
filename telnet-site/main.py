@@ -96,5 +96,15 @@ def currencyExchage():
         'result':models.doCurrencyExchange(fromCurrency, toCurrency, amount),
     });
 
+@route('/dict')
+@view('dict')
+def dict():
+    word = request.query.word;
+    result = models.queryDictionary(word);
+    return {
+        'word': word,
+        'result': result,
+    };
+
 run(host=args.host, port=args.port);
 
