@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser();
 parser.add_argument(
     '--host',
     '-H',
-    help='Specify host for the telnet server.',
+    help='Specify binding host for the telnet server.',
     default=''
 );
 parser.add_argument(
