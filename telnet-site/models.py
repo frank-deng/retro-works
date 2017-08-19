@@ -1,7 +1,26 @@
-import json, urllib, httplib2, hashlib;
+import json, urllib, httplib2, hashlib, threading;
 import config;
 from collections import OrderedDict;
 import xml.dom.minidom as minidom;
+
+class Cache:
+    __data = {};
+    __mutex = threading.Lock();
+    def __init__(self):
+        pass;
+
+    def get(self, key):
+        self.__mutex.acquire();
+        val = self.__data.get(key);
+        self.__mutex.release();
+        return val;
+
+    def set(self, key, val):
+        self.__mutex.acquire();
+        self.__data[key] = val;
+        self.__mutex.release();
+
+cache = Cache();
 
 def fetchJSON(url, headers = None, body = None):
     http = httplib2.Http(timeout = config.REQUEST_TIMEOUT);
@@ -73,6 +92,24 @@ def doCurrencyExchange(f, t, a):
         return data['money'];
     except KeyError:
         return None;
+
+def getJokes(page = 1, size = 19):
+    global cache;
+    data = showAPIFetchJSON('http://route.showapi.com/341-1', {'page':page,'maxResult':size});
+    if not data:
+        return None;
+    try:
+        for idx, content in enumerate(data['contentlist']):
+            jokeid = hashlib.md5((content['title']+content['text']+content['ct']).encode('UTF-8')).hexdigest();
+            data['contentlist'][idx]['id'] = jokeid;
+            cache.set('joke'+jokeid, data['contentlist'][idx]);
+        return data['contentlist'],data['allPages'];
+    except KeyError:
+        return None;
+
+def getJokeDetail(jokeid):
+    global cache;
+    return cache.get('joke'+jokeid);
 
 def queryDictionary(word):
     http = httplib2.Http(timeout = config.REQUEST_TIMEOUT);

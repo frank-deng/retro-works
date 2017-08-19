@@ -129,7 +129,7 @@ class LoginManager(ConsoleManager):
     def __launch(self):
         env = os.environ.copy();
         env.update(env_custom);
-        self.__proc = subprocess.Popen(['w3m', '-no-mouse'], env = env);
+        self.__proc = subprocess.Popen(['w3m', '-no-mouse', '-config', 'config.telnetsite'], env = env);
         self.__proc.wait();
         self.__proc = None;
     

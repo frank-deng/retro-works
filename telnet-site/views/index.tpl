@@ -34,11 +34,23 @@ from langpack import lang;
 			<tr><td colspan='2'>
 				<hr/><div><b>{{lang('Up To Date')}}</b>&nbsp;<a href='/news'>{{lang('More')}}&gt;&gt;</a></div>
 				
-				<hr/><div><b>{{lang('Jokes Collection')}}</b>&nbsp;<a href='jokes.php'>{{lang('More')}}&gt;&gt;</a></div>
+				<hr/><div><b>{{lang('Jokes Collection')}}</b>&nbsp;<a href='/jokes'>{{lang('More')}}&gt;&gt;</a></div>
+% if None == jokes:
+				<p>{{lang('No Jokes')}}</p>
+% else:
 				<table width='100%'><tr>
-					<td valign='top' width='50%'>
-					</td>
+					<td valign='top' width='50%'><ul>
+% for i in range(5):
+						<li><a href='jokes/{{jokes[i]['id']}}'>{{jokes[i]['title']}}</a></li>
+% end
+					</ul></td>
+					<td valign='top' width='50%'><ul>
+% for i in range(5,10):
+						<li><a href='jokes/{{jokes[i]['id']}}'>{{jokes[i]['title']}}</a></li>
+% end
+					</ul></td>
 				</tr></table>
+% end
 
 				<hr/><div><b>{{lang('My Space')}}</b>&nbsp;<a href='/articles'>{{lang('More')}}&gt;&gt;</a></div>
 				<ul>

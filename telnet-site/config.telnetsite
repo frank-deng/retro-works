@@ -77,7 +77,7 @@ index_file
 cgi_bin 
 personal_document_root 
 document_root 
-keymap_file keymap
+keymap_file keymap.telnetsite
 preserve_timestamp 1
 auto_uncompress 0
 decode_cte 0

@@ -27,6 +27,7 @@ def index():
     city = urllib.parse.unquote(request.cookies.getunicode('city'));
     return {
         'weather':models.getWeatherInfo(city),
+        'jokes':models.getJokes(1,10)[0],
     };
 
 @route('/weather/detail.do')
@@ -105,6 +106,21 @@ def dict():
         'word': word,
         'result': result,
     };
+
+@route('/jokes')
+def jokes():
+    page = int(request.query.get('page', 1));
+    jokes, totalPages = models.getJokes(page);
+    if not jokes:
+        return template('error', {'error':'No Jokes'});
+    return template('jokes', {'jokes':jokes, 'totalPages':totalPages, 'page':page});
+
+@route('/jokes/<jokeid:re:[0-9A-Za-z]+>')
+def jokeDetail(jokeid):
+    joke = models.getJokeDetail(jokeid);
+    if not joke:
+        return template('error', {'error':'No Jokes'});
+    return template('jokeDetail', {'joke':joke});
 
 run(host=args.host, port=args.port);
 
