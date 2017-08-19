@@ -16,3 +16,4 @@ ie3-site/*.zip
 ie3-site/*.iso
 ie3-site/*.img
 config.py
+test.py
