@@ -1,40 +1,10 @@
-import json, urllib, httplib2, hashlib, threading;
+import json, urllib, httplib2, hashlib, threading, html;
+from util import fetchJSON, Cache;
 import config;
 from collections import OrderedDict;
 import xml.dom.minidom as minidom;
 
-class Cache:
-    __data = {};
-    __mutex = threading.Lock();
-    def __init__(self):
-        pass;
-
-    def get(self, key):
-        self.__mutex.acquire();
-        val = self.__data.get(key);
-        self.__mutex.release();
-        return val;
-
-    def set(self, key, val):
-        self.__mutex.acquire();
-        self.__data[key] = val;
-        self.__mutex.release();
-
 cache = Cache();
-
-def fetchJSON(url, headers = None, body = None):
-    http = httplib2.Http(timeout = config.REQUEST_TIMEOUT);
-    if (None != body):
-        if isinstance(body, dict):
-            if None == headers:
-                headers = {'content-type': 'application/x-www-form-urlencoded'};
-            else:
-                headers['content-type'] = 'application/x-www-form-urlencoded';
-            body = urllib.parse.urlencode(body);
-        resp,content = http.request(url, 'POST', body, headers=headers);
-    else:
-        resp,content = http.request(url, 'GET', headers=headers);
-    return json.loads(content.decode('UTF-8'));
 
 def getWeatherInfo(city):
     if not city:
@@ -66,8 +36,13 @@ def showAPIFetchJSON(url, params = {}):
     except Exception as e:
         print(e);
         return None;
+    print(sign);
+    print(params);
+    print(data);
+    keys = list(params.keys());
+    for key in keys:
+        del params[key];
     try:
-        del params['showapi_sign'];
         if (data and data['showapi_res_code'] == 0 and data['showapi_res_body']['ret_code'] == 0):
             return data['showapi_res_body'];
         else:
@@ -93,11 +68,53 @@ def doCurrencyExchange(f, t, a):
     except KeyError:
         return None;
 
+def getNewsList(page = 1, size = 19, channel = None, keyword = None):
+    global cache;
+    params = {
+        'page':page,
+        'needHtml':0,
+        'needContent':0,
+        'needAllList':1,
+        'maxResult':size,
+    };
+    if (channel):
+        params['channelId'] = channel;
+    if (keyword):
+        params['title'] = urllib.parse.quote(keyword);
+    data = showAPIFetchJSON('http://route.showapi.com/109-35', params);
+    if not data:
+        return None, None;
+    try:
+        contentlist = data['pagebean']['contentlist'];
+        for idx, content in enumerate(contentlist):
+            if (not content['title'] or content['title'] == ''):
+                for titleCandidate in content['allList']:
+                    if isinstance(titleCandidate, str):
+                        contentlist[idx]['title'] = re.sub(r'^(\s|　)+', titleCandidate[:25]);
+                        break;
+            content['html'] = '';
+            for line in content['allList']:
+                if isinstance(line, str):
+                    content['html'] += '<p>'+html.escape(line)+'</p>';
+            newsid = hashlib.md5((content['title']+content['source']+content['pubDate']+content['html']).encode('UTF-8')).hexdigest();
+            contentlist[idx]['newsid'] = newsid;
+            contentlist[idx]['html'] = content['html'];
+            del contentlist[idx]['allList'];
+            cache.set('news'+newsid, contentlist[idx]);
+        return contentlist, data['pagebean']['allPages'];
+    except KeyError as e:
+        print(e);
+        return None, None;
+
+def getNewsDetail(newsid):
+    global cache;
+    return cache.get('news'+newsid);
+
 def getJokes(page = 1, size = 19):
     global cache;
     data = showAPIFetchJSON('http://route.showapi.com/341-1', {'page':page,'maxResult':size});
     if not data:
-        return None;
+        return None, None;
     try:
         for idx, content in enumerate(data['contentlist']):
             jokeid = hashlib.md5((content['title']+content['text']+content['ct']).encode('UTF-8')).hexdigest();
@@ -105,7 +122,7 @@ def getJokes(page = 1, size = 19):
             cache.set('joke'+jokeid, data['contentlist'][idx]);
         return data['contentlist'],data['allPages'];
     except KeyError:
-        return None;
+        return None, None;
 
 def getJokeDetail(jokeid):
     global cache;

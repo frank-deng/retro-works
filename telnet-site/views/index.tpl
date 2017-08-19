@@ -33,7 +33,15 @@ from langpack import lang;
 			</td></tr>
 			<tr><td colspan='2'>
 				<hr/><div><b>{{lang('Up To Date')}}</b>&nbsp;<a href='/news'>{{lang('More')}}&gt;&gt;</a></div>
-				
+% if None == news:
+				<p>{{lang('No News')}}</p>
+% else:
+				<ul>
+% for n in news:
+				<li><a href='/news/{{n['newsid']}}'>{{n['title']}}</a></li>
+% end
+				</ul>
+% end
 				<hr/><div><b>{{lang('Jokes Collection')}}</b>&nbsp;<a href='/jokes'>{{lang('More')}}&gt;&gt;</a></div>
 % if None == jokes:
 				<p>{{lang('No Jokes')}}</p>

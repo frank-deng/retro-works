@@ -28,6 +28,7 @@ def index():
     return {
         'weather':models.getWeatherInfo(city),
         'jokes':models.getJokes(1,10)[0],
+        'news':models.getNewsList(1,10)[0],
     };
 
 @route('/weather/detail.do')
@@ -107,18 +108,40 @@ def dict():
         'result': result,
     };
 
+@route('/news')
+def news():
+    page = int(request.query.get('page', 1));
+    keyword = request.query.keyword;
+    news,totalPages = models.getNewsList(page, keyword=keyword);
+    if None == news:
+        return template('error', {'error':'No News'});
+    return template('newsList', {
+        'news':news,
+        'channel':None,
+        'keyword':keyword,
+        'totalPages':totalPages,
+        'page':page,
+    });
+
+@route('/news/<newsid:re:[0-9A-Za-z]+>')
+def newsDetail(newsid):
+    news = models.getNewsDetail(newsid);
+    if None == news:
+        return template('error', {'error':'No News'});
+    return template('newsDetail', {'news':news});
+
 @route('/jokes')
 def jokes():
     page = int(request.query.get('page', 1));
     jokes, totalPages = models.getJokes(page);
-    if not jokes:
+    if None == jokes:
         return template('error', {'error':'No Jokes'});
     return template('jokes', {'jokes':jokes, 'totalPages':totalPages, 'page':page});
 
 @route('/jokes/<jokeid:re:[0-9A-Za-z]+>')
 def jokeDetail(jokeid):
     joke = models.getJokeDetail(jokeid);
-    if not joke:
+    if None == joke:
         return template('error', {'error':'No Jokes'});
     return template('jokeDetail', {'joke':joke});
 
