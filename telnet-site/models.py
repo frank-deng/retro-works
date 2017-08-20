@@ -1,4 +1,4 @@
-import json, urllib, httplib2, hashlib, threading, html;
+import json, urllib, httplib2, hashlib, threading, html, re;
 from langpack import lang;
 from util import fetchJSON, Cache;
 import config;
@@ -40,7 +40,7 @@ def showAPIFetchJSON(url, params = {}):
     for key in keys:
         del params[key];
     try:
-        if (data and data['showapi_res_code'] == 0 and data['showapi_res_body']['ret_code'] == 0):
+        if (data and data['showapi_res_code'] == 0):
             return data['showapi_res_body'];
         else:
             return None;
@@ -87,7 +87,7 @@ def getNewsList(page = 1, size = 19, channel = None, keyword = None):
             if (not content['title'] or content['title'] == ''):
                 for titleCandidate in content['allList']:
                     if isinstance(titleCandidate, str):
-                        contentlist[idx]['title'] = re.sub(r'^(\s|　)+', titleCandidate[:25]);
+                        contentlist[idx]['title'] = re.sub(r'^(\s|　)+', '', titleCandidate[:25]);
                         break;
             content['html'] = '';
             for line in content['allList']:
@@ -185,4 +185,75 @@ def queryDictionary(word):
     except Exception as e:
         print(e);
         return None;
+
+from multiprocessing.pool import ThreadPool;
+def __getRank(item):
+    if None != item.get('Rank'):
+        return item['Rank'];
+    elif None != item.get('MovieRank'):
+        return item['MovieRank'];
+def getMovieRank():
+    pool = ThreadPool(processes=1);
+    tweekly = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-1',));
+    tdaily = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-2',));
+    tweekend = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-3',));
+    weekly, daily, weekend = tweekly.get(), tdaily.get(), tweekend.get();
+    if (None == weekly and None == daily and None == weekend):
+        return None;
+    result = {'weekly':[], 'daily':[], 'weekend':[]};
+    if None != weekly:
+        sorted(weekly['datalist'], key=__getRank, reverse=True);
+        result['weekly'] = weekly['datalist'];
+    if None != daily:
+        sorted(daily['datalist'], key=__getRank, reverse=True);
+        result['daily'] = daily['datalist'];
+    if None != weekend:
+        sorted(weekend['datalist'], key=__getRank, reverse=True);
+        result['weekend'] = weekend['datalist'];
+    return result;
+
+import os, markdown;
+def __getMtime(item):
+    return item['mtime'];
+def getArticles():
+    global cache;
+    data = cache.get('mySpaceArticles');
+    if None != data and data['timeStamp'] == os.stat(config.ARTICLES_PATH).st_mtime:
+        return data;
+
+    fileList = [];
+    for dirname, dirnames, filenames in os.walk(config.ARTICLES_PATH):
+        for f in filenames:
+            fd = config.ARTICLES_PATH+os.sep+f;
+            if os.path.isfile(fd) and re.search(r'\.md', fd):
+                fileList.append(fd);
+
+    data = {'timeStamp':os.stat(config.ARTICLES_PATH).st_mtime, 'content':[]};
+    for fpath in fileList:
+        title = None;
+        with open(fpath) as fp:
+            title = re.sub(r'^#+\s*', '', fp.readlines()[0].strip());
+        if None == title:
+            continue;
+        data['content'].append({
+            'id':hashlib.md5(fpath.encode('UTF-8')).hexdigest(),
+            'title':title,
+            'file':fpath,
+            'mtime':os.stat(fpath).st_mtime,
+        });
+    sorted(data['content'], key=__getMtime, reverse=True);
+    cache.set('mySpaceArticles', data);
+    return data;
+
+def getArticleDetail(aid):
+    articles = getArticles();
+    if None == articles:
+        return None, None;
+    for a in articles['content']:
+        if a['id'] == aid:
+            content = None;
+            with open(a['file']) as fp:
+                content = markdown.markdown(fp.read());
+            return a['title'], content;
+    return None, None;
 

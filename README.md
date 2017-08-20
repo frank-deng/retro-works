@@ -70,6 +70,7 @@ Add `zh_CN.GB2312` into `/etc/locale.gen`, then run `sudo locale-gen`.
 Install package needed
 
 	sudo apt-get install ncurses-term tcpser
+	sudo pip install httplib2 markdown
 	
 将`telnetd.py`和`mylogin.py`复制到`/usr/local/bin`目录中。  
 Copy `telnetd.py` and `mylogin.py` to directory `/usr/local/bin`.

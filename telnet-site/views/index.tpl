@@ -42,6 +42,41 @@ from langpack import lang;
 % end
 				</ul>
 % end
+
+% if None != movieRank:
+				<hr/><div><b>{{lang('Movie Rank')}}</b></div>
+				<table width='100%'>
+					<tr>
+						<th align='left' width='33%'><b>{{lang('Daily Rank')}}</b></th>
+						<th align='left' width='33%'><b>{{lang('Weekend Rank')}}</b></th>
+						<th align='left' width='33%'><b>{{lang('Weekly Rank')}}</b></th>
+					</tr>
+					<tr>
+						<td valign='top'><ol>
+% if None != movieRank['weekly']:
+% for movie in movieRank['weekly']:
+							<li>{{movie['MovieName']}}</li>
+% end
+% end
+						</ol></td>
+						<td valign='top'><ol>
+% if None != movieRank['daily']:
+% for movie in movieRank['daily']:
+							<li>{{movie['MovieName']}}</li>
+% end
+% end
+						</ol></td>
+						<td valign='top'><ol>
+% if None != movieRank['weekend']:
+% for movie in movieRank['weekend']:
+							<li>{{movie['MovieName']}}</li>
+% end
+% end
+						</ol></td>
+					</tr>
+				</table>
+% end
+
 				<hr/><div><b>{{lang('Jokes Collection')}}</b>&nbsp;<a href='/jokes'>{{lang('More')}}&gt;&gt;</a></div>
 % if None == jokes:
 				<p>{{lang('No Jokes')}}</p>
@@ -62,6 +97,9 @@ from langpack import lang;
 
 				<hr/><div><b>{{lang('My Space')}}</b>&nbsp;<a href='/articles'>{{lang('More')}}&gt;&gt;</a></div>
 				<ul>
+% for a in articles:
+					<li><a href='/article/{{a['id']}}'>{{a['title']}}</a></li>
+% end
 				</ul>
 				
 				<hr/><div>{{!lang('About')}}</div>

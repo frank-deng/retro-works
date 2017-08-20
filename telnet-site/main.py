@@ -21,14 +21,25 @@ args = parser.parse_args();
 from bottle import route, run, view, template, request, response, redirect;
 import models, urllib;
 
+from multiprocessing.pool import ThreadPool;
 @route('/')
 @view('index')
 def index():
     city = urllib.parse.unquote(request.cookies.getunicode('city'));
+
+    pool = ThreadPool(processes=1);
+    weatherInfo = pool.apply_async(models.getWeatherInfo, (city,));
+    jokes = pool.apply_async(models.getJokes, (1,10));
+    newsList = pool.apply_async(models.getNewsList, (1,10));
+    articles = pool.apply_async(models.getArticles);
+    movieRank = pool.apply_async(models.getMovieRank);
+
     return {
-        'weather':models.getWeatherInfo(city),
-        'jokes':models.getJokes(1,10)[0],
-        'news':models.getNewsList(1,10)[0],
+        'weather':weatherInfo.get(),
+        'jokes':jokes.get()[0],
+        'news':newsList.get()[0],
+        'articles':articles.get()['content'][0:10],
+        'movieRank':movieRank.get(),
     };
 
 @route('/weather/detail.do')
@@ -158,6 +169,21 @@ def jokeDetail(jokeid):
     if None == joke:
         return template('error', {'error':'No Jokes'});
     return template('jokeDetail', {'joke':joke});
+
+@route('/articles')
+def articles():
+    data = models.getArticles();
+    page = int(request.query.get('page', 1));
+    if None == data:
+        return template('error', {'error':'Failed to load article'});
+    return template('articleList', {'articles':data['content'], 'page':page});
+
+@route('/article/<aid:re:[0-9A-Za-z]+>')
+def articleDetail(aid):
+    title, content = models.getArticleDetail(aid);
+    if None == content:
+        return template('error', {'error':'Failed to load article'});
+    return template('articleDetail', {'title':title, 'article':content});
 
 run(host=args.host, port=args.port);
 

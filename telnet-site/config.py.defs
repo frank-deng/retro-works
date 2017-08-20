@@ -1,5 +1,7 @@
+import os;
 SHOWAPI_APPID="12345";
 SHOWAPI_SECRET="nnn";
 HEWEATHER_KEY="nnn";
 REQUEST_TIMEOUT=7
 LANGUAGE='zh-CN';
+ARTICLES_PATH=os.path.dirname(os.path.realpath(__file__))+os.sep+'articles';
