@@ -77,7 +77,7 @@ def getNewsList(page = 1, size = 19, channel = None, keyword = None):
     if (channel):
         params['channelId'] = channel;
     if (isinstance(keyword, str) and len(keyword) > 0):
-        params['title'] = urllib.parse.quote(keyword);
+        params['title'] = keyword;
     data = showAPIFetchJSON('http://route.showapi.com/109-35', params);
     if not data:
         return None, None;
