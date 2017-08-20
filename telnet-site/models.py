@@ -25,9 +25,8 @@ def getWeatherInfo(city):
 
 def showAPIFetchJSON(url, params = {}):
     params['showapi_appid'] = config.SHOWAPI_APPID;
-    signParams = OrderedDict(sorted(params.items(), key=lambda x: x[0]));
     sign = '';
-    for key in signParams:
+    for key in OrderedDict(sorted(params.items(), key=lambda x: x[0])):
         sign += key+str(params[key]);
     sign += config.SHOWAPI_SECRET;
     params['showapi_sign'] = hashlib.md5(sign.encode('UTF-8')).hexdigest();
@@ -36,9 +35,6 @@ def showAPIFetchJSON(url, params = {}):
     except Exception as e:
         print(e);
         return None;
-    print(sign);
-    print(params);
-    print(data);
     keys = list(params.keys());
     for key in keys:
         del params[key];
@@ -79,7 +75,7 @@ def getNewsList(page = 1, size = 19, channel = None, keyword = None):
     };
     if (channel):
         params['channelId'] = channel;
-    if (keyword):
+    if (isinstance(keyword, str) and len(keyword) > 0):
         params['title'] = urllib.parse.quote(keyword);
     data = showAPIFetchJSON('http://route.showapi.com/109-35', params);
     if not data:

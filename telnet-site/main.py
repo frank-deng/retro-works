@@ -14,7 +14,7 @@ parser.add_argument(
     '-p',
     help='Specify port for the server.',
     type=int,
-    default=80
+    default=8080
 );
 args = parser.parse_args();
 

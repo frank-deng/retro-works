@@ -33,16 +33,52 @@ class Cache:
         self.__data[key] = val;
         self.__mutex.release();
 
+def __parseKeys(query):
+    result = '';
+    for key in query:
+        if key == pagevar:
+            continue;
+        elif isinstance(key, str):
+            result += "<input type='hidden' name='%s' value='%s'/>"%(key, query['key']);
+        elif isinstance(key, list) or isinstance(key, tuple):
+            result += __parseKeys(query['key'], pagevar);
+    return result;
+
 def pager(baseUrl, pagevar, total, cur):
-    query_prev = query_next = cur;
-    result = "<form action=\"%s\" method='GET'>"%baseUrl;
+    url = urllib.parse.urlparse(baseUrl);
+    query = urllib.parse.parse_qs(url.query);
+
+    queryNext = urllib.parse.urlencode(queryNext, doseq=True);
+    urlNext = urllib.parse.urlunparse(urllib.parse.ParseResult(url.scheme, url.netloc, url.path, url.params, queryNext, url.fragment));
+
+    urlForm = urllib.parse.urlunparse(
+        urllib.parse.ParseResult(url.scheme, url.netloc, url.path, url.params, '', url.fragment)
+    );
+    result = "<form action=\"%s\" method='GET'>"%urlForm;
     if cur > 1:
-        result += ("<a href=\"%s?%s=%d\">&lt;"+lang('Prev Page')+"</a>&nbsp;")%(baseUrl, pagevar, cur-1);
+        query[pagevar] = cur-1;
+        urlPrev = urllib.parse.urlunparse(
+            urllib.parse.ParseResult(
+                url.scheme, url.netloc, url.path, url.params,
+                urllib.parse.urlencode(query, doseq=True),
+                url.fragment
+            )
+        );
+        result += ("<a href=\"%s\">&lt;"+lang('Prev Page')+"</a>&nbsp;")%(urlPrev);
     if cur < total:
-        result += ("<a href=\"%s?%s=%d\">"+lang('Next Page')+"&gt;</a>&nbsp;")%(baseUrl, pagevar, cur+1);
+        query[pagevar] = cur+1;
+        urlNext = urllib.parse.urlunparse(
+            urllib.parse.ParseResult(
+                url.scheme, url.netloc, url.path, url.params,
+                urllib.parse.urlencode(query, doseq=True),
+                url.fragment
+            )
+        );
+        result += ("<a href=\"%s\">"+lang('Next Page')+"&gt;</a>&nbsp;")%(urlNext);
     inputBox = "<input type='text' name='%s' maxlength='%d' size='%d' value='%d'/>"%(pagevar, len(str(total)), len(str(total)), cur);
     result += lang('_jump_page')%(total, inputBox);
-    result += "&nbsp;<input type='submit' value='"+lang('OK')+"'/>";
+    del query[pagevar];
+    result += "&nbsp;<input type='submit' value='"+lang('OK')+"'/>"+__parseKeys(query);
     result += '</form>';
     return result;
 
