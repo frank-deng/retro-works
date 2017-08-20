@@ -4,11 +4,9 @@
 from langpack import lang;
 from util import pager;
 if None == channel:
-channelName = lang('Up To Date');
 searchLink = '/news';
 else:
-channelName = channel['name'];
-searchLink = '/news/'+channel['id'];
+searchLink = '/news/'+channel;
 end
 %>
 	<head>
@@ -30,7 +28,7 @@ end
 			</table>
 			<ul>
 % for n in news:
-				<li><a href="/news/{{n['newsid']}}">{{n['title']}}</a></li>
+				<li><a href="/news/detail/{{n['newsid']}}">{{n['title']}}</a></li>
 % end
 			</ul>
 			{{!pager(searchLink, 'page', totalPages, page)}}<br/>

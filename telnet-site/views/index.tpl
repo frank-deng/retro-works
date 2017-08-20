@@ -38,7 +38,7 @@ from langpack import lang;
 % else:
 				<ul>
 % for n in news:
-				<li><a href='/news/{{n['newsid']}}'>{{n['title']}}</a></li>
+				<li><a href='/news/detail/{{n['newsid']}}'>{{n['title']}}</a></li>
 % end
 				</ul>
 % end

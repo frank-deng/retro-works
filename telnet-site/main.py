@@ -109,7 +109,8 @@ def dict():
     };
 
 @route('/news')
-def news():
+@route('/news/<channel:re:[0-9A-Za-z]+>')
+def news(channel = None):
     page = int(request.query.get('page', 1));
     keyword = request.query.keyword;
     news,totalPages = models.getNewsList(page, keyword=keyword);
@@ -117,18 +118,24 @@ def news():
         return template('error', {'error':'No News'});
     return template('newsList', {
         'news':news,
-        'channel':None,
+        'channel':channel,
+        'channelName':models.getNewsChannelName(channel),
         'keyword':keyword,
         'totalPages':totalPages,
         'page':page,
     });
 
-@route('/news/<newsid:re:[0-9A-Za-z]+>')
+@route('/news/detail/<newsid:re:[0-9A-Za-z]+>')
 def newsDetail(newsid):
     news = models.getNewsDetail(newsid);
     if None == news:
         return template('error', {'error':'No News'});
     return template('newsDetail', {'news':news});
+
+@route('/news/channels')
+@view('newsChannelSel')
+def newsChannelSel():
+    return {'channelsAll':models.getNewsChannelList()};
 
 @route('/jokes')
 def jokes():

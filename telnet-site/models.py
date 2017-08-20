@@ -1,4 +1,5 @@
 import json, urllib, httplib2, hashlib, threading, html;
+from langpack import lang;
 from util import fetchJSON, Cache;
 import config;
 from collections import OrderedDict;
@@ -105,6 +106,35 @@ def getNewsList(page = 1, size = 19, channel = None, keyword = None):
 def getNewsDetail(newsid):
     global cache;
     return cache.get('news'+newsid);
+
+def getNewsChannelList(forceUpdate = False):
+    global cache;
+    data = None;
+    if (not forceUpdate):
+        data = cache.get('newsChannelList');
+        if None != data:
+            return data;
+
+    dataRemote = showAPIFetchJSON('http://route.showapi.com/109-34');
+    if (None == dataRemote):
+        return None;
+
+    data = [('0', lang('Up To Date'))];
+    for item in dataRemote['channelList']:
+        data.append((item['channelId'], item['name']));
+    return data;
+
+def getNewsChannelName(channelId):
+    global cache;
+    if not channelId:
+        channelId = '0';
+    data = cache.get('newsChannelList');
+    if None == data:
+        data = getNewsChannelList(True);
+    for item in data:
+        if item[0] == channelId:
+            return item[1];
+    return None;
 
 def getJokes(page = 1, size = 19):
     global cache;
