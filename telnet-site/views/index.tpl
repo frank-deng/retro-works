@@ -17,9 +17,7 @@ from langpack import lang;
 			</tr>
 			<tr><td colspan='2'>
 % if weather:
-{{weather['basic']['city']}}
-{{weather['now']['cond']['txt']}}
-{{weather['daily_forecast'][0]['tmp']['min']}}{{lang('Centidegree')}}/{{weather['daily_forecast'][0]['tmp']['max']}}{{lang('Centidegree')}}
+{{weather['basic']['city']}}&nbsp;{{weather['now']['cond']['txt']}}&nbsp;{{weather['daily_forecast'][0]['tmp']['min']}}{{lang('Centidegree')}}/{{weather['daily_forecast'][0]['tmp']['max']}}{{lang('Centidegree')}}
 % try:
 {{lang('AQI')}}{{weather['aqi']['city']['aqi']}} {{weather['aqi']['city']['qlty']}}
 % except KeyError:

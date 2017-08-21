@@ -25,7 +25,7 @@ from multiprocessing.pool import ThreadPool;
 @route('/')
 @view('index')
 def index():
-    city = urllib.parse.unquote(request.cookies.getunicode('city', ''));
+    city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
 
     pool = ThreadPool(processes=1);
     weatherInfo = pool.apply_async(models.getWeatherInfo, (city,));
@@ -44,7 +44,7 @@ def index():
 
 @route('/weather/detail.do')
 def weatherDetail():
-    city = urllib.parse.unquote(request.cookies.getunicode('city', '0'));
+    city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
     weather = models.getWeatherInfo(city);
     if None != weather:
         return template('weatherDetail', {
@@ -56,14 +56,14 @@ def weatherDetail():
 @route('/weather/setcity.do')
 @view('weatherSetCity')
 def weatherSetCity():
-    city = urllib.parse.unquote(request.cookies.getunicode('city', ''));
+    city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
     return {
         'city': city,
     };
 
 @route('/weather/setcity.do', method='POST')
 def doWeatherSetCity():
-    response.set_cookie('city', urllib.parse.quote(request.forms.city), path='/', max_age=3600*24*356);
+    response.set_cookie('city', urllib.parse.quote(request.forms.city.strip()), path='/', max_age=3600*24*356);
     response.status = 301;
     response.set_header('Location', '/weather/detail.do');
 
@@ -123,7 +123,7 @@ def dict():
 @route('/news/<channel:re:[0-9A-Za-z]+>')
 def news(channel = None):
     page = int(request.query.get('page', 1));
-    keyword = request.query.getunicode('keyword');
+    keyword = request.query.getunicode('keyword').strip();
     news,totalPages = models.getNewsList(page, keyword=keyword, channel=channel);
     if None == news:
         return template('error', {'error':'No News'});
