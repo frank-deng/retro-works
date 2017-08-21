@@ -123,15 +123,13 @@ def dict():
 @route('/news/<channel:re:[0-9A-Za-z]+>')
 def news(channel = None):
     page = int(request.query.get('page', 1));
-    keyword = request.query.getunicode('keyword').strip();
+    keyword = request.query.getunicode('keyword', '').strip();
     news,totalPages = models.getNewsList(page, keyword=keyword, channel=channel);
     if None == news:
         return template('error', {'error':'No News'});
     url = '/news';
     if channel:
         url += '/'+channel;
-    if not keyword:
-        keyword = '';
     return template('newsList', {
         'url':url,
         'query':urllib.parse.urlencode(request.query.decode(), encoding='UTF-8'),
