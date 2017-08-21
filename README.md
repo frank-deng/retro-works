@@ -75,8 +75,8 @@ Install package needed
 将`telnetd.py`和`mylogin.py`复制到`/usr/local/bin`目录中。  
 Copy `telnetd.py` and `mylogin.py` to directory `/usr/local/bin`.
 
-将`config`文件和`keymap`文件复制到`~/.w3m`目录中，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
-Copy file `config` and `keymap` to folder `~/.w3m` to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
+将`config.telnetsite`文件和`keymap.telnetsite`文件复制到`~/.w3m`目录中，然后将`config.telnetsite`更名为`config`，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
+Copy file `config.telnetsite` and `keymap.telnetsite` to folder `~/.w3m`, then rename `config.telnetsite` to `config`, so as to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
