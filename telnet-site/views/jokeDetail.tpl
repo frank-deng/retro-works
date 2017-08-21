@@ -7,6 +7,6 @@
 	</head>
 	<body>
 		<h1>{{joke['title']}}</h1>
-		<p>{{joke['text']}}</p>
+		<p>{{!joke['text']}}</p>
 	</body>
 </html>
