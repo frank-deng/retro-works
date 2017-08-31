@@ -213,8 +213,8 @@ def getMovieRank():
     return result;
 
 import os, markdown;
-def __getMtime(item):
-    return item['mtime'];
+def __getKey(item):
+    return item['file'];
 def getArticles():
     global cache;
     data = cache.get('mySpaceArticles');
@@ -241,7 +241,8 @@ def getArticles():
             'file':fpath,
             'mtime':os.stat(fpath).st_mtime,
         });
-    sorted(data['content'], key=__getMtime, reverse=True);
+    contentSorted = sorted(data['content'], key=__getKey, reverse=True);
+    data['content'] = contentSorted;
     cache.set('mySpaceArticles', data);
     return data;
 
