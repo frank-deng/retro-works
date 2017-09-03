@@ -1,2 +1,0 @@
-TXDEMO.BAS
-TX.BAS

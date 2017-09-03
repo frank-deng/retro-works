@@ -1,2 +1,0 @@
-GUSHI.BAS
-TX.BAS
