@@ -145,6 +145,9 @@ def getJokes(page = 1, size = 19):
         for idx, content in enumerate(data['contentlist']):
             jokeid = hashlib.md5((content['title']+content['text']+content['ct']).encode('UTF-8')).hexdigest();
             data['contentlist'][idx]['id'] = jokeid;
+            text = data['contentlist'][idx]['text'];
+            if text.find('<') < 0 or text.find('>') < 0:
+            	data['contentlist'][idx]['text'] = text.replace('\\n', '<br/>').replace('\n', '<br/>').replace('\\r', '').replace('\r', '');
             cache.set('joke'+jokeid, data['contentlist'][idx]);
         return data['contentlist'],data['allPages'];
     except KeyError:
