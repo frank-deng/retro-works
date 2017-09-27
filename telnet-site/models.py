@@ -199,7 +199,7 @@ def __getRank(item):
     elif None != item.get('MovieRank'):
         return item['MovieRank'];
 def getMovieRank():
-    pool = ThreadPool();
+    pool = ThreadPool(processes=3);
     tweekly = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-1',));
     tdaily = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-2',));
     tweekend = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-3',));
