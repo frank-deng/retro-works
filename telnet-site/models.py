@@ -24,7 +24,9 @@ def getWeatherInfo(city):
     except KeyError:
         return None;
 
-def showAPIFetchJSON(url, params = {}):
+def showAPIFetchJSON(url, params = None):
+    if None == params:
+        params = {};
     params['showapi_appid'] = config.SHOWAPI_APPID;
     sign = '';
     for key in OrderedDict(sorted(params.items(), key=lambda x: x[0])):
@@ -39,6 +41,7 @@ def showAPIFetchJSON(url, params = {}):
     keys = list(params.keys());
     for key in keys:
         del params[key];
+    params = None;
     try:
         if (data and data['showapi_res_code'] == 0):
             return data['showapi_res_body'];
@@ -196,7 +199,7 @@ def __getRank(item):
     elif None != item.get('MovieRank'):
         return item['MovieRank'];
 def getMovieRank():
-    pool = ThreadPool(processes=1);
+    pool = ThreadPool();
     tweekly = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-1',));
     tdaily = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-2',));
     tweekend = pool.apply_async(showAPIFetchJSON, ('http://route.showapi.com/578-3',));

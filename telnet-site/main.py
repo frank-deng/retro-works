@@ -27,7 +27,7 @@ from multiprocessing.pool import ThreadPool;
 def index():
     city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
 
-    pool = ThreadPool(processes=1);
+    pool = ThreadPool();
     weatherInfo = pool.apply_async(models.getWeatherInfo, (city,));
     jokes = pool.apply_async(models.getJokes, (1,10));
     newsList = pool.apply_async(models.getNewsList, (1,10));
