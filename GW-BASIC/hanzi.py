@@ -10,9 +10,9 @@ class TextDispParser(argparse.Action):
                 pos,text = v.split(':');
                 x,y = pos.split(',');
                 x,y = int(x),int(y);
+                text_all.append({'pos':(x,y), 'text':text});
             except Exception as e:
                 print(str(e));
-            text_all.append({'pos':(x,y), 'text':text});
         setattr(namespace, self.dest, text_all);
 
 argParser = argparse.ArgumentParser();
