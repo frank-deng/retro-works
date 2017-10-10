@@ -38,28 +38,11 @@ telnet-site
 一个简单的telnet站点，使用[w3m](http://w3m.sourceforge.net)浏览器在字符界面下显示HTML页面。  
 A simple site designed for console-based browser [w3m](http://w3m.sourceforge.net), which makes it works like an old-school telnet BBS site.
 
-DOSBox模拟的客户端硬件  
-Client side hardware emulated by DOSBox
-
-* Old 486 platform
-* S3 864 video card
-* Virtual serial line connected to modem emulated by [`tcpser`](http://www.jbrain.com/pub/linux/serial/)
-
-客户端使用的软件  
-Client side software
-
-* MS-DOS 5.0
-* ANSI.SYS
-* UCDOS 7.0
-* NRDTERM.EXE
-
 ### 截图欣赏 Screenshots
 
-![](http://frank-deng.github.io/retro-works/Telnet%201.png)
+![Telnet 1](http://frank-deng.github.io/retro-works/telnet1.png)
 
-![](http://frank-deng.github.io/retro-works/Telnet%202.png)
-
-![](http://frank-deng.github.io/retro-works/Telnet%203.png)
+![Telnet 2](http://frank-deng.github.io/retro-works/telnet2.png)
 
 ### Linux服务器端配置 Linux Server Configuration
 
@@ -84,15 +67,10 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/mylogin.py
 	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:23"
 
-### DOSBox客户端使用方法
+### Windows 3.x客户端使用方法 Windows 3.x Client Usage
 
-输入以下命令打开串口终端程序  
-Run serial terminal program with the following command
-
-	NRDTERM -A -M19200,N,8,1 COM1:
-
-在串口终端中输入`ATDT92163`连接telnet站点，然后按`Enter`进入登录界面。  
-Input `ATDT92163` in the serial terminal, then press `Enter` to open login panel.
+打开“附件”程序组里的“终端仿真程序”，将使用的串口设为COM1，并将号码设为“92163”或“1270000000012333”，然后开始拨号，拨号成功后按Enter键进入登录界面。  
+Open "Terminal Emulator" in the "Accessories" program group, set the serial port to use as "COM1", set phone number as 92163 or 1270000000012333, then start dialing. When dialing succeed, press `Enter` to open login panel.
 
 
 Notes 

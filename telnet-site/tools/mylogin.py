@@ -10,7 +10,7 @@ env_custom = {
     'LANG' : 'zh_CN.GB2312',
     'LC_ALL' : 'zh_CN.GB2312',
     'LANGUAGE' : 'zh_CN:zh',
-    'LINES' : '25',
+    'LINES' : '24',
     'COLUMNS' : '80',
     'WWW_HOME' : 'http://127.0.0.1:8080',
 }
