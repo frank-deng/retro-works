@@ -68,7 +68,7 @@ def doCurrencyExchange(f, t, a):
     except KeyError:
         return None;
 
-def getNewsList(page = 1, size = 19, channel = None, keyword = None):
+def getNewsList(page = 1, size = config.PAGESIZE, channel = None, keyword = None):
     global cache;
     params = {
         'page':page,
@@ -139,7 +139,7 @@ def getNewsChannelName(channelId):
             return item[1];
     return None;
 
-def getJokes(page = 1, size = 19):
+def getJokes(page = 1, size = config.PAGESIZE):
     global cache;
     data = showAPIFetchJSON('http://route.showapi.com/341-1', {'page':page,'maxResult':size});
     if not data:
