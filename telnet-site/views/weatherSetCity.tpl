@@ -10,6 +10,5 @@
 		<form action='/weather/setcity.do' method='post'>
 			<input type='text' name='city' value="{{city}}"/><input type='submit' value="{{lang('OK')}}"/>
 		</form>
-		<p><hr/><center><a href='/'>[{{lang('Back Home Page')}}]</a></center></p>
 	</body>
 </html>
