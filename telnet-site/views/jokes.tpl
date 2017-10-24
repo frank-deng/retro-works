@@ -16,6 +16,6 @@
 			<li><a href='/jokes/{{content['id']}}'>{{content['title']}}</a></li>
 % end
 		</ul>
-		{{!pager('/jokes', 'page', totalPages, page)}}<br/>
+		{{!pager('/jokes', 'page', totalPages, page)}}
 	</body>
 </html>

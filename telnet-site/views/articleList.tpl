@@ -3,7 +3,8 @@
 <%
 from langpack import lang;
 from util import pager;
-PAGE_SIZE = 19
+import config;
+PAGE_SIZE = config.PAGESIZE;
 totalPages = int(len(articles)/PAGE_SIZE);
 if len(articles) % PAGE_SIZE:
 	totalPages += 1;
