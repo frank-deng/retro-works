@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, subprocess, os, multiprocessing, magic, tempfile, getopt;
+import sys, subprocess, os, multiprocessing, magic, tempfile, getopt, re;
 OUTPUT_CUE='audiocd.cue';
 OUTPUT_AUDIO='audiocd.wav';
 
@@ -16,7 +16,7 @@ mime = magic.open(magic.MIME);
 mime.load();
 for i in range(len(files)):
     mime_type = mime.file(files[i]).split(';')[0];
-    if (mime_type in ('audio/mpeg')):
+    if (mime_type in ('audio/mpeg') or re.search(r'\.mp3$', files[i], re.I)):
         tf = tempfile.NamedTemporaryFile(prefix='%02d-'%(i+1), suffix='.wav', delete=False);
         tf.close();
         tempfiles.append(tf.name);
