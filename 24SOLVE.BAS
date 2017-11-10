@@ -1,5 +1,6 @@
 DEFINT I-K
 COMMON SHARED goal, FOUND
+DECLARE FUNCTION comp (A!, B!)
 DECLARE FUNCTION calc! (A!, B!, o$)
 DECLARE FUNCTION expr1! (A!, B!, C!, D!, O1$, O2$, O3$)
 DECLARE FUNCTION expr2! (A!, B!, C!, D!, O1$, O2$, O3$)
@@ -11,6 +12,14 @@ DECLARE SUB enumoper (A!, B!, C!, D!)
 DECLARE SUB main ()
 
 CALL main
+
+FUNCTION comp (A!, B!)
+  if abs(a!-b!)<0.0001 then
+    comp = 1
+  else
+    comp = 0
+  end if
+END FUNCTION
 
 FUNCTION calc! (A!, B!, o$)
   SELECT CASE o$
@@ -32,23 +41,23 @@ END FUNCTION
 SUB enumoper (A AS SINGLE, B AS SINGLE, C AS SINGLE, D AS SINGLE)
   DIM o(4) AS STRING: o(0) = "+": o(1) = "-": o(2) = "*": o(3) = "/"
   FOR i = 0 TO 3: FOR j = 0 TO 3: FOR k = 0 TO 3
-    IF expr1(A, B, C, D, o(i), o(j), o(k)) = goal THEN
+    IF comp(expr1(A, B, C, D, o(i), o(j), o(k)), goal) THEN
       PRINT A; o(i); "("; B; o(j); "("; C; o(k); D; "))="; goal
       FOUND = 1
       exit sub
-    ELSEIF expr2(A, B, C, D, o(i), o(j), o(k)) = goal THEN
+    ELSEIF comp(expr2(A, B, C, D, o(i), o(j), o(k)), goal) THEN
       PRINT A; o(i); "(("; B; o(j); C;")"; o(k); D; ")="; goal
       FOUND = 1
       exit sub
-    ELSEIF expr3(A, B, C, D, o(i), o(j), o(k)) = goal THEN
+    ELSEIF comp(expr3(A, B, C, D, o(i), o(j), o(k)), goal) THEN
       PRINT "("; A; o(i); "("; B; o(j); C;"))"; o(k); D; "="; goal
       FOUND = 1
       exit sub
-    ELSEIF expr4(A, B, C, D, o(i), o(j), o(k)) = goal THEN
+    ELSEIF comp(expr4(A, B, C, D, o(i), o(j), o(k)), goal) THEN
       PRINT "("; A; o(i); B; ")";  o(j); "("; C; o(k); D; ")="; goal
       FOUND = 1
       exit sub
-    ELSEIF expr5(A, B, C, D, o(i), o(j), o(k)) = goal THEN
+    ELSEIF comp(expr5(A, B, C, D, o(i), o(j), o(k)), goal) THEN
       PRINT "(("; A; o(i); B; ")"; o(j); C;")"; o(k); D; "="; goal
       FOUND = 1
       exit sub
@@ -57,27 +66,27 @@ SUB enumoper (A AS SINGLE, B AS SINGLE, C AS SINGLE, D AS SINGLE)
 END SUB
 
 FUNCTION expr1! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM abcd### a#(b#(c#d))
+  REM abcd!!! a!(b!(c!d))
   expr1! = calc!(A!, calc!(B!, calc!(C!, D!, O3$), O2$), O1$)
 END FUNCTION
 
 FUNCTION expr2! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM abc#d## a#((b#c)#d)
+  REM abc!d!! a!((b!c)!d)
   expr2! = calc!(A!, calc!(calc!(B!, C!, O2$), D!, O3$), O1$)
 END FUNCTION
 
 FUNCTION expr3! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM abc##d# (a#(b#c))#d
+  REM abc!!d! (a!(b!c))!d
   expr3! = calc!(calc!(A!, calc!(B!, C!, O2$), O1$), D!, O3$)
 END FUNCTION
 
 FUNCTION expr4! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM ab#cd## (a#b)#(c#d)
+  REM ab!cd!! (a!b)!(c!d)
   expr4! = calc!(calc!(A!, B!, O1$), calc!(C!, D!, O3$), O2$)
 END FUNCTION
 
 FUNCTION expr5! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM ab#c#d# ((a#b)#c)#d
+  REM ab!c!d! ((a!b)!c)!d
   expr5! = calc!(calc!(calc!(A!, B!, O1$), C!, O2$), D!, O3$)
 END FUNCTION
 
