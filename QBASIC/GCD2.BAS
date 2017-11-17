@@ -1,0 +1,8 @@
+10 DEFDBL A-Z
+20 INPUT "请输入A,B：",A,B:AB=A*B
+30 IF A>B THEN T=A:A=B:B=T
+40 WHILE B<>0
+50 T=A-B*FIX(A/B):A=B:B=T
+60 WEND
+70 PRINT "最大公约数：";A:PRINT "最小公倍数：";AB/A
+80 END
