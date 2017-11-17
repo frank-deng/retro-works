@@ -8,16 +8,28 @@ DATA &H05,&h2E,&HC7,&H04,&H01,&H00,&H5E,&H5B,&H58,&HCB
 DEFINT A-Z
 TestTX
 OPEN "LPT3" FOR OUTPUT AS #1
-TX ("M18CU1,0CO8KB1,0CL0CO7B0,0,640,480")
-SIZE = 72: X = (640 - SIZE * 8) / 2 + (SIZE / 4)
-TX ("{=0%1@" + n$(SIZE) + "," + n$(SIZE) + "}")
-TX ("{(15-" + n$(X - 1) + "|" + n$(219 - SIZE) + "长风破浪会有时，}")
-TX ("{(15-" + n$(X - 1) + "|219直挂云帆济沧海。}")
-TX ("{(0-" + n$(X + 1) + "|" + n$(221 - SIZE) + "长风破浪会有时，}")
-TX ("{(0-" + n$(X + 1) + "|221直挂云帆济沧海。}")
-TX ("{(9-" + n$(X) + "|" + n$(220 - SIZE) + "长风破浪会有时，}")
-TX ("{(9-" + n$(X) + "|220直挂云帆济沧海。}")
+TX ("M18CU1,0CO8KB1,0CL0")
+
+I = 0
+FOR y = 0 TO 15
+  FOR x = 0 TO 15
+    TX ("CO" + n$(I) + "B" + n$(x * 40) + "," + n$(y * 30) + "," + n$(x * 40 + 40) + "," + n$(y * 30 + 30))
+    I = I + 1
+  NEXT x
+NEXT y
 WHILE INPUT$(1) = "": WEND
+
+TX ("CL0CO0B0,0,640,480CO7")
+I = 0
+FOR y = 0 TO 8
+  FOR x = 0 TO 3
+    TX ("{(7@52,52=" + n$(I) + "-" + n$(x * 160) + "|" + n$(y * 53) + "}")
+    TX ("{字体" + n$(I) + "}")
+    I = I + 1
+  NEXT x
+NEXT y
+WHILE INPUT$(1) = "": WEND
+
 TX ("KB1,1M3CU1,1")
 CLOSE
 END
