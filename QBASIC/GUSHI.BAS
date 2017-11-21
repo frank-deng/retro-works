@@ -1,6 +1,7 @@
 DECLARE SUB TestTX ()
 DECLARE FUNCTION n$ (n%)
 DECLARE SUB TX (s AS STRING)
+DECLARE SUB DrawText(x as integer,y as integer,text as string)
 DATA &H50,&H53,&H56,&HBE,&H00,&H00,&H2E,&HC7,&H04,&H00,&H00,&HB8,&H00,&HDB,&HCD,&H2F
 DATA &H3C,&HFF,&H75,&H12,&H81,&HFB,&H50,&H54,&H75,&H0C,&HB8,&H11,&H00,&HCD,&H79,&H75
 DATA &H05,&h2E,&HC7,&H04,&H01,&H00,&H5E,&H5B,&H58,&HCB
@@ -8,15 +9,16 @@ DATA &H05,&h2E,&HC7,&H04,&H01,&H00,&H5E,&H5B,&H58,&HCB
 DEFINT A-Z
 TestTX
 OPEN "LPT3" FOR OUTPUT AS #1
-TX ("M18CU1,0CO8KB1,0CL0CO7B0,0,640,480")
-SIZE = 72: X = (640 - SIZE * 8) / 2 + (SIZE / 4)
+TX ("M18CU1,0KB1,0CL0CO7B0,0,640,480")
+
+T1$ = "长风破浪会有时，" : T2$ = "直挂云帆济沧海。" : L = LEN(T1$)
+SIZE = 72: X = (640 - SIZE * L / 2) / 2 + (SIZE / 4) : Y1=480/2-SIZE : Y2=480/2
+
 TX ("{=0%1@" + n$(SIZE) + "," + n$(SIZE) + "}")
-TX ("{(15-" + n$(X - 1) + "|" + n$(219 - SIZE) + "长风破浪会有时，}")
-TX ("{(15-" + n$(X - 1) + "|219直挂云帆济沧海。}")
-TX ("{(0-" + n$(X + 1) + "|" + n$(221 - SIZE) + "长风破浪会有时，}")
-TX ("{(0-" + n$(X + 1) + "|221直挂云帆济沧海。}")
-TX ("{(9-" + n$(X) + "|" + n$(220 - SIZE) + "长风破浪会有时，}")
-TX ("{(9-" + n$(X) + "|220直挂云帆济沧海。}")
+TX ("{(15}"): CALL DrawText(X-1,Y1-1,T1$): CALL DrawText(X-1,Y2-1,T2$)
+TX ("{(0}"): CALL DrawText(X+1,Y1+1,T1$): CALL DrawText(X+1,Y2+1,T2$)
+TX ("{(9}"): CALL DrawText(X,Y1,T1$): CALL DrawText(X,Y2,T2$)
+
 WHILE INPUT$(1) = "": WEND
 TX ("KB1,1M3CU1,1")
 CLOSE
@@ -51,3 +53,6 @@ SUB TX (s AS STRING)
 PRINT #1, CHR$(14); "["; s; "]";
 END SUB
 
+SUB DrawText(x as integer,y as integer,text as string)
+  TX ("{-" + n$(x) + "|" + n$(y) + CHR$(0) + text+"}")
+END SUB
