@@ -48,7 +48,6 @@ WHILE INPUT$(1) = "": WEND
 ' Start drawing pie chart
 TX ("CL0CO"+n$(BG)+"B0,0,640,480CO7")
 
-' TX ("CO1E430,240,0,360,"+n$(RADIUS)+","+n$(RADIUS)+",2,1}")
 SANGLE = 0
 FOR I=0 TO C-2
   ANGLE = SANGLE+FIX(D(I)/S#*360)
