@@ -48,7 +48,7 @@ WHILE INPUT$(1) = "": WEND
 ' Start drawing pie chart
 TX ("CL0CO"+n$(BG)+"B0,0,640,480CO7")
 
-TX ("CO1E430,240,0,360,"+n$(RADIUS)+","+n$(RADIUS)+",2,1}")
+' TX ("CO1E430,240,0,360,"+n$(RADIUS)+","+n$(RADIUS)+",2,1}")
 SANGLE = 0
 FOR I=0 TO C-2
   ANGLE = SANGLE+FIX(D(I)/S#*360)
@@ -56,6 +56,7 @@ FOR I=0 TO C-2
   CALL DrawPie(430, 240, SANGLE, ANGLE, COL)
   SANGLE=ANGLE
 NEXT I
+CALL DrawPie(430, 240, SANGLE, 360, 1)
 
 TX ("{(15@16,16}")
 LH = 18
@@ -66,7 +67,7 @@ FOR I=0 TO C-1
     COL = 1
   END IF
   TX ("CO"+n$(COL)+"B5,"+n$(i*LH+TOP)+","+n$(5+15)+","+n$(i*LH+TOP+15))
-  CALL DrawText(5+16+4,I*LH+TOP,T(I)+"£¨"+percent$(D(I)/s#)+"£©")
+  CALL DrawText(5+16+6,I*LH+TOP,T(I)+"£¨"+percent$(D(I)/s#)+"£©")
 NEXT I
 
 WHILE INPUT$(1) = "": WEND
