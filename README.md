@@ -91,3 +91,7 @@ Mount floppy image under Linux (Use GB2312 for filename encoding)
 
 	sudo mount -o loop,codepage=936,iocharset=utf8 floppy.img /mnt
 
+使用ffmpeg制作Windows 3.1下播放的视频  
+Convert video into format accepted by Windows 3.1
+
+	ffmpeg -i input.mp4 -c:v cinepak -c:a adpcm_ima_wav -vf scale=320:240 -ac 1 -ar 32000 -r 15 -y output.avi
