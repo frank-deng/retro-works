@@ -14,20 +14,20 @@ WHILE NOT EOF(1)
   END IF
 WEND
 CLOSE #1
-PRINT "记录数：";C
-PRINT "总计：  ";S
-PRINT "平均数：";S/C
-PRINT "最小值：";MIN
-PRINT "最大值：";MAX
+PRINT "记录数： ";C
+PRINT "总计：   ";S
+PRINT "平均数： ";S/C
+PRINT "最小值： ";MIN
+PRINT "最大值： ";MAX
 A=S/C:VAR=0
 FOR I=0 TO C-1:VAR=VAR+(D(I)-A)^2:NEXT I
-PRINT "方差：  ";SQR(VAR/C)
-PRINT "标准差：";SQR(VAR/(C-1))
+PRINT "标准差： ";SQR(VAR/C)
+PRINT "标准差2：";SQR(VAR/(C-1))
 FOR I=C-1 TO 0 STEP -1:FOR J=0 TO I-1
   IF D(J)>D(J+1) THEN
     T=D(J):D(J)=D(J+1):D(J+1)=T
   END IF
 NEXT J:NEXT I
-PRINT "中位数：";
+PRINT "中位数： ";
 IF C AND 1 THEN PRINT D(C\2) ELSE PRINT D(C\2-1);D(C\2)
 END
