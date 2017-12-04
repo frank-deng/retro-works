@@ -1,7 +1,5 @@
 DEFDBL A-Z : DEFINT I
 COMMON LENGTH
-DECLARE FUNCTION H(T0 AS DOUBLE, T1 AS DOUBLE, X AS DOUBLE)
-
 PRINT ""
 PRINT "*** Linear Regression Demo ***"
 PRINT ""
@@ -30,8 +28,9 @@ WHILE ABS(J0)>0.0001 OR ABS(J1)>0.0001
   FOR I = 0 TO LENGTH-1
     B = B + X(I)
     D = D + X(I) * X(I)
-    J0 = J0 + H(T0, T1, X(I)) - Y(I)
-    J1 = J1 + (H(T0, T1, X(I)) - Y(I)) * X(I)
+    H = T0 + T1 * X(I)
+    J0 = J0 + (H - Y(I))
+    J1 = J1 + (H - Y(I)) * X(I)
   NEXT I
   B = B / LENGTH : C = B : D = D / LENGTH
   J0 = J0 / LENGTH : J1 = J1 / LENGTH
@@ -42,10 +41,5 @@ WHILE ABS(J0)>0.0001 OR ABS(J1)>0.0001
   T0 = T0 - (A1 * J0 + B1 * J1)
   T1 = T1 - (C1 * J0 + D1 * J1)
 WEND
-
 PRINT "y = ";T0;"+ (";T1;") * x"
 END
-
-FUNCTION H(T0 AS DOUBLE, T1 AS DOUBLE, X AS DOUBLE)
-  H = T0 + T1 * X
-END FUNCTION
