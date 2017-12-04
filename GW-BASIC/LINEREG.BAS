@@ -15,4 +15,4 @@
 82 A1=DET*D:B1=DET*(-B):C1=DET*(-C):D1=DET*A
 84 T0=T0-(A1*J0+B1*J1):T1=T1-(C1*J0+D1*J1)
 90 WEND
-91 PRINT "y = ";T0;"+ (";T1;") * x":END
+91 PRINT "y = ";T0;" + (";T1;") * x":END
