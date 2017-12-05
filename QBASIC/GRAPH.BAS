@@ -36,7 +36,7 @@ FOR I=1 TO L
   IF K!>0.5 THEN
     PUT (K!*W+LT-70-LEN(SV$)*8,Y-1),G,PRESET
   ELSE
-    PUT (K!*W+LT+4,Y-1),G,PSET
+    PUT (K!*W+LT+8,Y-1),G,PSET
   END IF
   IF (I MOD 47)<>0 OR I=L THEN
     Y=Y+10
