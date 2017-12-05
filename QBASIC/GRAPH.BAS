@@ -5,8 +5,7 @@ PI=3.141592654
 
 L=0:LT=0:S#=0:M#=0:Y=1
 
-' INPUT "Filename: ", F$
-F$="gdata3.txt"
+INPUT "Filename: ", F$
 OPEN F$ FOR INPUT AS #1
 WHILE NOT EOF(1)
   INPUT #1,T$,D#: L=L+1
@@ -52,7 +51,7 @@ WHILE INPUT$(1)="":WEND:CLS
 IF L>47 THEN SCREEN 0:END
 
 OPEN F$ FOR INPUT AS #1
-SANGLE# = 0: Y=(480-10*L)/2
+SANGLE# = 0: 
 FOR I=1 TO L
   INPUT #1,T$,D#
   IF I = L THEN
@@ -63,7 +62,18 @@ FOR I=1 TO L
     CALL DRAWPIE(430, 240, 200, SANGLE#, ANGLE#, COL)
     SANGLE#=ANGLE#
   END IF
+NEXT I
+CLOSE #1
 
+OPEN F$ FOR INPUT AS #1
+Y=(480-10*L)/2
+FOR I=1 TO L
+  INPUT #1,T$,D#
+  IF I = L THEN
+    COL = 1
+  ELSE
+    COL = (I mod 14)+1
+  END IF
   LOCATE 60,1,0
   PRINT T$;" (";: PRINT USING "##.###%";D#/S#*100;: PRINT ")";TAB(79);
   LCMT=(LEN(T$)+10)*8
