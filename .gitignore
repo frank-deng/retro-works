@@ -17,3 +17,5 @@ ie3-site/*.iso
 ie3-site/*.img
 config.py
 test.py
+autorun.bat
+AUTORUN.BAT
