@@ -6,16 +6,15 @@ DECLARE SUB PRINTBOARD()
 DECLARE SUB UPDATECANDL()
 
 COMMON CANDL,STACKL,STATUS
-DIM SHARED BOARD(9,9), CAND(81,3): STATUS=0
-' INPUT "Filename: ", F$
-F$="sudoku2.txt"
+DIM SHARED BOARD(9,9), CAND(81,3): STATUS = 0
+INPUT "Filename: ", F$
 OPEN F$ FOR INPUT AS #1
 FOR Y=0 TO 8:FOR X=0 TO 8
   INPUT #1,BOARD(Y,X)
 NEXT X:NEXT Y
 CLOSE #1
 
-PRINT "Checking sudoku...";: LOCATE ,1
+PRINT "Checking sudoku... ";
 
 REM Check inconsistent numbers
 FOR Y = 0 TO 8: NUMS = 0
@@ -56,53 +55,56 @@ FOR AREA = 0 TO 8
   NEXT X: NEXT Y
 NEXT AREA
 
-PRINT "Checking passed, start calculating...";: LOCATE ,1
-
 REM Check empty cells without answer, and complete cells with only one answer
+CALL UPDATECANDL : PRINT "Passed"
+PRINT "Calculation started, press Esc to cancel.";: LOCATE ,1
 DO
-  CALL UPDATECANDL
-  IF CANDL = 0 THEN
-    EXIT DO
-  END IF
   STATUS = 1
   FOR I = 0 TO CANDL-1
     CN = CAND(I,2)
     IF (CN AND (CN-1))=0 THEN
       X = CAND(I,0): Y = CAND(I,1)
-      BOARD(Y,X) = GETNEXTNUM(0, CN)
+      BOARD(Y,X) = GETNEXTNUM(0,CN)
       STATUS = 0
     END IF
   NEXT I
-LOOP WHILE STATUS=0
+  IF STATUS = 0 THEN CALL UPDATECANDL
+LOOP WHILE STATUS=0 AND CANDL>0
 
 IF CANDL = 0 THEN
-  PRINT "Calculation finished."; TAB(78)
-  PRINT ""
+  PRINT "Calculation finished."; TAB(78): PRINT ""
   CALL PRINTBOARD: END
 END IF
 
 REM Start solving complex puzzles
-CLS
 DIM S(81): SL=0: S(0) = GETNEXTNUM(0, CAND(0,2))
-WHILE SL<CANDL
+WHILE SL < CANDL AND INKEY$<>CHR$(27)
   X = CAND(SL,0): Y = CAND(SL,1)
   IF S(SL) = 0 THEN
     BOARD(Y,X) = 0: SL = SL - 1
     IF SL = -1 THEN
-      LOCATE 1,1: CALL PRINTBOARD
-      LOCATE 15,1
-      PRINT "No answer."; TAB(78): PRINT "": END
+      PRINT "No answer."; TAB(78): PRINT ""
+      END
     END IF
     S(SL) = GETNEXTNUM(S(SL), CAND(SL,2))
   ELSEIF CHECKNUM(X,Y,S(SL))=1 THEN
     BOARD(Y,X) = S(SL) : SL = SL + 1
-    S(SL) = GETNEXTNUM(0, CAND(SL,2))
+    IF SL < CANDL THEN
+      S(SL) = GETNEXTNUM(0, CAND(SL,2))
+    ELSE
+      STATUS = 2
+    END IF
   ELSE
     S(SL) = GETNEXTNUM(S(SL), CAND(SL,2))
   END IF
-  LOCATE 1,1: CALL PRINTBOARD
 WEND
-'CALL PRINTBOARD
+
+IF STATUS = 2 THEN
+  PRINT "Calculation finished."; TAB(78): PRINT ""
+  CALL PRINTBOARD
+ELSE
+  PRINT "Calculation cancelled."; TAB(78): PRINT ""
+END IF
 END
 
 REM Functions and SUBs
@@ -161,9 +163,7 @@ SUB UPDATECANDL()
   FOR Y=0 TO 8:FOR X=0 TO 8
     IF BOARD(Y,X)=0 THEN
       C = GETCAND(X,Y)
-      IF C=0 THEN
-        PRINT "No answer at row";Y+1;", column";X+1;TAB(79):END
-      END IF
+      IF C=0 THEN PRINT "No answer at row";Y+1;", column";X+1: END
       CAND(CANDL,0)=X : CAND(CANDL,1)=Y: CAND(CANDL,2)=C
       CANDL = CANDL + 1
     END IF
