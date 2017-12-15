@@ -21,13 +21,16 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 求100以内的质数 Show prime numbers under 100  
 ![Prime Numbers](http://frank-deng.github.io/retro-works/images/GW-BASIC/Prime%20Numbers.png)
 
+显示杨辉三角 Display Yanghui Triangle  
+![Yanghui Triangle](http://frank-deng.github.io/retro-works/images/GW-BASIC/Yanghui.png)
+
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](http://frank-deng.github.io/retro-works/images/GW-BASIC/Guessnum.png)
 
-2048  
+2048游戏 2048 Game  
 ![2048](http://frank-deng.github.io/retro-works/images/GW-BASIC/2048-1.png)
 
-2048  
+2048游戏 2048 Game  
 ![2048](http://frank-deng.github.io/retro-works/images/GW-BASIC/2048-2.png)
 
 条形图 Bargraph
