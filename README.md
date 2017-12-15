@@ -15,21 +15,29 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 
 ### 截图欣赏 Screenshots
 
-![Startup](http://frank-deng.github.io/retro-works/Startup.png)
+开机画面 Startup  
+![Startup](http://frank-deng.github.io/retro-works/images/GW-BASIC/Startup.png)
 
-![Prime Numbers](http://frank-deng.github.io/retro-works/Prime%20Numbers.png)
+求100以内的质数 Show prime numbers under 100  
+![Prime Numbers](http://frank-deng.github.io/retro-works/images/GW-BASIC/Prime%20Numbers.png)
 
-![Bulls and Cows](http://frank-deng.github.io/retro-works/Guessnum.png)
+猜数字游戏 Bulls and Cows  
+![Bulls and Cows](http://frank-deng.github.io/retro-works/images/GW-BASIC/Guessnum.png)
 
-![2048](http://frank-deng.github.io/retro-works/2048-1.png)
+2048  
+![2048](http://frank-deng.github.io/retro-works/images/GW-BASIC/2048-1.png)
 
-![2048](http://frank-deng.github.io/retro-works/2048-2.png)
+2048  
+![2048](http://frank-deng.github.io/retro-works/images/GW-BASIC/2048-2.png)
 
-![Graph](http://frank-deng.github.io/retro-works/Graph.png)
+条形图 Bargraph
+![Graph](http://frank-deng.github.io/retro-works/images/GW-BASIC/Graph.png)
 
-![Chinese Demo](http://frank-deng.github.io/retro-works/Chinese.png)
+显示汉字 Display Chinese text  
+![Chinese Demo](http://frank-deng.github.io/retro-works/images/GW-BASIC/Chinese.png)
 
-![Shapes](http://frank-deng.github.io/retro-works/Shapes.png)
+绘制几何形状 Drawing geometric shapes    
+![Shapes](http://frank-deng.github.io/retro-works/images/GW-BASIC/Shapes.png)
 
 
 QBASIC
@@ -56,9 +64,9 @@ A simple site designed for console-based browser [w3m](http://w3m.sourceforge.ne
 
 ### 截图欣赏 Screenshots
 
-![Telnet 1](http://frank-deng.github.io/retro-works/telnet1.png)
+![Telnet 1](http://frank-deng.github.io/retro-works/images/telnet-site/telnet1.png)
 
-![Telnet 2](http://frank-deng.github.io/retro-works/telnet2.png)
+![Telnet 2](http://frank-deng.github.io/retro-works/images/telnet-site/telnet2.png)
 
 ### Linux服务器端配置 Linux Server Configuration
 
@@ -66,7 +74,7 @@ A simple site designed for console-based browser [w3m](http://w3m.sourceforge.ne
 Add `zh_CN.GB2312` into `/etc/locale.gen`, then run `sudo locale-gen`.
 
 安装需要的软件包  
-Install package needed
+Install packages needed
 
 	sudo apt-get install ncurses-term tcpser
 	sudo pip install bottle httplib2 markdown
@@ -89,8 +97,8 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 Open "Terminal Emulator" in the "Accessories" program group, set the serial port to use as "COM1", set phone number as 92163 or 1270000000012333, then start dialing. When dialing succeed, press `Enter` to open login panel.
 
 
-Notes 
------
+实用命令 Useful Commands
+-----------------------
 
 将原始硬盘镜像转换成VDI格式硬盘镜像  
 Convert raw disk image into VDI format image
@@ -98,7 +106,7 @@ Convert raw disk image into VDI format image
 	VBoxManage convertdd source.img destination.vdi --format VDI
 
 将VDI格式硬盘镜像转换成原始硬盘镜像  
-Convert VDI format HDD image into raw one
+Convert VDI format HDD image into raw HDD image
 
 	VBoxManage clonehd source.vdi destination.img --format RAW
 
@@ -107,7 +115,7 @@ Mount floppy image under Linux (Use GB2312 for filename encoding)
 
 	sudo mount -o loop,codepage=936,iocharset=utf8 floppy.img /mnt
 
-使用ffmpeg制作Windows 3.1下播放的视频  
+使用ffmpeg制作可在Windows 3.1下播放的视频  
 Convert video into format accepted by Windows 3.1
 
 	ffmpeg -i input.mp4 -c:v cinepak -c:a adpcm_ima_wav -vf scale=320:240 -ac 1 -ar 32000 -r 15 -y output.avi
