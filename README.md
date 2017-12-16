@@ -46,7 +46,7 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 QBASIC
 ------
 
-一些DOS下的QBASIC上的作品。  
+一些基于DOS下QBASIC上的作品。  
 Some works based on QBASIC under DOS.
 
 因其支持结构化编程，使得程序的开发、维护更加方便。  
@@ -57,6 +57,41 @@ Some programs require DOS-based chinese system (e.g. UCDOS) to display chinese c
 
 `GUSHI.BAS`、`TUBIAO.BAS`、`TXDEMO.BAS`需要UCDOS下自带的特显程序`TX.COM`和UCDOS的轮廓字库，以实现UCDOS下的绘图操作，并以正确的字体显示大尺寸汉字。  
 `GUSHI.BAS`, `TUBIAO.BAS`, `TXDEMO.BAS` require UCDOS's special display utility `TX.COM` and outline fonts for UCDOS, so as to enable graphic drawing under UCDOS, as well as displaying large-sized chinese characters in correct glyph.
+
+### 截图欣赏 Screenshots
+
+2048游戏 2048 Game  
+![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048_1.png)
+
+2048游戏 2048 Game  
+![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048_2.png)
+
+猜数字游戏 Bulls and Cows  
+![Bulls and Cows](http://frank-deng.github.io/retro-works/images/QBASIC/guessnum.png)
+
+条形图 Bar Chart  
+![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/barchart.png)
+
+饼图 Pie Chart  
+![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/piechart.png)
+
+条形图（使用UCDOS特显程序） Bar Chart (Use Special Display utility from UCDOS)  
+![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/barchart2.png)
+
+饼图（使用UCDOS特显程序） Pie Chart (Use Special Display utility from UCDOS)  
+![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/piechart2.png)
+
+使用UCDOS特显程序显示大尺寸汉字 Use Special Display utility from UCDOS to display Chinese characters in large size  
+![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/poem.png)
+
+UCDOS特显程序中可用的颜色 Colors available in the Special Display utility from UCDOS  
+![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/256colors.png)  
+UCDOS使用VESA.DRV显示驱动后，可以显示上图中的256种颜色。（默认的VGA显示驱动只显示最上面一行的16种颜色）  
+When UCDOS is started with VESA.DRV display driver, it will be capable of displaying the 256 colors above. (Default VGA.DRV can only display 16 colors in the first row)
+
+UCDOS特显程序中可用的字体 Fonts available in the Special Display utility from UCDOS  
+![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/fonts.png)  
+目前该环境中只安装了“宋体”一种字体。 At present, only "SongTi" font was installed on this system.
 
 
 telnet-site
