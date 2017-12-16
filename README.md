@@ -70,27 +70,27 @@ Some programs require DOS-based chinese system (e.g. UCDOS) to display chinese c
 ![Bulls and Cows](http://frank-deng.github.io/retro-works/images/QBASIC/guessnum.png)
 
 条形图 Bar Chart  
-![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/barchart.png)
+![Bar Chart](http://frank-deng.github.io/retro-works/images/QBASIC/barchart.png)
 
 饼图 Pie Chart  
-![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/piechart.png)
+![Pie Chart](http://frank-deng.github.io/retro-works/images/QBASIC/piechart.png)
 
 条形图（使用UCDOS特显程序） Bar Chart (Use Special Display utility from UCDOS)  
-![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/barchart2.png)
+![UCDOS Bar Chart](http://frank-deng.github.io/retro-works/images/QBASIC/barchart2.png)
 
 饼图（使用UCDOS特显程序） Pie Chart (Use Special Display utility from UCDOS)  
-![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/piechart2.png)
+![UCDOS Pie Chart](http://frank-deng.github.io/retro-works/images/QBASIC/piechart2.png)
 
 使用UCDOS特显程序显示大尺寸汉字 Use Special Display utility from UCDOS to display Chinese characters in large size  
-![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/poem.png)
+![Poem](http://frank-deng.github.io/retro-works/images/QBASIC/poem.png)
 
 UCDOS特显程序中可用的颜色 Colors available in the Special Display utility from UCDOS  
-![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/256colors.png)  
+![256 Colors](http://frank-deng.github.io/retro-works/images/QBASIC/256color.png)  
 UCDOS使用VESA.DRV显示驱动后，可以显示上图中的256种颜色。（默认的VGA显示驱动只显示最上面一行的16种颜色）  
 When UCDOS is started with VESA.DRV display driver, it will be capable of displaying the 256 colors above. (Default VGA.DRV can only display 16 colors in the first row)
 
 UCDOS特显程序中可用的字体 Fonts available in the Special Display utility from UCDOS  
-![Graph](http://frank-deng.github.io/retro-works/images/QBASIC/fonts.png)  
+![Fonts](http://frank-deng.github.io/retro-works/images/QBASIC/fonts.png)  
 目前该环境中只安装了“宋体”一种字体。 At present, only "SongTi" font was installed on this system.
 
 
