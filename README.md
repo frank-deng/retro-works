@@ -75,6 +75,12 @@ Some programs require DOS-based chinese system (e.g. UCDOS) to display chinese c
 饼图 Pie Chart  
 ![Pie Chart](http://frank-deng.github.io/retro-works/images/QBASIC/piechart.png)
 
+数独求解程序 Sudoku Solver  
+![Sudoku](http://frank-deng.github.io/retro-works/images/QBASIC/sudoku.png)
+
+简单统计程序（使用中文界面） Simple Statistics Program with Chinese UI  
+![Statistics](http://frank-deng.github.io/retro-works/images/QBASIC/stat.png)
+
 条形图（使用UCDOS特显程序） Bar Chart (Use Special Display utility from UCDOS)  
 ![UCDOS Bar Chart](http://frank-deng.github.io/retro-works/images/QBASIC/barchart2.png)
 
