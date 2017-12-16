@@ -25,7 +25,7 @@ FOR I=1 TO L
   INPUT #1,T$,D#
 
   LOCATE 60,1,0:PRINT T$;TAB(79);
-  GET (0,472)-(LT,479),G:PUT (0,Y-1),G,PSET
+  GET (0,472)-(LT,479),G:PUT (0,Y),G,PSET
 
   K!=D#/M#:LINE (LT+1,Y-1)-(K!*W+LT+1,Y+7),,BF
 
@@ -34,9 +34,9 @@ FOR I=1 TO L
   PRINT SV$;"(";: PRINT USING "##.###%";D#/S#*100;: PRINT ")";TAB(79);
   GET (0,472)-(70+LEN(SV$)*8,479),G
   IF K!>0.5 THEN
-    PUT (K!*W+LT-70-LEN(SV$)*8,Y-1),G,PRESET
+    PUT (K!*W+LT-70-LEN(SV$)*8,Y),G,PRESET
   ELSE
-    PUT (K!*W+LT+8,Y-1),G,PSET
+    PUT (K!*W+LT+8,Y),G,PSET
   END IF
   IF (I MOD 47)<>0 OR I=L THEN
     Y=Y+10
@@ -79,7 +79,7 @@ FOR I=1 TO L
   LCMT=(LEN(T$)+10)*8
   GET (0,472)-(LCMT,479),G
   LOCATE 60,1,0:PRINT TAB(79);
-  PUT (16,Y),G,PSET
+  PUT (16,Y+1),G,PSET
   LINE (4,Y)-(12,Y+8),COL,BF
   Y=Y+10
 NEXT I
