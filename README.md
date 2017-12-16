@@ -97,7 +97,6 @@ When UCDOS is started with VESA.DRV display driver, it will be capable of displa
 
 UCDOS特显程序中可用的字体 Fonts available in the Special Display utility from UCDOS  
 ![Fonts](http://frank-deng.github.io/retro-works/images/QBASIC/fonts.png)  
-目前该环境中只安装了“宋体”一种字体。 At present, only "SongTi" font was installed on this system.
 
 
 telnet-site
