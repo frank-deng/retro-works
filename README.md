@@ -18,7 +18,7 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 开机画面 Startup  
 ![Startup](http://frank-deng.github.io/retro-works/images/GW-BASIC/Startup.png)
 
-求100以内的质数 Show prime numbers under 100  
+求100以内的质数 Get prime numbers under 100  
 ![Prime Numbers](http://frank-deng.github.io/retro-works/images/GW-BASIC/Prime%20Numbers.png)
 
 显示杨辉三角 Display Yanghui Triangle  
@@ -33,13 +33,13 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 2048游戏 2048 Game  
 ![2048](http://frank-deng.github.io/retro-works/images/GW-BASIC/2048-2.png)
 
-条形图 Bargraph
+条形图 Bar Chart  
 ![Graph](http://frank-deng.github.io/retro-works/images/GW-BASIC/Graph.png)
 
 显示汉字 Display Chinese text  
 ![Chinese Demo](http://frank-deng.github.io/retro-works/images/GW-BASIC/Chinese.png)
 
-绘制几何形状 Drawing geometric shapes    
+绘制几何形状 Drawing Geometric Shapes  
 ![Shapes](http://frank-deng.github.io/retro-works/images/GW-BASIC/Shapes.png)
 
 
