@@ -1,5 +1,0 @@
-10 INPUT "«Î ‰»Î≤„ ˝£∫",N:S=N
-20 FOR X=0 TO N:A=1:PRINT SPC(S*2);:S=S-1
-30 FOR Y=0 TO X:PRINT A;" ";:A=A*(X-Y)/(Y+1):NEXT Y
-40 PRINT "":NEXT X
-50 END
