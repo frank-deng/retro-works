@@ -1,3 +1,6 @@
+DECLARE FUNCTION nd$ (A#)
+DECLARE FUNCTION percent$ (A#)
+
 DEFINT A-Z: DEFDBL P
 COMMON PI
 DECLARE SUB DRAWPIE(X AS INTEGER, Y AS INTEGER, R AS INTEGER, S AS DOUBLE, E AS DOUBLE, CL AS INTEGER)
@@ -30,11 +33,11 @@ FOR I=1 TO L
   K!=D#/M#:LINE (LT+1,Y-1)-(K!*W+LT+1,Y+7),,BF
 
   LOCATE 60,1,0
-  SV$ = LTRIM$(RTRIM$(STR$(D#)))
-  PRINT SV$;"(";: PRINT USING "##.###%";D#/S#*100;: PRINT ")";TAB(79);
-  GET (0,472)-(70+LEN(SV$)*8,479),G
+  SV$ = LTRIM$(RTRIM$(STR$(D#))) + " (" + percent$(D#/S#) + ")"
+  PRINT SV$;TAB(79);
+  GET (0,472)-(LEN(SV$)*8,479),G
   IF K!>0.5 THEN
-    PUT (K!*W+LT-70-LEN(SV$)*8,Y),G,PRESET
+    PUT (K!*W+LT-LEN(SV$)*8,Y),G,PRESET
   ELSE
     PUT (K!*W+LT+8,Y),G,PSET
   END IF
@@ -75,9 +78,9 @@ FOR I=1 TO L
     COL = (I mod 14)+1
   END IF
   LOCATE 60,1,0
-  PRINT T$;" (";: PRINT USING "##.###%";D#/S#*100;: PRINT ")";TAB(79);
-  LCMT=(LEN(T$)+10)*8
-  GET (0,472)-(LCMT,479),G
+  SV$=T$+" ("+percent$(D#/S#)+")"
+  PRINT SV$;TAB(79);
+  GET (0,472)-(LEN(SV$)*8,479),G
   LOCATE 60,1,0:PRINT TAB(79);
   PUT (16,Y+1),G,PSET
   LINE (4,Y)-(12,Y+8),COL,BF
@@ -95,3 +98,11 @@ SUB DRAWPIE(X AS INTEGER, Y AS INTEGER, R AS INTEGER, S AS DOUBLE, E AS DOUBLE, 
   YP = Y-(R-10)*SIN((S+(E-S)/2)/180*PI)
   PAINT (XP,YP),CL
 END SUB
+
+FUNCTION nd$ (A AS DOUBLE)
+  nd$ = LTRIM$(RTRIM$(STR$(A)))
+END FUNCTION
+
+FUNCTION percent$(A AS DOUBLE)
+  percent$ = nd$(FIX(A * 100)) + "." + nd$(FIX(A * 100000) MOD 1000) + "%"
+END FUNCTION
