@@ -3,7 +3,7 @@ DECLARE SUB TestTX ()
 DECLARE FUNCTION n$ (n%)
 DECLARE FUNCTION nd$ (A#)
 DECLARE SUB TX (s AS STRING)
-COMMON SC#, SL
+COMMON SC#, SL, W, H, X0, Y0
 
 SC#=0:DIM SHARED B(4,4),S(16,2):SL=0
 RANDOMIZE TIMER
@@ -11,8 +11,14 @@ RANDOMIZE TIMER
 CALL TestTX
 OPEN "LPT3" FOR OUTPUT AS #1
 TX("M10CU1,0CO8KB1,0CL0")
-TX("CL0CO0B0,0,640,480CO7")
-TX ("{(7@24,24=0-240|40???}")
+TX("CO2B0,0,640,480CO7")
+
+W = 90: H = 90 : X0 = (640-W*4)/2: Y0 = (480-W*4-40)/2+40
+CALL DRAWBOX(X0, Y0-40, X0+W*4-1, Y0-1)
+TX ("{(0)7@24,24=0-"+n$(X0+6)+"|"+n$(Y0-24-8)+"得分：}")
+FOR J=0 TO 3:FOR I=0 TO 3
+  CALL DRAWBOX(X0+W*I, Y0+H*J, X0+W*(I+1)-1, Y0+H*(J+1)-1)
+NEXT I:NEXT J
 
 CALL UPDATEBOARD
 
@@ -20,7 +26,7 @@ DO
   K$=INKEY$
   SELECT CASE K$
     CASE CHR$(27) 
-      CLS:END
+      EXIT DO
     CASE CHR$(0)+CHR$(72)
       CALL MOVEUP
     CASE CHR$(0)+CHR$(75)
@@ -31,8 +37,13 @@ DO
       CALL MOVEDOWN
   END SELECT
 LOOP WHILE SL>0
-LOCATE 20,35:PRINT "GAME OVER";
-WHILE INPUT$(1)<>CHR$(27):WEND
+
+IF SL=0 THEN
+  TX ("CO7B"+n$((640-32*4)/2-4)+","+n$(Y0+W*2-16-4)+","+n$((640-32*4)/2+32*4+3)+","+n$(Y0+W*2+19))
+  TX ("{%0(0)7@32,32=0-"+n$((640-32*4)/2)+"|"+n$(Y0+W*2-16)+"游戏结束}")
+  TX ("CO0R"+n$((640-32*4)/2-4)+","+n$(Y0+W*2-16-4)+","+n$((640-32*4)/2+32*4+3)+","+n$(Y0+W*2+19))
+  WHILE INPUT$(1)<>CHR$(27):WEND
+END IF
 
 TX("KB1,1M3CU1,1")
 CLOSE
@@ -159,9 +170,9 @@ SUB MOVEDOWN
 END SUB
 
 SUB UPDATEBOARD()
-  SHARED SL, SC#
+  SHARED SL, SC#, X0, Y0
   SL=0:
-  TX("{-320|40"+CHR$(0)+nd$(SC#)+"}")
+  TX("{-"+n$(X0+6+24*3)+"|"+n$(Y0-24-8)+"%0(0)7@24,24"+CHR$(0)+nd$(SC#)+"}")
   FOR Y=0 TO 3
     FOR X=0 TO 3
       IF B(Y,X)<>0 THEN
@@ -223,8 +234,35 @@ SUB TX (s AS STRING)
 PRINT #1, CHR$(14); "["; s; "]";
 END SUB
 
+SUB DRAWBOX(X0 AS INTEGER,Y0 AS INTEGER,X1 AS INTEGER,Y1 AS INTEGER)
+  TX("CO7B"+n$(X0+2)+","+n$(Y0+2)+","+n$(X1-2)+","+n$(Y1-2))
+  TX("CO15B"+n$(X0)+","+n$(Y0)+","+n$(X1)+","+n$(Y0+1))
+  TX("B"+n$(X0)+","+n$(Y0)+","+n$(X0+1)+","+n$(Y1))
+  TX("CO8B"+n$(X1-1)+","+n$(Y0)+","+n$(X1)+","+n$(Y1))
+  TX("B"+n$(X0)+","+n$(Y1-1)+","+n$(X1)+","+n$(Y1))
+END SUB
+
 SUB DRAWNUM(X,Y,N)
-  X0 = 120: Y0 = 64: W = 60: H = 24
-  TX("CO0B"+n$(X0+X*W)+","+n$(Y0+Y*H)+","+n$(X0+X*W+W)+","+n$(Y0+Y*H+H))
-  TX("{-"+n$(X0+X*W)+"|"+n$(Y0+Y*H)+CHR$(0)+n$(N)+"}")
+  SHARED W, H, X0, Y0
+  TX("CO7B"+n$(X0+X*W+3)+","+n$(Y0+Y*H+3)+","+n$(X0+X*W+W-3)+","+n$(Y0+Y*H+H-3))
+  IF N>0 THEN
+    text$ = n$(N): tl = len(text$)
+    ya = (H-32)/2
+    IF N<100 THEN
+      TX("{@32,48}")
+      xa = (W-24*tl)/2
+    ELSE
+      TX("{@32,32}")
+      xa = (W-16*tl)/2
+    END IF
+    X$ = n$(X0+X*W+xa-1)
+    Y$ = n$(Y0+Y*H+ya-1)
+    TX("{%1(15-"+X$+"|"+Y$+CHR$(0)+text$+"}")
+    X$ = n$(X0+X*W+xa+1)
+    Y$ = n$(Y0+Y*H+ya+1)
+    TX("{%1(0-"+X$+"|"+Y$+CHR$(0)+text$+"}")
+    X$ = n$(X0+X*W+xa)
+    Y$ = n$(Y0+Y*H+ya)
+    TX("{%1(9-"+X$+"|"+Y$+CHR$(0)+text$+"}")
+  END IF
 END SUB
