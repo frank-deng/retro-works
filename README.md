@@ -42,6 +42,9 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 绘制几何形状 Drawing Geometric Shapes  
 ![Shapes](http://frank-deng.github.io/retro-works/images/GW-BASIC/Shapes.png)
 
+屏保 Screensaver  
+![Screensaver](http://frank-deng.github.io/retro-works/images/GW-BASIC/Lines.png)
+
 
 QBASIC
 ------
@@ -53,10 +56,10 @@ Some works based on QBASIC under DOS.
 Thanks to QBASIC's support of structured programming, development and maintenance is much easier.
 
 部分程序需要DOS方式下的中文系统（如UCDOS），以正确显示汉字。  
-Some programs require DOS-based chinese system (e.g. UCDOS) to display chinese characters properly.
+Some programs require DOS-based Chinese system (e.g. UCDOS) to display Chinese characters properly.
 
-`GUSHI.BAS`、`TUBIAO.BAS`、`TXDEMO.BAS`需要UCDOS下自带的特显程序`TX.COM`和UCDOS的轮廓字库，以实现UCDOS下的绘图操作，并以正确的字体显示大尺寸汉字。  
-`GUSHI.BAS`, `TUBIAO.BAS`, `TXDEMO.BAS` require UCDOS's special display utility `TX.COM` and outline fonts for UCDOS, so as to enable graphic drawing under UCDOS, as well as displaying large-sized chinese characters in correct glyph.
+部分程序需要UCDOS下自带的特显程序`TX.COM`和UCDOS的轮廓字库，以实现UCDOS下的绘图操作，并以正确的字形显示大尺寸字符。  
+Some programs require UCDOS's special display utility `TX.COM` and outline fonts for UCDOS, so as to enable graphic drawing under UCDOS, as well as displaying large-sized characters in correct glyph.
 
 ### 截图欣赏 Screenshots
 
@@ -65,6 +68,12 @@ Some programs require DOS-based chinese system (e.g. UCDOS) to display chinese c
 
 2048游戏 2048 Game  
 ![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048_2.png)
+
+2048游戏（使用UCDOS特显程序） 2048 Game (Use Special Display utility from UCDOS)  
+![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048C_1.png)
+
+2048游戏（使用UCDOS特显程序） 2048 Game (Use Special Display utility from UCDOS)  
+![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048C_2.png)
 
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](http://frank-deng.github.io/retro-works/images/QBASIC/guessnum.png)
@@ -96,7 +105,13 @@ UCDOS使用VESA.DRV显示驱动后，可以显示上图中的256种颜色。（�
 When UCDOS is started with VESA.DRV display driver, it will be capable of displaying the 256 colors above. (Default VGA.DRV can only display 16 colors in the first row)
 
 UCDOS特显程序中可用的字体 Fonts available in the Special Display utility from UCDOS  
-![Fonts](http://frank-deng.github.io/retro-works/images/QBASIC/fonts.png)  
+![Fonts](http://frank-deng.github.io/retro-works/images/QBASIC/fonts.png)
+
+屏保 Screensaver  
+![Screensaver](http://frank-deng.github.io/retro-works/images/QBASIC/lines.png)
+
+屏保（使用UCDOS特显程序） Screensaver (Use Special Display utility from UCDOS)  
+![Screensaver](http://frank-deng.github.io/retro-works/images/QBASIC/lines2.png)
 
 
 telnet-site
@@ -138,6 +153,12 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 
 打开“附件”程序组里的“终端仿真程序”，将使用的串口设为COM1，并将号码设为“92163”或“1270000000012333”，然后开始拨号，拨号成功后按Enter键进入登录界面。  
 Open "Terminal Emulator" in the "Accessories" program group, set the serial port to use as "COM1", set phone number as 92163 or 1270000000012333, then start dialing. When dialing succeed, press `Enter` to open login panel.
+
+
+EL_BASIC
+--------
+
+Some works based on [EL_BASIC 1.94 for PC-98](http://www.vector.co.jp/soft/dos/prog/se008573.html), which requires emulator for NEC PC-9800 Series (The same platform that *Touhou Gensoukyou ~ Lotus Land Story (東方幻想郷 ～ Lotus Land Story)* and *Touhou Kaikidan ~ Mystic Square (東方怪綺談 ～ Mystic Square)* based on), e.g. [Neko Project II](https://github.com/AZO234/NP2kai).
 
 
 实用命令 Useful Commands
