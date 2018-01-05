@@ -241,6 +241,7 @@ SUB DRAWBOX(X0 AS INTEGER,Y0 AS INTEGER,X1 AS INTEGER,Y1 AS INTEGER)
   TX("B"+n$(X0)+","+n$(Y0)+","+n$(X0+1)+","+n$(Y1))
   TX("CO8B"+n$(X1-1)+","+n$(Y0)+","+n$(X1)+","+n$(Y1))
   TX("B"+n$(X0)+","+n$(Y1-1)+","+n$(X1)+","+n$(Y1))
+  TX("CO15D"+n$(X1-1)+","+n$(Y0)+"D"+n$(X0)+","+n$(Y1-1))
 END SUB
 
 SUB DRAWNUM(X,Y,N)
