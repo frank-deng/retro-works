@@ -165,6 +165,9 @@ Some works based on [EL_BASIC 1.94 for PC-98](http://www.vector.co.jp/soft/dos/p
 2048ゲーム 2048 Game  
 ![2048](http://frank-deng.github.io/retro-works/images/EL_BASIC/2048_1.png)
 
+2048ゲーム 2048 Game  
+![2048](http://frank-deng.github.io/retro-works/images/EL_BASIC/2048_2.png)
+
 
 实用命令 Useful Commands
 -----------------------
