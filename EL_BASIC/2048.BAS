@@ -15,13 +15,24 @@ RANDOMIZE VAL RIGHT$(TIME$,2)
 
 CURSORTYPE 0
 CLS
-LOCATE 28,7
-PRINT "************************";
-FOR I=1 TO 9
- LOCATE 28,7+I:PRINT "*";SPC(21);"*";
+LOCATE 26,7
+PRINT chr$(&H86);chr$(&Hae);
+FOR I=0 to 10
+  PRINT chr$(&H86);chr$(&Ha2);
 NEXT
-LOCATE 28,17
-PRINT "************************";
+PRINT chr$(&H86);chr$(&Hb2);
+
+FOR I=1 TO 9
+  LOCATE 26,7+I:PRINT chr$(&H86);chr$(&Ha4);SPC(21);chr$(&H86);chr$(&Ha4);
+NEXT
+
+LOCATE 26,17
+PRINT chr$(&H86);chr$(&Hb6);
+FOR I=0 to 10
+  PRINT chr$(&H86);chr$(&Ha2);
+NEXT
+PRINT chr$(&H86);chr$(&Hba);
+
 LOCATE 29,5:PRINT "ìæì_ÅF";
 
 CALL UPDATEBOARD()
