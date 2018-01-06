@@ -160,6 +160,11 @@ EL_BASIC
 
 Some works based on [EL_BASIC 1.94 for PC-98](http://www.vector.co.jp/soft/dos/prog/se008573.html), which requires emulator for NEC PC-9800 Series (The same platform that *Touhou Gensoukyou ~ Lotus Land Story (東方幻想郷 ～ Lotus Land Story)* and *Touhou Kaikidan ~ Mystic Square (東方怪綺談 ～ Mystic Square)* based on), e.g. [Neko Project II](https://github.com/AZO234/NP2kai).
 
+### スクリーンショット Screenshots
+
+2048ゲーム 2048 Game  
+![2048](http://frank-deng.github.io/retro-works/images/EL_BASIC/2048_1.png)
+
 
 实用命令 Useful Commands
 -----------------------
