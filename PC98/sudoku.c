@@ -58,8 +58,6 @@ void printboard(){
 }
 void check_sudoku(){
 	int x, y, area, ax, ay, nums, n;
-	
-	//Check inconsistent numbers
 	for (y = 0; y < 9; y++){
 		nums = 0;
 		for (x = 0; x < 9; x++){
@@ -206,7 +204,6 @@ void calc_step2(){
 		} else {
 			s[sl] = getnextnum(s[sl], cand[sl][2]);
 		}
-		//printboard();
 	}
 }
 
@@ -220,8 +217,8 @@ int main(int argc, char *argv[]){
 	check_sudoku();
 	printf(CHECK_SUDOKU_PASSED);
 	if (calc_step1()) {
-		printboard();
 		printf(CALC_FINISHED);
+		printboard();
 		return 0;
 	}
 	calc_step2();
