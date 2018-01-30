@@ -155,10 +155,14 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 Open "Terminal Emulator" in the "Accessories" program group, set the serial port to use as "COM1", set phone number as 92163 or 1270000000012333, then start dialing. When dialing succeed, press `Enter` to open login panel.
 
 
-EL_BASIC
---------
+PC98
+----
 
-Some works based on [EL_BASIC 1.94 for PC-98](http://www.vector.co.jp/soft/dos/prog/se008573.html), which requires emulator for NEC PC-9800 Series (The same platform that *Touhou Gensoukyou ~ Lotus Land Story (東方幻想郷 ～ Lotus Land Story)* and *Touhou Kaikidan ~ Mystic Square (東方怪綺談 ～ Mystic Square)* based on), e.g. [Neko Project II](https://github.com/AZO234/NP2kai).
+Some works based on NEC PC-9800 Series (The same platform that *Touhou Gensoukyou ~ Lotus Land Story (東方幻想郷 ～ Lotus Land Story)* and *Touhou Kaikidan ~ Mystic Square (東方怪綺談 ～ Mystic Square)* based on), which requires emulators like [Neko Project II](https://github.com/AZO234/NP2kai).
+
+Programs written in BASIC language use [EL_BASIC 1.94 for PC-98](http://www.vector.co.jp/soft/dos/prog/se008573.html) as development and runtime envirinment.
+
+Programs written in C language use [LSI C-86](https://www.lsi-j.co.jp/freesoft/index.html) as developing environment.
 
 ### スクリーンショット Screenshots
 
