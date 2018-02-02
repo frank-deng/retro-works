@@ -44,7 +44,6 @@ void cputchar(uint16_t ch, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
 	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
 	
-	attr <<= 8;
 	if (ch > 0xff){
 		*p_vram = ch - 0x20;
 		*(p_vram + 1) = ch + 0x60;
@@ -87,11 +86,31 @@ void cputkanji(uint16_t* arr, uint16_t x, uint16_t y, uint16_t attr){
 }
 void drawframe(){
 	uint16_t takuden[] = {0xc0c6, 0xc0c5, 0xa7a1, 0};
-	cputkanji(takuden, 27, 5, 0xe1);
+	int i;
+	cputkanji(takuden, 28, 5, 0xc1);
+
+#define ATTR_BORDER 0x21
+	cputchar('\x9c', 27, 7, ATTR_BORDER);
+	for (i = 0; i < 24; i++){
+		cputchar('\x95', 28+i, 7, ATTR_BORDER);
+	}
+	cputchar('\x9d', 27+25, 7, ATTR_BORDER);
+
+	for (i = 0; i < 9; i++){
+		cputchar('\x96', 27, 8+i, ATTR_BORDER);
+		cputchar('\x96', 27+25, 8+i, ATTR_BORDER);
+	}
+
+	cputchar('\x9e', 27, 17, ATTR_BORDER);
+	for (i = 0; i < 24; i++){
+		cputchar('\x95', 28+i, 17, ATTR_BORDER);
+	}
+	cputchar('\x9f', 27+25, 17, ATTR_BORDER);
 }
 void drawboard(game2048_t* game){
 	uint16_t gameover[] = {0xb2a5, 0xbca1, 0xe0a5, 0xaaa5, 0xbca1, 0xd0a5, 0xbca1, 0};
-	char buf[16] = "";
+	int x, y;
+	char buf[16] = {'\0'};
 	for (y = 0; y < BOARD_H; y++){
 		for (x = 0; x < BOARD_W; x++){
 			if (game->board[y][x]) {
@@ -103,9 +122,9 @@ void drawboard(game2048_t* game){
 		}
 	}
 	sprintf(buf, "%lu", game->score);
-	cputstr(buf, 32, 5, 0xe1);
+	cputstr(buf, 34, 5, 0xc1);
 	if (game->status){
-		cputkanji(gameover, 33, 19, 0xe1);
+		cputkanji(gameover, 33, 19, 0x41);
 	}
 }
 
@@ -142,7 +161,7 @@ int game2048_update(game2048_t* game){
 	space_sel = rand() % space_len;
 	x = space[space_sel].x;
 	y = space[space_sel].y;
-	game->board[y][x] = ((rand() % 1) << 1);
+	game->board[y][x] = (rand() % 2) ? 2 : 4;
 	if (space_len > 1){
 		return 1;
 	}
@@ -176,7 +195,7 @@ int game2048_move_up(game2048_t* g){
 				if (0 == g->board[y][x]){
 					y++;
 				} else if (g->board[y0][x] == g->board[y][x]) {
-					g->score += g->board[y][x];
+					g->score += (g->board[y][x] * 2);
 					g->board[y0][x] <<= 1;
 					g->board[y][x] = 0;
 					y0++; y++;
@@ -212,7 +231,7 @@ int game2048_move_down(game2048_t* g){
 				if (0 == g->board[y][x]){
 					y--;
 				} else if (g->board[y0][x] == g->board[y][x]) {
-					g->score += g->board[y][x];
+					g->score += (g->board[y][x] * 2);
 					g->board[y0][x] <<= 1;
 					g->board[y][x] = 0;
 					y0--; y--;
@@ -248,7 +267,7 @@ int game2048_move_left(game2048_t* g){
 				if (0 == g->board[y][x]){
 					x++;
 				} else if (g->board[y][x0] == g->board[y][x]) {
-					g->score += g->board[y][x];
+					g->score += (g->board[y][x] * 2);
 					g->board[y][x0] <<= 1;
 					g->board[y][x] = 0;
 					x0++; x++;
@@ -284,7 +303,7 @@ int game2048_move_right(game2048_t* g){
 				if (0 == g->board[y][x]){
 					x--;
 				} else if (g->board[y][x0] == g->board[y][x]) {
-					g->score += g->board[y][x];
+					g->score += (g->board[y][x] * 2);
 					g->board[y][x0] <<= 1;
 					g->board[y][x] = 0;
 					x0--; x--;
@@ -343,7 +362,7 @@ void main(){
 	drawframe();
 	drawboard(&game);
 	while (running && 0 == game.status){
-		moved = 0
+		moved = 0;
 		switch (getaction()){
 			case ACTION_QUIT:
 				running = 0;
@@ -369,5 +388,5 @@ void main(){
 		while (ACTION_QUIT != getaction()){}
 	}
 	game2048_quit(&game);
-	closescr();
+	endscr();
 }

@@ -158,19 +158,20 @@ Open "Terminal Emulator" in the "Accessories" program group, set the serial port
 PC98
 ----
 
-Some works based on NEC PC-9800 Series (The same platform that *Touhou Gensoukyou ~ Lotus Land Story (東方幻想郷 ～ Lotus Land Story)* and *Touhou Kaikidan ~ Mystic Square (東方怪綺談 ～ Mystic Square)* based on), which requires emulators like [Neko Project II](https://github.com/AZO234/NP2kai).
+Some works based on NEC PC-9800 Series (The same platform that *Touhou Gensoukyou ~ Lotus Land Story (東方幻想郷 ～ Lotus Land Story)* and *Touhou Kaikidan ~ Mystic Square (東方怪綺談 ～ Mystic Square)* based on), which requires emulators like [Neko Project II](https://github.com/AZO234/NP2kai) to run them.
 
-Programs written in BASIC language use [EL_BASIC 1.94 for PC-98](http://www.vector.co.jp/soft/dos/prog/se008573.html) as development and runtime envirinment.
-
-Programs written in C language use [LSI C-86](https://www.lsi-j.co.jp/freesoft/index.html) as developing environment.
+Programs written in C language use [LSI C-86](https://www.lsi-j.co.jp/freesoft/index.html) to compile code into executable files.
 
 ### スクリーンショット Screenshots
 
 2048ゲーム 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/EL_BASIC/2048_1.png)
+![2048](http://frank-deng.github.io/retro-works/images/PC98/2048_1.png)
 
 2048ゲーム 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/EL_BASIC/2048_2.png)
+![2048](http://frank-deng.github.io/retro-works/images/PC98/2048_2.png)
+
+2048ゲーム 2048 Game  
+![2048](http://frank-deng.github.io/retro-works/images/PC98/2048_3.png)
 
 
 实用命令 Useful Commands
@@ -195,3 +196,4 @@ Mount floppy image under Linux (Use GB2312 for filename encoding)
 Convert video into format accepted by Windows 3.1
 
 	ffmpeg -i input.mp4 -c:v cinepak -c:a adpcm_ima_wav -vf scale=320:240 -ac 1 -ar 32000 -r 15 -y output.avi
+
