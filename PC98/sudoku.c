@@ -1,18 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define HELP_TEXT "Usage: %s sudoku_file\n"
+#define HELP_TEXT "使い方：%s 数独ファイル\n"
 
-#define CHECK_SUDOKU "Checking sudoku... "
-#define CHECK_SUDOKU_PASSED "Passed\nStart calculatng...\n"
-#define CALC_FINISHED "Calculation finished.\n"
+#define CHECK_SUDOKU "数独検査中... "
+#define CHECK_SUDOKU_PASSED "通過する\n計算開始...\n"
+#define CALC_FINISHED "計算が終了した。\n"
 
-#define OPEN_FILE_FAILED "Unable to open file.\n"
-#define INCONSISTENT_NUM_ROW "Inconsistent number at row %d.\n"
-#define INCONSISTENT_NUM_COL "Inconsistent number at column %d.\n"
-#define INCONSISTENT_NUM_AREA "Inconsistent number at area %d.\n"
-#define NO_ANSWER_POS "No answer at row %d, column %d.\n"
-#define NO_ANSWER "No answer\n"
+#define OPEN_FILE_FAILED "ファイルを開くことができません。\n"
+#define INCONSISTENT_NUM_ROW "行%dの数は違います。\n"
+#define INCONSISTENT_NUM_COL "列%dの数は違います。\n"
+#define INCONSISTENT_NUM_AREA "ブロック%dの数は違います。\n"
+#define NO_ANSWER_POS "行%d列%d：答えはありません。\n"
+#define NO_ANSWER "答えはありません。\n"
 
 static int candl, board[9][9] = {
 	{0,0,0,0,0,0,0,0,0},
@@ -58,8 +58,6 @@ void printboard(){
 }
 void check_sudoku(){
 	int x, y, area, ax, ay, nums, n;
-	
-	//Check inconsistent numbers
 	for (y = 0; y < 9; y++){
 		nums = 0;
 		for (x = 0; x < 9; x++){
@@ -206,7 +204,6 @@ void calc_step2(){
 		} else {
 			s[sl] = getnextnum(s[sl], cand[sl][2]);
 		}
-		//printboard();
 	}
 }
 
@@ -220,8 +217,8 @@ int main(int argc, char *argv[]){
 	check_sudoku();
 	printf(CHECK_SUDOKU_PASSED);
 	if (calc_step1()) {
-		printboard();
 		printf(CALC_FINISHED);
+		printboard();
 		return 0;
 	}
 	calc_step2();
