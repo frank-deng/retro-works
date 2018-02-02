@@ -37,7 +37,7 @@ void endscr(){
 }
 void clrscr(){
 	far_memset((void far *)vram, 0, 4000);
-	far_memset((void far *)vramattr, 0xe1, 4000);
+	far_memset((void far *)vramattr, 0, 4000);
 }
 void cputchar(uint16_t ch, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t offset = (y<<6) + (y<<4) + x;
@@ -61,7 +61,6 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
 	char *ch;
 	
-	attr <<= 8;
 	for (ch = str; *ch != '\0'; ch++){
 		*p_vram = (uint16_t)(*ch);
 		*p_vramattr = attr;
@@ -69,29 +68,44 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 		p_vramattr++;
 	}
 }
-void cputdata(uint16_t* arr, uint16_t x, uint16_t y, uint16_t attr){
+void cputkanji(uint16_t* arr, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t offset = (y<<6) + (y<<4) + x;
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
 	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
 	uint16_t *ch;
 
-	attr <<= 8;
 	for (ch = arr; *ch != 0; ch++){
-		*p_vram = *ch;
+		*p_vram = *ch - 0x20;
+		*p_vramattr = attr;
+		p_vram++;
+		p_vramattr++;
+		*p_vram = *ch + 0x60;
 		*p_vramattr = attr;
 		p_vram++;
 		p_vramattr++;
 	}
 }
 void drawframe(){
+	uint16_t takuden[] = {0xc0c6, 0xc0c5, 0xa7a1, 0};
+	cputkanji(takuden, 27, 5, 0xe1);
 }
 void drawboard(game2048_t* game){
-	char buf[8] = "";
+	uint16_t gameover[] = {0xb2a5, 0xbca1, 0xe0a5, 0xaaa5, 0xbca1, 0xd0a5, 0xbca1, 0};
+	char buf[16] = "";
 	for (y = 0; y < BOARD_H; y++){
 		for (x = 0; x < BOARD_W; x++){
-			sprintf(buf, "%5d ", game->board[y][x]);
-			cputstr(buf, 28+6*x, 9+(y<<1), 0xe1);
+			if (game->board[y][x]) {
+				sprintf(buf, "%5u ", game->board[y][x]);
+				cputstr(buf, 28+6*x, 9+(y<<1), 0xe1);
+			} else {
+				cputstr("    . ", 28+6*x, 9+(y<<1), 0xe1);
+			}
 		}
+	}
+	sprintf(buf, "%lu", game->score);
+	cputstr(buf, 32, 5, 0xe1);
+	if (game->status){
+		cputkanji(gameover, 33, 19, 0xe1);
 	}
 }
 
@@ -323,9 +337,11 @@ action_t getaction(){
 }
 void main(){
 	game2048_t game; int running = 1, moved;
+	game2048_init(&game);
+
 	initscr();
 	drawframe();
-	game2048_init(&game);
+	drawboard(&game);
 	while (running && 0 == game.status){
 		moved = 0
 		switch (getaction()){
