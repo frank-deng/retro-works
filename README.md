@@ -173,6 +173,9 @@ Programs written in C language use [LSI C-86](https://www.lsi-j.co.jp/freesoft/i
 2048ゲーム 2048 Game  
 ![2048](http://frank-deng.github.io/retro-works/images/PC98/2048_3.png)
 
+数独自動解法プログラム Sudoku Solver
+![2048](http://frank-deng.github.io/retro-works/images/PC98/sudoku.png)
+
 
 实用命令 Useful Commands
 -----------------------
