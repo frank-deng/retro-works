@@ -81,11 +81,12 @@ void cputstrj(char* str, uint16_t x, uint16_t y, uint16_t attr){
 			ch2 = jmstojis(ch);
 			ch = (ch2 << 8) | (0xFF & (ch2 >> 8));
 			*p_vram = ch - 0x20;
-			*(p_vram + 1) = ch + 0x60;
-			*(p_vramattr) = *(p_vramattr + 1) = attr;
+			*p_vramattr = attr;
 			p++;
 			p_vram++;
 			p_vramattr++;
+			*p_vram = ch + 0x60;
+			*p_vramattr = attr;
 		} else {
 			*p_vram = (uint16_t)(*p);
 			*p_vramattr = attr;
