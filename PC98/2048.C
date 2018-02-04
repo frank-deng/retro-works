@@ -4,6 +4,7 @@
 #include <farstr.h>
 #include <stdlib.h>
 #include <time.h>
+#include <jctype.h>
 
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
@@ -44,7 +45,7 @@ void cputchar(uint16_t ch, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
 	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
 	
-	if (ch > 0xff){
+	if (ch > 0xFF){
 		*p_vram = ch - 0x20;
 		*(p_vram + 1) = ch + 0x60;
 		*(p_vramattr) = attr;
@@ -59,7 +60,7 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
 	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
 	char *ch;
-	
+				
 	for (ch = str; *ch != '\0'; ch++){
 		*p_vram = (uint16_t)(*ch);
 		*p_vramattr = attr;
@@ -67,27 +68,33 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 		p_vramattr++;
 	}
 }
-void cputkanji(uint16_t* arr, uint16_t x, uint16_t y, uint16_t attr){
+void cputstrj(char* str, uint16_t x, uint16_t y, uint16_t attr){
+	char *p;
 	uint16_t offset = (y<<6) + (y<<4) + x;
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
 	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
-	uint16_t *ch;
-
-	for (ch = arr; *ch != 0; ch++){
-		*p_vram = *ch - 0x20;
-		*p_vramattr = attr;
-		p_vram++;
-		p_vramattr++;
-		*p_vram = *ch + 0x60;
-		*p_vramattr = attr;
-		p_vram++;
-		p_vramattr++;
+	unsigned short ch, ch2;
+	
+	for (p = str; *p != '\0'; p++, p_vram++, p_vramattr++){
+		ch = *p; ch <<= 8; ch |= *(p+1);
+		if (jiszen(ch)) {
+			ch2 = jmstojis(ch);
+			ch = (ch2 << 8) | (0xFF & (ch2 >> 8));
+			*p_vram = ch - 0x20;
+			*(p_vram + 1) = ch + 0x60;
+			*(p_vramattr) = *(p_vramattr + 1) = attr;
+			p++;
+			p_vram++;
+			p_vramattr++;
+		} else {
+			*p_vram = (uint16_t)(*p);
+			*p_vramattr = attr;
+		}
 	}
 }
 void drawframe(){
-	uint16_t takuden[] = {0xc0c6, 0xc0c5, 0xa7a1, 0};
 	int i;
-	cputkanji(takuden, 28, 5, 0xc1);
+	cputstrj("得点：", 28, 5, 0xc1);
 
 #define ATTR_BORDER 0x21
 	cputchar('\x9c', 27, 7, ATTR_BORDER);
@@ -108,7 +115,6 @@ void drawframe(){
 	cputchar('\x9f', 27+25, 17, ATTR_BORDER);
 }
 void drawboard(game2048_t* game){
-	uint16_t gameover[] = {0xb2a5, 0xbca1, 0xe0a5, 0xaaa5, 0xbca1, 0xd0a5, 0xbca1, 0};
 	int x, y;
 	char buf[16] = {'\0'};
 	for (y = 0; y < BOARD_H; y++){
@@ -124,7 +130,7 @@ void drawboard(game2048_t* game){
 	sprintf(buf, "%lu", game->score);
 	cputstr(buf, 34, 5, 0xc1);
 	if (game->status){
-		cputkanji(gameover, 33, 19, 0x41);
+		cputstrj("ゲームオーバー", 33, 19, 0x41);
 	}
 }
 
