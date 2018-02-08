@@ -87,8 +87,11 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 数独求解程序 Sudoku Solver  
 ![Sudoku](http://frank-deng.github.io/retro-works/images/QBASIC/sudoku.png)
 
-简单统计程序（使用中文界面） Simple Statistics Program with Chinese UI  
+简单统计程序 Simple Statistics Program  
 ![Statistics](http://frank-deng.github.io/retro-works/images/QBASIC/stat.png)
+
+简单统计程序（使用中文界面） Simple Statistics Program with Chinese UI  
+![Statistics](http://frank-deng.github.io/retro-works/images/QBASIC/stat2.png)
 
 条形图（使用UCDOS特显程序） Bar Chart (Use Special Display utility from UCDOS)  
 ![UCDOS Bar Chart](http://frank-deng.github.io/retro-works/images/QBASIC/barchart2.png)
@@ -153,28 +156,6 @@ Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot
 
 打开“附件”程序组里的“终端仿真程序”，将使用的串口设为COM1，并将号码设为“92163”或“1270000000012333”，然后开始拨号，拨号成功后按Enter键进入登录界面。  
 Open "Terminal Emulator" in the "Accessories" program group, set the serial port to use as "COM1", set phone number as 92163 or 1270000000012333, then start dialing. When dialing succeed, press `Enter` to open login panel.
-
-
-PC98
-----
-
-Some works based on NEC PC-9800 Series (The same platform that *Touhou Gensoukyou ~ Lotus Land Story (東方幻想郷 ～ Lotus Land Story)* and *Touhou Kaikidan ~ Mystic Square (東方怪綺談 ～ Mystic Square)* based on), which requires emulators like [Neko Project II](https://github.com/AZO234/NP2kai) to run them.
-
-Programs written in C language use [LSI C-86](https://www.lsi-j.co.jp/freesoft/index.html) to compile code into executable files.
-
-### スクリーンショット Screenshots
-
-2048ゲーム 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/PC98/2048_1.png)
-
-2048ゲーム 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/PC98/2048_2.png)
-
-2048ゲーム 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/PC98/2048_3.png)
-
-数独自動解法プログラム Sudoku Solver
-![2048](http://frank-deng.github.io/retro-works/images/PC98/sudoku.png)
 
 
 实用命令 Useful Commands
