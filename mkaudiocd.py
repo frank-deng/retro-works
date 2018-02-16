@@ -7,7 +7,7 @@ opts, args = getopt.getopt(sys.argv[1:], 'o:');
 for k,v in opts:
     if (k == '-o'):
         OUTPUT_CUE = v+'.cue';
-        OUTPUT_AUDIO = v+'.wav';
+        OUTPUT_AUDIO = v+'.dat';
 
 files = args;
 tempfiles = [];
