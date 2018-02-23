@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, subprocess, os, multiprocessing, magic, tempfile, getopt, re;
 OUTPUT_CUE='audiocd.cue';
-OUTPUT_AUDIO='audiocd.wav';
+OUTPUT_AUDIO='audiocd.dat';
 
 opts, args = getopt.getopt(sys.argv[1:], 'o:');
 for k,v in opts:
@@ -36,9 +36,13 @@ stdout, stderr = pcue.communicate();
 sys.stderr.write(stderr.decode('UTF-8'));
 with open(OUTPUT_CUE, 'w') as f:
     f.write(stdout.decode('UTF-8').replace('joined.wav', OUTPUT_AUDIO).replace('WAVE', 'BINARY'));
-pwav.wait();
-os.rename('joined.wav', OUTPUT_AUDIO);
 
+pwav.wait();
+with open(OUTPUT_AUDIO, 'wb') as fp:
+    pwav = subprocess.Popen(['/usr/bin/shntool', 'cat', '-e', 'joined.wav'], stdout=fp);
+    pwav.wait();
+
+os.unlink('joined.wav');
 for f in tempfiles:
     os.unlink(f);
 
