@@ -63,11 +63,24 @@ try:
             continue;
         for i, d in enumerate(ank):
             writeBMP(f, metadata, ch, i, struct.pack('B', (~d & 0xFF)));
+
     for k in sorted(charTable.keys()):
         ch = charTable[k];
         row, col = ch['eucjp'];
         if (None != ch['pixel'] and len(ch['pixel']) == 32):
             writeChar(f, metadata, row - 0x20, col, ch['pixel']);
+
+    for ch, ank in enumerate(ank16):
+        if (ch >= 0x21 and ch <= 0x7e):
+            ank2 = b'';
+            for i, d in enumerate(ank):
+                ank2 += (struct.pack('B', d) + b'\0');
+            writeChar(f, metadata, 0x29 - 0x20, ch, ank2);
+        elif (ch >= 0xA1 and ch <= 0xDF):
+            ank2 = b'';
+            for i, d in enumerate(ank):
+                ank2 += (struct.pack('B', d) + b'\0');
+            writeChar(f, metadata, 0x2A - 0x20, ch & 0x7f, ank2);
 except Exception as e:
     traceback.print_exc();
 finally:
