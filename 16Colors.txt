@@ -1,0 +1,16 @@
+#000000
+#0000aa
+#aa0000
+#aa00aa
+#00aa00
+#00aaaa
+#aaaa00
+#cccccc
+#777777
+#0000ff
+#ff0000
+#ff00ff
+#00ff00
+#00ffff
+#ffff00
+#ffffff
