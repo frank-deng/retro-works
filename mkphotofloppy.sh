@@ -16,7 +16,7 @@ mknewdisk() {
 }
 
 mknewdisk
-find "${SOURCE}" -type f -iname \*.jpg | sort | while read file; do
+find "${SOURCE}" -maxdepth 1 -type f -iname \*.jpg | sort | while read file; do
 	newfile=DSC$(printf %05d $counter).jpg;
 	convert "${file}" -strip -resize '640x640>' -quality $quality "${TEMPFILE}"
 	mcopy -i "${IMGFILE}" "${TEMPFILE}" ::/"${newfile}" &>/dev/null
