@@ -11,7 +11,7 @@ INPUT "Filename: ", F$
 OPEN F$ FOR INPUT AS #1
 FOR Y=0 TO 8:FOR X=0 TO 8
   INPUT #1,BOARD(Y,X)
-  IF BOARD(Y,X) > 9 THEN
+  IF BOARD(Y,X) > 9 OR BOARD(Y,X) < 0 THEN
     PRINT "Invalid number at row";Y+1;", column";X+1: END
   END IF
 NEXT X:NEXT Y

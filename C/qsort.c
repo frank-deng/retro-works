@@ -1,83 +1,108 @@
-DEFINT A-Z
-DECLARE SUB QSORT(A() AS DOUBLE, L AS INTEGER, R AS INTEGER)
-DECLARE SUB BSORT(A() AS DOUBLE, L AS INTEGER, R AS INTEGER)
-DIM ARRAY(4096) AS DOUBLE, ARRAY2(4096) AS DOUBLE
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-RANDOMIZE TIMER
+void gennum(long *arr, long *arr2, int length){
+	int i;
+	for (i = 0; i < length; i++) {
+		arr[i] = arr2[i] = ((long)rand() << 16) | rand();
+	}
+}
+void _qsort(long *arr, int left, int right) {
+	int sorted = 1, i, j;
+	long key;
 
-LENGTH = 666
-FOR I = 0 TO LENGTH-1
-  ARRAY(I) = RND * 100
-  ARRAY2(I) = ARRAY(I)
-NEXT I
+	//No need to continue sort
+	if (left >= right) {
+		return;
+	}
 
-T# = TIMER
-CALL QSORT(ARRAY(), 0, LENGTH-1)
-TQSORT# = TIMER - T#
+	//Check if the sequence is sorted
+	for (i = left; i < right; i++) {
+		if (arr[i] > arr[i+1]) {
+			sorted = 0;
+			break;
+		}
+	}
+	if (sorted) {
+		return;
+	}
 
-T# = TIMER
-CALL BSORT(ARRAY2(), 0, LENGTH-1)
-TBSORT# = TIMER - T#
+	//Quick sort current sequence
+	i = left; j = right; key = arr[left];	
+	while (i < j) {
+		while (i < j && key <= arr[j]) {
+			j--;
+		}
+		arr[i] = arr[j];
+		while (i < j && key >= arr[j]) {
+			i++;
+		}
+		arr[j] = arr[i];
+	}
+	arr[i] = key;
 
-I = LENGTH - 1
-IF ARRAY2(I) <> ARRAY2(I) THEN
-  PRINT "Mismatch Detected"
-END IF
-FOR I = 0 TO LENGTH-2
-  IF ARRAY(I) > ARRAY2(I+1) THEN
-    PRINT "Quick Sort Failed"
-    EXIT FOR
-  END IF
-  IF ARRAY2(I) > ARRAY2(I+1) THEN
-    PRINT "Bubble Sort Failed"
-    EXIT FOR
-  END IF
-  IF ARRAY2(I) <> ARRAY2(I) THEN
-    PRINT "Mismatch Detected"
-    EXIT FOR
-  END IF
-NEXT I
+	//Sort each subsequences
+	_qsort(arr, left, i-1);
+	_qsort(arr, i+1, right);
+}
+void myqsort(long *arr, int length) {
+	_qsort(arr, 0, length - 1);
+}
+void bubblesort(long *arr, int length) {
+	int i, j; long temp;
+	for (i = length - 1; i >= 1; i--) {
+		for (j = 0; j < i - 1; j++) {
+			temp = arr[j]; arr[j] = arr[j+1]; arr[j+1] = temp;
+		}
+	}
+}
+int verifysort(long *arr, long *arr2, int length) {
+	int i, pass = 1;;
+	for (i = 0; i < length; i++) {
+		printf("%ld\t%ld\n", arr[i], arr2[i]);
+		/*
+		if (i < length - 1) {
+			if (arr[i] > arr[i+1]) {
+				printf("Error: %ld, %ld, %d", arr[i], arr[i+1], i);
+				return 0;
+			}
+			if (arr2[i] > arr2[i+1]) {
+				puts("Error 2");
+				return 0;
+			}
+		}
+		if (arr[i] != arr2[i]) {
+			printf("Error 3, %d", i);
+			return 0;
+		}
+		*/
+	}
+	return 1;
+}
+#define LENGTH 16
+int main(){
+	long data[LENGTH], data2[LENGTH];
+	int length = LENGTH;
+	time_t time_qsort, time_bsort;
 
-PRINT "Quick Sort Seconds: "; TQSORT#
-PRINT "Bubble Sort Seconds: "; TBSORT#
-END
+	puts("クイックソートや二分探索のデモ");
 
-SUB QSORT(A() AS DOUBLE, L AS INTEGER, R AS INTEGER)
-  IF L >= R THEN EXIT SUB
-  
-  REM CHECK IF SEQ IS SORTED
-  SORTED = 1
-  FOR I = 0 TO R-1
-    IF A(I) > A(I+1) THEN
-      SORTED = 0
-      EXIT FOR
-    END IF
-  NEXT I
-  IF SORTED = 1 THEN EXIT SUB
-  
-  REM QUICK SORT MAIN
-  I = L : J = R : K# = A(L)
-  WHILE I < J
-    WHILE I < J AND K# <= A(J)
-      J = J - 1
-    WEND
-    A(I) = A(J)
-    WHILE I < J AND K# >= A(I)
-      I = I + 1
-    WEND
-    A(J) = A(I)
-  WEND
-  A(I) = K#
-  
-  REM QSORT FOR SUBGROUPS
-  CALL QSORT(A(), L, I-1)
-  CALL QSORT(A(), I+1, R)
-END SUB
+	srand(time(NULL));
+	gennum(data, data2, length);
+	verifysort(data, data2, length);
+	puts("");
 
-SUB BSORT(A() AS DOUBLE, L AS INTEGER, R AS INTEGER)
-  FOR I=R TO L STEP -1:FOR J=L TO I-1
-    IF A(J)>A(J+1) THEN
-      T#=A(J):A(J)=A(J+1):A(J+1)=T#
-    END IF
-  NEXT J:NEXT I
-END SUB
+	time_qsort = time(0);
+	myqsort(data, length);
+	time_qsort = time(0) - time_qsort;
+
+	time_bsort = time(0);
+	bubblesort(data2, length);
+	time_bsort = time(0) - time_bsort;
+
+	verifysort(data, data2, length);
+	printf("クイックソートの実行時間：%lu秒\n", time_qsort);
+	printf("バブルソートの実行時間：%lu秒\n", time_bsort);
+}
+

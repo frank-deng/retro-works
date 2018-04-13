@@ -37,7 +37,10 @@ void read_sudoku(char *filename){
 	for (y = 0; y < 9; y++){
 		for (x = 0; x < 9; x++){
 			fscanf(fp, "%u", &(board[y][x]));
-			if 
+			if (board[y][x] > 9 || board[y][x] < 0) {
+				printf(INVALID_NUM_POS, y+1, x+1);
+				exit(1);
+			}
 		}
 	}
 	fclose(fp);
