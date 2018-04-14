@@ -19,3 +19,5 @@ config.py
 test.py
 autorun.bat
 AUTORUN.BAT
+C/qsort
+C/makefile

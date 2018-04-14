@@ -112,23 +112,23 @@ int verifysort(num_t *arr, num_t *arr2, int length) {
 	int i;
 	for (i = 0; i < length - 1; i++) {
 		if (arr[i] > arr[i+1]) {
-			printf("”z—ñ1‚Ìƒ\[ƒg‚É¸”s‚µ‚Ü‚µ‚½B\n");
+			printf("é…åˆ—1ã®ã‚½ãƒ¼ãƒˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n");
 			return 0;
 		} else if (arr2[i] > arr2[i+1]) {
-			printf("”z—ñ2‚Ìƒ\[ƒg‚É¸”s‚µ‚Ü‚µ‚½B\n");
+			printf("é…åˆ—2ã®ã‚½ãƒ¼ãƒˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n");
 			return 0;
 		}
 	}
 	for (i = 0; i < length; i++) {
 		if (arr[i] != arr2[i]) {
-			printf("”z—ñ1‚Æ”z—ñ2‚Ì”‚ª•sˆê’v‚Å‚·B\n");
+			printf("é…åˆ—1ã¨é…åˆ—2ã®æ•°ãŒä¸ä¸€è‡´ã§ã™ã€‚\n");
 			return 0;
 		}
 	}
 	return 1;
 }
 
-#define LENGTH 7777
+#define LENGTH 6666
 int main(){
 	num_t *data, *data2, search_num;
 	int length = LENGTH, i;
@@ -139,28 +139,28 @@ int main(){
 	data = malloc(length * sizeof(num_t));
 	data2 = malloc(length * sizeof(num_t));
 	if (NULL == data) {
-		puts("data‚Ìmalloc()‚É¸”s‚µ‚Ü‚µ‚½B");
+		puts("dataã®malloc()ã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		return 1;
 	}
 	if (NULL == data2) {
-		puts("data2‚Ìmalloc()‚É¸”s‚µ‚Ü‚µ‚½B");
+		puts("data2ã®malloc()ã«å¤±æ•—ã—ã¾ã—ãŸã€‚");
 		return 1;
 	}
 
-	puts("*** ƒNƒCƒbƒNƒ\[ƒg‚â“ñ•ª’Tõ‚Ìƒfƒ‚ ***\n");
+	puts("*** ã‚¯ã‚¤ãƒƒã‚¯ã‚½ãƒ¼ãƒˆã‚„äºŒåˆ†æ¢ç´¢ã®ãƒ‡ãƒ¢ ***\n");
 	srand(time(NULL));
 	gennum(data, data2, length);
 
 	/* Quicksort demo */
-	printf("ƒNƒCƒbƒNƒ\[ƒg‚ÌÀsŠÔF");
+	printf("ã‚¯ã‚¤ãƒƒã‚¯ã‚½ãƒ¼ãƒˆã®å®Ÿè¡Œæ™‚é–“ï¼š");
 	timestamp = time(0);
 	myqsort(data, length);
-	printf("%lu•b\n", time(0) - timestamp);
+	printf("%luç§’\n", time(0) - timestamp);
 
-	printf("ƒoƒuƒ‹ƒ\[ƒg‚ÌÀsŠÔF");
+	printf("ãƒãƒ–ãƒ«ã‚½ãƒ¼ãƒˆã®å®Ÿè¡Œæ™‚é–“ï¼š");
 	timestamp = time(0);
 	bubblesort(data2, length);
-	printf("%lu•b\n", time(0) - timestamp);
+	printf("%luç§’\n", time(0) - timestamp);
 
 	puts("");
 	if (!verifysort(data, data2, length)) {
@@ -168,27 +168,27 @@ int main(){
 	}
 
 	/* Binary Search demo */
-	printf("“ñ•ª’Tõ‚ÌÀsŠÔF");
+	printf("äºŒåˆ†æ¢ç´¢ã®å®Ÿè¡Œæ™‚é–“ï¼š");
 	timestamp = time(0);
 	for (i = 0; i < length; i++) {
 		search_result = mybsearch(data, length, data2[i]);
 		if (i != search_result) {
 			search_failed = 1;
-			printf("“ñ•ª’Tõ‚É¸”s‚µ‚Ü‚µ‚½B\n");
+			printf("äºŒåˆ†æ¢ç´¢ã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n");
 		}
 	}
-	printf("%lu•b\n", time(0) - timestamp);
+	printf("%luç§’\n", time(0) - timestamp);
 
-	printf("’Êí‚ÌŒŸõ•û–@‚ÌÀsŠÔF");
+	printf("é€šå¸¸ã®æ¤œç´¢æ–¹æ³•ã®å®Ÿè¡Œæ™‚é–“ï¼š");
 	timestamp = time(0);
 	for (i = 0; i < length; i++) {
 		search_result = normalsearch(data, length, data2[i]);
 		if (i != search_result) {
 			search_failed = 1;
-			printf("’Êí‚ÌŒŸõ•û–@‚É¸”s‚µ‚Ü‚µ‚½B\n");
+			printf("é€šå¸¸ã®æ¤œç´¢æ–¹æ³•ã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n");
 		}
 	}
-	printf("%lu•b\n", time(0) - timestamp);
+	printf("%luç§’\n", time(0) - timestamp);
 
 	puts("");
 
@@ -196,15 +196,15 @@ int main(){
 	/*
 	reversenum(data, data2, length);
 
-	printf("ƒoƒuƒ‹ƒ\[ƒg‚ÌÅˆ«ÀsŠÔF");
+	printf("ãƒãƒ–ãƒ«ã‚½ãƒ¼ãƒˆã®æœ€æ‚ªå®Ÿè¡Œæ™‚é–“ï¼š");
 	timestamp = time(0);
 	bubblesort(data2, length);
-	printf("%lu•b\n", time(0) - timestamp);
+	printf("%luç§’\n", time(0) - timestamp);
 
-	printf("ƒNƒCƒbƒNƒ\[ƒg‚ÌÅˆ«ÀsŠÔF");
+	printf("ã‚¯ã‚¤ãƒƒã‚¯ã‚½ãƒ¼ãƒˆã®æœ€æ‚ªå®Ÿè¡Œæ™‚é–“ï¼š");
 	timestamp = time(0);
 	myqsort(data, length);
-	printf("%lu•b\n", time(0) - timestamp);
+	printf("%luç§’\n", time(0) - timestamp);
 
 	puts("");
 	if (!verifysort(data, data2, length)) {
