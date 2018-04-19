@@ -6,7 +6,11 @@ DECLARE SUB PRINTBOARD()
 DECLARE SUB UPDATECANDL()
 
 COMMON CANDL,STATUS
-DIM SHARED BOARD(9,9), CAND(81,3): STATUS = 0
+DIM SHARED BOARD(9,9), CAND(81,3), BITMASK(15): STATUS = 0
+FOR I = 0 TO 14
+  BITMASK(I) = 2^I
+NEXT I
+
 INPUT "Filename: ", F$
 OPEN F$ FOR INPUT AS #1
 FOR Y=0 TO 8:FOR X=0 TO 8
@@ -23,10 +27,10 @@ REM Check inconsistent numbers
 FOR Y = 0 TO 8: NUMS = 0
   FOR X = 0 TO 8: N = BOARD(Y, X)
     IF N<>0 THEN
-      IF (NUMS AND (2^N)) <> 0 THEN
+      IF (NUMS AND BITMASK(N)) <> 0 THEN
         PRINT "Inconsistent number at row";Y+1:END
       ELSE
-        NUMS = NUMS OR (2^N)
+        NUMS = NUMS OR BITMASK(N)
       END IF
     END IF
   NEXT X
@@ -35,10 +39,10 @@ NEXT Y
 FOR X = 0 TO 8: NUMS = 0
   FOR Y = 0 TO 8: N = BOARD(Y, X)
     IF N<>0 THEN
-      IF (NUMS AND (2^N)) <> 0 THEN
+      IF (NUMS AND BITMASK(N)) <> 0 THEN
         PRINT "Inconsistent number at column";X+1:END
       ELSE
-        NUMS = NUMS OR (2^N)
+        NUMS = NUMS OR BITMASK(N)
       END IF
     END IF
   NEXT Y
@@ -49,10 +53,10 @@ FOR AREA = 0 TO 8
   FOR Y = 0 TO 2: FOR X = 0 TO 2
     N = BOARD(AY+Y, AX+X)
     IF N<>0 THEN
-      IF (NUMS AND (2^N)) <> 0 THEN
+      IF (NUMS AND BITMASK(N)) <> 0 THEN
         PRINT "Inconsistent number at area";AREA+1:END
       ELSE
-        NUMS = NUMS OR (2^N)
+        NUMS = NUMS OR BITMASK(N)
       END IF
     END IF
   NEXT X: NEXT Y
@@ -126,7 +130,7 @@ END FUNCTION
 FUNCTION GETNEXTNUM(N,C)
   N = N + 1
   WHILE N <= 9
-    IF (C AND (2^N)) <> 0 THEN
+    IF (C AND BITMASK(N)) <> 0 THEN
       GETNEXTNUM = N
       EXIT FUNCTION
     END IF
