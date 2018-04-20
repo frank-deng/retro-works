@@ -78,13 +78,13 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](http://frank-deng.github.io/retro-works/images/QBASIC/guessnum.png)
 
-俄罗斯方块 Tetris
+俄罗斯方块 Tetris  
 ![Tetris](http://frank-deng.github.io/retro-works/images/QBASIC/Tetris_1.png)
 
-俄罗斯方块 Tetris
+俄罗斯方块 Tetris  
 ![Tetris](http://frank-deng.github.io/retro-works/images/QBASIC/Tetris_2.png)
 
-俄罗斯方块 Tetris
+俄罗斯方块 Tetris  
 ![Tetris](http://frank-deng.github.io/retro-works/images/QBASIC/Tetris_3.png)
 
 条形图 Bar Chart  
