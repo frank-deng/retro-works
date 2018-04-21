@@ -60,7 +60,6 @@ int mybsearch(num_t arr[], int length, num_t target) {
 	int low = 0, high = length - 1;
 	unsigned int mid;
 	while (low <= high) {
-		/* mid = low + (high - low) / 2; */
 		mid = low + ((high - low) >> 1);
 		if (arr[mid] == target) {
 			return mid;
@@ -128,9 +127,9 @@ int verifysort(num_t *arr, num_t *arr2, int length) {
 	return 1;
 }
 
-#define LENGTH 6666
+#define LENGTH 66666
 int main(){
-	num_t *data, *data2, search_num;
+	num_t *data, *data2;
 	int length = LENGTH, i;
 	int search_failed = 0, search_result;
 	time_t timestamp;
@@ -172,7 +171,7 @@ int main(){
 	timestamp = time(0);
 	for (i = 0; i < length; i++) {
 		search_result = mybsearch(data, length, data2[i]);
-		if (i != search_result) {
+		if (i != search_result && data[i] != data[search_result]) {
 			search_failed = 1;
 			printf("二分探索に失敗しました。\n");
 		}
@@ -183,7 +182,7 @@ int main(){
 	timestamp = time(0);
 	for (i = 0; i < length; i++) {
 		search_result = normalsearch(data, length, data2[i]);
-		if (i != search_result) {
+		if (i != search_result && data[i] != data[search_result]) {
 			search_failed = 1;
 			printf("通常の検索方法に失敗しました。\n");
 		}
@@ -193,7 +192,6 @@ int main(){
 	puts("");
 
 	/* Quicksort demo with worst case */
-	/*
 	reversenum(data, data2, length);
 
 	printf("バブルソートの最悪実行時間：");
@@ -210,7 +208,6 @@ int main(){
 	if (!verifysort(data, data2, length)) {
 		goto error;
 	}
-	*/
 
 	/* Free memory needed */
 	free(data);
