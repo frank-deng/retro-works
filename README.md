@@ -190,3 +190,21 @@ Convert video into format accepted by Windows 3.1
 
 	ffmpeg -i input.mp4 -c:v cinepak -c:a adpcm_ima_wav -vf scale=320:240 -ac 1 -ar 32000 -r 15 -y output.avi
 
+
+### 启用Linux的串口终端 Enable serial console under Linux
+
+临时为`/dev/ttyS0`启用串口登录（重启后失效）：  
+Temporarily enable serial console on `/dev/ttyS0` (Disabled after reboot):
+
+    systemctl start getty@ttyS0.service
+
+永久为`/dev/ttyS0`启用串口登录：  
+Permanently enable serial console on `/dev/ttyS0`:
+
+    systemctl enable serial-getty@ttyS0.service
+
+查看`/dev/ttyS0`的串口登录功能是否启用：  
+Check whether serial console is enabled on `/dev/ttyS0`:
+
+    systemctl status serial-getty@ttyS0.service
+
