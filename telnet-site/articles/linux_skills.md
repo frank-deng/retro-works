@@ -1,9 +1,10 @@
 Linux使用技巧
 =============
 
+---
 
 MySQL如何解决赋予/收回用户权限时发生Access Denied的情况
-------------------------------------------------
+-------------------------------------------------------
 
 1. 停止MySQL服务。
 2. 使用命令`mysqld_safe --skip-grant-table`启动MySQL数据库服务。
@@ -11,29 +12,33 @@ MySQL如何解决赋予/收回用户权限时发生Access Denied的情况
 4. 将第2步启动的`mysqld_safe`进程杀掉。
 5. 重启MySQL服务。
 
+---
 
 使用crontab实现开机自动运行脚本
----------------------------
+-------------------------------
 
 将以下内容加入到`/etc/crontab`中：
 
 	@reboot    username    /path/to/script arguments
 
+---
 
 防止笔记本合上后进入休眠状态
------------------------
+----------------------------
 
 编辑`/etc/systemd/login.conf`，将`HandleLidSwitch`的值改为`ignore`。
 
+---
 
 提升ALSA播放时的音质
------------------
+--------------------
 
 打开`/usr/share/alsa/alsa.conf`，然后将`defaults.pcm.dmix.rate 48000`更改为`defaults.pcm.dmix.rate 44100`。
 
+---
 
-为Linux命令行配置自动登录
-----------------------
+为Linux命令行配置自动登录（使用`systemd`）
+------------------------------------------
 
 新建目录`/etc/systemd/system/getty@tty1.service.d/`（如果该目录不存在）
 
@@ -45,9 +50,10 @@ MySQL如何解决赋予/收回用户权限时发生Access Denied的情况
 
 保存，然后重启。
 
+---
 
 更改日期、时间、时区
-----------------
+--------------------
 
 更改日期：`date -s MM/DD/YYYY`
 	
@@ -55,9 +61,10 @@ MySQL如何解决赋予/收回用户权限时发生Access Denied的情况
 
 更改时区：`sudo dpkg-reconfigure tzdata`
 
+---
 
 Debian/Ubuntu下修复华硕笔记本的Wifi
---------------------------------
+-----------------------------------
 
 如果华硕笔记本上的Wifi模块是Ralink的，安装完Debian/Ubuntu后会出现Wifi无法使用的情况。同时在终端运行`sudo rfkill list all`命令后会有如下输出：
 
@@ -76,9 +83,10 @@ Debian/Ubuntu下修复华硕笔记本的Wifi
 
 然后重启。
 
+---
 
 Linux命令行下捕获系统声音
-----------------------
+-------------------------
 
 当pulseaudio被用于管理系统声音时，可以在命令行环境下使用`pacat`命令捕获系统声音。
 
@@ -109,9 +117,10 @@ Linux命令行下捕获系统声音
 	
 	pacat --record -d alsa_output.pci-0000_00_1b.0.analog-stereo.monitor | ffmpeg -f s16le -ar 44.1k -ac 2 -i pipe:0 record.wav
 
+---
 
 Linux命令行下配置Wifi
--------------------
+---------------------
 
 ###前期准备
 
@@ -153,11 +162,13 @@ Linux命令行下配置Wifi
 
 其中`wlan0`需要换成需要使用的Wifi设备。
 
+---
 
 Termux下安装Jekyll
------------------
+------------------
 
 	apt update && apt install libffi-dev clang ruby ruby-dev make
 	gem install jekyll
 
+---
 

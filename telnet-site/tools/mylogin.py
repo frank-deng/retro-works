@@ -46,7 +46,7 @@ class ConsoleManager(Kbhit):
             try:
                 timestamp = time.time();
                 while (not self.kbhit()):
-                    time.sleep(0);
+                    time.sleep(0.1);
                     if (time.time() - timestamp >= timeout):
                         raise TimeoutException(timeout);
             

@@ -1,25 +1,28 @@
 Bash使用技巧
 ============
 
+---
 
 从给定文件名中获取基本名和扩展名
---------------------------
+--------------------------------
 
-基本名：`BASENAME="${FILENAME%.*}";`
+基本名：`BASENAME="${FILENAME%.*}";`  
 扩展名：`EXTENSION="${FILENAME##*.}";`
 
+---
 
 按行遍历标准输出
---------------
+----------------
 
 	IFS=$'\n';
 	for LINE in `ls`; do
 		#Do some works on "${LINE}"
 	done;
 
+---
 
 遍历带空格的命令行参数
-------------------
+----------------------
 
 	while [ -n "${1}" ]; do
 		FILENAME="${1}";
@@ -27,9 +30,10 @@ Bash使用技巧
 		shift 1;
 	done;
 
+---
 
 如何使用Perl的rename工具进行批量重命名
----------------------------------
+--------------------------------------
 
 去除`.bak`扩展名：
 
@@ -45,9 +49,10 @@ Bash使用技巧
 
 ArchLinux上需要安装`perl-rename`包来获得该工具。
 
+---
 
 如何找出带BOM头的文本文件
-----------------------
+-------------------------
 
 使用`find`命令和`file`命令：
 
@@ -67,15 +72,17 @@ ArchLinux上需要安装`perl-rename`包来获得该工具。
 	grep -rlI $'^\xEF\xBB\xBF' --exclude-dir=.svn .
 	find . -type f -not \( -ipath '*.svn*' \) -exec file {} \; | grep BOM
 
+---
 
 将视频转换成兼容HTML5的格式
------------------------
+---------------------------
 
 	ffmpeg -i INPUT_FILE -c:v libx264 -crf 18 -c:a aac -q:a 100 -strict experimental OUTPUT.mp4
 
+---
 
 调整VIM的制表符宽度
------------------
+-------------------
 
 将以下内容加入到`/etc/vim/vimrc`中：
 
@@ -83,5 +90,5 @@ ArchLinux上需要安装`perl-rename`包来获得该工具。
 	set softtabstop=4
 	set shiftwidth=4
 
-
+---
 
