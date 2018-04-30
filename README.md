@@ -159,7 +159,7 @@ Copy file `config.telnetsite` and `keymap.telnetsite` to folder `~/.w3m`, then r
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
 
 	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/mylogin.py
-	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:23"
+	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:2333"
 
 ### Windows 3.x客户端使用方法 Windows 3.x Client Usage
 

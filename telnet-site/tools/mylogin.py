@@ -1,21 +1,6 @@
 #!/usr/bin/env python3
 
-import sys, os, time, subprocess, atexit;
-
-users = {
-    'user' : 'user'
-}
-env_custom = {
-    'TERM' : 'ansi43m',
-    'LANG' : 'zh_CN.GB2312',
-    'LC_ALL' : 'zh_CN.GB2312',
-    'LANGUAGE' : 'zh_CN:zh',
-    'LINES' : '24',
-    'COLUMNS' : '80',
-    'WWW_HOME' : 'http://127.0.0.1:8080',
-}
-
-import termios;
+import sys, os, time, subprocess, atexit, hashlib, termios;
 from select import select;
 class Kbhit:
     def __init__(self):
@@ -59,11 +44,10 @@ class ConsoleManager(Kbhit):
         _input = '';
         while running:
             try:
-                tick = 0;
+                timestamp = time.time();
                 while (not self.kbhit()):
-                    time.sleep(0.1);
-                    tick += 1;
-                    if (tick >= timeout*10):
+                    time.sleep(0);
+                    if (time.time() - timestamp >= timeout):
                         raise TimeoutException(timeout);
             
                 ch = self.getch();
@@ -100,8 +84,11 @@ class ConsoleManager(Kbhit):
 
 class LoginManager(ConsoleManager):
     __proc = None;
-    def __init__(self, encoding = 'UTF-8', timeout = 60, nextLoginDelay = 3):
+    def __init__(self, config, welcome=None, encoding = 'UTF-8', timeout = 60, nextLoginDelay = 3):
         ConsoleManager.__init__(self, encoding);
+        self.__encoding = encoding;
+        self.__config = config;
+        self.__welcomeMsg = welcome;
         self.__timeout = timeout;
         self.__nextLoginDelay = nextLoginDelay;
         atexit.register(self.shutdown);
@@ -111,25 +98,28 @@ class LoginManager(ConsoleManager):
             self.__proc.kill();
 
     def __login(self):
-        self.writeln('*** 欢迎光临我的信息港 ***');
-        self.writeln(b'');
+        if (None != self.__welcomeMsg):
+            self.writeln(self.__welcomeMsg);
+            self.writeln(b'');
         self.write('用户名：');
         username = self.readln(timeout=self.__timeout, maxlength=40);
         self.write('密　码：');
         password = self.readln(password=True, timeout=self.__timeout, maxlength=40);
-        if (username in users and password == users[username]):
-            self.writeln('登录成功！');
-            return True;
-        else:
-            self.writeln('登录失败！');
-            self.writeln(b'');
-            time.sleep(self.__nextLoginDelay);
-            return False;
 
-    def __launch(self):
+        user = self.__config.get(username);
+        if (None == user):
+            return None;
+        sha256handler = hashlib.sha256();
+        sha256handler.update(password.encode(self.__encoding));
+        hashval = sha256handler.hexdigest();
+        if (hashval != user['password']):
+            return None;
+        return (user['exec'], user['env']);
+
+    def __launch(self, executable, env_custom):
         env = os.environ.copy();
         env.update(env_custom);
-        self.__proc = subprocess.Popen(['w3m', '-no-mouse'], env = env);
+        self.__proc = subprocess.Popen(executable, env = env);
         self.__proc.wait();
         self.__proc = None;
     
@@ -137,20 +127,45 @@ class LoginManager(ConsoleManager):
         try:
             while True:
                 try:
-                    if self.__login():
-                        self.__launch();
+                    loginInfo = self.__login();
+                    if None != loginInfo:
+                        self.writeln('登录成功！');
+                        self.__launch(loginInfo[0], loginInfo[1]);
+                    else: 
+                        self.writeln('登录失败！');
+                        self.writeln(b'');
+                        time.sleep(self.__nextLoginDelay);
+                except KeyboardInterrupt:
+                    pass;
                 except TimeoutException as e:
                     raise e;
                 except Exception as e:
                     print(str(e));
-                    time.sleep(3);
         except TimeoutException as e:
             self.writeln(b'');
             self.writeln('%d秒内无用户输入，退出。'%(e.timeout));
             self.writeln(b'');
 
 if __name__ == '__main__':
-    loginManager = LoginManager(encoding='GB2312');
+    loginManager = LoginManager(
+        config = {
+            'user': {
+                'password': '04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb',
+                'exec': ['w3m', '-no-mouse'],
+                'env': {
+                    'TERM' : 'ansi43m',
+                    'LANG' : 'zh_CN.GB2312',
+                    'LC_ALL' : 'zh_CN.GB2312',
+                    'LANGUAGE' : 'zh_CN:zh',
+                    'LINES' : '24',
+                    'COLUMNS' : '80',
+                    'WWW_HOME' : 'http://127.0.0.1:8080',
+                },
+            },
+        },
+        encoding='GB2312',
+        welcome='*** 欢迎光临我的信息港 ***'
+    );
     loginManager.run();
     exit(0);
 
