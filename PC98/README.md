@@ -16,11 +16,11 @@ Gabriele Cirulli's 2048 game for NEC PC-9800 Series.
 
 ## Screenshots
 
-![2048](https://frank-deng.github.io/retro-works/PC98/images/2048_1.png)
+![2048](https://frank-deng.github.io/retro-works/PC98/screenshots/2048_1.png)
 
-![2048](https://frank-deng.github.io/retro-works/PC98/images/2048_2.png)
+![2048](https://frank-deng.github.io/retro-works/PC98/screenshots/2048_2.png)
 
-![2048](https://frank-deng.github.io/retro-works/PC98/images/2048_3.png)
+![2048](https://frank-deng.github.io/retro-works/PC98/screenshots/2048_3.png)
 
 
 Sudoku Solver
@@ -28,7 +28,7 @@ Sudoku Solver
 
 ## Screenshots
 
-![Sudoku Solver](https://frank-deng.github.io/retro-works/PC98/images/sudoku.png)
+![Sudoku Solver](https://frank-deng.github.io/retro-works/PC98/screenshots/sudoku.png)
 
 
 Quick Sort Demo
@@ -36,6 +36,6 @@ Quick Sort Demo
 
 ## Screenshots
 
-![Quick Sort Demo](https://frank-deng.github.io/retro-works/PC98/images/qsort.png)
+![Quick Sort Demo](https://frank-deng.github.io/retro-works/PC98/screenshots/qsort.png)
 
 
