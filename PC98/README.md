@@ -8,13 +8,13 @@ Some retro programming works for NEC PC-9800 Series.
 
 Gabriele Cirulli's 2048 game for NEC PC-9800 Series.
 
-## How To Build
+### How To Build
 
 1. Download [LSI C-86](https://www.lsi-j.co.jp/freesoft/index.html).
 2. Copy `lsic330c.lzh` to your PC98 environment, then extract it to directory `A:\LSIC86\`.
 3. Compile with command `lcc -o 2048.EXE 2048.C`.
 
-## Screenshots
+### Screenshots
 
 ![2048](https://frank-deng.github.io/retro-works/PC98/screenshots/2048_1.png)
 
@@ -26,7 +26,7 @@ Gabriele Cirulli's 2048 game for NEC PC-9800 Series.
 Sudoku Solver
 -------------
 
-## Screenshots
+### Screenshots
 
 ![Sudoku Solver](https://frank-deng.github.io/retro-works/PC98/screenshots/sudoku.png)
 
@@ -34,7 +34,7 @@ Sudoku Solver
 Quick Sort Demo
 ---------------
 
-## Screenshots
+### Screenshots
 
 ![Quick Sort Demo](https://frank-deng.github.io/retro-works/PC98/screenshots/qsort.png)
 
