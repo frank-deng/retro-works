@@ -3,6 +3,17 @@ Bash Shell Skills
 
 ---
 
+Execute GUI Programs
+--------------------
+
+Execute GUI programs in background mode from terminal, and suppresses stdout and stderr.
+
+	(gui_program &>/dev/null &)
+
+`gui_program` is the command you'd like to execute for the GUI program.
+
+---
+
 Extract basename and extension
 ------------------------------
 
