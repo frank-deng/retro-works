@@ -2,7 +2,7 @@ Retro Programming Works 怀旧编程作品
 ====================================
 
 一些古董平台上的编程作品。仅供娱乐。  
-Some retro programming works for some old platforms. Just for fun.
+Some retro programming works for some vintage platforms. For entertainment use only.
 
 GW-BASIC
 --------
@@ -16,34 +16,34 @@ However, due to the [limitations](http://programmingisterrible.com/post/40132515
 ### 截图欣赏 Screenshots
 
 开机画面 Startup  
-![Startup](http://frank-deng.github.io/retro-works/images/GW-BASIC/Startup.png)
+![Startup](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Startup.png)
 
 求100以内的质数 Get prime numbers under 100  
-![Prime Numbers](http://frank-deng.github.io/retro-works/images/GW-BASIC/Prime%20Numbers.png)
+![Prime Numbers](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Prime%20Numbers.png)
 
 显示杨辉三角 Display Yanghui Triangle  
-![Yanghui Triangle](http://frank-deng.github.io/retro-works/images/GW-BASIC/Yanghui.png)
+![Yanghui Triangle](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Yanghui.png)
 
 猜数字游戏 Bulls and Cows  
-![Bulls and Cows](http://frank-deng.github.io/retro-works/images/GW-BASIC/Guessnum.png)
+![Bulls and Cows](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Guessnum.png)
 
 2048游戏 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/GW-BASIC/2048-1.png)
+![2048](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/2048-1.png)
 
 2048游戏 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/GW-BASIC/2048-2.png)
+![2048](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/2048-2.png)
 
 条形图 Bar Chart  
-![Graph](http://frank-deng.github.io/retro-works/images/GW-BASIC/Graph.png)
+![Graph](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Graph.png)
 
 显示汉字 Display Chinese text  
-![Chinese Demo](http://frank-deng.github.io/retro-works/images/GW-BASIC/Chinese.png)
+![Chinese Demo](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Chinese.png)
 
 绘制几何形状 Drawing Geometric Shapes  
-![Shapes](http://frank-deng.github.io/retro-works/images/GW-BASIC/Shapes.png)
+![Shapes](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Shapes.png)
 
 屏保 Screensaver  
-![Screensaver](http://frank-deng.github.io/retro-works/images/GW-BASIC/Lines.png)
+![Screensaver](http://frank-deng.github.io/retro-works/screenshots/GW-BASIC/Lines.png)
 
 
 QBASIC
@@ -64,66 +64,66 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ### 截图欣赏 Screenshots
 
 2048游戏 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048_1.png)
+![2048](http://frank-deng.github.io/retro-works/screenshots/QBASIC/2048_1.png)
 
 2048游戏 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048_2.png)
+![2048](http://frank-deng.github.io/retro-works/screenshots/QBASIC/2048_2.png)
 
 2048游戏（使用UCDOS特显程序） 2048 Game (Use Special Display utility from UCDOS)  
-![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048C_1.png)
+![2048](http://frank-deng.github.io/retro-works/screenshots/QBASIC/2048C_1.png)
 
 2048游戏（使用UCDOS特显程序） 2048 Game (Use Special Display utility from UCDOS)  
-![2048](http://frank-deng.github.io/retro-works/images/QBASIC/2048C_2.png)
+![2048](http://frank-deng.github.io/retro-works/screenshots/QBASIC/2048C_2.png)
 
 猜数字游戏 Bulls and Cows  
-![Bulls and Cows](http://frank-deng.github.io/retro-works/images/QBASIC/guessnum.png)
+![Bulls and Cows](http://frank-deng.github.io/retro-works/screenshots/QBASIC/guessnum.png)
 
 俄罗斯方块 Tetris  
-![Tetris](http://frank-deng.github.io/retro-works/images/QBASIC/Tetris_1.png)
+![Tetris](http://frank-deng.github.io/retro-works/screenshots/QBASIC/Tetris_1.png)
 
 俄罗斯方块 Tetris  
-![Tetris](http://frank-deng.github.io/retro-works/images/QBASIC/Tetris_2.png)
+![Tetris](http://frank-deng.github.io/retro-works/screenshots/QBASIC/Tetris_2.png)
 
 俄罗斯方块 Tetris  
-![Tetris](http://frank-deng.github.io/retro-works/images/QBASIC/Tetris_3.png)
+![Tetris](http://frank-deng.github.io/retro-works/screenshots/QBASIC/Tetris_3.png)
 
 条形图 Bar Chart  
-![Bar Chart](http://frank-deng.github.io/retro-works/images/QBASIC/barchart.png)
+![Bar Chart](http://frank-deng.github.io/retro-works/screenshots/QBASIC/barchart.png)
 
 饼图 Pie Chart  
-![Pie Chart](http://frank-deng.github.io/retro-works/images/QBASIC/piechart.png)
+![Pie Chart](http://frank-deng.github.io/retro-works/screenshots/QBASIC/piechart.png)
 
 数独求解程序 Sudoku Solver  
-![Sudoku](http://frank-deng.github.io/retro-works/images/QBASIC/sudoku.png)
+![Sudoku](http://frank-deng.github.io/retro-works/screenshots/QBASIC/sudoku.png)
 
 简单统计程序 Simple Statistics Program  
-![Statistics](http://frank-deng.github.io/retro-works/images/QBASIC/stat.png)
+![Statistics](http://frank-deng.github.io/retro-works/screenshots/QBASIC/stat.png)
 
 简单统计程序（使用中文界面） Simple Statistics Program with Chinese UI  
-![Statistics](http://frank-deng.github.io/retro-works/images/QBASIC/stat2.png)
+![Statistics](http://frank-deng.github.io/retro-works/screenshots/QBASIC/stat2.png)
 
 条形图（使用UCDOS特显程序） Bar Chart (Use Special Display utility from UCDOS)  
-![UCDOS Bar Chart](http://frank-deng.github.io/retro-works/images/QBASIC/barchart2.png)
+![UCDOS Bar Chart](http://frank-deng.github.io/retro-works/screenshots/QBASIC/barchart2.png)
 
 饼图（使用UCDOS特显程序） Pie Chart (Use Special Display utility from UCDOS)  
-![UCDOS Pie Chart](http://frank-deng.github.io/retro-works/images/QBASIC/piechart2.png)
+![UCDOS Pie Chart](http://frank-deng.github.io/retro-works/screenshots/QBASIC/piechart2.png)
 
 使用UCDOS特显程序显示大尺寸汉字 Use Special Display utility from UCDOS to display Chinese characters in large size  
-![Poem](http://frank-deng.github.io/retro-works/images/QBASIC/poem.png)
+![Poem](http://frank-deng.github.io/retro-works/screenshots/QBASIC/poem.png)
 
 UCDOS特显程序中可用的颜色 Colors available in the Special Display utility from UCDOS  
-![256 Colors](http://frank-deng.github.io/retro-works/images/QBASIC/256color.png)  
+![256 Colors](http://frank-deng.github.io/retro-works/screenshots/QBASIC/256color.png)  
 UCDOS使用VESA.DRV显示驱动后，可以显示上图中的256种颜色。（默认的VGA显示驱动只显示最上面一行的16种颜色）  
 When UCDOS is started with VESA.DRV display driver, it will be capable of displaying the 256 colors above. (Default VGA.DRV can only display 16 colors in the first row)
 
 UCDOS特显程序中可用的字体 Fonts available in the Special Display utility from UCDOS  
-![Fonts](http://frank-deng.github.io/retro-works/images/QBASIC/fonts.png)
+![Fonts](http://frank-deng.github.io/retro-works/screenshots/QBASIC/fonts.png)
 
 屏保 Screensaver  
-![Screensaver](http://frank-deng.github.io/retro-works/images/QBASIC/lines.png)
+![Screensaver](http://frank-deng.github.io/retro-works/screenshots/QBASIC/lines.png)
 
 屏保（使用UCDOS特显程序） Screensaver (Use Special Display utility from UCDOS)  
-![Screensaver](http://frank-deng.github.io/retro-works/images/QBASIC/lines2.png)
+![Screensaver](http://frank-deng.github.io/retro-works/screenshots/QBASIC/lines2.png)
 
 
 telnet-site
@@ -134,9 +134,9 @@ A simple site designed for console-based browser [w3m](http://w3m.sourceforge.ne
 
 ### 截图欣赏 Screenshots
 
-![Telnet 1](http://frank-deng.github.io/retro-works/images/telnet-site/telnet1.png)
+![Telnet 1](http://frank-deng.github.io/retro-works/screenshots/telnet-site/telnet1.png)
 
-![Telnet 2](http://frank-deng.github.io/retro-works/images/telnet-site/telnet2.png)
+![Telnet 2](http://frank-deng.github.io/retro-works/screenshots/telnet-site/telnet2.png)
 
 ### Linux服务器端配置 Linux Server Configuration
 
