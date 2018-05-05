@@ -5,6 +5,7 @@ import cv2;
 class BLEllena(WindowGrabber):
     ELLENA_WATCHING = 'ELLENA_WATCHING';
     ELLENA_ACTIVE = 'ELLENA_ACTIVE';
+    ELLENA_FAILED = 'ELLENA_FAILED';
     def __init__(self, winTitle = r'Neko Project'):
         npRunning = WindowGrabber.getWindowByTitle(winTitle);
         if (len(npRunning) == 0):
@@ -17,6 +18,7 @@ class BLEllena(WindowGrabber):
         self.imgLightVerOn = cv2.imread('images/light_v_on.png');
         self.imgEllenaWatching = cv2.imread('images/ellena_watching.png');
         self.imgEllenaActive = cv2.imread('images/ellena_active.png');
+        self.imgEllenaFailed = cv2.imread('images/ellena_failed.png');
 
     def __capture(self):
         pixbuf = self.capture();
@@ -49,6 +51,8 @@ class BLEllena(WindowGrabber):
             return self.ELLENA_WATCHING;
         elif len(self.__match(cvimg, self.imgEllenaActive, 0.6)):
             return self.ELLENA_ACTIVE;
+        elif len(self.__match(cvimg, self.imgEllenaFailed, 0.6)):
+            return self.ELLENA_FAILED;
         return None;
 
     def getMove(self):

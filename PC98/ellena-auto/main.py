@@ -28,54 +28,57 @@ def showImage(img, matchedPos = None, tempImg = None):
             break;
     cv2.destroyAllWindows();
 
-
-def printMoves(move):
-    labelMoves = ('Up', 'Left', 'Right', 'Down', 'Middle');
-    print(labelMoves[move]);
-
 from pykeyboard import PyKeyboard;
 def performMove(move):
     k = PyKeyboard();
     try:
         keyOper = (k.up_key, k.left_key, k.right_key, k.down_key, k.space);
         k.press_key(keyOper[move]);
-        time.sleep(0.3);
+        time.sleep(0.4);
         k.release_key(keyOper[move]);
+        time.sleep(0.1);
     except KeyError:
         print('Unknown move: %s'%move);
 
+running = True;
 ellena = BLEllena();
+labelMoves = ('Up', 'Left', 'Right', 'Down', 'Middle');
 try:
     lastMove = None;
     lastStatus = None;
     moves = [];
     timestamp = time.time();
-    while True:
+    while running:
         status = ellena.getStatus();
         if (None != status and status != lastStatus):
             lastStatus = status;
             if BLEllena.ELLENA_WATCHING == status:
-                print('\nWatching:');
                 timestamp = time.time();
                 moves = [];
+                lastMove = None;
             elif BLEllena.ELLENA_ACTIVE == status:
-                print('Operating...');
                 timestamp = time.time();
+            elif BLEllena.ELLENA_FAILED == status:
+                running = False;
 
         if (BLEllena.ELLENA_WATCHING == status):
             move = ellena.getMove();
             if (None != move and lastMove != move):
-                printMoves(move);
-                lastMove = move;
                 moves.append({
                     'ts': time.time() - timestamp,
                     'mv': move,
+                    'idx': len(moves),
                 });
+            if (None != move):
+                lastMove = move;
         elif (BLEllena.ELLENA_ACTIVE == status):
             lastMove = [];
             if (len(moves) > 0 and time.time() - timestamp >= moves[0]['ts']):
                 performMove(moves[0]['mv']);
                 moves.pop(0);
+        elif (BLEllena.ELLENA_FAILED == status):
+            if (len(moves) > 0):
+                print('Failed at move %d (%s, %f)'%(moves[0]['idx'], labelMoves[moves[0]['mv']], moves[0]['ts']));
         time.sleep(1/30);
 except KeyboardInterrupt:
     pass;
