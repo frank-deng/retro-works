@@ -34,9 +34,9 @@ def performMove(move):
     try:
         keyOper = (k.up_key, k.left_key, k.right_key, k.down_key, k.space);
         k.press_key(keyOper[move]);
-        time.sleep(0.4);
+        time.sleep(0.2);
         k.release_key(keyOper[move]);
-        time.sleep(0.1);
+        time.sleep(0.05);
     except KeyError:
         print('Unknown move: %s'%move);
 
