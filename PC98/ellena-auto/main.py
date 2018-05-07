@@ -31,14 +31,31 @@ def showImage(img, matchedPos = None, tempImg = None):
 from pykeyboard import PyKeyboard;
 def performMove(move):
     k = PyKeyboard();
-    try:
-        keyOper = (k.up_key, k.left_key, k.right_key, k.down_key, k.space);
-        k.press_key(keyOper[move]);
-        time.sleep(0.2);
-        k.release_key(keyOper[move]);
+    keyOper = (k.up_key, k.left_key, k.right_key, k.down_key, k.space);
+
+    k.press_key(keyOper[move]);
+    counter = 30;
+    while counter:
+        actualMove = ellena.getPlayerMove();
+        if (moves[0]['mv'] == actualMove):
+            break;
         time.sleep(0.05);
-    except KeyError:
-        print('Unknown move: %s'%move);
+        counter -= 1;
+    if (counter == 0):
+        if (None == actualMove):
+            actualMoveStr = 'None';
+        else:
+            actualMoveStr = labelMoves[actualMove];
+        print("Warning: Expected %s, got %s."%(labelMoves[moves[0]['mv']], actualMoveStr));
+    k.release_key(keyOper[move]);
+
+    counter = 30;
+    while counter:
+        actualMove = ellena.getPlayerMove();
+        if (None == actualMove):
+            break;
+        time.sleep(0.05);
+        counter -= 1;
 
 running = True;
 ellena = BLEllena();
@@ -56,8 +73,10 @@ try:
                 timestamp = time.time();
                 moves = [];
                 lastMove = None;
+                print('\nWatching...');
             elif BLEllena.ELLENA_ACTIVE == status:
                 timestamp = time.time();
+                print('\nOperating...');
             elif BLEllena.ELLENA_FAILED == status:
                 running = False;
 
@@ -69,11 +88,11 @@ try:
                     'mv': move,
                     'idx': len(moves),
                 });
+                print(labelMoves[move]);
             if (None != move):
                 lastMove = move;
         elif (BLEllena.ELLENA_ACTIVE == status):
-            lastMove = [];
-            if (len(moves) > 0 and time.time() - timestamp >= moves[0]['ts']):
+            if (len(moves) > 0):
                 performMove(moves[0]['mv']);
                 moves.pop(0);
         elif (BLEllena.ELLENA_FAILED == status):

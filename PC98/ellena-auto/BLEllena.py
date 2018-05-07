@@ -76,3 +76,24 @@ class BLEllena(WindowGrabber):
         else:
             return None;
 
+    def getPlayerMove(self):
+        cvimg = self.__capture();
+        lightsHor = self.__match(cvimg, self.imgLightHorOn, 0.6);
+        lightsVer = self.__match(cvimg, self.imgLightVerOn, 0.6);
+        result = [];
+        if (self.__matchPos(lightsHor, (152, 0))):
+            result.append(0);
+        if (self.__matchPos(lightsVer, (16, 145))):
+            result.append(1);
+        if (self.__matchPos(lightsVer, (304, 144))):
+            result.append(2);
+        if (self.__matchPos(lightsHor, (152, 304))):
+            result.append(3);
+
+        if (len(result) == 1):
+            return result[0];
+        elif (len(result) == 4):
+            return 4;
+        else:
+            return None;
+
