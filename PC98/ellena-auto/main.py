@@ -34,7 +34,7 @@ def performMove(move):
     keyOper = (k.up_key, k.left_key, k.right_key, k.down_key, k.space);
 
     k.press_key(keyOper[move]);
-    counter = 30;
+    counter = 100;
     while counter:
         actualMove = ellena.getPlayerMove();
         if (moves[0]['mv'] == actualMove):
@@ -48,14 +48,7 @@ def performMove(move):
             actualMoveStr = labelMoves[actualMove];
         print("Warning: Expected %s, got %s."%(labelMoves[moves[0]['mv']], actualMoveStr));
     k.release_key(keyOper[move]);
-
-    counter = 30;
-    while counter:
-        actualMove = ellena.getPlayerMove();
-        if (None == actualMove):
-            break;
-        time.sleep(0.05);
-        counter -= 1;
+    time.sleep(0.05);
 
 running = True;
 ellena = BLEllena();
