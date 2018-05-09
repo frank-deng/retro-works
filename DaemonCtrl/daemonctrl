@@ -13,8 +13,8 @@ def stat(cmd, pid):
 
 if __name__ == '__main__':
     daemons_all = {
-        '2048': DaemonCtrl(['/usr/local/bin/2048', '/home/frank/.2048.log']),
-        'guessnum': DaemonCtrl(['/usr/local/bin/guessnum-stat', '/home/frank/.guessnum-stat.txt']),
+        '2048': DaemonCtrl(['/usr/local/bin/2048', '/home/user/.2048.log']),
+        'guessnum': DaemonCtrl(['/usr/local/bin/guessnum-stat', '/home/user/.guessnum-stat.txt']),
     };
 
     parser = argparse.ArgumentParser();
