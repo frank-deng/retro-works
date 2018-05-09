@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+
+FG_DATA_URL='http://localhost:5410/json/fgreport/';
+
+import time, httplib2, json, sysinfo, curses;
+
+def getFlightData():
+    try:
+        result = {};
+        h = httplib2.Http(timeout=0.8);
+        resp, content = h.request(FG_DATA_URL);
+        data = json.loads(content.decode('UTF-8'));
+        for item in data['children']:
+            result[item['name']] = item['value'];
+        return result;
+    except Exception as e:
+        return None;
+
+class TXFgfsView:
+    __hasFgData = False;
+    __lastTime = None;
+    def __init__(self):
+        self.__tx = curses.initscr();
+        curses.noecho();
+        curses.cbreak();
+        self.__tx.keypad(True);
+        self.__tx.timeout(0);
+        self.__drawFrame();
+
+    def close(self):
+        self.__tx.keypad(False)
+        self.__tx.clear();
+        self.__tx.refresh();
+        curses.nocbreak()
+        curses.echo()
+        curses.endwin();
+
+    def __drawFrame(self):
+        self.__tx.addstr(0, 0, " "*79, curses.A_REVERSE);
+        self.__tx.addstr(23, 0, " "*79, curses.A_REVERSE);
+        self.__tx.addstr(0, 0, " Flight Console", curses.A_REVERSE);
+        self.__tx.addstr(1, 2, "CPU Temperature");
+        self.__tx.addstr(1, 22, "GPU Temperature");
+        self.__tx.addstr(1, 42, "CPU Usage");
+        self.__tx.addstr(1, 62, "RAM Usage");
+
+    def getch(self):
+        return self.__tx.getch();
+
+    def updateTime(self):
+        nowTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()));
+        self.__tx.addstr(0, 60, nowTime, curses.A_REVERSE);
+        self.__tx.refresh();
+        curses.doupdate();
+
+    def update(self, sysdata, fgdata, redraw = False):
+        if (redraw):
+            self.__drawFrame();
+
+        self.__tx.addstr(2, 2, '%d C  '%sysdata['cpu_temp']);
+        self.__tx.addstr(2, 22, '%d C  '%sysdata['cpu_temp']);
+        self.__tx.addstr(2, 42, '%.1f%%  '%(sysdata['cpu_usage']['overall'] * 100));
+        self.__tx.addstr(2, 62, '%.1f%%  '%(sysdata['mem_usage'] * 100));
+
+        if None == fgdata:
+            self.__tx.addstr(3, 0, ' '*79);
+            self.__tx.addstr(23, 1, '(No ongoing flight)', curses.A_REVERSE);
+            self.__hasFgData = False;
+            return;
+
+        if not self.__hasFgData:
+            self.__tx.addstr(3, 0, '-'*79);
+            self.__hasFgData = True;
+
+        if fgdata['longitude-deg'] >= 0:
+            fgdata['longitude'] = " %.6fE   "%(abs(fgdata['longitude-deg']));
+        else:
+            fgdata['longitude'] = " %.6fW   "%(abs(fgdata['longitude-deg']));
+
+        if fgdata['latitude-deg'] >= 0:
+            fgdata['latitude'] = " %.6fN   "%(abs(fgdata['latitude-deg']));
+        else:
+            fgdata['latitude'] = " %.6fS   "%(abs(fgdata['latitude-deg']));
+        self.__tx.addstr(4, 2, 'Model:              %s         '%fgdata['aircraft']);
+        self.__tx.addstr(5, 2, 'Longitude:         %s         '%fgdata['longitude']);
+        self.__tx.addstr(6, 2, 'Latitude:          %s         '%fgdata['latitude']);
+        self.__tx.addstr(7, 2, 'Flight Time:        %s         '%fgdata['flight-time-string']);
+        self.__tx.addstr(8, 2, 'ETE:                %s         '%fgdata['ete-string']);
+        self.__tx.addstr(9, 2, 'Total Distance:     %.1fnm       '%fgdata['total-distance']);
+        self.__tx.addstr(10,2, 'Distance Remaining: %.1fnm       '%fgdata['distance-remaining-nm']);
+        self.__tx.addstr(11,2, 'Distance Elapsed:   %.1fnm       '%(fgdata['total-distance'] - fgdata['distance-remaining-nm']));
+
+        if fgdata['crashed']:
+            statusText = 'Crashed            ';
+        elif fgdata['paused']:
+            statusText = 'Paused             ';
+        else:
+            statusText = 'In Flight          ';
+        self.__tx.addstr(23, 1, statusText, curses.A_REVERSE);
+
+
+if __name__ == '__main__':
+    running = True;
+    view = TXFgfsView();
+    tick = 0;
+    lastTime = None;
+    try:
+        while running:
+            if (tick % 10 == 0):
+                view.update(sysinfo.SysInfo().fetch(), getFlightData());
+
+            view.updateTime();
+
+            if 113 == view.getch():
+                running = False;
+
+            curses.halfdelay(1);
+            if (running):
+                tick += 1;
+    except KeyboardInterrupt:
+        pass;
+    finally:
+        view.close();
+    exit(0);
+
