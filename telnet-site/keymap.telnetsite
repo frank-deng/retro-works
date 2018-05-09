@@ -26,3 +26,4 @@ keymap  U   NULL
 keymap  ESC-u   NULL
 keymap	ESC-t	NULL
 keymap	Q	ABORT
+keymap	M	NULL

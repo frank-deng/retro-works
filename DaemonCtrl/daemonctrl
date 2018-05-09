@@ -6,7 +6,7 @@ from DaemonCtrl import DaemonCtrl;
 def stat(cmd, pid):
     if (None != pid):
         os.kill(pid, 10);
-    time.sleep(2);
+        time.sleep(2);
     process = subprocess.Popen([cmd[0], 'stat', cmd[1]], stdout = subprocess.PIPE, stderr = subprocess.PIPE);
     stdout, stderr = process.communicate();
     return stdout;

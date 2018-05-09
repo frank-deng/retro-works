@@ -66,7 +66,7 @@ use_lessopen 0
 bgextviewer 0
 extbrowser3 
 extbrowser2 
-extbrowser w3mdump.py
+extbrowser 
 mailer xdg-open mailto:%s
 mailto_options 1
 editor sensible-editor

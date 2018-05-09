@@ -103,3 +103,10 @@ Add the following lines to `/etc/vim/vimrc`:
 
 ---
 
+Backup file with gzip compression and date suffix
+-------------------------------------------------
+
+	gzip -kfS ".$(date '+%Y%m%d_%H%M').gz"
+
+---
+

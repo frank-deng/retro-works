@@ -149,8 +149,8 @@ Install packages needed
 	sudo apt-get install ncurses-term tcpser
 	sudo pip install bottle httplib2 markdown
 	
-将`telnetd.py`和`mylogin.py`复制到`/usr/local/bin`目录中。  
-Copy `telnetd.py` and `mylogin.py` to directory `/usr/local/bin`.
+将`telnetd.py`和`telnetLogin.py`复制到`/usr/local/bin`目录中。  
+Copy `telnetd.py` and `telnetLogin.py` to directory `/usr/local/bin`.
 
 将`config.telnetsite`文件和`keymap.telnetsite`文件复制到`~/.w3m`目录中，然后将`config.telnetsite`更名为`config`，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
 Copy file `config.telnetsite` and `keymap.telnetsite` to folder `~/.w3m`, then rename `config.telnetsite` to `config`, so as to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
@@ -158,7 +158,7 @@ Copy file `config.telnetsite` and `keymap.telnetsite` to folder `~/.w3m`, then r
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
 
-	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/mylogin.py
+	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/telnetLogin.py
 	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:2333"
 
 ### Windows 3.x客户端使用方法 Windows 3.x Client Usage
