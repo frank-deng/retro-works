@@ -163,24 +163,31 @@ class LoginManager(ConsoleManager):
             self.writeln(b'');
 
 if __name__ == '__main__':
-    import json, argparse;
-    parser = argparse.ArgumentParser();
-    parser.add_argument('config', metavar='Config', type=str, nargs=1, help='Configuration JSON file');
-    args = parser.parse_args();
-    config = None;
-    try:
-        with open(args.config[0]) as f:
-            config = json.loads(f.read());
-    except Exception as e:
-        sys.stderr.write('Failed to load configuration file: ');
-        sys.stderr.write(str(e)+'\n');
-        exit(1);
-
     loginManager = LoginManager(
-        config = config['config'],
-        encoding = config['encoding'],
-        welcome = config.get('welcome'),
-        lang = config.get('lang'),
+	config = {
+            "user": {
+                "password": "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb",
+                "exec": ["w3m", "-no-mouse"],
+                "env": {
+                    "TERM" : "ansi43m",
+                    "LANG" : "zh_CN.GB2312",
+                    "LC_ALL" : "zh_CN.GB2312",
+                    "LANGUAGE" : "zh_CN:zh",
+                    "LINES" : "24",
+                    "COLUMNS" : "80",
+                    "WWW_HOME" : "http://127.0.0.1:8080"
+                }
+            }
+	},
+	encoding = "GB2312",
+	welcome = "*** 欢迎光临我的信息港 ***",
+	lang = {
+            "username": "用户名：",
+            "password": "密　码：",
+            "login_success": "登录成功！",
+            "login_failed": "登录失败！",
+            "timeout_msg": "%d秒内无用户输入，退出。"
+	}
     );
     loginManager.run();
     exit(0);

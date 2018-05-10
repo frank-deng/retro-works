@@ -148,8 +148,8 @@ Execute the following commands:
 
 	sudo apt-get install w3m ncurses-term tcpser
 	sudo pip install bottle httplib2 markdown
-	sudo cp misc/telnetd.py misc/LoginManager.py -t /usr/local/bin
-	cp telnet-site/telnetLogin.json telnet-site/config.telnetsite telnet-site/keymap.telnetsite -t ~/.w3m
+	sudo cp telnet-site/telnetd.py telnet-site/telnetLogin.py -t /usr/local/bin
+	cp telnet-site/config.telnetsite telnet-site/keymap.telnetsite -t ~/.w3m
 	cd ~/.w3m
 	mv config config.bak ; mv keymap keymap.bak
 	mv config.telnetsite config ; mv keymap.telnetsite keymap
