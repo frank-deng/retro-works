@@ -146,12 +146,13 @@ Add `zh_CN.GB2312` into `/etc/locale.gen`, then run `sudo locale-gen`.
 执行以下命令：  
 Execute the following commands:
 
-	sudo apt-get install ncurses-term tcpser
+	sudo apt-get install w3m ncurses-term tcpser
 	sudo pip install bottle httplib2 markdown
 	sudo cp misc/telnetd.py misc/LoginManager.py -t /usr/local/bin
-	cp telnet-site/telnetLogin.json -t ~/.w3m
-	cp telnet-site/config.telnetsite telnet-site/keymap.telnetsite -t ~/.w3m
-	cd ~/.w3m && mv config.telnetsite config && mv keymap.telnetsite keymap
+	cp telnet-site/telnetLogin.json telnet-site/config.telnetsite telnet-site/keymap.telnetsite -t ~/.w3m
+	cd ~/.w3m
+	mv config config.bak ; mv keymap keymap.bak
+	mv config.telnetsite config ; mv keymap.telnetsite keymap
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
