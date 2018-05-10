@@ -143,22 +143,20 @@ A simple site designed for console-based browser [w3m](http://w3m.sourceforge.ne
 在`/etc/locale.gen`中加上`zh_CN.GB2312`，然后运行`sudo locale-gen`。  
 Add `zh_CN.GB2312` into `/etc/locale.gen`, then run `sudo locale-gen`.
 
-安装需要的软件包  
-Install packages needed
+执行以下命令：  
+Execute the following commands:
 
 	sudo apt-get install ncurses-term tcpser
 	sudo pip install bottle httplib2 markdown
-	
-将`telnetd.py`和`telnetLogin.py`复制到`/usr/local/bin`目录中。  
-Copy `telnetd.py` and `telnetLogin.py` to directory `/usr/local/bin`.
-
-将`config.telnetsite`文件和`keymap.telnetsite`文件复制到`~/.w3m`目录中，然后将`config.telnetsite`更名为`config`，以禁止从`w3m`浏览器中运行外部命令，增强站点的安全性。  
-Copy file `config.telnetsite` and `keymap.telnetsite` to folder `~/.w3m`, then rename `config.telnetsite` to `config`, so as to disable executing external commands from `w3m` browser, so as to enhance the safety of the site.
+	sudo cp misc/telnetd.py misc/LoginManager.py -t /usr/local/bin
+	cp telnet-site/telnetLogin.json -t ~/.w3m
+	cp telnet-site/config.telnetsite telnet-site/keymap.telnetsite -t ~/.w3m
+	cd ~/.w3m && mv config.telnetsite config && mv keymap.telnetsite keymap
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
 
-	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/telnetLogin.py
+	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/LoginManager.py /home/user/.w3m/telnetLogin.json
 	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:2333"
 
 ### Windows 3.x客户端使用方法 Windows 3.x Client Usage

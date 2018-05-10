@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys, os, time, subprocess, atexit, hashlib, termios;
 from select import select;
 class Kbhit:
@@ -159,3 +161,27 @@ class LoginManager(ConsoleManager):
             self.writeln(b'');
             self.writeln((self.__lang['timeout_msg'])%(e.timeout));
             self.writeln(b'');
+
+if __name__ == '__main__':
+    import json, argparse;
+    parser = argparse.ArgumentParser();
+    parser.add_argument('config', metavar='Config', type=str, nargs=1, help='Configuration JSON file');
+    args = parser.parse_args();
+    config = None;
+    try:
+        with open(args.config[0]) as f:
+            config = json.loads(f.read());
+    except Exception as e:
+        sys.stderr.write('Failed to load configuration file: ');
+        sys.stderr.write(str(e)+'\n');
+        exit(1);
+
+    loginManager = LoginManager(
+        config = config['config'],
+        encoding = config['encoding'],
+        welcome = config.get('welcome'),
+        lang = config.get('lang'),
+    );
+    loginManager.run();
+    exit(0);
+
