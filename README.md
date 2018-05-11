@@ -157,8 +157,8 @@ Execute the following commands:
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
 
-	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/LoginManager.py /home/user/.w3m/telnetLogin.json
-	@reboot frank   /usr/bin/tcpser -v 6401 -s 2400 -n"92163=127.0.0.1:2333"
+	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/telnetLogin.py
+	@reboot frank   /usr/bin/tcpser -v 6401 -s 19200 -n"92163=127.0.0.1:2333"
 
 ### Windows 3.x客户端使用方法 Windows 3.x Client Usage
 
