@@ -111,7 +111,7 @@ try:
                         terms[str(s.fileno())].write(data);
                         if s not in outputs:
                             outputs.append(s);
-                except (ConnectionResetError, KeyError):
+                except (ConnectionAbortedError, ConnectionResetError, KeyError):
                     if str(s.fileno()) in terms:
                         terms.pop(str(s.fileno())).close();
                     if s in inputs:
