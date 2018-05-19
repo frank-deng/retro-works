@@ -29,17 +29,11 @@ def index():
 
     pool = ThreadPool(processes=8);
     weatherInfo = pool.apply_async(models.getWeatherInfo, (city,));
-    jokes = pool.apply_async(models.getJokes, (1,10));
-    newsList = pool.apply_async(models.getNewsList, (1,10));
     articles = pool.apply_async(models.getArticles);
-    movieRank = pool.apply_async(models.getMovieRank);
 
     return {
         'weather':weatherInfo.get(),
-        'jokes':jokes.get()[0],
-        'news':newsList.get()[0],
         'articles':articles.get()['content'][0:10],
-        'movieRank':movieRank.get(),
     };
 
 @route('/weather/detail.do')
@@ -118,55 +112,6 @@ def dict():
         'word': word,
         'result': result,
     };
-
-@route('/news')
-@route('/news/<channel:re:[0-9A-Za-z]+>')
-def news(channel = None):
-    page = int(request.query.get('page', 1));
-    keyword = request.query.getunicode('keyword', '').strip();
-    news,totalPages = models.getNewsList(page, keyword=keyword, channel=channel);
-    if None == news:
-        return template('error', {'error':'No News'});
-    url = '/news';
-    if channel:
-        url += '/'+channel;
-    return template('newsList', {
-        'url':url,
-        'query':urllib.parse.urlencode(request.query.decode(), encoding='UTF-8'),
-        'news':news,
-        'channel':channel,
-        'channelName':models.getNewsChannelName(channel),
-        'keyword':keyword,
-        'totalPages':totalPages,
-        'page':page,
-    });
-
-@route('/news/detail/<newsid:re:[0-9A-Za-z]+>')
-def newsDetail(newsid):
-    news = models.getNewsDetail(newsid);
-    if None == news:
-        return template('error', {'error':'No News'});
-    return template('newsDetail', {'news':news});
-
-@route('/news/channels')
-@view('newsChannelSel')
-def newsChannelSel():
-    return {'channelsAll':models.getNewsChannelList(True)};
-
-@route('/jokes')
-def jokes():
-    page = int(request.query.get('page', 1));
-    jokes, totalPages = models.getJokes(page);
-    if None == jokes:
-        return template('error', {'error':'No Jokes'});
-    return template('jokes', {'jokes':jokes, 'totalPages':totalPages, 'page':page});
-
-@route('/jokes/<jokeid:re:[0-9A-Za-z]+>')
-def jokeDetail(jokeid):
-    joke = models.getJokeDetail(jokeid);
-    if None == joke:
-        return template('error', {'error':'No Jokes'});
-    return template('jokeDetail', {'joke':joke});
 
 @route('/articles')
 def articles():

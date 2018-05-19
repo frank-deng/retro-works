@@ -16,11 +16,11 @@ articles = articles[(page-1)*PAGE_SIZE : (page)*PAGE_SIZE];
 %>
 	<head>
 		<meta charset='UTF-8'/>
-		<title>{{lang('My Space')}}</title>
+		<title>{{lang('Articles')}}</title>
 	</head>
 	<body>
 		<table width='100%'><tr>
-			<td width='50%'><h1>{{lang('My Space')}}</h1></td>
+			<td width='50%'><h1>{{lang('Articles')}}</h1></td>
 			<td align='right'><a href='/'>[{{lang('Back Home Page')}}]</a></td>
 		</tr></table>
 		<ul>

@@ -42,13 +42,10 @@ LANGDATA['zh-CN'] = {
         'trav' : '旅行指数：',
         'uv' : '紫外线指数：',
     },
-    
-    '_date_format' : '%Y年%m月%d日 %H时%M分',
+
+    '_date_format' : '%Y年%m月%d日',
     '_week_format' : ['星期一','星期二','星期三','星期四','星期五','星期六','星期日'],
-    
-    'News' : '新闻',
-    'Up To Date' : '最新资讯',
-    'Select Channel' : '选择频道',
+
     'More' : '更多',
     'No News' : '获取新闻失败',
     'No News, Please Reload' : '获取新闻失败，请刷新页面重试。',
@@ -86,7 +83,7 @@ LANGDATA['zh-CN'] = {
     'See Also' : '参见',
 
     'Failed to load article' : '文章加载失败',
-    'My Space' : '我的空间',
+    'Articles' : '文章列表',
 
     'Send Message' : '发短信',
     'Message Content' : '内容',
