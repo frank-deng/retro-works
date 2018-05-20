@@ -138,6 +138,10 @@ A simple site designed for console-based browser [w3m](http://w3m.sourceforge.ne
 
 ![Telnet 2](http://frank-deng.github.io/retro-works/screenshots/telnet-site/telnet2.png)
 
+![Telnet 3](http://frank-deng.github.io/retro-works/screenshots/telnet-site/telnet3.png)
+
+![Telnet 4](http://frank-deng.github.io/retro-works/screenshots/telnet-site/telnet4.png)
+
 ### Linux服务器端配置 Linux Server Configuration
 
 在`/etc/locale.gen`中加上`zh_CN.GB2312`，然后运行`sudo locale-gen`。  
