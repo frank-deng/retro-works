@@ -75,7 +75,7 @@ LANGDATA['zh-CN'] = {
     'zhesuan' : '中行折算价',
 
     'Dictionary' : '英汉词典',
-    '_about_dict' : 'Powered By: <a href=\'http://www.webxml.com.cn/\'>http://www.webxml.com.cn/</a>',
+    '_about_dict' : 'Powered By: http://www.webxml.com.cn/',
     'Query Dictionary' : '查词典',
     'Meaning' : '释义',
     'Not Found' : '未找到释义',
