@@ -3,7 +3,7 @@
 %from langpack import lang;
 	<head>
 		<meta charset='UTF-8'/>
-		<title>{{lang('Currency Exchange')}}</title>
+		<title>{{lang('Currency Exchange')}} - Powered By：易源接口</title>
 	</head>
 	<body>
 		<table width='100%'><tr>

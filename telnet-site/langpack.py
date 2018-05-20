@@ -1,6 +1,6 @@
 LANGDATA = {};
 LANGDATA['zh-CN'] = {
-    'About' : 'Powered by: <a href="http://www.showapi.com">易源接口</a>&nbsp;<a href="http://www.heweather.com">和风全球天气</a>',
+    'About' : 'Powered by: 易源接口&nbsp;和风全球天气',
     '_sep' : '｜',
     '_point' : '·',
     

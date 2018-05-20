@@ -3,6 +3,9 @@
 <%
 import datetime
 from langpack import lang;
+now = datetime.datetime.now();
+dateStr = now.strftime(lang('_date_format'));
+weekStr = lang('_week_format')[now.weekday()];
 %>
 	<head>
 		<meta charset='UTF-8'/>
@@ -11,8 +14,7 @@ from langpack import lang;
 	<body>
 		<table width='100%'>
 			<tr>
-% now = datetime.datetime.now();
-				<td width='40%'>{{now.strftime(lang('_date_format'))}}&nbsp;{{lang('_week_format')[now.weekday()]}}</td>
+				<td width='40%'>{{dateStr}}&nbsp;{{weekStr}}</td>
 				<td width='60%' align='right'>｜<a href='/dict'>{{lang('Dictionary')}}</a>｜<a href='/currency'>{{lang('Currency Exchange')}}</a>｜</td>
 			</tr>
 			<tr><td colspan='2'>
@@ -30,13 +32,12 @@ from langpack import lang;
 				<a href='weather/setcity.do'>[{{lang('Change City')}}]</a>
 			</td></tr>
 			<tr><td colspan='2'>
-				<hr/><div><b>{{lang('Articles')}}</b>&nbsp;<a href='/articles'>{{lang('More')}}&gt;&gt;</a></div>
-				<ul>
+				<b><hr/></b><ul>
 % for a in articles:
 					<li><a href='/article/{{a['id']}}'>{{a['title']}}</a></li>
 % end
 				</ul>
-				<hr/><div>{{!lang('About')}}</div>
+				<div><a href='/articles'><b>更多文章&gt;&gt;</b></a></div>
 			</td></tr>
 		</table>
 	</body>

@@ -167,7 +167,10 @@ def getArticles():
     for fpath in fileList:
         title = None;
         with open(fpath) as fp:
-            title = re.sub(r'^#+\s*', '', fp.readlines()[0].strip());
+            try:
+                title = re.sub(r'^#+\s*', '', fp.readlines()[0].strip());
+            except Exception as e:
+                print(e);
         if None == title:
             continue;
         data['content'].append({
