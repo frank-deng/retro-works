@@ -1,5 +1,6 @@
 LANGDATA = {};
 LANGDATA['zh-CN'] = {
+    '_title_spacer': '&gt;'+'&nbsp;'*80,
     'About' : 'Powered by: 易源接口&nbsp;和风全球天气',
     '_sep' : '｜',
     '_point' : '·',

@@ -33,7 +33,7 @@ def index():
 
     return {
         'weather':weatherInfo.get(),
-        'articles':articles.get()['content'][0:16],
+        'articles':articles.get()['content'][0:17],
     };
 
 @route('/weather/detail.do')

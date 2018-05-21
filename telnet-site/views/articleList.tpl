@@ -16,7 +16,7 @@ articles = articles[(page-1)*PAGE_SIZE : (page)*PAGE_SIZE];
 %>
 	<head>
 		<meta charset='UTF-8'/>
-		<title>{{lang('Articles')}}</title>
+		<title>{{lang('Articles')}}{{!lang('_title_spacer')}}</title>
 	</head>
 	<body>
 		<table width='100%'><tr>

@@ -3,7 +3,7 @@
 % from langpack import lang;
 	<head>
 		<meta charset='UTF-8'/>
-		<title>{{title}}</title>
+		<title>{{title}}{{!lang('_title_spacer')}}</title>
 	</head>
 	<body>{{!article}}</body>
 </html>

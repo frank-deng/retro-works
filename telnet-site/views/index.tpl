@@ -9,7 +9,7 @@ weekStr = lang('_week_format')[now.weekday()];
 %>
 	<head>
 		<meta charset='UTF-8'/>
-		<title>{{lang('Index')}}</title>
+		<title>{{lang('Index')}} - {{dateStr}}&nbsp;{{weekStr}}{{!lang('_title_spacer')}}</title>
 	</head>
 	<body>
 		<table width='100%'>
@@ -30,16 +30,15 @@ weekStr = lang('_week_format')[now.weekday()];
 {{lang('No Weather Information')}}
 % end
 				<a href='weather/setcity.do'>[{{lang('Change City')}}]</a>
-			</td></tr>
-			<tr><td colspan='2'>
-				<b><hr/></b><ul>
-% for a in articles:
-					<li><a href='/article/{{a['id']}}'>{{a['title']}}</a></li>
-% end
-				</ul>
-				<div><a href='/articles'><b>更多文章&gt;&gt;</b></a></div>
+				<b><hr/></b>
 			</td></tr>
 		</table>
+		<ul>
+% for a in articles:
+			<li><a href='/article/{{a['id']}}'>{{a['title']}}</a></li>
+% end
+		</ul>
+		<div><a href='/articles'><b>更多文章&gt;&gt;</b></a></div>
 	</body>
 </html>
 

@@ -3,7 +3,7 @@
 % from langpack import lang;
 	<head>
 		<meta charset='UTF-8'/>
-		<title>{{lang('Dictionary')}} - {{lang('_about_dict')}}</title>
+		<title>{{lang('Dictionary')}} - {{lang('_about_dict')}}{{!lang('_title_spacer')}}</title>
 	</head>
 	<body>
 		<table width='100%'><tr>
