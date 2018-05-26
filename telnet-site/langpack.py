@@ -53,7 +53,7 @@ LANGDATA['zh-CN'] = {
     'No Channel Info, Please Reload' : '获取频道信息失败，请刷新页面重试。',
     'Prev Page' : '上一页',
     'Next Page' : '下一页',
-    '_jump_page' : '共%s页&nbsp;到第%s页',
+    '_jump_page' : '第%d页&nbsp;共%d页&nbsp;到第%s页',
     'Search' : '搜索',
     
     'Jokes Collection' : '笑话大全',

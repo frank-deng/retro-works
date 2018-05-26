@@ -61,7 +61,7 @@ def pager(baseUrl, pagevar, total, cur):
         );
         result += ("<a href=\"%s\">"+lang('Next Page')+"&gt;</a>&nbsp;")%(urlNext);
     inputBox = "<input type='text' name='%s' maxlength='%d' size='%d' value='%d'/>"%(pagevar, len(str(total)), len(str(total)), cur);
-    result += lang('_jump_page')%(total, inputBox);
+    result += lang('_jump_page')%(cur, total, inputBox);
     if pagevar in query:
         del query[pagevar];
     result += "&nbsp;<input type='submit' value='"+lang('OK')+"'/>";
