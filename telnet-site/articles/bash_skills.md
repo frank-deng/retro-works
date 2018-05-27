@@ -12,6 +12,15 @@ Bash使用技巧
 
 `gui_program`是运行GUI程序相关的命令。
 
+也可以在`~/.bash_aliases`里添加以下内容：
+
+	function xexec(){
+		($@ &>/dev/null &)
+	}
+	complete -cf xexec
+
+然后就可以使用`xexec gui_program arguments`命令以后台方式运行GUI程序，并抑制标准输出和标准错误输出。
+
 ---
 
 从给定文件名中获取基本名和扩展名

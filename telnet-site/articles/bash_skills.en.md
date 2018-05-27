@@ -12,6 +12,15 @@ Execute GUI programs in background mode from terminal, and suppresses stdout and
 
 `gui_program` is the command you'd like to execute for the GUI program.
 
+You can also add the following code to `~/.bash_aliases`:
+
+	function xexec(){
+		($@ &>/dev/null &)
+	}
+	complete -cf xexec
+
+The use command `xexec gui_program arguments` to execute GUI programs in background mode from terminal with stdout and stderr suppressed.
+
 ---
 
 Extract basename and extension
