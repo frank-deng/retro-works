@@ -48,19 +48,14 @@ LANGDATA['zh-CN'] = {
     '_week_format' : ['星期一','星期二','星期三','星期四','星期五','星期六','星期日'],
 
     'More' : '更多',
-    'No News' : '获取新闻失败',
-    'No News, Please Reload' : '获取新闻失败，请刷新页面重试。',
-    'No Channel Info, Please Reload' : '获取频道信息失败，请刷新页面重试。',
     'Prev Page' : '上一页',
     'Next Page' : '下一页',
     '_jump_page' : '第%d页&nbsp;共%d页&nbsp;到第%s页',
+
     'Search' : '搜索',
-    
-    'Jokes Collection' : '笑话大全',
-    'No Jokes' : '木有笑话鸟～～',
-    'Prev One' : '上一个',
-    'Next One' : '下一个',
-    'No Jokes, Refresh Again' : '木有笑话鸟～～再刷一回吧～～',
+
+    'News': '最新资讯',
+    'No News' : '获取新闻失败',
     
     'Currency Exchange' : '汇率换算',
     'Exchange' : '兑换',
@@ -85,18 +80,7 @@ LANGDATA['zh-CN'] = {
 
     'Failed to load article' : '文章加载失败',
     'Articles' : '文章列表',
-
-    'Send Message' : '发短信',
-    'Message Content' : '内容',
-    'Send To' : '对方手机',
-    'Message Send Success' : '发送成功',
-    'Message Send Failed' : '发送失败',
-    'Send' : '发送',
-
-    'Movie Rank' : '电影票房排行榜',
-    'Daily Rank' : '　　单日票房',
-    'Weekend Rank' : '　　周末票房',
-    'Weekly Rank' : '　　单周票房',
+    'More Articles': '更多文章',
 };
 
 import config;

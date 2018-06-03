@@ -74,6 +74,21 @@ def currency():
         'amount':'',
     });
 
+@route('/news')
+def newsList():
+    page = int(request.query.get('page', 1));
+    data, total = models.getNewsList(page, config.PAGESIZE);
+    if (None == data):
+        return template('error', {'error':'No News'});
+    return template('newsList', {'newsList':data, 'page':page, 'total':total});
+
+@route('/news/<newsId:re:[0-9A-Za-z]+>')
+def newsDetail(newsId):
+    data = models.getNewsDetail(newsId);
+    if (None == data):
+        return template('error', {'error':'No News'});
+    return template('newsDetail', {'news':data});
+
 @route('/currency', method='POST')
 def currencyExchage():
     fromCurrency = request.forms.get('from');
@@ -128,5 +143,33 @@ def articleDetail(aid):
         return template('error', {'error':'Failed to load article'});
     return template('articleDetail', {'title':title, 'article':content});
 
-run(host=args.host, port=args.port);
+# Update news every 1 minute
+import threading, time, datetime, config;
+class ThreadNewsUpdate(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+    def stop(self):
+        self.running = False;
+    def run(self):
+        self.running = True;
+        self.timestamp = time.time();
+        models.updateNews();
+        print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Update News');
+        while self.running:
+            time.sleep(1);
+            timestamp = time.time();
+            if ((timestamp - self.timestamp) > config.NEWS_UPDATE_INTERVAL):
+                self.timestamp = timestamp;
+                models.updateNews();
+                print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Update News');
+        print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Stop updating news');
+
+try:
+    threadNewsUpdate = ThreadNewsUpdate();
+    threadNewsUpdate.start();
+    run(server='eventlet', host=args.host, port=args.port);
+except KeyboardInterrupt:
+    pass;
+finally:
+    threadNewsUpdate.stop();
 

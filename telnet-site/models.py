@@ -50,6 +50,50 @@ def showAPIFetchJSON(url, params = None):
     except KeyError:
         return None;
 
+def updateNews(page = 1, pageSize = 100):
+    global cache;
+    origData = showAPIFetchJSON('http://route.showapi.com/109-35', {
+        'page': int(page),
+        'maxResult': pageSize,
+        'needAllList': 1,
+    });
+    newsList = [];
+    if (None == origData):
+        return False;
+    idx = 0;
+    for news in origData['pagebean']['contentlist']:
+        # Filter news with no text content
+        contentList = [];
+        if (None == news.get('allList')):
+            continue;
+        for content in news['allList']:
+            if (isinstance(content, str)):
+                contentList.append(content.strip());
+        if (len(contentList) < 4):
+            continue;
+        newsData = {
+            'id': news['id'],
+            'title': news['title'].strip(),
+            'date': news['pubDate'],
+            'content': contentList,
+        };
+        newsList.append(newsData);
+        cache.set('news'+news['id'], newsData);
+        idx += 1;
+    cache.set('newsList', newsList);
+    return True;
+
+def getNewsList(page=1, pageSize=19):
+    global cache;
+    newsList = cache.get('newsList');
+    if (None == newsList):
+        return None, 0;
+    return newsList[pageSize*(page-1):pageSize*page], len(newsList);
+
+def getNewsDetail(newsId):
+    global cache;
+    return cache.get('news'+newsId);
+
 def getCurrencies():
     data = showAPIFetchJSON('http://route.showapi.com/105-30');
     if not data:
@@ -67,27 +111,6 @@ def doCurrencyExchange(f, t, a):
         return data['money'];
     except KeyError:
         return None;
-
-def getJokes(page = 1, size = config.PAGESIZE):
-    global cache;
-    data = showAPIFetchJSON('http://route.showapi.com/341-1', {'page':page,'maxResult':size});
-    if not data:
-        return None, None;
-    try:
-        for idx, content in enumerate(data['contentlist']):
-            jokeid = hashlib.md5((content['title']+content['text']+content['ct']).encode('UTF-8')).hexdigest();
-            data['contentlist'][idx]['id'] = jokeid;
-            text = data['contentlist'][idx]['text'];
-            if text.find('<') < 0 or text.find('>') < 0:
-            	data['contentlist'][idx]['text'] = text.replace('\\n', '<br/>').replace('\n', '<br/>').replace('\\r', '').replace('\r', '');
-            cache.set('joke'+jokeid, data['contentlist'][idx]);
-        return data['contentlist'],data['allPages'];
-    except KeyError:
-        return None, None;
-
-def getJokeDetail(jokeid):
-    global cache;
-    return cache.get('joke'+jokeid);
 
 def queryDictionary(word):
     http = httplib2.Http(timeout = config.REQUEST_TIMEOUT);

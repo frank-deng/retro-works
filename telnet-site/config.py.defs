@@ -6,3 +6,4 @@ REQUEST_TIMEOUT=7
 LANGUAGE='zh-CN';
 ARTICLES_PATH=os.path.dirname(os.path.realpath(__file__))+os.sep+'articles';
 PAGESIZE=19
+NEWS_UPDATE_INTERVAL=666
