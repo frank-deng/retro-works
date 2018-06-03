@@ -50,13 +50,16 @@ def showAPIFetchJSON(url, params = None):
     except KeyError:
         return None;
 
-def updateNews(page = 1, pageSize = 100):
+def updateNews(channel='', page = 1, pageSize = 100):
     global cache;
-    origData = showAPIFetchJSON('http://route.showapi.com/109-35', {
+    postData = {
         'page': int(page),
         'maxResult': pageSize,
         'needAllList': 1,
-    });
+    }
+    if (channel):
+        postData['channelId'] = channel;
+    origData = showAPIFetchJSON('http://route.showapi.com/109-35', postData);
     newsList = [];
     if (None == origData):
         return False;
@@ -68,7 +71,7 @@ def updateNews(page = 1, pageSize = 100):
             continue;
         for content in news['allList']:
             if (isinstance(content, str)):
-                contentList.append(content.strip());
+                contentList.append(content.strip().replace('•', '・'));
         if (len(contentList) < 4):
             continue;
         newsData = {
@@ -80,15 +83,15 @@ def updateNews(page = 1, pageSize = 100):
         newsList.append(newsData);
         cache.set('news'+news['id'], newsData);
         idx += 1;
-    cache.set('newsList', newsList);
+    cache.set('newsList'+channel, newsList);
     return True;
 
-def getNewsList(page=1, pageSize=19):
+def getNewsList(page=1, pageSize=19, channel=''):
     global cache;
-    newsList = cache.get('newsList');
+    newsList = cache.get('newsList'+channel);
     if (None == newsList):
         return None, 0;
-    return newsList[pageSize*(page-1):pageSize*page], len(newsList);
+    return newsList[(pageSize*(page-1)): (pageSize*page)], len(newsList);
 
 def getNewsDetail(newsId):
     global cache;

@@ -89,6 +89,14 @@ def newsDetail(newsId):
         return template('error', {'error':'No News'});
     return template('newsDetail', {'news':data});
 
+@route('/inews')
+def iNewsList():
+    page = int(request.query.get('page', 1));
+    data, total = models.getNewsList(page, config.PAGESIZE, '5572a108b3cdc86cf39001d1');
+    if (None == data):
+        return template('error', {'error':'No News'});
+    return template('iNewsList', {'newsList':data, 'page':page, 'total':total});
+
 @route('/currency', method='POST')
 def currencyExchage():
     fromCurrency = request.forms.get('from');
@@ -146,30 +154,34 @@ def articleDetail(aid):
 # Update news every 1 minute
 import threading, time, datetime, config;
 class ThreadNewsUpdate(threading.Thread):
-    def __init__(self):
+    def __init__(self, channel=''):
         threading.Thread.__init__(self)
+        self.__channel = channel;
     def stop(self):
-        self.running = False;
+        self.__running = False;
     def run(self):
-        self.running = True;
-        self.timestamp = time.time();
-        models.updateNews();
+        self.__running = True;
+        self.__timestamp = time.time();
+        models.updateNews(self.__channel);
         print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Update News');
-        while self.running:
+        while self.__running:
             time.sleep(1);
             timestamp = time.time();
-            if ((timestamp - self.timestamp) > config.NEWS_UPDATE_INTERVAL):
-                self.timestamp = timestamp;
-                models.updateNews();
+            if ((timestamp - self.__timestamp) > config.NEWS_UPDATE_INTERVAL):
+                self.__timestamp = timestamp;
+                models.updateNews(self.__channel);
                 print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Update News');
         print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Stop updating news');
 
 try:
     threadNewsUpdate = ThreadNewsUpdate();
     threadNewsUpdate.start();
+    threadNewsUpdate2 = ThreadNewsUpdate('5572a108b3cdc86cf39001d1');
+    threadNewsUpdate2.start();
     run(server='eventlet', host=args.host, port=args.port);
 except KeyboardInterrupt:
     pass;
 finally:
     threadNewsUpdate.stop();
+    threadNewsUpdate2.stop();
 

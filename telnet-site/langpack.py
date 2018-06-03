@@ -55,6 +55,7 @@ LANGDATA['zh-CN'] = {
     'Search' : '搜索',
 
     'News': '最新资讯',
+    'iNews': '互联网资讯',
     'No News' : '获取新闻失败',
     
     'Currency Exchange' : '汇率换算',
