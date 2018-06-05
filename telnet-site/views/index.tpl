@@ -14,8 +14,13 @@ weekStr = lang('_week_format')[now.weekday()];
 	<body>
 		<table width='100%'>
 			<tr>
-				<td width='40%'>{{dateStr}}&nbsp;{{weekStr}}</td>
-				<td width='60%' align='right'>｜<a href='/news'>{{lang('News')}}</a>｜<a href='/inews'>{{lang('iNews')}}</a>｜<a href='/dict'>{{lang('Dictionary')}}</a>｜<a href='/currency'>{{lang('Currency Exchange')}}</a>｜</td>
+				<td width='100%'>{{dateStr}}&nbsp;{{weekStr}}&nbsp;<!--
+					-->｜<a href='/news'>{{lang('News')}}</a><!--
+					-->｜<a href='/inews'>{{lang('iNews')}}</a><!--
+					-->｜<a href='/jokes'>{{lang('Jokes')}}</a><!--
+					-->｜<a href='/dict'>{{lang('Dictionary')}}</a><!--
+					-->｜<a href='/currency'>{{lang('Currency Exchange')}}</a><!--
+					-->｜</td>
 			</tr>
 			<tr><td colspan='2'>
 % if weather:

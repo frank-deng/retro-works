@@ -82,6 +82,11 @@ LANGDATA['zh-CN'] = {
     'Failed to load article' : '文章加载失败',
     'Articles' : '文章列表',
     'More Articles': '更多文章',
+
+    'Jokes': '来福岛笑话',
+    'No Jokes': '啊哦～木有笑话鸟～～',
+    'Prev One': '《上一个',
+    'Next One': '下一个》',
 };
 
 import config;

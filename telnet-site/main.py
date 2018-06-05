@@ -19,31 +19,17 @@ parser.add_argument(
 args = parser.parse_args();
 
 from bottle import route, run, view, template, request, response, redirect;
-import models, urllib;
-
-from multiprocessing.pool import ThreadPool;
-@route('/')
-@view('index')
-def index():
-    city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
-
-    pool = ThreadPool(processes=8);
-    weatherInfo = pool.apply_async(models.getWeatherInfo, (city,));
-    articles = pool.apply_async(models.getArticles);
-
-    return {
-        'weather':weatherInfo.get(),
-        'articles':articles.get()['content'][0:17],
-    };
+import models, util, config, urllib;
+timerNewsUpdate = None;
+timerNewsUpdate2 = None;
+timerJokesUpdate = None;
 
 @route('/weather/detail.do')
 def weatherDetail():
     city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
     weather = models.getWeatherInfo(city);
     if None != weather:
-        return template('weatherDetail', {
-            'weather':weather,
-        });
+        return template('weatherDetail', {'weather':weather,});
     else:
         return template('error', {'error':'Failed To Fetch Weather'});
 
@@ -151,37 +137,52 @@ def articleDetail(aid):
         return template('error', {'error':'Failed to load article'});
     return template('articleDetail', {'title':title, 'article':content});
 
-# Update news every 1 minute
-import threading, time, datetime, config;
-class ThreadNewsUpdate(threading.Thread):
+@route('/jokes')
+def showJokes():
+    jokes = models.getJokes();
+    page = int(request.query.get('page', 1));
+    if None == jokes:
+        return template('error', {'error':'No Jokes'});
+    return template('jokes', {'jokes':jokes, 'page':page});
+
+class UpdateNews:
     def __init__(self, channel=''):
-        threading.Thread.__init__(self)
         self.__channel = channel;
-    def stop(self):
-        self.__running = False;
     def run(self):
-        self.__running = True;
-        self.__timestamp = time.time();
         models.updateNews(self.__channel);
-        print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Update News');
-        while self.__running:
-            time.sleep(1);
-            timestamp = time.time();
-            if ((timestamp - self.__timestamp) > config.NEWS_UPDATE_INTERVAL):
-                self.__timestamp = timestamp;
-                models.updateNews(self.__channel);
-                print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Update News');
-        print('{0:%Y-%m-%dT%H:%M:%S}'.format(datetime.datetime.now()) + ' Stop updating news');
+
+class UpdateJokes:
+    def run(self):
+        models.updateJokes();
+
+@route('/')
+@view('index')
+def index():
+    global timerNewsUpdate, timerNewsUpdate2, timerJokesUpdate;
+    if (None == timerNewsUpdate):
+        timerNewsUpdate = util.ThreadInterval(UpdateNews(), config.NEWS_UPDATE_INTERVAL, 'Update News');
+        timerNewsUpdate.start();
+    if (None == timerNewsUpdate2):
+        timerNewsUpdate2 = util.ThreadInterval(UpdateNews('5572a108b3cdc86cf39001d1'), config.NEWS_UPDATE_INTERVAL, 'Update iNews');
+        timerNewsUpdate2.start();
+    if (None == timerJokesUpdate):
+        timerJokesUpdate = util.ThreadInterval(UpdateJokes(), config.JOKES_UPDATE_INTERVAL, 'Update Jokes');
+        timerJokesUpdate.start();
+    city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
+    return {
+        'weather':models.getWeatherInfo(city),
+        'articles':models.getArticles()['content'][0:17],
+    };
 
 try:
-    threadNewsUpdate = ThreadNewsUpdate();
-    threadNewsUpdate.start();
-    threadNewsUpdate2 = ThreadNewsUpdate('5572a108b3cdc86cf39001d1');
-    threadNewsUpdate2.start();
     run(server='eventlet', host=args.host, port=args.port);
 except KeyboardInterrupt:
     pass;
 finally:
-    threadNewsUpdate.stop();
-    threadNewsUpdate2.stop();
+    if (None != timerNewsUpdate):
+        timerNewsUpdate.stop();
+    if (None != timerNewsUpdate2):
+        timerNewsUpdate2.stop();
+    if (None != timerJokesUpdate):
+        timerJokesUpdate.stop();
 

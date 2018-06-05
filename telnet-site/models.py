@@ -115,6 +115,29 @@ def doCurrencyExchange(f, t, a):
     except KeyError:
         return None;
 
+def updateJokes():
+    global cache;
+    data = showAPIFetchJSON('http://route.showapi.com/107-32');
+    if (not data or None == data.get('list')):
+        return None;
+    result = [];
+    for item in data['list']:
+        lines = [];
+        for line in item['content'].split('<br/>'):
+            line = line.strip();
+            if (len(line)):
+                lines.append(line);
+        result.append({
+            'title': item['title'],
+            'content': lines,
+        });
+    cache.set('jokes', result);
+    return result;
+
+def getJokes():
+    global cache;
+    return cache.get('jokes');
+
 def queryDictionary(word):
     http = httplib2.Http(timeout = config.REQUEST_TIMEOUT);
     word = word.replace('\r', '').replace('\n', '');
