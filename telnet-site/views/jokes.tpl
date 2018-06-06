@@ -17,6 +17,8 @@ from langpack import lang;
 % end
 % if page < len(jokes):
 &nbsp;<a href='/jokes?page={{page+1}}'>{{lang('Next One')}}</a>
+% else:
+&nbsp;<span>　　　　</span>
 % end
 &nbsp;<a href='/'>[{{lang('Back Home Page')}}]&nbsp;</a>
 				</td>

@@ -14,7 +14,7 @@ weekStr = lang('_week_format')[now.weekday()];
 	<body>
 		<table width='100%'>
 			<tr>
-				<td width='100%' align='center'><!--
+				<td width='100%'>&nbsp;<!--
 					-->｜<a href='/news'>{{lang('News')}}</a><!--
 					-->｜<a href='/inews'>{{lang('iNews')}}</a><!--
 					-->｜<a href='/jokes'>{{lang('Jokes')}}</a><!--
