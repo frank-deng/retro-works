@@ -29,17 +29,17 @@ CLOSE #2
 
 OPEN "LPT3" FOR OUTPUT AS #1
 TX ("M10CU1,0KB1,0CL0CO" + n$(BG) + "B0,0,640,480")
-TX ("{=0%1@16,16}")
+TX ("{=0%1@12,12}")
 
 OPEN F$ FOR INPUT AS #2
-Y = 0 : TL = TL * 8
+Y = 0 : TL = TL * 6
 FOR I = 1 TO C
   INPUT #2, T$, D#
   TX ("{(" + n$(COL) + "}")
   CALL DrawText(0, Y, T$)
-  CALL DrawBar(TL + 1, Y, 639 - TL, D# / MAX#, D# / s#, D#)
-  IF (I MOD 27)<>0 OR I=L THEN
-    Y=Y+17
+  CALL DrawBar(TL + 2, Y, 639 - TL, D# / MAX#, D# / s#, D#)
+  IF (I MOD 38)<>0 OR I=L THEN
+    Y=Y+12
   ELSE
     TX ("{(" + n$(COL) + "}")
     CALL DrawText(0, 480-16, "请按任意键继续")
@@ -98,11 +98,11 @@ END SUB
 
 SUB DrawBar (x AS INTEGER, y AS INTEGER, w AS INTEGER, l AS SINGLE, pc AS DOUBLE, v as DOUBLE)
   SHARED COL, BG
-  TX ("CO" + n$(COL) + "B" + n$(x) + "," + n$(y) + "," + n$(FIX(x + w * l)) + "," + n$(y + 15))
+  TX ("CO" + n$(COL) + "B" + n$(x) + "," + n$(y) + "," + n$(FIX(x + w * l)) + "," + n$(y + 10))
   SN$ = nd$(v)+"（"+percent$(pc)+"）"
-  SNL = LEN(SN$) * 8
+  SNL = LEN(SN$) * 6 + 4
   IF l < .5 THEN
-    TX ("{(" + n$(COL) + "}"): CALL DrawText(x + w * l + 8, y, SN$)
+    TX ("{(" + n$(COL) + "}"): CALL DrawText(x + w * l + 4, y, SN$)
   ELSE
     TX ("{(" + n$(BG) + "}"): CALL DrawText(x + w * l - SNL, y, SN$)
   END IF
