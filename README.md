@@ -197,6 +197,12 @@ Convert video into format accepted by Windows 3.1
 
 	ffmpeg -i input.mp4 -c:v cinepak -c:a adpcm_ima_wav -vf scale=320:240 -ac 1 -ar 32000 -r 15 -y output.avi
 
+DOSBox使用的Autoexec命令，用于挂载原始硬盘镜像和软盘镜像  
+DOSBox autoexec command for mounting raw harddisk image and floppy image
+
+	@imgmount 0 /home/frank/.dosbox/floppy.img -fs none
+	@imgmount 2 /home/frank/.dosbox/dos620jp.img -fs none -t hdd -size 512,63,16,X
+
 
 ### 启用Linux的串口终端 Enable serial console under Linux
 
@@ -214,4 +220,12 @@ Permanently enable serial console on `/dev/ttyS0`:
 Check whether serial console is enabled on `/dev/ttyS0`:
 
     systemctl status serial-getty@ttyS0.service
+
+### 如何在Windows 3.x下安装S3显卡驱动 How to install S3 video driver for Windows 3.x
+
+安装Windows 3.x时使用标准VGA显示驱动，安装完成后在“Windows 设置程序”中更改显卡驱动。  
+Use the basic VGA driver for the initial install, then change the video driver using Windows Setup in the Main program group.
+
+安装显卡驱动时如果提示插入S3 Trio 64V Flat Mode Driver软盘，则此时需要将路径填写成`C:\WINDOWS\SYSTEM\`以完成显卡驱动的安装。  
+When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk, redirect the installer to `C:\WINDOWS\SYSTEM\` to complete the graphics driver install.
 
