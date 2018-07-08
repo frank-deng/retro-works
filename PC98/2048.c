@@ -506,7 +506,7 @@ void main(){
 		}
 	}
 	if (game.status){
-		beep(100, 500);
+		beep(100, 200);
 		while (ACTION_QUIT != getaction()){}
 	}
 	game2048_quit(&game);

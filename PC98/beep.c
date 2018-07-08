@@ -104,11 +104,11 @@ int main(){
 
 	enableTimer();
 	outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
-	while (tick <= 10){
+	while (tick <= 15){
 		_asm_c("\n\tHLT\n");
 	}
 	setfreq(1, 1000);
-	while (tick <= 20){
+	while (tick <= 30){
 		_asm_c("\n\tHLT\n");
 	}
 	disableTimer();
