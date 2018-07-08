@@ -139,8 +139,12 @@ int main(){
 
 	maxticks = (unsigned long)(minutes * 60.0 * 100);
 
+	outp(TMRMODE, TMR1MOD3);
+	setfreq(1, 2000);
 	outp(TMRMODE, TMR0MOD2);
 	set10msec(0);
+	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
+
 	enableTimer();
 	while (running && tick < maxticks){
 		_asm_c("\n\tHLT\n");
@@ -156,9 +160,6 @@ int main(){
 	disableTimer();
 
 	if (running){
-		outp(TMRMODE, TMR1MOD3);
-		setfreq(1, 2000);
-
 		tick = 0;
 		enableTimer();
 		while (running){
@@ -178,13 +179,13 @@ int main(){
 			}
 		}
 		disableTimer();
-
-		outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
-		outp(TMRMODE, TMR1MOD3);
-		setfreq(1, 2000);
 	}
 
 	putchar('\n');
+
+	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
+	outp(TMRMODE, TMR1MOD3);
+	setfreq(1, 2000);
 	outp(TMRMODE, TMR0MOD3);
 	setfreq(0, 2000);
 	outp(0x62, 0x4b);
