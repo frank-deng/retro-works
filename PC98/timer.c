@@ -61,8 +61,8 @@ static void set10msec(unsigned int timer){
 #define	PICPORT		0x00		/* interrupt controller (int 08h = master) */
 #define	EOI			0x20		/* end of interrupt */
 
-static void (far *OrgTimerVect)();
 static unsigned long tick = 0;
+static void (far *OrgTimerVect)();
 static unsigned char imr_m, imr_s;
 static void NewTimerVectMain() {
 	tick++;
@@ -125,10 +125,8 @@ action_t getaction(){
 }
 int main(){
 	float minutes;
-	unsigned int seconds, running = 1;
-
-	outp(TMRMODE, TMR0MOD2);
-	set10msec(0);
+	unsigned int running = 1;
+	unsigned long maxticks;
 
 	puts("\n  *** カウントダウンタイマー ***\n");
 	printf("時間（分）：");
@@ -137,14 +135,16 @@ int main(){
 	outp(0x62, 0x4b);
 	outp(0x60, 0x0f);
 
-	seconds = (unsigned int)(minutes * 60.0);
+	maxticks = (unsigned long)(minutes * 60.0 * 100);
 
+	outp(TMRMODE, TMR0MOD2);
+	set10msec(0);
 	enableTimer();
-	while (running && tick < seconds*100){
+	while (running && tick < maxticks){
 		_asm_c("\n\tHLT\n");
 		disableTimer();
 
-		showTime(seconds - tick/100);
+		showTime((maxticks - tick)/100);
 		if (ACTION_QUIT == getaction()) {
 			running = 0;
 		}
@@ -157,20 +157,20 @@ int main(){
 		outp(TMRMODE, TMR1MOD3);
 		setfreq(1, 2000);
 
+		tick = 0;
 		enableTimer();
 		while (running){
 			_asm_c("\n\tHLT\n");
-			disableTimer();
-
 			if (tick % 140 < 70) {
 				outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
 			} else {
 				outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 			}
+
+			disableTimer();
 			if (ACTION_QUIT == getaction()) {
 				running = 0;
 			}
-
 			enableTimer();
 		}
 		disableTimer();
@@ -181,6 +181,8 @@ int main(){
 	}
 
 	putchar('\n');
+	outp(TMRMODE, TMR0MOD3);
+	setfreq(0, 2000);
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
 	return 0;
