@@ -130,10 +130,10 @@ int main(){
 	outp(TMRMODE, TMR0MOD2);
 	set10msec(0);
 
-	puts("\n  *** ƒJƒEƒ“ƒgƒ_ƒEƒ“ƒ^ƒCƒ}[ ***\n");
-	printf("ŠÔi•ªjF");
+	puts("\n  *** ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³ã‚¿ã‚¤ãƒãƒ¼ ***\n");
+	printf("æ™‚é–“ï¼ˆåˆ†ï¼‰ï¼š");
 	scanf("%f", &minutes);
-	puts("\nEsc‚ğ‰Ÿ‚µ‚ÄƒVƒXƒeƒ€‚É–ß‚è‚Ü‚·");
+	puts("\nEscã‚’æŠ¼ã—ã¦ã‚·ã‚¹ãƒ†ãƒ ã«æˆ»ã‚Šã¾ã™");
 	outp(0x62, 0x4b);
 	outp(0x60, 0x0f);
 
