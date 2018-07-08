@@ -115,7 +115,9 @@ action_t getaction(){
 	}
 	switch (getch()){
 		case 0x1b:
-			action = ACTION_QUIT;
+			if (!kbhit()) {
+				action = ACTION_QUIT;
+			}
 		break;
 	}
 	while(kbhit()){
