@@ -142,14 +142,14 @@ int main(){
 	enableTimer();
 	while (running && tick < maxticks){
 		_asm_c("\n\tHLT\n");
-		disableTimer();
-
-		showTime((maxticks - tick)/100);
-		if (ACTION_QUIT == getaction()) {
-			running = 0;
+		if (0 == (tick & 0xF)) {
+			disableTimer();
+			showTime((maxticks - tick)/100);
+			if (ACTION_QUIT == getaction()) {
+				running = 0;
+			}
+			enableTimer();
 		}
-
-		enableTimer();
 	}
 	disableTimer();
 
@@ -167,11 +167,13 @@ int main(){
 				outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 			}
 
-			disableTimer();
-			if (ACTION_QUIT == getaction()) {
-				running = 0;
+			if (0 == (tick & 0xF)) {
+				disableTimer();
+				if (ACTION_QUIT == getaction()) {
+					running = 0;
+				}
+				enableTimer();
 			}
-			enableTimer();
 		}
 		disableTimer();
 
