@@ -23,6 +23,16 @@ Gabriele Cirulli's 2048 game for NEC PC-9800 Series.
 ![2048](https://frank-deng.github.io/retro-works/PC98/screenshots/2048_3.png)
 
 
+Countdown Timer
+---------------
+
+A simple countdown timer for NEC PC-9800 Series, using beep speaker for alarming.
+
+### Screenshots
+
+![Countdown Timer](https://frank-deng.github.io/retro-works/PC98/screenshots/timer.png)
+
+
 Sudoku Solver
 -------------
 
