@@ -439,7 +439,7 @@ static void beep(unsigned int freq){
 	outp(TMR1CLK, (int)(count&0x00ff));
 	outp(TMR1CLK, (int)(count>>8));
 	outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
-	while (tick <= 30){
+	while (tick <= 15){
 		_asm_c("\n\tHLT\n");
 	}
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
