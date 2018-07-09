@@ -24,6 +24,7 @@ static uint16_t far* vramattr = 0xA0002000;
 
 void clrscr();
 void initscr(){
+	putchar('\x1e');
 	inregs.x.dx = 0;
 	inregs.h.ah = 0x13;
 	int86y(0x18, &inregs, &outregs);
@@ -35,6 +36,7 @@ void endscr(){
 	clrscr();
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
+	putchar('\x1e');
 }
 void clrscr(){
 	far_memset((void far *)vram, 0, 4000);
@@ -359,18 +361,27 @@ static void beep(unsigned int freq){
 	unsigned int count, i;
 	if (BIOS_FLAG&SYSCLK_BIT) {				/* 8MHz/16MHz... */
 		count = (unsigned int)((double)COUNT8/(double)freq+0.5);
-	}
-	else {									/* 5MHz/10MHz... */
+	} else {								/* 5MHz/10MHz... */
 		count = (unsigned int)((double)COUNT5/(double)freq+0.5);
 	}
+	outp(TMRMODE, TMR1MOD3);
 	outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
 	outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
 
 	outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
-	for (i = 0; i < 20; i++){
+	for (i = 0; i < 50; i++){
 		_asm_c("\n\tHLT\n");
 	}
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
+
+	if (BIOS_FLAG&SYSCLK_BIT) {				/* 8MHz/16MHz... */
+		count = 998;
+	} else {								/* 5MHz/10MHz... */
+		count = 1229;
+	}
+	outp(TMRMODE, TMR1MOD3);
+	outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
+	outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
 }
 
 typedef enum _action_t{

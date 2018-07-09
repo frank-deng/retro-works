@@ -13,39 +13,6 @@
 #define	COUNT5		2457600L	/* timer clock freq.[Hz] at 5/10/20MHz */
 #define	COUNT8		1996800L	/* timer clock freq.[Hz] at 8/16MHz */
 
-static void setfreq(unsigned int timer, unsigned int freq){
-	unsigned int count;
-	if (BIOS_FLAG&SYSCLK_BIT) {				/* 8MHz/16MHz... */
-		count = (unsigned int)((double)COUNT8/(double)freq+0.5);
-	}
-	else {									/* 5MHz/10MHz... */
-		count = (unsigned int)((double)COUNT5/(double)freq+0.5);
-	}
-	if (timer) {
-		outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
-	} else {
-		outp(TMR0CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR0CLK, (int)(count>>8));			/* rate MSB */
-	}
-}
-
-static void set10msec(unsigned int timer){
-	unsigned int count;
-	if (BIOS_FLAG&SYSCLK_BIT) {
-		count = 19968;
-	} else {
-		count = 24576;
-	}
-	if (timer) {
-		outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
-	} else {
-		outp(TMR0CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR0CLK, (int)(count>>8));			/* rate MSB */
-	}
-}
-
 #define	IMR_M		0x02		/* IMR r/w port(master) */
 #define	TMRIMRBIT	0x01		/* timer IRQ mask bit */
 #define	IMR_S		0x0a		/* IMR r/w port(slave) */
@@ -58,8 +25,6 @@ static void set10msec(unsigned int timer){
 #define	EOI			0x20		/* end of interrupt */
 
 static unsigned long tick = 0;
-static void (far *OrgTimerVect)();
-static unsigned char imr_m, imr_s;
 static void NewTimerVectMain() {
 	tick++;
 	outp(PICPORT, EOI);
@@ -68,7 +33,27 @@ static void far NewTimerVect() {
 	NewTimerVectMain();
 	_asm_c("\n\tIRET\n");
 }
-static void enableTimer(){
+
+int main(){
+	unsigned int count;
+	void (far *OrgTimerVect)();
+	unsigned char imr_m, imr_s;
+
+	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
+		count = 998;
+	} else {					/* 5MHz/10MHz... */
+		count = 1229;
+	}
+
+	outp(TMRMODE, TMR0MOD2);
+	outp(TMR0CLK, (int)(count&0x00ff));
+	outp(TMR0CLK, (int)(count>>8));
+
+	outp(TMRMODE, TMR1MOD3);
+	outp(TMR1CLK, (int)(count&0x00ff));
+	outp(TMR1CLK, (int)(count>>8));
+
+	/* Enable Timer */
 	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
 	_asm_c("\n\tSTI\n");
@@ -81,8 +66,22 @@ static void enableTimer(){
 	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
 	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
 	_asm_c("\n\tSTI\n");
-}
-static void disableTimer(){
+	/* Enable Timer Finishend */
+
+	outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
+	while (tick <= 300){
+		_asm_c("\n\tHLT\n");
+	}
+	outp(TMR1CLK, (int)((count << 1)&0x00ff));
+	outp(TMR1CLK, (int)((count << 1)>>8));
+	while (tick <= 600){
+		_asm_c("\n\tHLT\n");
+	}
+	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
+	outp(TMR1CLK, (int)(count&0x00ff));
+	outp(TMR1CLK, (int)(count>>8));
+
+	/* Disable Timer */
 	_asm_c("\n\tCLI\n");
 	outp(IMR_M, imr_m);
 	outp(IMR_S, imr_s);
@@ -94,30 +93,9 @@ static void disableTimer(){
 	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
 	_asm_c("\n\tSTI\n");
-}
+	/* Disable Timer Finishend */
 
-int main(){
-	outp(TMRMODE, TMR0MOD2);
-	set10msec(0);
-	outp(TMRMODE, TMR1MOD3);
-	setfreq(1, 2000);
-
-	enableTimer();
-	outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
-	while (tick <= 15){
-		_asm_c("\n\tHLT\n");
-	}
-	setfreq(1, 1000);
-	while (tick <= 30){
-		_asm_c("\n\tHLT\n");
-	}
-	disableTimer();
-
-	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
-	outp(TMRMODE, TMR1MOD3);
-	setfreq(1, 2000);
 	outp(TMRMODE, TMR0MOD3);
-	setfreq(0, 2000);
 	return 0;
 }
 

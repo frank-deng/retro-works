@@ -17,39 +17,6 @@
 #define	COUNT5		2457600L	/* timer clock freq.[Hz] at 5/10/20MHz */
 #define	COUNT8		1996800L	/* timer clock freq.[Hz] at 8/16MHz */
 
-static void setfreq(unsigned int timer, unsigned int freq){
-	unsigned int count;
-	if (BIOS_FLAG&SYSCLK_BIT) {				/* 8MHz/16MHz... */
-		count = (unsigned int)((double)COUNT8/(double)freq+0.5);
-	}
-	else {									/* 5MHz/10MHz... */
-		count = (unsigned int)((double)COUNT5/(double)freq+0.5);
-	}
-	if (timer) {
-		outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
-	} else {
-		outp(TMR0CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR0CLK, (int)(count>>8));			/* rate MSB */
-	}
-}
-
-static void set10msec(unsigned int timer){
-	unsigned int count;
-	if (BIOS_FLAG&SYSCLK_BIT) {
-		count = 19968;
-	} else {
-		count = 24576;
-	}
-	if (timer) {
-		outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
-	} else {
-		outp(TMR0CLK, (int)(count&0x00ff));		/* rate LSB */
-		outp(TMR0CLK, (int)(count>>8));			/* rate MSB */
-	}
-}
-
 #define	IMR_M		0x02		/* IMR r/w port(master) */
 #define	TMRIMRBIT	0x01		/* timer IRQ mask bit */
 #define	IMR_S		0x0a		/* IMR r/w port(slave) */
@@ -102,7 +69,7 @@ static void disableTimer(){
 
 void showTime(unsigned int secRemain){
 	unsigned char min = secRemain / 60, sec = secRemain % 60;
-	printf("%02u:%02u\r", min, sec);
+	printf("\x0d %02u:%02u", min, sec);
 }
 typedef enum _action_t{
 	ACTION_NULL,
@@ -127,22 +94,35 @@ action_t getaction(){
 }
 int main(){
 	float minutes;
-	unsigned int running = 1;
+	unsigned int running = 1, counter, counter10ms;
 	unsigned long maxticks;
 
-	puts("\n  *** カウントダウンタイマー ***\n");
+	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
+		counter = 998;
+		counter10ms = 19968;
+	} else {					/* 5MHz/10MHz... */
+		counter = 1229;
+		counter10ms = 24576;
+	}
+
+	printf("\033[2J");
+	puts("\033[2;25H\033[21m*** カウントダウンタイマー ***\n\033[0m");
 	printf("時間（分）：");
 	scanf("%f", &minutes);
-	puts("\nEscを押してシステムに戻ります");
+	puts("\nEscを押してシステムに戻ります\n");
 	outp(0x62, 0x4b);
 	outp(0x60, 0x0f);
 
 	maxticks = (unsigned long)(minutes * 60.0 * 100);
 
 	outp(TMRMODE, TMR1MOD3);
-	setfreq(1, 2000);
+	outp(TMR1CLK, (int)(counter&0x00ff));
+	outp(TMR1CLK, (int)(counter>>8));
+
 	outp(TMRMODE, TMR0MOD2);
-	set10msec(0);
+	outp(TMR0CLK, (int)(counter10ms&0x00ff));
+	outp(TMR0CLK, (int)(counter10ms>>8));
+
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 
 	enableTimer();
@@ -184,10 +164,11 @@ int main(){
 	putchar('\n');
 
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
-	outp(TMRMODE, TMR1MOD3);
-	setfreq(1, 2000);
+
 	outp(TMRMODE, TMR0MOD3);
-	setfreq(0, 2000);
+	outp(TMR0CLK, (int)(counter&0x00ff));
+	outp(TMR0CLK, (int)(counter>>8));
+
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
 	return 0;
