@@ -37,6 +37,7 @@ void endscr(){
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
 	putchar('\x1e');
+	printf("\033[2J");
 }
 void clrscr(){
 	far_memset((void far *)vram, 0, 4000);
