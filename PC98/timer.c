@@ -39,6 +39,22 @@ static void far NewTimerVect() {
 	NewTimerVectMain();
 	_asm_c("\n\tIRET\n");
 }
+
+static unsigned int origCounter = 0;
+static void GetTimer() {
+	unsigned char lo, hi;
+	lo = inp(TMR0CLK);
+	hi = inp(TMR0CLK);
+	origCounter = hi;
+	origCounter <<= 8;
+	origCounter |= lo;
+	outp(PICPORT, EOI);
+}
+static void far GetTimerVect() {
+	GetTimer();
+	_asm_c("\n\tIRET\n");
+}
+
 static void enableTimer(){
 	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
@@ -66,10 +82,37 @@ static void disableTimer(){
 	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
 	_asm_c("\n\tSTI\n");
 }
+static unsigned int getOrigCounter(){
+	outp(TMRMODE, TMR0MOD2);
+
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
+	_asm_c("\n\tSTI\n");
+
+	OrgTimerVect = _dos_getvect(TMRINTVEC);
+	_dos_setvect(TMRINTVEC, GetTimerVect);
+
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
+	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
+	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
+	_asm_c("\n\tSTI\n");
+
+	while (!origCounter) {
+		_asm_c("\n\tHLT\n");
+	}
+
+	disableTimer();
+	return origCounter;
+}
 
 void showTime(unsigned int secRemain){
 	unsigned char min = secRemain / 60, sec = secRemain % 60;
-	printf("\x0d %02u:%02u", min, sec);
+	if (secRemain) {
+		printf("\x0d< %02u:%02u >", min, sec);
+	} else {
+		printf("\x0d\033[41m< %02u:%02u >", min, sec);
+	}
 }
 typedef enum _action_t{
 	ACTION_NULL,
@@ -94,7 +137,7 @@ action_t getaction(){
 }
 int main(){
 	float minutes;
-	unsigned int running = 1, counter, counter10ms;
+	unsigned int running = 1, counter, counter10ms, counterOrig;
 	unsigned long maxticks;
 
 	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
@@ -114,6 +157,8 @@ int main(){
 	outp(0x60, 0x0f);
 
 	maxticks = (unsigned long)(minutes * 60.0 * 100);
+
+	counterOrig = getOrigCounter();
 
 	outp(TMRMODE, TMR1MOD3);
 	outp(TMR1CLK, (int)(counter&0x00ff));
@@ -161,16 +206,15 @@ int main(){
 		disableTimer();
 	}
 
-	putchar('\n');
-
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 
 	outp(TMRMODE, TMR0MOD3);
-	outp(TMR0CLK, (int)(counter&0x00ff));
-	outp(TMR0CLK, (int)(counter>>8));
+	outp(TMR0CLK, (int)(counterOrig&0x00ff));
+	outp(TMR0CLK, (int)(counterOrig>>8));
 
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
+	puts("\033[0m");
 	return 0;
 }
 

@@ -358,31 +358,117 @@ int game2048_move_right(game2048_t* g){
 #define	PICPORT		0x00		/* interrupt controller (int 08h = master) */
 #define	EOI			0x20		/* end of interrupt */
 
-static void beep(unsigned int freq){
-	unsigned int count, i;
-	if (BIOS_FLAG&SYSCLK_BIT) {				/* 8MHz/16MHz... */
-		count = (unsigned int)((double)COUNT8/(double)freq+0.5);
-	} else {								/* 5MHz/10MHz... */
-		count = (unsigned int)((double)COUNT5/(double)freq+0.5);
-	}
-	outp(TMRMODE, TMR1MOD3);
-	outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
-	outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
+static unsigned long tick = 0;
+static void NewTimer() {
+	tick++;
+	outp(PICPORT, EOI);
+}
+static void far NewTimerVect() {
+	NewTimer();
+	_asm_c("\n\tIRET\n");
+}
 
+static unsigned int origCounter = 0;
+static void GetTimer() {
+	unsigned char lo, hi;
+	lo = inp(TMR0CLK);
+	hi = inp(TMR0CLK);
+	origCounter = hi;
+	origCounter <<= 8;
+	origCounter |= lo;
+	outp(PICPORT, EOI);
+}
+static void far GetTimerVect() {
+	GetTimer();
+	_asm_c("\n\tIRET\n");
+}
+static void beep(unsigned int freq){
+	unsigned int count;
+	void (far *OrgTimerVect)();
+	unsigned char imr_m, imr_s;
+
+	outp(TMRMODE, TMR0MOD2);
+
+	/* Enable Timer */
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
+	_asm_c("\n\tSTI\n");
+
+	OrgTimerVect = _dos_getvect(TMRINTVEC);
+	_dos_setvect(TMRINTVEC, GetTimerVect);
+
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
+	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
+	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
+	_asm_c("\n\tSTI\n");
+	/* Enable Timer Finishend */
+
+	/* Get clock */
+	while (!origCounter) {
+		_asm_c("\n\tHLT\n");
+	}
+	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
+		count = 19968;
+	} else {					/* 5MHz/10MHz... */
+		count = 24576;
+	}
+	outp(TMR0CLK, (int)(count&0x00ff));
+	outp(TMR0CLK, (int)(count>>8));
+	/* Get clock end */
+
+	/* Switch Timer */
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
+	_asm_c("\n\tSTI\n");
+
+	_dos_setvect(TMRINTVEC, NewTimerVect);
+
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
+	_asm_c("\n\tSTI\n");
+	/* Enable Timer Finishend */
+
+	/* Play beep sound */
+	outp(TMRMODE, TMR1MOD3);
+	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
+		count = 19968;
+	} else {					/* 5MHz/10MHz... */
+		count = 24576;
+	}
+	outp(TMR1CLK, (int)(count&0x00ff));
+	outp(TMR1CLK, (int)(count>>8));
 	outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
-	for (i = 0; i < 50; i++){
+	while (tick <= 30){
 		_asm_c("\n\tHLT\n");
 	}
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
-
-	if (BIOS_FLAG&SYSCLK_BIT) {				/* 8MHz/16MHz... */
+	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
 		count = 998;
-	} else {								/* 5MHz/10MHz... */
+	} else {					/* 5MHz/10MHz... */
 		count = 1229;
 	}
-	outp(TMRMODE, TMR1MOD3);
-	outp(TMR1CLK, (int)(count&0x00ff));		/* rate LSB */
-	outp(TMR1CLK, (int)(count>>8));			/* rate MSB */
+	outp(TMR1CLK, (int)(count&0x00ff));
+	outp(TMR1CLK, (int)(count>>8));
+	/* Play beep sound end */
+
+	/* Disable Timer */
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, imr_m);
+	outp(IMR_S, imr_s);
+	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
+	_asm_c("\n\tSTI\n");
+
+	_dos_setvect(TMRINTVEC, OrgTimerVect);
+
+	_asm_c("\n\tCLI\n");
+	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
+	_asm_c("\n\tSTI\n");
+	/* Disable Timer Finishend */
+
+	outp(TMRMODE, TMR0MOD2);
+	outp(TMR0CLK, (int)(origCounter&0x00ff));
+	outp(TMR0CLK, (int)(origCounter>>8));
 }
 
 typedef enum _action_t{
