@@ -30,7 +30,9 @@ A simple countdown timer for NEC PC-9800 Series, using beep speaker for alarming
 
 ### Screenshots
 
-![Countdown Timer](https://frank-deng.github.io/retro-works/PC98/screenshots/timer.png)
+![Countdown Timer](https://frank-deng.github.io/retro-works/PC98/screenshots/timer1.png)
+
+![Countdown Timer](https://frank-deng.github.io/retro-works/PC98/screenshots/timer2.png)
 
 
 Sudoku Solver
