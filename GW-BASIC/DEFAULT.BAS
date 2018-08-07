@@ -1,5 +1,0 @@
-10 WIDTH "SCRN:",40:LOCATE 1,1,1,0,7
-20 KEY 1,"":KEY 2,"":KEY 3,"":KEY 4,"":KEY 5,"":KEY 6,"":KEY 7,"":KEY 8,"":KEY 9,"":KEY 10,""
-30 PRINT "GW-BASIC 2.00"
-40 PRINT USING "#####";FRE(0);:PRINT " Bytes free"
-50 NEW
