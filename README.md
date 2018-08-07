@@ -48,6 +48,9 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 条形图 Bar Chart  
 ![Bar Chart](http://frank-deng.github.io/retro-works/screenshots/barchart.png)
 
+饼图 Pie Chart  
+![Pie Chart](http://frank-deng.github.io/retro-works/screenshots/piechart.png)
+
 求1000以内的质数 Get prime numbers under 1000  
 ![Prime Numbers](http://frank-deng.github.io/retro-works/screenshots/primes.png)
 
@@ -56,9 +59,6 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 
 绘制几何形状 Drawing Geometric Shapes  
 ![Shapes](http://frank-deng.github.io/retro-works/screenshots/Shapes.png)
-
-饼图 Pie Chart  
-![Pie Chart](http://frank-deng.github.io/retro-works/screenshots/piechart.png)
 
 数独求解程序 Sudoku Solver  
 ![Sudoku](http://frank-deng.github.io/retro-works/screenshots/sudoku.png)
