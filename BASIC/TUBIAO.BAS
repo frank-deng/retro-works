@@ -68,8 +68,8 @@ FOR I=1 TO C
     CALL DrawPie(430, 240, FIX(K1#/S#*360), FIX(K2#/S#*360), COL)
     K1#=K1#+VALUE#(I):K2#=K2#+VALUE#(I+1)
   ENDIF
-  TX ("CO"+n$(COL)+"B5,"+n$(I*LH+TOP)+","+n$(5+15)+","+n$(I*LH+TOP+15))
-  CALL DrawText(5+16+6,I*LH+TOP,T$+"£¨"+percent$(D#/S#)+"£©")
+  TX ("CO"+n$(COL)+"B5,"+n$((I-1)*LH+TOP)+","+n$(5+15)+","+n$((I-1)*LH+TOP+15))
+  CALL DrawText(5+16+6,(I-1)*LH+TOP,T$+"£¨"+percent$(D#/S#)+"£©")
 NEXT I
 
 WHILE INPUT$(1) = "": WEND
@@ -110,7 +110,7 @@ END FUNCTION
 FUNCTION percent$(A AS DOUBLE)
   p# = FIX(A * 100000 + 0.5) / 1000
   pn$ = nd$(p#):if p#<1 and p#>0 then pn$ = "0"+pn$
-  percent$ = mid$(pn$, 1, len(str$(fix(p#)))+3) + "%"
+  percent$ = mid$(pn$, 1, len(str$(fix(p#)))+3) + "£¥"
 END FUNCTION
 
 SUB TestTX
