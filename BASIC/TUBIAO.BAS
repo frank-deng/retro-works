@@ -13,7 +13,7 @@ DEFINT A-Z: COMMON COL, BG, RADIUS
 TestTX
 
 ' Prepare data
-s# = 0: MAX# = 0: C = 0: TL = 0
+S# = 0: MAX# = 0: C = 0: TL = 0
 COL = 15: BG = 0: RADIUS = 200
 DIM LABEL$(2048),VALUE#(2048)
 
@@ -24,7 +24,7 @@ WHILE NOT EOF(2)
   TL0 = LEN(T$)
   IF TL0 > TL THEN TL = TL0
   IF D# > MAX# THEN MAX# = D#
-  s# = s# + D#: C = C + 1
+  S# = S# + D#: C = C + 1
   LABEL$(C)=T$:VALUE#(C)=D#
 WEND
 CLOSE #2
@@ -38,7 +38,7 @@ FOR I = 1 TO C
   T$=LABEL$(I):D#=VALUE#(I)
   TX ("{(" + n$(COL) + "}")
   CALL DrawText(0, Y, T$)
-  CALL DrawBar(TL + 2, Y, 639 - TL, D# / MAX#, D# / s#, D#)
+  CALL DrawBar(TL + 2, Y, 639 - TL, D# / MAX#, D# / S#, D#)
   IF (I MOD 38)<>0 OR I=L THEN
     Y=Y+12
   ELSE
@@ -55,30 +55,21 @@ IF C>27 THEN TX ("KB1,1M3CU1,1"):CLOSE:END
 ' Start drawing pie chart
 TX ("CL0CO"+n$(BG)+"B0,460,640,480CO7")
 
-SANGLE = 0
+K1#=0: K2#=VALUE#(1)
+TX ("{(15@16,16}")
+LH = 18: TOP = (480-C*LH)/2
 FOR I=1 TO C
   T$=LABEL$(I):D#=VALUE#(I)
   IF I=C THEN
     COL = 1
-    ANGLE=360
+    CALL DrawPie(430, 240, FIX(K1#/S#*360), 360, 1)
   ELSE
     COL = ((I-1) mod 13)+2
-    ANGLE = SANGLE+FIX(D#/S#*360)
+    CALL DrawPie(430, 240, FIX(K1#/S#*360), FIX(K2#/S#*360), COL)
+    K1#=K1#+VALUE#(I):K2#=K2#+VALUE#(I+1)
   ENDIF
-  CALL DrawPie(430, 240, SANGLE, ANGLE, COL)
-  SANGLE=ANGLE
-NEXT I
-CALL DrawPie(430, 240, SANGLE, 360, 1)
-
-TX ("{(15@16,16}")
-LH = 18
-TOP = (480-C*LH)/2
-FOR I=0 TO C-1
-  T$=LABEL$(I):D#=VALUE#(I)
-  COL = (I mod 13)+2
-  IF I=C-1 THEN COL = 1
-  TX ("CO"+n$(COL)+"B5,"+n$(i*LH+TOP)+","+n$(5+15)+","+n$(i*LH+TOP+15))
-  CALL DrawText(5+16+6,I*LH+TOP,T$+"£¨"+percent$(D#/s#)+"£©")
+  TX ("CO"+n$(COL)+"B5,"+n$(I*LH+TOP)+","+n$(5+15)+","+n$(I*LH+TOP+15))
+  CALL DrawText(5+16+6,I*LH+TOP,T$+"£¨"+percent$(D#/S#)+"£©")
 NEXT I
 
 WHILE INPUT$(1) = "": WEND
