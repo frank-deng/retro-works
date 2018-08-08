@@ -15,6 +15,7 @@ TestTX
 ' Prepare data
 s# = 0: MAX# = 0: C = 0: TL = 0
 COL = 15: BG = 0: RADIUS = 200
+DIM LABEL$(2048),VALUE#(2048)
 
 INPUT "请输入文件名：", F$
 OPEN F$ FOR INPUT AS #2
@@ -24,6 +25,7 @@ WHILE NOT EOF(2)
   IF TL0 > TL THEN TL = TL0
   IF D# > MAX# THEN MAX# = D#
   s# = s# + D#: C = C + 1
+  LABEL$(C)=T$:VALUE#(C)=D#
 WEND
 CLOSE #2
 
@@ -31,10 +33,9 @@ OPEN "LPT3" FOR OUTPUT AS #1
 TX ("M10CU1,0KB1,0CL0CO" + n$(BG) + "B0,0,640,480")
 TX ("{=0%1@12,12}")
 
-OPEN F$ FOR INPUT AS #2
 Y = 0 : TL = TL * 6
 FOR I = 1 TO C
-  INPUT #2, T$, D#
+  T$=LABEL$(I):D#=VALUE#(I)
   TX ("{(" + n$(COL) + "}")
   CALL DrawText(0, Y, T$)
   CALL DrawBar(TL + 2, Y, 639 - TL, D# / MAX#, D# / s#, D#)
@@ -47,7 +48,6 @@ FOR I = 1 TO C
     TX ("CL0CO" + n$(BG) + "B0,400,640,480CO7")
   END IF
 NEXT I
-CLOSE #2
 
 WHILE INPUT$(1) = "": WEND
 IF C>27 THEN TX ("KB1,1M3CU1,1"):CLOSE:END
@@ -55,35 +55,31 @@ IF C>27 THEN TX ("KB1,1M3CU1,1"):CLOSE:END
 ' Start drawing pie chart
 TX ("CL0CO"+n$(BG)+"B0,460,640,480CO7")
 
-OPEN F$ FOR INPUT AS #2
 SANGLE = 0
 FOR I=1 TO C
-  INPUT #2, T$, D#
+  T$=LABEL$(I):D#=VALUE#(I)
   IF I=C THEN
     COL = 1
     ANGLE=360
   ELSE
-    COL = (I mod 13)+1
+    COL = ((I-1) mod 13)+2
     ANGLE = SANGLE+FIX(D#/S#*360)
   ENDIF
   CALL DrawPie(430, 240, SANGLE, ANGLE, COL)
   SANGLE=ANGLE
 NEXT I
-CLOSE #2
 CALL DrawPie(430, 240, SANGLE, 360, 1)
 
 TX ("{(15@16,16}")
 LH = 18
 TOP = (480-C*LH)/2
-OPEN F$ FOR INPUT AS #2
 FOR I=0 TO C-1
-  INPUT #2, T$, D#
+  T$=LABEL$(I):D#=VALUE#(I)
   COL = (I mod 13)+2
   IF I=C-1 THEN COL = 1
   TX ("CO"+n$(COL)+"B5,"+n$(i*LH+TOP)+","+n$(5+15)+","+n$(i*LH+TOP+15))
   CALL DrawText(5+16+6,I*LH+TOP,T$+"（"+percent$(D#/s#)+"）")
 NEXT I
-CLOSE #2
 
 WHILE INPUT$(1) = "": WEND
 TX ("KB1,1M3CU1,1")
@@ -120,8 +116,10 @@ FUNCTION nd$ (A AS DOUBLE)
 nd$ = LTRIM$(RTRIM$(STR$(A)))
 END FUNCTION
 
-FUNCTION percent$ (A AS DOUBLE)
-  percent$ = n$(FIX(A * 100)) + "." + n$(FIX(A * 10000) MOD 100) + "％"
+FUNCTION percent$(A AS DOUBLE)
+  p# = FIX(A * 100000 + 0.5) / 1000
+  pn$ = nd$(p#):if p#<1 and p#>0 then pn$ = "0"+pn$
+  percent$ = mid$(pn$, 1, len(str$(fix(p#)))+3) + "%"
 END FUNCTION
 
 SUB TestTX
