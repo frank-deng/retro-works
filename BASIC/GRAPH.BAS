@@ -26,35 +26,21 @@ LT=LT*8:W=638-LT
 OPEN F$ FOR INPUT AS #1
 FOR I=1 TO L
   INPUT #1,T$,D#
-
-  LOCATE 60,1,0:PRINT T$;TAB(79);
-  GET (0,472)-(LT,479),G:PUT (0,Y),G,PSET
-
-  K!=D#/M#:LINE (LT+1,Y-1)-(K!*W+LT+1,Y+7),,BF
-
-  LOCATE 60,1,0
-  SV$ = LTRIM$(RTRIM$(STR$(D#))) + " (" + percent$(D#/S#) + ")"
-  PRINT SV$;TAB(79);
-  GET (0,472)-(LEN(SV$)*8,479),G
-  IF K!>0.5 THEN
-    PUT (K!*W+LT-LEN(SV$)*8,Y),G,PRESET
-  ELSE
-    PUT (K!*W+LT+8,Y),G,PSET
-  END IF
-  IF (I MOD 47)<>0 OR I=L THEN
-    Y=Y+10
+  LOCATE Y,1,0:PRINT T$;
+  K!=D#/M#:LINE (LT+1,(Y-1)*8)-(K!*W+LT+1,(Y-1)*8+6),,BF
+  IF (I MOD 59)<>0 OR I=L THEN
+    Y=Y+1
   ELSE
     LOCATE 60,1,0:PRINT "Press any key to continue";TAB(79);
     WHILE INPUT$(1)="":WEND:CLS:Y=1
   END IF
 NEXT I
 CLOSE #1
-LOCATE 60,1,0:PRINT TAB(79);
 WHILE INPUT$(1)="":WEND:CLS
-IF L>47 THEN SCREEN 0:END
+IF L>60 THEN SCREEN 0:END
 
 OPEN F$ FOR INPUT AS #1
-SANGLE# = 0: 
+SANGLE# = 0: Y=(60-L)/2
 FOR I=1 TO L
   INPUT #1,T$,D#
   IF I = L THEN
@@ -65,26 +51,9 @@ FOR I=1 TO L
     CALL DRAWPIE(430, 240, 200, SANGLE#, ANGLE#, COL)
     SANGLE#=ANGLE#
   END IF
-NEXT I
-CLOSE #1
-
-OPEN F$ FOR INPUT AS #1
-Y=(480-10*L)/2
-FOR I=1 TO L
-  INPUT #1,T$,D#
-  IF I = L THEN
-    COL = 1
-  ELSE
-    COL = (I mod 14)+1
-  END IF
-  LOCATE 60,1,0
-  SV$=T$+" ("+percent$(D#/S#)+")"
-  PRINT SV$;TAB(79);
-  GET (0,472)-(LEN(SV$)*8,479),G
-  LOCATE 60,1,0:PRINT TAB(79);
-  PUT (16,Y+1),G,PSET
-  LINE (4,Y)-(12,Y+8),COL,BF
-  Y=Y+10
+  LOCATE Y+1,2,0:SV$=T$+" ("+percent$(D#/S#)+")":PRINT SV$;
+  LINE (0,Y*8)-(6,Y*8+6),COL,BF
+  Y=Y+1
 NEXT I
 CLOSE #1
 WHILE INPUT$(1)="":WEND:CLS:SCREEN 0:END
