@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from BLEllena import BLEllena;
-import time;
+import cv2, time;
 
 def writePpm(fname, pixbuf):
     with open(fname, 'wb') as f:
