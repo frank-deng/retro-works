@@ -18,6 +18,8 @@ class WindowGrabber:
         self.wnckWindow = wnckWindow;
         self.window = GdkX11.X11Window.foreign_new_for_display(self.screen, self.wnckWindow.get_xid());
         (self.x, self.y, self.w, self.h) = self.window.get_geometry();
+        self.y = self.h - 400;
+        self.h = 400;
 
     def capture(self):
         return Gdk.pixbuf_get_from_window(self.window, self.x, self.y, self.w, self.h);
