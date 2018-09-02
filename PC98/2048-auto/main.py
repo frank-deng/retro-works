@@ -41,6 +41,11 @@ if __name__ == '__main__':
     }
 
     grabber2048 = Grabber2048();
+    if None != grabber2048.getBoard():
+        offline = True;
+        timeout = 5;
+        print('Please switch to game window in %s seconds'%timeout);
+        time.sleep(timeout);
     try:
         while True:
             board = grabber2048.getBoard();
@@ -58,7 +63,7 @@ if __name__ == '__main__':
                 print('Game Over');
                 break;
             kbd.tap_key(keyOper[move]);
-            time.sleep(1/60);
+            time.sleep(0.05);
     except KeyboardInterrupt:
         pass;
     exit(0);
