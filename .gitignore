@@ -3,6 +3,7 @@ __pycache__
 *.o
 *.COM
 *.com
+*.so
 guessnum
 guessnum.h
 DOC
