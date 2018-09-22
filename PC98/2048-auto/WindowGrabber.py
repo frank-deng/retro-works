@@ -1,3 +1,4 @@
+# Install requirements: apt-get install gir1.2-wnck-3.0 python3-gi
 import gi, re;
 gi.require_version('Wnck', '3.0');
 from gi.repository import Wnck, Gdk, GdkX11;
