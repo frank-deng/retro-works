@@ -11,8 +11,10 @@ from gi.repository import Wnck, Gdk, GdkX11;
 # Get DOSBox-X window
 windowMatch = r'DOSBox-X';
 dosboxWindow = None;
+time.sleep(0.2);
 wnckScreen = Wnck.Screen.get_default();
 wnckScreen.force_update();
+time.sleep(0.2);
 for win in wnckScreen.get_windows():
     if re.match(windowMatch, win.get_name()):
         dosboxWindow = win;
