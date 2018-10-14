@@ -25,25 +25,33 @@
 #define	EOI			0x20		/* end of interrupt */
 
 static unsigned long tick = 0;
-void (interrupt far *OrgTimerVect)();
-static void interrupt far NewTimerVect() {
+static void NewTimer() {
 	tick++;
-	(OrgTimerVect)();
+	outp(PICPORT, EOI);
+}
+static void far NewTimerVect() {
+	NewTimer();
+	_asm_c("\n\tIRET\n");
 }
 
 static unsigned int origCounter = 0;
-static void interrupt far GetTimerVect() {
+static void GetTimer() {
 	unsigned char lo, hi;
 	lo = inp(TMR0CLK);
 	hi = inp(TMR0CLK);
 	origCounter = hi;
 	origCounter <<= 8;
 	origCounter |= lo;
-	(OrgTimerVect)();
+	outp(PICPORT, EOI);
+}
+static void far GetTimerVect() {
+	GetTimer();
+	_asm_c("\n\tIRET\n");
 }
 
 int main(){
 	unsigned int count;
+	void (far *OrgTimerVect)();
 	unsigned char imr_m, imr_s;
 
 	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
@@ -55,38 +63,38 @@ int main(){
 	outp(TMRMODE, TMR0MOD2);
 
 	/* Enable Timer */
-	asm { CLI }
+	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
-	asm { STI }
+	_asm_c("\n\tSTI\n");
 
-	OrgTimerVect = getvect(TMRINTVEC);
-	setvect(TMRINTVEC, GetTimerVect);
+	OrgTimerVect = _dos_getvect(TMRINTVEC);
+	_dos_setvect(TMRINTVEC, GetTimerVect);
 
-	asm { CLI }
+	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
 	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
 	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
-	asm { STI }
+	_asm_c("\n\tSTI\n");
 	/* Enable Timer Finishend */
 
 	/* Get clock */
 	while (!origCounter) {
-		asm { HLT }
+		_asm_c("\n\tHLT\n");
 	}
 	outp(TMR0CLK, (int)(count&0x00ff));
 	outp(TMR0CLK, (int)(count>>8));
 	/* Get clock end */
 
 	/* Change Timer */
-	asm { CLI }
+	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
-	asm { STI }
+	_asm_c("\n\tSTI\n");
 
-	setvect(TMRINTVEC, NewTimerVect);
+	_dos_setvect(TMRINTVEC, NewTimerVect);
 
-	asm { CLI }
+	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
-	asm { STI }
+	_asm_c("\n\tSTI\n");
 	/* Change Timer Finishend */
 
 	/* Play beep sound */
@@ -94,13 +102,13 @@ int main(){
 	outp(TMR1CLK, (int)(count&0x00ff));
 	outp(TMR1CLK, (int)(count>>8));
 	outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
-	while (tick <= 15){
-		asm { HLT }
+	while (tick <= 300){
+		_asm_c("\n\tHLT\n");
 	}
 	outp(TMR1CLK, (int)((count << 1)&0x00ff));
 	outp(TMR1CLK, (int)((count << 1)>>8));
-	while (tick <= 30){
-		asm { HLT }
+	while (tick <= 600){
+		_asm_c("\n\tHLT\n");
 	}
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 	outp(TMR1CLK, (int)(count&0x00ff));
@@ -108,17 +116,17 @@ int main(){
 	/* Play beep sound end */
 
 	/* Disable Timer */
-	asm { CLI }
+	_asm_c("\n\tCLI\n");
 	outp(IMR_M, imr_m);
 	outp(IMR_S, imr_s);
 	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
-	asm { STI }
+	_asm_c("\n\tSTI\n");
 
-	setvect(TMRINTVEC, OrgTimerVect);
+	_dos_setvect(TMRINTVEC, OrgTimerVect);
 
-	asm { CLI }
+	_asm_c("\n\tCLI\n");
 	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
-	asm { STI }
+	_asm_c("\n\tSTI\n");
 	/* Disable Timer Finishend */
 
 	outp(TMRMODE, TMR0MOD2);

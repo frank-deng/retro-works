@@ -28,6 +28,12 @@ Countdown Timer
 
 A simple countdown timer for NEC PC-9800 Series, using beep speaker for alarming.
 
+### How To Build
+
+1. Install Turbo C++ 4.0 Japanese Version under PC98 or DOS/V.
+2. Build using command `tc /b /m timer.c`.
+3. Copy generated `timer.exe` to your PC98 environment.
+
 ### Screenshots
 
 ![Countdown Timer](https://frank-deng.github.io/retro-works/PC98/screenshots/timer1.png)

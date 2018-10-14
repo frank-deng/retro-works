@@ -164,7 +164,7 @@ int main(){
 	enableTimer();
 	while (running && tick < maxticks){
 		asm { HLT }
-		if (0 == (tick & 0xF)) {
+		if (0 == (tick & 0x1F)) {
 			showTime((maxticks - tick)/100);
 			if (ACTION_QUIT == getaction()) {
 				running = 0;
@@ -182,7 +182,7 @@ int main(){
 				outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 			}
 
-			if (0 == (tick & 0xF)) {
+			if (0 == (tick & 0x1F)) {
 				if (ACTION_QUIT == getaction()) {
 					running = 0;
 				}
