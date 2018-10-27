@@ -196,3 +196,12 @@ Use the basic VGA driver for the initial install, then change the video driver u
 安装显卡驱动时如果提示插入S3 Trio 64V Flat Mode Driver软盘，则此时需要将路径填写成`C:\WINDOWS\SYSTEM\`以完成显卡驱动的安装。  
 When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk, redirect the installer to `C:\WINDOWS\SYSTEM\` to complete the graphics driver install.
 
+### X11禁止Ctrl+Alt+Fn键切换终端 Disable Switching TTY Via Ctrl+Alt+Fn Under X11
+
+将以下内容添加到`/etc/xorg.conf`：  
+Add the following code to `/etc/xorg.conf`:
+
+	Section "ServerFlags"
+	    Option "DontVTSwitch" "true"
+	EndSection
+
