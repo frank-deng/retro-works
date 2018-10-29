@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <dos.h>
 #include <farstr.h>
 typedef unsigned char uint8_t;
@@ -123,9 +125,24 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 	}
 }
 void showTime(unsigned int secRemain){
-	unsigned char min = secRemain / 60, sec = secRemain % 60, buf[80];
+	unsigned char min = secRemain / 60, sec = secRemain % 60, buf[80], nbuf[12];
 	uint16_t attr = (0==secRemain ? 0x45 : 0xe1);
-	sprintf(buf, "< %02u:%02u >", min, sec);
+	strcpy(buf,"< ");
+
+	itoa(min,nbuf,10);
+	if (min<10){
+		strcat(buf,"0");
+	}
+	strcat(buf,nbuf);
+	strcat(buf,":");
+
+	itoa(sec,nbuf,10);
+	if (sec<10){
+		strcat(buf,"0");
+	}
+	strcat(buf,nbuf);
+	strcat(buf," >");
+
 	cputstr(buf, 0, 7, attr);
 }
 typedef enum _action_t{
@@ -133,19 +150,12 @@ typedef enum _action_t{
 	ACTION_QUIT,
 }action_t;
 action_t getaction(){
-	action_t action = ACTION_NULL;
-	unsigned int keycode;
-	inregs.h.ah=0x05;
+	inregs.x.ax=0x0400;
 	int86(0x18,&inregs,&outregs);
-	if(0!=outregs.h.bh){
-		keycode=outregs.x.ax;
-		switch (keycode){
-			case 0x1b:
-				action = ACTION_QUIT;
-			break;
-		}
+	if(0x01 & outregs.h.ah){
+		return ACTION_QUIT;
 	}
-	return action;
+	return ACTION_NULL;
 }
 int main(){
 	float minutes;
@@ -190,9 +200,9 @@ int main(){
 		_asm_c("\n\tHLT\n");
 		if (0 == (tick & 0x1F)) {
 			showTime((maxticks - tick)/100);
-			if (ACTION_QUIT == getaction()) {
-				running = 0;
-			}
+		}
+		if (0 == (tick & 0x7) && ACTION_QUIT == getaction()) {
+			running = 0;
 		}
 	}
 
@@ -205,11 +215,8 @@ int main(){
 			} else {
 				outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 			}
-
-			if (0 == (tick & 0x1F)) {
-				if (ACTION_QUIT == getaction()) {
-					running = 0;
-				}
+			if (0 == (tick & 0x7) && ACTION_QUIT == getaction()) {
+				running = 0;
 			}
 		}
 	}
@@ -223,6 +230,8 @@ int main(){
 
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
+	inregs.h.ah=0x03;
+	int86(0x18,&inregs,&outregs);
 	/* Direct screen manipulation only above */
 	
 	puts("\033[8;1H\033[0m");
