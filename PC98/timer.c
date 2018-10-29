@@ -150,9 +150,7 @@ typedef enum _action_t{
 	ACTION_QUIT,
 }action_t;
 action_t getaction(){
-	inregs.x.ax=0x0400;
-	int86(0x18,&inregs,&outregs);
-	if(0x01 & outregs.h.ah){
+	if(0 == inp(0x41)){
 		return ACTION_QUIT;
 	}
 	return ACTION_NULL;
