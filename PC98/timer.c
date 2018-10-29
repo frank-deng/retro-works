@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <dos.h>
-#include <conio.h>
 #include <time.h>
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
 
 #define	TMRMODE		0x77		/* timer mode port */
 #define	TMR0MOD2	0x34		/* timer #0, mode 2(interval timer interrupt) */
@@ -27,6 +28,7 @@
 #define	PICPORT		0x00		/* interrupt controller (int 08h = master) */
 #define	EOI			0x20		/* end of interrupt */
 
+union REGS inregs, outregs;
 static unsigned long tick = 0;
 static void (interrupt far *OrgTimerVect)();
 static unsigned char imr_m, imr_s;
@@ -97,13 +99,26 @@ static unsigned int getOrigCounter(){
 	return origCounter;
 }
 
-void showTime(unsigned int secRemain){
-	unsigned char min = secRemain / 60, sec = secRemain % 60;
-	if (secRemain) {
-		printf("\x0d< %02u:%02u >", min, sec);
-	} else {
-		printf("\x0d\033[41m< %02u:%02u >", min, sec);
+static uint16_t far* vram = 0xA0000000;
+static uint16_t far* vramattr = 0xA0002000;
+void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
+	uint16_t offset = (y<<6) + (y<<4) + x;
+	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
+	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
+	char *ch;
+				
+	for (ch = str; *ch != '\0'; ch++){
+		*p_vram = (uint16_t)(*ch);
+		*p_vramattr = attr;
+		p_vram++;
+		p_vramattr++;
 	}
+}
+void showTime(unsigned int secRemain){
+	unsigned char min = secRemain / 60, sec = secRemain % 60, buf[80];
+	uint16_t attr = (0==secRemain ? 0x45 : 0xe1);
+	sprintf(buf, "< %02u:%02u >", min, sec);
+	cputstr(buf, 0, 7, attr);
 }
 typedef enum _action_t{
 	ACTION_NULL,
@@ -111,18 +126,16 @@ typedef enum _action_t{
 }action_t;
 action_t getaction(){
 	action_t action = ACTION_NULL;
-	if (!kbhit()) {
-		return action;
-	}
-	switch (getch()){
-		case 0x1b:
-			if (!kbhit()) {
+	unsigned int keycode;
+	inregs.h.ah=0x05;
+	int86(0x18,&inregs,&outregs);
+	if(0!=outregs.h.bh){
+		keycode=outregs.x.ax;
+		switch (keycode){
+			case 0x1b:
 				action = ACTION_QUIT;
-			}
-		break;
-	}
-	while(kbhit()){
-		getch();
+			break;
+		}
 	}
 	return action;
 }
@@ -131,6 +144,20 @@ int main(){
 	unsigned int running = 1, counter, counter10ms, counterOrig;
 	unsigned long maxticks;
 
+	printf("\033[2J");
+	puts("\033[2;25H\033[21m*** カウントダウンタイマー ***\n\033[0m");
+	printf("時間（分）：");
+	scanf("%f", &minutes);
+	puts("\nEscを押してシステムに戻ります\n");
+	
+	/* Direct screen manipulation only below */
+	outp(0x62, 0x4b);
+	outp(0x60, 0x0f);
+	inregs.h.ah=0x03;
+	int86(0x18,&inregs,&outregs);
+
+	maxticks = (unsigned long)(minutes * 60.0 * 100);
+	showTime((maxticks - tick)/100);
 	if (BIOS_FLAG&SYSCLK_BIT) {	/* 8MHz/16MHz... */
 		counter = 998;
 		counter10ms = 19968;
@@ -138,17 +165,6 @@ int main(){
 		counter = 1229;
 		counter10ms = 24576;
 	}
-
-	printf("\033[2J");
-	puts("\033[2;25H\033[21m*** カウントダウンタイマー ***\n\033[0m");
-	printf("時間（分）：");
-	scanf("%f", &minutes);
-	puts("\nEscを押してシステムに戻ります\n");
-	outp(0x62, 0x4b);
-	outp(0x60, 0x0f);
-
-	maxticks = (unsigned long)(minutes * 60.0 * 100);
-
 	counterOrig = getOrigCounter();
 
 	outp(TMRMODE, TMR1MOD3);
@@ -199,7 +215,9 @@ int main(){
 
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
-	puts("\033[0m");
+	/* Direct screen manipulation only above */
+	
+	puts("\033[8;1H\033[0m");
 	return 0;
 }
 
