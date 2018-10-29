@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <dos.h>
-#include <conio.h>
 #include <farstr.h>
 #include <stdlib.h>
 #include <time.h>
@@ -30,10 +29,14 @@ void initscr(){
 	int86y(0x18, &inregs, &outregs);
 	outp(0x62, 0x4b);
 	outp(0x60, 0x0f);
+	inregs.h.ah=0x03;
+	int86y(0x18,&inregs,&outregs);
 	clrscr();
 }
 void endscr(){
 	clrscr();
+	inregs.h.ah=0x03;
+	int86y(0x18,&inregs,&outregs);
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
 	putchar('\x1e');
@@ -479,24 +482,29 @@ typedef enum _action_t{
 	ACTION_MOVE_RIGHT,
 }action_t;
 action_t getaction(){
-	char ch;
-	ch = getch();
-	switch (ch){
+	unsigned int keycode;
+	inregs.h.ah=0x05;
+	int86y(0x18,&inregs,&outregs);
+	while(0==outregs.h.bh){
+		_asm_c("\n\tHLT\n");
+		inregs.h.ah=0x05;
+		int86y(0x18,&inregs,&outregs);
+	}
+	keycode=outregs.x.ax;
+	switch (keycode){
 		case 0x1b:
-			if (!kbhit()) {
-				return ACTION_QUIT;
-			}
+			return ACTION_QUIT;
 		break;
-		case 0x0b:
+		case 0x3a00:
 			return ACTION_MOVE_UP;
 		break;
-		case 0x0a:
+		case 0x3d00:
 			return ACTION_MOVE_DOWN;
 		break;
-		case 0x08:
+		case 0x3b00:
 			return ACTION_MOVE_LEFT;
 		break;
-		case 0x0c:
+		case 0x3c00:
 			return ACTION_MOVE_RIGHT;
 		break;
 	}
