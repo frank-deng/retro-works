@@ -141,7 +141,10 @@ void showTime(unsigned int secRemain){
 		strcat(buf,"0");
 	}
 	strcat(buf,nbuf);
-	strcat(buf," >   ");
+	strcat(buf," >");
+	if (min > 1){
+		strcat(buf,"   ");
+	}
 
 	cputstr(buf, 0, 7, attr);
 }
