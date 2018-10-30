@@ -125,7 +125,7 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 	}
 }
 void showTime(unsigned int secRemain){
-	unsigned char min = secRemain / 60, sec = secRemain % 60, buf[80], nbuf[12];
+	unsigned char min = secRemain / 60, sec = secRemain % 60, buf[20], nbuf[6];
 	uint16_t attr = (0==secRemain ? 0x45 : 0xe1);
 	strcpy(buf,"< ");
 
@@ -141,7 +141,7 @@ void showTime(unsigned int secRemain){
 		strcat(buf,"0");
 	}
 	strcat(buf,nbuf);
-	strcat(buf," >");
+	strcat(buf," >   ");
 
 	cputstr(buf, 0, 7, attr);
 }
