@@ -19,7 +19,6 @@ weekStr = lang('_week_format')[now.weekday()];
 					-->｜<a href='/inews'>{{lang('iNews')}}</a><!--
 					-->｜<a href='/jokes'>{{lang('Jokes')}}</a><!--
 					-->｜<a href='/dict'>{{lang('Dictionary')}}</a><!--
-					-->｜<a href='/currency'>{{lang('Currency Exchange')}}</a><!--
 					-->｜</td>
 			</tr>
 			<tr><td colspan='2'>

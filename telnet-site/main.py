@@ -47,19 +47,6 @@ def doWeatherSetCity():
     response.status = 301;
     response.set_header('Location', '/weather/detail.do');
 
-@route('/currency')
-def currency():
-    currencies = models.getCurrencies();
-    if not currencies:
-        return template('error', {'error':'Initialization Failed'});
-    return template('currency', {
-        'currencies':currencies,
-        'hasResult':False,
-        'fromCurrency':request.cookies.getunicode('fromCurrency', ''),
-        'toCurrency':request.cookies.getunicode('toCurrency', ''),
-        'amount':'',
-    });
-
 @route('/news')
 def newsList():
     page = int(request.query.get('page', 1));
@@ -82,35 +69,6 @@ def iNewsList():
     if (None == data):
         return template('error', {'error':'No News'});
     return template('iNewsList', {'newsList':data, 'page':page, 'total':total});
-
-@route('/currency', method='POST')
-def currencyExchage():
-    fromCurrency = request.forms.get('from');
-    toCurrency = request.forms.to;
-    amount = request.forms.amount;
-    response.set_cookie('fromCurrency', fromCurrency, path='/', max_age=3600*24*356);
-    response.set_cookie('toCurrency', toCurrency, path='/', max_age=3600*24*356);
-
-    currencies = models.getCurrencies();
-    if not currencies:
-        return template('error', {'error':'Initialization Failed'});
-    fromCurrencyName, toCurrencyName = fromCurrency, toCurrency;
-    for c in currencies:
-        if (fromCurrency == c['code']):
-            fromCurrencyName = c['name'];
-        if (toCurrency == c['code']):
-            toCurrencyName = c['name'];
-
-    return template('currency', {
-        'currencies':currencies,
-        'hasResult':True,
-        'fromCurrency':fromCurrency,
-        'toCurrency':toCurrency,
-        'fromCurrencyName':fromCurrencyName,
-        'toCurrencyName':toCurrencyName,
-        'amount':amount,
-        'result':models.doCurrencyExchange(fromCurrency, toCurrency, amount),
-    });
 
 @route('/dict')
 @view('dict')
