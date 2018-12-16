@@ -11,15 +11,16 @@ FOR I = 0 TO 14
   BITMASK(I) = 2^I
 NEXT I
 
-INPUT "Filename: ", F$
-OPEN F$ FOR INPUT AS #1
-FOR Y=0 TO 8:FOR X=0 TO 8
-  INPUT #1,BOARD(Y,X)
-  IF BOARD(Y,X) > 9 OR BOARD(Y,X) < 0 THEN
-    PRINT "Invalid number at row";Y+1;", column";X+1: END
-  END IF
-NEXT X:NEXT Y
-CLOSE #1
+PRINT "Input sudoku":DIM B(9)
+FOR Y=0 TO 8:
+  PRINT Y+1;:INPUT ": ",B(0),B(1),B(2),B(3),B(4),B(5),B(6),B(7),B(8)
+  FOR X=0 TO 8
+    BOARD(Y,X)=B(X)
+    IF BOARD(Y,X) > 9 OR BOARD(Y,X) < 0 THEN
+      PRINT "Invalid number at row";Y+1;", column";X+1: END
+    END IF
+  NEXT X
+NEXT Y
 
 PRINT "Checking sudoku... ";
 
