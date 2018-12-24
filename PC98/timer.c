@@ -127,8 +127,10 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 void showTime(unsigned int secRemain){
 	unsigned char min = secRemain / 60, sec = secRemain % 60, buf[20], nbuf[6];
 	uint16_t attr = (0==secRemain ? 0x45 : 0xe1);
+    memset(buf,'\0',20);
 	strcpy(buf,"< ");
 
+    memset(nbuf,'\0',6);
 	itoa(min,nbuf,10);
 	if (min<10){
 		strcat(buf,"0");
@@ -136,6 +138,7 @@ void showTime(unsigned int secRemain){
 	strcat(buf,nbuf);
 	strcat(buf,":");
 
+    memset(nbuf,'\0',6);
 	itoa(sec,nbuf,10);
 	if (sec<10){
 		strcat(buf,"0");
