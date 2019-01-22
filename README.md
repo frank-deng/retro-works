@@ -63,12 +63,6 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 数独求解程序 Sudoku Solver  
 ![Sudoku](http://frank-deng.github.io/retro-works/screenshots/sudoku.png)
 
-简单统计程序 Simple Statistics Program  
-![Statistics](http://frank-deng.github.io/retro-works/screenshots/stat.png)
-
-简单统计程序（使用中文界面） Simple Statistics Program with Chinese UI  
-![Statistics](http://frank-deng.github.io/retro-works/screenshots/stat2.png)
-
 条形图（使用UCDOS特显程序） Bar Chart (Use Special Display utility from UCDOS)  
 ![UCDOS Bar Chart](http://frank-deng.github.io/retro-works/screenshots/barchart2.png)
 
