@@ -9,7 +9,7 @@ DATA &H05,&h2E,&HC7,&H04,&H01,&H00,&H5E,&H5B,&H58,&HCB
 DEFINT A-Z
 TestTX
 OPEN "LPT3" FOR OUTPUT AS #1
-TX ("M18CU1,0KB1,0CL0CO12B0,0,640,480")
+TX ("M18CU1,0KB1,0CL0CO4B0,0,640,480")
 CALL BORDER(5)
 CALL BORDER(6)
 CALL BORDER(7)
@@ -19,14 +19,14 @@ T$ = "»¶¶ÈÐÂÄê": L = LEN(T$)
 SIZE = 120: X = (640 - SIZE * L / 2) / 2 : Y=240-SIZE
 TX ("{=0%1@" + n$(SIZE) + "," + n$(SIZE) + "}")
 TX ("{(15}"): CALL DrawText(X-1,Y-1,T$)
-TX ("{(8}"): CALL DrawText(X+1,Y+1,T$)
+TX ("{(0}"): CALL DrawText(X+1,Y+1,T$)
 TX ("{(14}"): CALL DrawText(X,Y,T$)
 
 T$ = "Happy New Year": L = LEN(T$)
 SIZE = 80: X = (640 - SIZE * L / 2) / 2 : Y=280
 TX ("{=0%1@" + n$(SIZE) + "," + n$(SIZE) + "}")
 TX ("{(15}"): CALL DrawText(X-1,Y-1,T$)
-TX ("{(8}"): CALL DrawText(X+1,Y+1,T$)
+TX ("{(0}"): CALL DrawText(X+1,Y+1,T$)
 TX ("{(14}"): CALL DrawText(X,Y,T$)
 
 WHILE INPUT$(1) = "": WEND
