@@ -95,7 +95,7 @@ class TextDataMaker:
                 if veven:
                     veven = 1;
                 value=(veven<<1)|vodd;
-                table=('32','223','230','229');
+                table=('32','223','220','219');
                 line.append(table[value]);
             result.append(line);
         return result;
@@ -106,6 +106,7 @@ class TextDataMaker:
             if None == fontData:
                 continue;
             self.__out.write('%d DATA %d,%d\r\n'%(self.__line, x, y));
+            self.__nextLine();
             for asciiData in self.__fontDataToAscii(fontData):
                 self.__out.write('%d DATA %s\r\n'%(self.__line, ','.join(asciiData)));
                 self.__nextLine();
