@@ -34,6 +34,13 @@ argParser.add_argument(
     help='Output file.'
 );
 argParser.add_argument(
+    '--line',
+    '-l',
+    default='100',
+    metavar='line',
+    help='Starting line.'
+);
+argParser.add_argument(
     'textdisp',
     metavar='X,Y:Text',
     nargs='+',
@@ -43,10 +50,10 @@ argParser.add_argument(
 );
 
 class TextDataMaker:
-    def __init__(self, font, output = sys.stdout):
+    def __init__(self, font, output = sys.stdout, line=110):
         self.__font = open(font, 'rb');
         self.__lineSpace = 10;
-        self.__line = 110;
+        self.__line = line;
         self.__out = output;
     
     def __enter__(self):
@@ -94,9 +101,7 @@ class TextDataMaker:
                     vodd = 1;
                 if veven:
                     veven = 1;
-                value=(veven<<1)|vodd;
-                table=('32','223','220','219');
-                line.append(table[value]);
+                line.append(str((veven<<1)|vodd));
             result.append(line);
         return result;
 
@@ -117,8 +122,8 @@ if __name__ == '__main__':
     out = sys.stdout;
     if None != args.o:
         out = open(args.o, 'w');
-    out.write('100 DATA %d\r\n'%(sum([len(item['text']) for item in args.textdisp])));
-    textDataMaker = TextDataMaker(args.font, out);
+    out.write('%d DATA %d\r\n'%(int(args.line), sum([len(item['text']) for item in args.textdisp])));
+    textDataMaker = TextDataMaker(args.font, out, int(args.line)+10);
     for item in args.textdisp:
         if 'ascii' == args.mode:
             textDataMaker.outputAscii(item['pos'][0], item['pos'][1], item['text']);
