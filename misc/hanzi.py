@@ -28,6 +28,12 @@ argParser.add_argument(
     help='Output file.'
 );
 argParser.add_argument(
+    '-m',
+    '--mode',
+    metavar='mode',
+    help='Output file.'
+);
+argParser.add_argument(
     'textdisp',
     metavar='X,Y:Text',
     nargs='+',
@@ -48,22 +54,32 @@ class TextDataMaker:
     
     def __exit__(self, exc_type, exc_value, traceback):
         self.__font.close();
+
+    def __nextLine(self):
+        self.__line += self.__lineSpace;
+
+    def getFontData(self,char):
+        gbcode = char.encode('GB2312', 'ignore');
+        if (len(gbcode) != 2):
+            return None;
+        qu,wei = gbcode[0]-0xA1, gbcode[1]-0xA1;
+        self.__font.seek((qu*94+wei)*32);
+        return struct.unpack('>'+'H'*16, self.__font.read(32));
         
     def output(self, x, y, text):
+        self.__nextLine();
         for char in text:
-            gbcode = char.encode('GB2312', 'ignore');
-            if (len(gbcode) != 2):
+            fontData = self.getFontData(char);
+            if None == fontData:
                 continue;
-            quwei = (gbcode[0]-0xA1, gbcode[1]-0xA1);
             gdata = [];
-            self.__font.seek((quwei[0]*94+quwei[1])*32);
-            for n in struct.unpack('>'+'H'*16, self.__font.read(32)):
+            for n in fontData:
                 if (n):
                     gdata.append('&H%x'%n);
                 else:
                     gdata.append('0');
             self.__out.write('%d DATA %d,%d,%s\r\n'%(self.__line, x, y, ','.join(gdata)));
-            self.__line += self.__lineSpace;
+            self.__nextLine();
             x += 16;
         
 if __name__ == '__main__':
@@ -72,6 +88,10 @@ if __name__ == '__main__':
     if None != args.o:
         out = open(args.o, 'w');
     textDataMaker = TextDataMaker(args.font, out);
+    textLen=0
+    for item in args.textdisp:
+        textLen+=len(item['text']);
+    out.write('100 DATA %d\r\n'%(textLen));
     for item in args.textdisp:
         textDataMaker.output(item['pos'][0], item['pos'][1], item['text']);
     if out != sys.stdout:
