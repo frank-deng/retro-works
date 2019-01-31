@@ -40,7 +40,7 @@ class TextDataMaker:
     def __init__(self, font, output = sys.stdout):
         self.__font = open(font, 'rb');
         self.__lineSpace = 10;
-        self.__line = 100;
+        self.__line = 110;
         self.__out = output;
     
     def __enter__(self):
@@ -57,7 +57,7 @@ class TextDataMaker:
             quwei = (gbcode[0]-0xA1, gbcode[1]-0xA1);
             gdata = [];
             self.__font.seek((quwei[0]*94+quwei[1])*32);
-            for n in struct.unpack('H'*16, self.__font.read(32)):
+            for n in struct.unpack('>'+'H'*16, self.__font.read(32)):
                 if (n):
                     gdata.append('&H%x'%n);
                 else:
