@@ -28,8 +28,8 @@ argParser.add_argument(
     help='Output file.'
 );
 argParser.add_argument(
-    '-m',
     '--mode',
+    '-m',
     metavar='mode',
     help='Output file.'
 );
@@ -67,7 +67,6 @@ class TextDataMaker:
         return struct.unpack('>'+'H'*16, self.__font.read(32));
         
     def output(self, x, y, text):
-        self.__nextLine();
         for char in text:
             fontData = self.getFontData(char);
             if None == fontData:
@@ -81,19 +80,49 @@ class TextDataMaker:
             self.__out.write('%d DATA %d,%d,%s\r\n'%(self.__line, x, y, ','.join(gdata)));
             self.__nextLine();
             x += 16;
+
+    def __fontDataToAscii(self,fontData):
+        result=[];
+        for i in range(8):
+            oddrow = fontData[i*2];
+            evenrow = fontData[i*2+1];
+            line = [];
+            for j in range(16):
+                vodd = oddrow & (1<<(15-j));
+                veven = evenrow & (1<<(15-j));
+                if vodd:
+                    vodd = 1;
+                if veven:
+                    veven = 1;
+                value=(veven<<1)|vodd;
+                table=('32','223','230','229');
+                line.append(table[value]);
+            result.append(line);
+        return result;
+
+    def outputAscii(self, x, y, text):
+        for char in text:
+            fontData = self.getFontData(char);
+            if None == fontData:
+                continue;
+            self.__out.write('%d DATA %d,%d\r\n'%(self.__line, x, y));
+            for asciiData in self.__fontDataToAscii(fontData):
+                self.__out.write('%d DATA %s\r\n'%(self.__line, ','.join(asciiData)));
+                self.__nextLine();
+            x+=16;
         
 if __name__ == '__main__':
     args = argParser.parse_args();
     out = sys.stdout;
     if None != args.o:
         out = open(args.o, 'w');
+    out.write('100 DATA %d\r\n'%(sum([len(item['text']) for item in args.textdisp])));
     textDataMaker = TextDataMaker(args.font, out);
-    textLen=0
     for item in args.textdisp:
-        textLen+=len(item['text']);
-    out.write('100 DATA %d\r\n'%(textLen));
-    for item in args.textdisp:
-        textDataMaker.output(item['pos'][0], item['pos'][1], item['text']);
+        if 'ascii' == args.mode:
+            textDataMaker.outputAscii(item['pos'][0], item['pos'][1], item['text']);
+        else:
+            textDataMaker.output(item['pos'][0], item['pos'][1], item['text']);
     if out != sys.stdout:
         out.close();
     exit(0);
