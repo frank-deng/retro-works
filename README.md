@@ -86,6 +86,9 @@ UCDOS特显程序中可用的字体 Fonts available in the Special Display utili
 屏保（使用UCDOS特显程序） Screensaver (Use Special Display utility from UCDOS)  
 ![Screensaver](http://frank-deng.github.io/retro-works/screenshots/lines2.png)
 
+九九乘法表 9x9 Multiplication Table  
+![Sudoku](http://frank-deng.github.io/retro-works/screenshots/Chengfa.png)
+
 
 telnet-site
 -----------
