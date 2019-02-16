@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+'''
+Convert image to the appropriate format used by bmp2cga.py using ImageMagick:
+
+    convert source.jpg -colorspace gray -resize 640x400 -background '#000000' -gravity center -extent 640x400 png:- | convert - -resize '640x200!' -monochrome dest.bmp
+    bmp2cga.py dest.bmp image.pic
+'''
+
 import sys, struct;
 
 #Prepare arguments
