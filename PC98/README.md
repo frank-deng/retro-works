@@ -48,12 +48,3 @@ Sudoku Solver
 
 ![Sudoku Solver](https://frank-deng.github.io/retro-works/PC98/screenshots/sudoku.png)
 
-
-Quick Sort Demo
----------------
-
-### Screenshots
-
-![Quick Sort Demo](https://frank-deng.github.io/retro-works/PC98/screenshots/qsort.png)
-
-
