@@ -41,7 +41,7 @@ if __name__ == '__main__':
         'RIGHT':kbd.right_key,
     }
 
-    grabber2048 = Grabber2048(winTitle=r'DOSBox');
+    grabber2048 = Grabber2048();
     if(TEST):
         time.sleep(5);
         grabber2048.testTemplate(3, 1, '8');

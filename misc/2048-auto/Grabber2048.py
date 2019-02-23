@@ -63,7 +63,7 @@ class Grabber2048(WindowGrabber):
             x, y = 0, y+1;
         return True;
 
-    def __getNum(self, src, threshold = 0.95):
+    def __getNum(self, src):
         for n in self.__numberTemplate:
             dest = self.__numberTemplate[n];
             if (self.__matchTemplateExact(src,dest)):
@@ -99,7 +99,7 @@ class Grabber2048(WindowGrabber):
             for x in range(4):
                 imgx, imgy = (28+6*x)*8, (9+(y<<1))*16;
                 img = cvimg[imgy:imgy+16, imgx:imgx+40];
-                #self.__processImg(img);
+                self.__processImg(img);
                 num = self.__getNum(img);
                 if (None == num):
                     return None;
