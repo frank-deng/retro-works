@@ -31,11 +31,11 @@ void endscr(){
 void drawframe(){
 	int i;
   textattr(0x0e);
-  gotoxy(28,6);
+  gotoxy(29,6);
 	cprintf("Score: ");
 
   textattr(0x09);
-  gotoxy(27,8);
+  gotoxy(28,8);
 	cprintf("\xc9");
 	for (i = 0; i < 24; i++){
 		cprintf("\xcd");
@@ -43,13 +43,13 @@ void drawframe(){
 	cprintf("\xbb");
 
 	for (i = 0; i < 9; i++){
-    gotoxy(27, 9+i);
+    gotoxy(28, 9+i);
 		cprintf("\xba");
-    gotoxy(27+25, 9+i);
+    gotoxy(28+25, 9+i);
 		cprintf("\xba");
 	}
 
-  gotoxy(27,18);
+  gotoxy(28,18);
 	cprintf("\xc8");
 	for (i = 0; i < 24; i++){
 		cprintf("\xcd");
@@ -61,7 +61,7 @@ void drawboard(game2048_t* game){
 	char buf[16] = {'\0'};
 	for (y = 0; y < BOARD_H; y++){
 		for (x = 0; x < BOARD_W; x++){
-      gotoxy(28+6*x, 10+(y<<1));
+      gotoxy(29+6*x, 10+(y<<1));
       textattr(0x0f);
 			if (game->board[y][x]) {
 				sprintf(buf, "%5u ", game->board[y][x]);
@@ -73,7 +73,7 @@ void drawboard(game2048_t* game){
 	}
 	sprintf(buf, "%lu", game->score);
   textattr(0x0e);
-  gotoxy(35,6);
+  gotoxy(36,6);
 	cprintf(buf);
 	if (game->status){
     textattr(0x0c);
