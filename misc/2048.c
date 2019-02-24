@@ -4,6 +4,8 @@
 #include <time.h>
 #include <conio.h>
 
+#define FILE_SAVE "2048.sav"
+
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 #define BOARD_W 4
@@ -77,9 +79,34 @@ void drawboard(game2048_t* game){
 	cprintf(buf);
 	if (game->status){
     textattr(0x0c);
-    gotoxy(35,20);
-		cprintf("GAME OVER");
+    gotoxy(36,20);
+		cprintf("GAME  OVER");
 	}
+}
+
+/* Load and save */
+int game2048_load(game2048_t* game, char* filename){
+  int i;
+  FILE *fp; uint16_t *p_board = game->board;
+  fp = fopen(filename, "rb");
+  if(NULL==fp){
+    return 0;
+  }
+  fseek(fp,0,SEEK_SET);
+  fread(game, sizeof(game2048_t), 1, fp);
+  fclose(fp);
+  return 1;
+}
+void game2048_save(game2048_t* game, char* filename){
+  int i;
+  FILE *fp; uint16_t *p_board = game->board;
+  fp = fopen(filename, "wb");
+  if(NULL==fp){
+    return;
+  }
+  fseek(fp,0,SEEK_SET);
+  fwrite(game, sizeof(game2048_t), 1, fp);
+  fclose(fp);
 }
 
 /* Game functions */
@@ -93,9 +120,16 @@ void game2048_init(game2048_t* game){
 	}
 	game->score = 0;
 	game->status = 0;
-	game2048_update(game);
+  if(!game2048_load(game, FILE_SAVE)){
+	  game2048_update(game);
+  }
 }
 void game2048_quit(game2048_t* game){
+	if(0 == game->status){
+    game2048_save(game, FILE_SAVE);
+  }else{
+    unlink(FILE_SAVE);
+  }
 }
 int game2048_update(game2048_t* game){
 	struct empty_space_t {

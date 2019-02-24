@@ -3,7 +3,7 @@ import cv2;
 import numpy as np;
 
 class Grabber2048(WindowGrabber):
-    def __init__(self, templatePath = 'numbers.png', winTitle = r'Neko Project'):
+    def __init__(self, templatePath = 'numbers.png', winTitle = r'DOSBox'):
         npRunning = WindowGrabber.getWindowByTitle(winTitle);
         if (len(npRunning) == 0):
             raise SystemError('No instances is running.');
@@ -99,7 +99,7 @@ class Grabber2048(WindowGrabber):
             for x in range(4):
                 imgx, imgy = (28+6*x)*8, (9+(y<<1))*16;
                 img = cvimg[imgy:imgy+16, imgx:imgx+40];
-                self.__processImg(img);
+                #self.__processImg(img);
                 num = self.__getNum(img);
                 if (None == num):
                     return None;

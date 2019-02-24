@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     if None != grabber2048.getBoard():
         offline = True;
-        timeout = 5;
+        timeout = 3;
         print('Please switch to game window in %s seconds'%timeout);
         time.sleep(timeout);
     try:
