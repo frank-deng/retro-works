@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
-% import re;
-% from langpack import lang;
+<%
+import re, datetime
+from langpack import lang;
+now = datetime.datetime.now();
+dateStr = now.strftime(lang('_date_format'));
+weekStr = lang('_week_format')[now.weekday()];
+%>
 	<head>
 		<meta charset='UTF-8'/>
-		<title>{{weather['basic']['city']}}{{lang('Weather')}} - Powered by：和风全球天气{{!lang('_title_spacer')}}</title>
+		<title>{{weather['basic']['city']}}{{lang('Weather')}} - {{dateStr}}&nbsp;{{weekStr}}{{!lang('_title_spacer')}}</title>
 	</head>
 	<body>
 		<table width='100%'><tr>
@@ -99,4 +104,3 @@
 		</ul>
 	</body>
 </html>
-

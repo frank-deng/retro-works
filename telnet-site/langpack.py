@@ -1,7 +1,6 @@
 LANGDATA = {};
 LANGDATA['zh-CN'] = {
     '_title_spacer': '&gt;'+'&nbsp;'*80,
-    'About' : 'Powered by: 易源接口&nbsp;和风全球天气',
     '_sep' : '｜',
     '_point' : '·',
     
@@ -52,41 +51,9 @@ LANGDATA['zh-CN'] = {
     'Next Page' : '下一页',
     '_jump_page' : '第%d页&nbsp;共%d页&nbsp;到第%s页',
 
-    'Search' : '搜索',
-
-    'News': '最新资讯',
-    'iNews': '互联网资讯',
-    'No News' : '获取新闻失败',
-    
-    'Currency Exchange' : '汇率换算',
-    'Exchange' : '兑换',
-    'Select Currency' : '选择币种',
-    'Initialization Failed' : '初始化失败',
-    'Realtime Exchange Rate' : '实时汇率',
-    'Currency Code' : '货币代码',
-    'Currency Name' : '货币名称',
-    'hui_in' : '现汇买入价',
-    'chao_in' : '现钞买入价',
-    'hui_out' : '现汇卖出价',
-    'chao_out' : '现钞卖出价',
-    'zhesuan' : '中行折算价',
-
-    'Dictionary' : '英汉词典',
-    '_about_dict' : 'Powered By: http://www.webxml.com.cn/',
-    'Query Dictionary' : '查词典',
-    'Meaning' : '释义',
-    'Not Found' : '未找到释义',
-    'Sentence Example' : '例句',
-    'See Also' : '参见',
-
     'Failed to load article' : '文章加载失败',
     'Articles' : '文章列表',
     'More Articles': '更多文章',
-
-    'Jokes': '来福岛笑话',
-    'No Jokes': '啊哦～木有笑话鸟～～',
-    'Prev One': '《上一个',
-    'Next One': '下一个》',
 };
 
 import config;
@@ -96,4 +63,3 @@ def lang(index):
         return LANGDATA[config.LANGUAGE][index];
     except KeyError:
         return index;
-

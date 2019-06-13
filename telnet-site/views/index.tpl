@@ -13,15 +13,7 @@ weekStr = lang('_week_format')[now.weekday()];
 	</head>
 	<body>
 		<table width='100%'>
-			<tr>
-				<td width='100%'>&nbsp;<!--
-					-->｜<a href='/news'>{{lang('News')}}</a><!--
-					-->｜<a href='/inews'>{{lang('iNews')}}</a><!--
-					-->｜<a href='/jokes'>{{lang('Jokes')}}</a><!--
-					-->｜<a href='/dict'>{{lang('Dictionary')}}</a><!--
-					-->｜</td>
-			</tr>
-			<tr><td colspan='2'>
+			<tr><td width='100%'>
 % if weather:
 {{weather['basic']['city']}}&nbsp;{{weather['now']['cond']['txt']}}&nbsp;{{weather['daily_forecast'][0]['tmp']['min']}}{{lang('Centidegree')}}/{{weather['daily_forecast'][0]['tmp']['max']}}{{lang('Centidegree')}}
 % try:
@@ -45,4 +37,3 @@ weekStr = lang('_week_format')[now.weekday()];
 		<div><a href='/articles'><b>{{lang('More Articles')}}&gt;&gt;</b></a></div>
 	</body>
 </html>
-
