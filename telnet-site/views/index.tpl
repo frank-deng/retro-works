@@ -13,7 +13,7 @@ weekStr = lang('_week_format')[now.weekday()];
 	</head>
 	<body>
 		<table width='100%'>
-			<tr><td width='100%'>
+			<tr><td>
 % if weather:
 {{weather['basic']['city']}}&nbsp;{{weather['now']['cond']['txt']}}&nbsp;{{weather['daily_forecast'][0]['tmp']['min']}}{{lang('Centidegree')}}/{{weather['daily_forecast'][0]['tmp']['max']}}{{lang('Centidegree')}}
 % try:
@@ -21,11 +21,19 @@ weekStr = lang('_week_format')[now.weekday()];
 % except KeyError:
 %	pass;
 % end
-<a href='/weather/detail.do'>[{{lang('Weather Detail')}}]</a>
 % else:
 {{lang('No Weather Information')}}
 % end
-				<a href='weather/setcity.do'>[{{lang('Change City')}}]</a>
+      </td>
+      <td align='right' width='160px'>
+% if weather:
+<a href='/weather/detail.do'>[{{lang('Weather Detail')}}]</a><!--
+% else:
+<!--
+% end
+--><a href='weather/setcity.do'>[{{lang('Change City')}}]</a>
+			</td></tr>
+      <tr><td colspan=2>
 				<b><hr/></b>
 			</td></tr>
 		</table>

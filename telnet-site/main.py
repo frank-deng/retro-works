@@ -65,17 +65,11 @@ def index():
     city = urllib.parse.unquote(request.cookies.getunicode('city', '')).strip();
     return {
         'weather':models.getWeatherInfo(city),
-        'articles':models.getArticles()['content'][0:17],
+        'articles':models.getArticles()['content'][0:18],
     };
 
 try:
     run(server='eventlet', host=args.host, port=args.port);
 except KeyboardInterrupt:
     pass;
-finally:
-    if (None != timerNewsUpdate):
-        timerNewsUpdate.stop();
-    if (None != timerNewsUpdate2):
-        timerNewsUpdate2.stop();
-    if (None != timerJokesUpdate):
-        timerJokesUpdate.stop();
+

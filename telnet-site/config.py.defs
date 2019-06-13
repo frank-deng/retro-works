@@ -1,10 +1,6 @@
 import os;
-SHOWAPI_APPID="12345";
-SHOWAPI_SECRET="nnn";
 HEWEATHER_KEY="nnn";
 REQUEST_TIMEOUT=7
 LANGUAGE='zh-CN';
 ARTICLES_PATH=os.path.dirname(os.path.realpath(__file__))+os.sep+'articles';
 PAGESIZE=19
-NEWS_UPDATE_INTERVAL=666
-JOKES_UPDATE_INTERVAL=3600
