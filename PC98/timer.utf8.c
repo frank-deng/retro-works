@@ -125,9 +125,9 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 	}
 }
 void showTime(unsigned int secRemain){
-	unsigned char sec = secRemain % 60, buf[20], *pbuf=buf;
+	unsigned char sec = secRemain % 60, buf[30], *pbuf=buf;
 	uint16_t min = secRemain / 60, attr = (0==secRemain ? 0x45 : 0xe1);
-  memset(buf,'\0',20);
+  memset(buf,'\0',29);
 
   *pbuf='<';
   pbuf++;
@@ -173,6 +173,16 @@ void showTime(unsigned int secRemain){
   *pbuf=' ';
   pbuf++;
   *pbuf='>';
+  pbuf++;
+  *pbuf=' ';
+  pbuf++;
+  *pbuf=' ';
+  pbuf++;
+  *pbuf=' ';
+  pbuf++;
+  *pbuf=' ';
+  pbuf++;
+  *pbuf='\0';
   pbuf++;
 
 	cputstr(buf, 0, 7, attr);
