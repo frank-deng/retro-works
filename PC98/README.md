@@ -30,9 +30,9 @@ A simple countdown timer for NEC PC-9800 Series, using beep speaker for alarming
 
 ### How To Build
 
-1. Install Turbo C++ 4.0 Japanese Version under PC98 or DOS/V.
-2. Build using command `tc /b /m timer.c`.
-3. Copy generated `timer.exe` to your PC98 environment.
+1. Download [LSI C-86](https://www.lsi-j.co.jp/freesoft/index.html).
+2. Copy `lsic330c.lzh` to your PC98 environment, then extract it to directory `A:\LSIC86\`.
+3. Compile with command `lcc -o TIMER.EXE TIMER.C`.
 
 ### Screenshots
 

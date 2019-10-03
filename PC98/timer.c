@@ -111,6 +111,7 @@ static unsigned int getOrigCounter(){
 
 static uint16_t far* vram = 0xA0000000;
 static uint16_t far* vramattr = 0xA0002000;
+/*
 void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t offset = (y<<6) + (y<<4) + x;
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
@@ -124,41 +125,47 @@ void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
 		p_vramattr++;
 	}
 }
+*/
 void showTime(unsigned int secRemain){
-	unsigned char sec = secRemain % 60, buf[30], *pbuf=buf;
-	uint16_t min = secRemain / 60, attr = (0==secRemain ? 0x45 : 0xe1);
-  memset(buf,'\0',29);
+	uint16_t offset = (7*80), i;
+	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
+	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
+	uint16_t far *pbuf = p_vram;
 
+	unsigned char sec = secRemain % 60, length=0;
+	uint16_t min = secRemain / 60, attr = (0==secRemain ? 0x45 : 0xe1);
+
+  /* Show prefix */
   *pbuf='<';
-  pbuf++;
+  pbuf++;length++;
   *pbuf=' ';
-  pbuf++;
+  pbuf++;length++;
 
   /* Show minute */
   if(min>=10000){
     *pbuf = '0'+(min/10000)%10;
-    pbuf++;
+    pbuf++;length++;
   }
   if(min>=1000){
     *pbuf = '0'+(min/1000)%10;
-    pbuf++;
+    pbuf++;length++;
   }
   if(min>=100){
     *pbuf = '0'+(min/100)%10;
-    pbuf++;
+    pbuf++;length++;
   }
   if(min>=10){
     *pbuf = '0'+(min/10)%10;
   }else{
     *pbuf = '0';
   }
-  pbuf++;
+  pbuf++;length++;
   *pbuf = '0'+(min%10);
-  pbuf++;
+  pbuf++;length++;
 
   /* Show separator */
   *pbuf = ':';
-  pbuf++;
+  pbuf++;length++;
 
   /* Show second */
   if(sec<10){
@@ -166,26 +173,24 @@ void showTime(unsigned int secRemain){
   }else{
     *pbuf = '0'+(sec/10)%10;
   }
-  pbuf++;
+  pbuf++;length++;
   *pbuf = '0'+(sec%10); 
-  pbuf++;
+  pbuf++;length++;
 
+  /* Show suffix */
   *pbuf=' ';
-  pbuf++;
+  pbuf++;length++;
   *pbuf='>';
-  pbuf++;
+  pbuf++;length++;
   *pbuf=' ';
-  pbuf++;
-  *pbuf=' ';
-  pbuf++;
-  *pbuf=' ';
-  pbuf++;
-  *pbuf=' ';
-  pbuf++;
-  *pbuf='\0';
   pbuf++;
 
-	cputstr(buf, 0, 7, attr);
+  /* Show red signal */
+  pbuf=p_vramattr;
+  for(i=0; i<length; i++){
+    *pbuf=attr;
+    pbuf++;
+  }
 }
 typedef enum _action_t{
 	ACTION_NULL,
