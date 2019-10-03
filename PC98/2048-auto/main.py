@@ -28,6 +28,7 @@ def findBestMove(board):
         '3': 'RIGHT',
     }.get(str(lib2048.find_best_move(boardHex)));
 
+TEST=False;
 if __name__ == '__main__':
     from Grabber2048 import Grabber2048;
     from pykeyboard import PyKeyboard;
@@ -41,9 +42,14 @@ if __name__ == '__main__':
     }
 
     grabber2048 = Grabber2048();
+    if(TEST):
+        time.sleep(5);
+        grabber2048.testTemplate(3, 1, '8');
+        exit(0);
+
     if None != grabber2048.getBoard():
         offline = True;
-        timeout = 5;
+        timeout = 3;
         print('Please switch to game window in %s seconds'%timeout);
         time.sleep(timeout);
     try:
@@ -63,7 +69,7 @@ if __name__ == '__main__':
                 print('Game Over');
                 break;
             kbd.tap_key(keyOper[move]);
-            time.sleep(0.05);
+            time.sleep(0.2);
     except KeyboardInterrupt:
         pass;
     exit(0);
