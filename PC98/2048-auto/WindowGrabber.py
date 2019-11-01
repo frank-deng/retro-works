@@ -1,27 +1,32 @@
-# Install requirements: apt-get install gir1.2-wnck-3.0 python3-gi
+# Install requirements: apt-get install python3-gi python3-xlib
 import gi, re;
-gi.require_version('Wnck', '3.0');
-from gi.repository import Wnck, Gdk, GdkX11;
+gi.require_version('Gdk','3.0');
+from gi.repository import Gdk, GdkX11;
+
+import Xlib
+import Xlib.display
+import time
 
 class WindowGrabber:
-    @staticmethod
-    def getWindowByTitle(regexp):
-        result = [];
-        screen = Wnck.Screen.get_default();
-        screen.force_update();
-        for win in screen.get_windows():
-            if re.match(regexp, win.get_name()):
-                result.append(win);
-        return result;
-
-    def __init__(self, wnckWindow):
-        self.screen = GdkX11.X11Display.get_default();
-        self.wnckWindow = wnckWindow;
-        self.window = GdkX11.X11Window.foreign_new_for_display(self.screen, self.wnckWindow.get_xid());
-        (self.x, self.y, self.w, self.h) = self.window.get_geometry();
-        self.y = self.h - 400;
-        self.h = 400;
+    def __init__(self, regexp):
+        self.regexp=regexp;
 
     def capture(self):
-        return Gdk.pixbuf_get_from_window(self.window, self.x, self.y, self.w, self.h);
+        try:
+            display = Xlib.display.Display()
+            root = display.screen().root
+            windowID = root.get_full_property(display.intern_atom('_NET_ACTIVE_WINDOW'), Xlib.X.AnyPropertyType).value[0]
+            window = display.create_resource_object('window', windowID);
+            if not re.match(self.regexp, window.get_wm_name()):
+                return None;
+            screen = GdkX11.X11Display.get_default();
+            window = GdkX11.X11Window.foreign_new_for_display(screen,windowID);
+            (x,y,w,h) = window.get_geometry();
+            y = h-400;
+            h = 400;
+            return Gdk.pixbuf_get_from_window(window,x,y,w,h);
+        except AttributeError:
+            return None;
+        except Xlib.error.BadWindow:
+            return None;
 

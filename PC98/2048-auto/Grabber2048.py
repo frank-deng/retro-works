@@ -4,12 +4,7 @@ import numpy as np;
 
 class Grabber2048(WindowGrabber):
     def __init__(self, templatePath = 'numbers.png', winTitle = r'Neko Project'):
-        npRunning = WindowGrabber.getWindowByTitle(winTitle);
-        if (len(npRunning) == 0):
-            raise SystemError('No instances is running.');
-        elif (len(npRunning) > 1):
-            raise SystemError('More than 1 instances are running.');
-        WindowGrabber.__init__(self, npRunning[0]);
+        WindowGrabber.__init__(self, winTitle);
 
         template = cv2.imread(templatePath);
         self.__numberTemplate = {
@@ -34,6 +29,8 @@ class Grabber2048(WindowGrabber):
 
     def __capture(self):
         pixbuf = self.capture();
+        if(None==pixbuf):
+            return None;
         cvimg = cv2.cvtColor(
             np.fromstring(pixbuf.get_pixels(), np.uint8).reshape(
                 pixbuf.get_height(),
@@ -87,6 +84,8 @@ class Grabber2048(WindowGrabber):
 
     def testTemplate(self, x, y, num):
         cvimg = self.__capture();
+        if(None==cvimg):
+            return;
         imgx, imgy = (28+6*x)*8, (9+(y<<1))*16;
         img = cvimg[imgy:imgy+16, imgx:imgx+40];
         template = self.__numberTemplate[num];
@@ -94,6 +93,8 @@ class Grabber2048(WindowGrabber):
 
     def getBoard(self):
         cvimg = self.__capture();
+        if(cvimg is None):
+            return None;
         result = [];
         for y in range(4):
             for x in range(4):

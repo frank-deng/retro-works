@@ -32,7 +32,8 @@ TEST=False;
 if __name__ == '__main__':
     from Grabber2048 import Grabber2048;
     from pykeyboard import PyKeyboard;
-    offline = False;
+    status=None;
+    statusLast=None;
     kbd = PyKeyboard();
     keyOper = {
         'UP':kbd.up_key,
@@ -47,29 +48,33 @@ if __name__ == '__main__':
         grabber2048.testTemplate(3, 1, '8');
         exit(0);
 
-    if None != grabber2048.getBoard():
-        offline = True;
-        timeout = 3;
-        print('Please switch to game window in %s seconds'%timeout);
-        time.sleep(timeout);
     try:
         while True:
+            # Grab current board
             board = grabber2048.getBoard();
-            if None == board:
-                if not offline:
+            if board is None:
+                if status!='offline':
+                    status='offline';
                     print('2048 is offline.');
-                offline = True;
+                time.sleep(0.5);
                 continue;
-            elif offline:
+            elif status!='online':
+                status='online';
                 print('2048 is online.');
-            offline = False;
 
+            # Find best move, this is time costy
             move = findBestMove(board);
             if None == move:
                 print('Game Over');
                 break;
+
+            # Recheck board after long time calculation
+            if board!=grabber2048.getBoard():
+                continue;
+
+            # Make the move
             kbd.tap_key(keyOper[move]);
-            time.sleep(0.2);
+            time.sleep(0.1);
     except KeyboardInterrupt:
         pass;
     exit(0);
