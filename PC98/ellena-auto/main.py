@@ -37,18 +37,20 @@ def performMove(move):
     counter = 100;
     while counter:
         actualMove = ellena.getPlayerMove();
-        if (moves[0]['mv'] == actualMove):
+        if(actualMove is None):
             break;
-        time.sleep(0.05);
+        if (moves[0]['mv'] == actualMove):
+            time.sleep(0.01);
+            break;
+        time.sleep(0);
         counter -= 1;
+    k.release_key(keyOper[move]);
     if (counter == 0):
         if (None == actualMove):
             actualMoveStr = 'None';
         else:
             actualMoveStr = labelMoves[actualMove];
         print("Warning: Expected %s, got %s."%(labelMoves[moves[0]['mv']], actualMoveStr));
-    k.release_key(keyOper[move]);
-    time.sleep(0.05);
 
 running = True;
 ellena = BLEllena();
@@ -91,7 +93,7 @@ try:
         elif (BLEllena.ELLENA_FAILED == status):
             if (len(moves) > 0):
                 print('Failed at move %d (%s, %f)'%(moves[0]['idx'], labelMoves[moves[0]['mv']], moves[0]['ts']));
-        time.sleep(1/30);
+        time.sleep(0);
 except KeyboardInterrupt:
     pass;
 
