@@ -139,7 +139,7 @@ void drawboard(game2048_t* game){
 	sprintf(buf, "%lu", game->score);
 	cputstr(buf, 34, 5, 0xc1);
 	if (game->status){
-		cputstrj("ゲームオーバー", 33, 19, 0x41);
+		cputstrj("ゲームオーバー", 33, 19, 0x43);
 	}
 }
 
