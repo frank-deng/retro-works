@@ -90,50 +90,6 @@ UCDOS特显程序中可用的字体 Fonts available in the Special Display utili
 ![Sudoku](http://frank-deng.github.io/retro-works/screenshots/Chengfa.png)
 
 
-telnet-site
------------
-
-一个简单的telnet站点，使用[w3m](http://w3m.sourceforge.net)浏览器在字符界面下显示HTML页面。  
-A simple site designed for console-based browser [w3m](http://w3m.sourceforge.net), which makes it works like an old-school telnet BBS site.
-
-### 截图欣赏 Screenshots
-
-![Telnet 1](http://frank-deng.github.io/retro-works/screenshots/telnet1.png)
-
-![Telnet 2](http://frank-deng.github.io/retro-works/screenshots/telnet2.png)
-
-![Telnet 3](http://frank-deng.github.io/retro-works/screenshots/telnet3.png)
-
-![Telnet 4](http://frank-deng.github.io/retro-works/screenshots/telnet4.png)
-
-### Linux服务器端配置 Linux Server Configuration
-
-在`/etc/locale.gen`中加上`zh_CN.GB2312`，然后运行`sudo locale-gen`。  
-Add `zh_CN.GB2312` into `/etc/locale.gen`, then run `sudo locale-gen`.
-
-执行以下命令：  
-Execute the following commands:
-
-	sudo apt-get install w3m ncurses-term tcpser
-	sudo pip install bottle httplib2 markdown
-	sudo cp telnet-site/telnetd.py telnet-site/telnetLogin.py -t /usr/local/bin
-	cp telnet-site/config.telnetsite telnet-site/keymap.telnetsite -t ~/.w3m
-	cd ~/.w3m
-	mv config config.bak ; mv keymap keymap.bak
-	mv config.telnetsite config ; mv keymap.telnetsite keymap
-
-在`/etc/crontab`中加入以下命令，实现开机时自动启动`telnetd.py`和`tcpser`：  
-Add the following command to `/etc/crontab`, so as to start `telnetd.py` on boot:
-
-	@reboot frank	/usr/local/bin/telnetd.py -H 127.0.0.1 -P 2333 -L /usr/local/bin/telnetLogin.py
-	@reboot frank   /usr/bin/tcpser -v 6401 -s 19200 -n"92163=127.0.0.1:2333"
-
-### Windows 3.x客户端使用方法 Windows 3.x Client Usage
-
-打开“附件”程序组里的“终端仿真程序”，将使用的串口设为COM1，并将号码设为“92163”或“1270000000012333”，然后开始拨号，拨号成功后按Enter键进入登录界面。  
-Open "Terminal Emulator" in the "Accessories" program group, set the serial port to use as "COM1", set phone number as 92163 or 1270000000012333, then start dialing. When dialing succeed, press `Enter` to open login panel.
-
-
 实用命令 Useful Commands
 -----------------------
 
