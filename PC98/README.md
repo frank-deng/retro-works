@@ -48,3 +48,10 @@ Sudoku Solver
 
 ![Sudoku Solver](https://frank-deng.github.io/retro-works/PC98/screenshots/sudoku.png)
 
+
+Strong in the Rain by Kenji Miyazawa
+------------------------------------
+
+![雨ニモマケズ](https://frank-deng.github.io/retro-works/PC98/screenshots/poem1.png)
+
+
