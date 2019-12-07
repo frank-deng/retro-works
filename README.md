@@ -22,10 +22,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ### 截图欣赏 Screenshots
 
 2048游戏 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/screenshots/2048_1.png)
-
-2048游戏 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/screenshots/2048_2.png)
+![2048](http://frank-deng.github.io/retro-works/screenshots/2048.png)
 
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](http://frank-deng.github.io/retro-works/screenshots/guessnum.png)
@@ -46,13 +43,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ![Pie Chart](http://frank-deng.github.io/retro-works/screenshots/piechart.png)
 
 俄罗斯方块 Tetris  
-![Tetris](http://frank-deng.github.io/retro-works/screenshots/Tetris_1.png)
-
-俄罗斯方块 Tetris  
-![Tetris](http://frank-deng.github.io/retro-works/screenshots/Tetris_2.png)
-
-俄罗斯方块 Tetris  
-![Tetris](http://frank-deng.github.io/retro-works/screenshots/Tetris_3.png)
+![Tetris](http://frank-deng.github.io/retro-works/screenshots/Tetris.png)
 
 绘制几何形状 Drawing Geometric Shapes  
 ![Shapes](http://frank-deng.github.io/retro-works/screenshots/Shapes.png)
