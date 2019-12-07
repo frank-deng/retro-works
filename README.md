@@ -27,14 +27,23 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 2048游戏 2048 Game  
 ![2048](http://frank-deng.github.io/retro-works/screenshots/2048_2.png)
 
-2048游戏（使用UCDOS特显程序） 2048 Game (Use Special Display utility from UCDOS)  
-![2048](http://frank-deng.github.io/retro-works/screenshots/2048C_1.png)
-
-2048游戏（使用UCDOS特显程序） 2048 Game (Use Special Display utility from UCDOS)  
-![2048](http://frank-deng.github.io/retro-works/screenshots/2048C_2.png)
-
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](http://frank-deng.github.io/retro-works/screenshots/guessnum.png)
+
+九九乘法表 9x9 Multiplication Table  
+![Sudoku](http://frank-deng.github.io/retro-works/screenshots/Chengfa.png)
+
+求1000以内的质数 Get prime numbers under 1000  
+![Prime Numbers](http://frank-deng.github.io/retro-works/screenshots/primes.png)
+
+显示杨辉三角 Display Yanghui Triangle  
+![Yanghui Triangle](http://frank-deng.github.io/retro-works/screenshots/Yanghui.png)
+
+条形图 Bar Chart  
+![Bar Chart](http://frank-deng.github.io/retro-works/screenshots/barchart.png)
+
+饼图 Pie Chart  
+![Pie Chart](http://frank-deng.github.io/retro-works/screenshots/piechart.png)
 
 俄罗斯方块 Tetris  
 ![Tetris](http://frank-deng.github.io/retro-works/screenshots/Tetris_1.png)
@@ -45,31 +54,13 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 俄罗斯方块 Tetris  
 ![Tetris](http://frank-deng.github.io/retro-works/screenshots/Tetris_3.png)
 
-条形图 Bar Chart  
-![Bar Chart](http://frank-deng.github.io/retro-works/screenshots/barchart.png)
-
-饼图 Pie Chart  
-![Pie Chart](http://frank-deng.github.io/retro-works/screenshots/piechart.png)
-
-求1000以内的质数 Get prime numbers under 1000  
-![Prime Numbers](http://frank-deng.github.io/retro-works/screenshots/primes.png)
-
-显示杨辉三角 Display Yanghui Triangle  
-![Yanghui Triangle](http://frank-deng.github.io/retro-works/screenshots/Yanghui.png)
-
 绘制几何形状 Drawing Geometric Shapes  
 ![Shapes](http://frank-deng.github.io/retro-works/screenshots/Shapes.png)
 
-数独求解程序 Sudoku Solver  
-![Sudoku](http://frank-deng.github.io/retro-works/screenshots/sudoku.png)
+屏保 Screensaver  
+![Screensaver](http://frank-deng.github.io/retro-works/screenshots/lines.png)
 
-条形图（使用UCDOS特显程序） Bar Chart (Use Special Display utility from UCDOS)  
-![UCDOS Bar Chart](http://frank-deng.github.io/retro-works/screenshots/barchart2.png)
-
-饼图（使用UCDOS特显程序） Pie Chart (Use Special Display utility from UCDOS)  
-![UCDOS Pie Chart](http://frank-deng.github.io/retro-works/screenshots/piechart2.png)
-
-使用UCDOS特显程序显示大尺寸汉字 Use Special Display utility from UCDOS to display Chinese characters in large size  
+显示古诗 Poem showing
 ![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
 
 UCDOS特显程序中可用的颜色 Colors available in the Special Display utility from UCDOS  
@@ -79,15 +70,6 @@ When UCDOS is started with VESA.DRV display driver, it will be capable of displa
 
 UCDOS特显程序中可用的字体 Fonts available in the Special Display utility from UCDOS  
 ![Fonts](http://frank-deng.github.io/retro-works/screenshots/fonts.png)
-
-屏保 Screensaver  
-![Screensaver](http://frank-deng.github.io/retro-works/screenshots/lines.png)
-
-屏保（使用UCDOS特显程序） Screensaver (Use Special Display utility from UCDOS)  
-![Screensaver](http://frank-deng.github.io/retro-works/screenshots/lines2.png)
-
-九九乘法表 9x9 Multiplication Table  
-![Sudoku](http://frank-deng.github.io/retro-works/screenshots/Chengfa.png)
 
 
 实用命令 Useful Commands
