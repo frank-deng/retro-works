@@ -51,20 +51,12 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 屏保 Screensaver  
 ![Screensaver](http://frank-deng.github.io/retro-works/screenshots/lines.png)
 
-显示古诗 Poem showing
+显示古诗 Poem Showing  
 ![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
-
-UCDOS特显程序中可用的颜色 Colors available in the Special Display utility from UCDOS  
-![256 Colors](http://frank-deng.github.io/retro-works/screenshots/256color.png)  
-UCDOS使用VESA.DRV显示驱动后，可以显示上图中的256种颜色。（默认的VGA显示驱动只显示最上面一行的16种颜色）  
-When UCDOS is started with VESA.DRV display driver, it will be capable of displaying the 256 colors above. (Default VGA.DRV can only display 16 colors in the first row)
-
-UCDOS特显程序中可用的字体 Fonts available in the Special Display utility from UCDOS  
-![Fonts](http://frank-deng.github.io/retro-works/screenshots/fonts.png)
 
 
 实用命令 Useful Commands
------------------------
+------------------------
 
 将原始硬盘镜像转换成VDI格式硬盘镜像  
 Convert raw disk image into VDI format image
