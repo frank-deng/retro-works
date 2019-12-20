@@ -86,10 +86,6 @@ void cputstrj(char* str, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
 	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
 	uint16_t ch, ch2;
-	
-	for (p = str; *p != '\0'; p++){
-    printf("%x ",*p);
-  }
 	for (p = str; *p != '\0'; p++, p_vram++, p_vramattr++){
 		ch = 0xff&(*p); ch <<= 8; ch |= 0xff&(*(p+1));
 		if (jiszen(ch)) {
@@ -414,7 +410,17 @@ action_t getaction(){
 		break;
 	}
 }
+
+#define	TMRMODE		0x77		/* timer mode port */
+#define	TMR1MOD0	0x70		/* timer #1, mode 0(interval timer mode) */
+#define	TMR1MOD3	0x76		/* timer #1, mode 3(square wave generator mode) */
+#define	TMR1CLK		0x3fdb		/* timer #1 counter set port */
+#define	BIOS_FLAG	*(unsigned char far *)0x00000501L	/* BIOS_FLAG at system area */
+#define	SYSCLK_BIT	0x80		/* system clock bit  0:5/10/20MHz, 1:8/16MHz */
+#define	SYSPORTC	0x35		/* system port C */
+#define	BUZ_BIT		0x08		/* buzzer bit  0:on, 1:off */
 void main(){
+  uint16_t counter;
 	game2048_t game; int running = 1, moved;
 	game2048_init(&game);
 
@@ -445,9 +451,17 @@ void main(){
 		}
 	}
 	if (game.status){
-    sound(100);
+    if (BIOS_FLAG&SYSCLK_BIT){
+      counter = 19968;
+    } else {
+      counter = 24576;
+    }
+    outp(TMRMODE, TMR1MOD3);
+    outp(TMR1CLK, (int)(counter&0x00ff));
+    outp(TMR1CLK, (int)(counter>>8));
+	  outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
 		delay(100);
-    nosound();
+	  outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 		while (ACTION_QUIT != getaction()){}
 	}
 	game2048_quit(&game);
