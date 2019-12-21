@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <dos.h>
-#include <farstr.h>
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 
@@ -31,101 +30,75 @@ typedef unsigned short uint16_t;
 #define	EOI			0x20		/* end of interrupt */
 
 union REGS inregs, outregs;
-static unsigned long tick = 0;
-static void (far *OrgTimerVect)();
 static unsigned char imr_m, imr_s;
-static void NewTimer() {
-	tick++;
-	outp(PICPORT, EOI);
-}
-static void far NewTimerVect() {
-	NewTimer();
-	_asm_c("\n\tIRET\n");
-}
-
+static unsigned long tick = 0;
 static unsigned int origCounter = 0;
-static void GetTimer() {
+void (interrupt far *OrgTimerVect)();
+void interrupt far NewTimerVect() {
+	tick++;
+  OrgTimerVect();
+}
+void interrupt far GetOrigTimerVect() {
 	unsigned char lo, hi;
 	lo = inp(TMR0CLK);
 	hi = inp(TMR0CLK);
-	origCounter = hi;
+	origCounter = (0xff&hi);
 	origCounter <<= 8;
-	origCounter |= lo;
-	outp(PICPORT, EOI);
-}
-static void far GetTimerVect() {
-	GetTimer();
-	_asm_c("\n\tIRET\n");
+	origCounter |= (0xff&lo);
+  OrgTimerVect();
 }
 
 static void enableTimer(){
-	_asm_c("\n\tCLI\n");
+  asm CLI;
 	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
-	_asm_c("\n\tSTI\n");
+	asm STI;
 
-	OrgTimerVect = _dos_getvect(TMRINTVEC);
-	_dos_setvect(TMRINTVEC, NewTimerVect);
+	OrgTimerVect = getvect(TMRINTVEC);
+	setvect(TMRINTVEC, NewTimerVect);
 
-	_asm_c("\n\tCLI\n");
-	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
+  asm CLI;
+  outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
 	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
 	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
-	_asm_c("\n\tSTI\n");
+	asm STI;
 }
 static void disableTimer(){
-	_asm_c("\n\tCLI\n");
-	outp(IMR_M, imr_m);
-	outp(IMR_S, imr_s);
+  asm CLI;
 	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
-	_asm_c("\n\tSTI\n");
+	asm STI;
 
-	_dos_setvect(TMRINTVEC, OrgTimerVect);
+	setvect(TMRINTVEC, OrgTimerVect);
 
-	_asm_c("\n\tCLI\n");
-	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
-	_asm_c("\n\tSTI\n");
-}
-static unsigned int getOrigCounter(){
-	outp(TMRMODE, TMR0MOD2);
-
-	_asm_c("\n\tCLI\n");
-	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
-	_asm_c("\n\tSTI\n");
-
-	OrgTimerVect = _dos_getvect(TMRINTVEC);
-	_dos_setvect(TMRINTVEC, GetTimerVect);
-
-	_asm_c("\n\tCLI\n");
-	outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
+  asm CLI;
+  outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
 	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
 	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
-	_asm_c("\n\tSTI\n");
+	asm STI;
+}
+static unsigned int getOrigCounter(){
+  unsigned char lo, hi;
+  asm CLI;
+	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
+	asm STI;
 
-	while (!origCounter) {
-		_asm_c("\n\tHLT\n");
+	OrgTimerVect = getvect(TMRINTVEC);
+	setvect(TMRINTVEC, GetOrigTimerVect);
+
+  asm CLI;
+  outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
+	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
+	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
+	asm STI;
+
+  while (!origCounter) {
+    asm hlt;
 	}
-
-	disableTimer();
-	return origCounter;
+  disableTimer();
+  return origCounter;
 }
 
 static uint16_t far* vram = 0xA0000000;
 static uint16_t far* vramattr = 0xA0002000;
-/*
-void cputstr(char* str, uint16_t x, uint16_t y, uint16_t attr){
-	uint16_t offset = (y<<6) + (y<<4) + x;
-	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
-	uint16_t far *p_vramattr = (uint16_t far*)(vramattr + offset);
-	char *ch;
-				
-	for (ch = str; *ch != '\0'; ch++){
-		*p_vram = (uint16_t)(*ch);
-		*p_vramattr = attr;
-		p_vram++;
-		p_vramattr++;
-	}
-}
-*/
 void showTime(unsigned int secRemain){
 	uint16_t offset = (7*80), i;
 	uint16_t far *p_vram = (uint16_t far*)(vram + offset);
@@ -203,6 +176,7 @@ action_t getaction(){
 	return ACTION_NULL;
 }
 int main(){
+  char input[100];
 	float minutes;
 	unsigned int running = 1, counter, counter10ms, counterOrig;
 	unsigned long maxticks;
@@ -228,21 +202,23 @@ int main(){
 		counter = 1229;
 		counter10ms = 24576;
 	}
-	counterOrig = getOrigCounter();
 
 	outp(TMRMODE, TMR1MOD3);
 	outp(TMR1CLK, (int)(counter&0x00ff));
 	outp(TMR1CLK, (int)(counter>>8));
 
+  /* Get original counter */
+  counterOrig=getOrigCounter();
+
 	outp(TMRMODE, TMR0MOD2);
 	outp(TMR0CLK, (int)(counter10ms&0x00ff));
 	outp(TMR0CLK, (int)(counter10ms>>8));
+	enableTimer();
 
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 
-	enableTimer();
 	while (running && tick < maxticks){
-		_asm_c("\n\tHLT\n");
+		asm hlt;
 		if (0 == (tick & 0x1F)) {
 			showTime((maxticks - tick)/100);
 		}
@@ -254,7 +230,7 @@ int main(){
 	if (running){
 		tick = 0;
 		while (running){
-			_asm_c("\n\tHLT\n");
+			asm hlt;
 			if (tick % 140 < 70) {
 				outp(SYSPORTC, (inp(SYSPORTC)&(~BUZ_BIT)));
 			} else {

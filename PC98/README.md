@@ -3,6 +3,8 @@ Retro Programming Works for NEC PC-9800 Series
 
 Some retro programming works for NEC PC-9800 Series.
 
+Use Turbo C++ 4.0J to compile all the C programs.
+
 2048 For PC-98
 --------------
 
