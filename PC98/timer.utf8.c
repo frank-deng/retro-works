@@ -176,10 +176,6 @@ int main(){
 	outp(TMRMODE, TMR1MOD3);
 	outp(TMR1CLK, (int)(counter&0x00ff));
 	outp(TMR1CLK, (int)(counter>>8));
-
-  /* Get original counter */
-  counterOrig=counter;
-
 	outp(TMRMODE, TMR0MOD2);
 	outp(TMR0CLK, (int)(counter10ms&0x00ff));
 	outp(TMR0CLK, (int)(counter10ms>>8));
@@ -216,8 +212,8 @@ int main(){
 	outp(SYSPORTC, (inp(SYSPORTC)|BUZ_BIT));
 
 	outp(TMRMODE, TMR0MOD3);
-	outp(TMR0CLK, (int)(counterOrig&0x00ff));
-	outp(TMR0CLK, (int)(counterOrig>>8));
+	outp(TMR0CLK, (int)(counter&0x00ff));
+	outp(TMR0CLK, (int)(counter>>8));
 
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
