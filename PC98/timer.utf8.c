@@ -38,15 +38,6 @@ void interrupt far NewTimerVect() {
 	tick++;
   OrgTimerVect();
 }
-void interrupt far GetOrigTimerVect() {
-	unsigned char lo, hi;
-	lo = inp(TMR0CLK);
-	hi = inp(TMR0CLK);
-	origCounter = (0xff&hi);
-	origCounter <<= 8;
-	origCounter |= (0xff&lo);
-  OrgTimerVect();
-}
 
 static void enableTimer(){
   asm CLI;
@@ -74,27 +65,6 @@ static void disableTimer(){
 	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
 	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
 	asm STI;
-}
-static unsigned int getOrigCounter(){
-  unsigned char lo, hi;
-  asm CLI;
-	outp(IMR_M, inp(IMR_M)|TMRIMRBIT);
-	asm STI;
-
-	OrgTimerVect = getvect(TMRINTVEC);
-	setvect(TMRINTVEC, GetOrigTimerVect);
-
-  asm CLI;
-  outp(IMR_M, inp(IMR_M)&(~TMRIMRBIT));
-	outp(IMR_M, (imr_m = (unsigned char)inp(IMR_M))|(0x00));
-	outp(IMR_S, (imr_s = (unsigned char)inp(IMR_S))|(0x20));
-	asm STI;
-
-  while (!origCounter) {
-    asm hlt;
-	}
-  disableTimer();
-  return origCounter;
 }
 
 static uint16_t far* vram = 0xA0000000;
@@ -208,7 +178,7 @@ int main(){
 	outp(TMR1CLK, (int)(counter>>8));
 
   /* Get original counter */
-  counterOrig=getOrigCounter();
+  counterOrig=counter;
 
 	outp(TMRMODE, TMR0MOD2);
 	outp(TMR0CLK, (int)(counter10ms&0x00ff));

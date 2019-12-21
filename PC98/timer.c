@@ -208,7 +208,7 @@ int main(){
 	outp(TMR1CLK, (int)(counter>>8));
 
   /* Get original counter */
-  counterOrig=getOrigCounter();
+  counterOrig=counter;
 
 	outp(TMRMODE, TMR0MOD2);
 	outp(TMR0CLK, (int)(counter10ms&0x00ff));
