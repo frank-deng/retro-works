@@ -1,6 +1,6 @@
 #include <stdio.h>
+#include <string.h>
 #include <dos.h>
-#include <farstr.h>
 #include <stdlib.h>
 #include <jctype.h>
 typedef unsigned char uint8_t;
@@ -47,8 +47,8 @@ static uint16_t far* vram = 0xA0000000;
 static uint16_t far* vramattr = 0xA0002000;
 
 void clrscr(){
-	far_memset((void far *)vram, 0, 4000);
-	far_memset((void far *)vramattr, 0, 4000);
+	_fmemset((void far *)vram, 0, 4000);
+	_fmemset((void far *)vramattr, 0, 4000);
 }
 void cputchar(uint16_t ch, uint16_t x, uint16_t y, uint16_t attr){
 	uint16_t offset = (y<<6) + (y<<4) + x;
@@ -74,11 +74,11 @@ void main(){
 	putchar('\x1e');
 	inregs.x.dx = 0;
 	inregs.h.ah = 0x13;
-	int86y(0x18, &inregs, &outregs);
+	int86(0x18, &inregs, &outregs);
 	outp(0x62, 0x4b);
 	outp(0x60, 0x0f);
 	inregs.h.ah=0x03;
-	int86y(0x18,&inregs,&outregs);
+	int86(0x18,&inregs,&outregs);
 	clrscr();
 
   /*Display lines*/
@@ -96,19 +96,19 @@ void main(){
 
   /*Wait for keypress*/
 	inregs.h.ah=0x05;
-	int86y(0x18,&inregs,&outregs);
-	_asm_c("\n\tHLT\n");
+	int86(0x18,&inregs,&outregs);
+  asm hlt;
 	inregs.h.ah=0x05;
-	int86y(0x18,&inregs,&outregs);
+	int86(0x18,&inregs,&outregs);
 	while(0==outregs.h.bh){
-		_asm_c("\n\tHLT\n");
+    asm hlt;
 		inregs.h.ah=0x05;
-		int86y(0x18,&inregs,&outregs);
+		int86(0x18,&inregs,&outregs);
 	}
 
   /*Recover screen*/
 	inregs.h.ah=0x03;
-	int86y(0x18,&inregs,&outregs);
+	int86(0x18,&inregs,&outregs);
 	outp(0x62, 0x4b);
 	outp(0x60, 0x8f);
 	putchar('\x1e');
