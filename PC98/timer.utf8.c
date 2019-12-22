@@ -37,6 +37,7 @@ void (interrupt far *OrgTimerVect)();
 void interrupt far NewTimerVect() {
 	tick++;
   OrgTimerVect();
+  outp(PICPORT,EOI);
 }
 
 static void enableTimer(){
