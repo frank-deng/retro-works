@@ -36,7 +36,6 @@ static unsigned int origCounter = 0;
 void (interrupt far *OrgTimerVect)();
 void interrupt far NewTimerVect() {
 	tick++;
-  OrgTimerVect();
   outp(PICPORT,EOI);
 }
 
