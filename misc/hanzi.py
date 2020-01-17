@@ -24,20 +24,19 @@ argParser.add_argument(
 );
 argParser.add_argument(
     '-o',
-    metavar='output',
+    metavar='OUTPUT',
     help='Output file.'
 );
 argParser.add_argument(
     '--mode',
     '-m',
-    metavar='mode',
-    help='Output file.'
+    metavar='ascii|graphic',
+    help='Output mode.'
 );
 argParser.add_argument(
     '--line',
     '-l',
     default='100',
-    metavar='line',
     help='Starting line.'
 );
 argParser.add_argument(
