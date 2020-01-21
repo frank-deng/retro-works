@@ -9,7 +9,7 @@ import time
 
 class WindowGrabber:
     def __init__(self, regexp):
-        self.regexp=regexp;
+        self.regexp=re.compile(regexp);
 
     def capture(self):
         try:
@@ -17,7 +17,7 @@ class WindowGrabber:
             root = display.screen().root
             windowID = root.get_full_property(display.intern_atom('_NET_ACTIVE_WINDOW'), Xlib.X.AnyPropertyType).value[0]
             window = display.create_resource_object('window', windowID);
-            if not re.match(self.regexp, window.get_wm_name()):
+            if not self.regexp.match(window.get_wm_name()):
                 return None;
             screen = GdkX11.X11Display.get_default();
             window = GdkX11.X11Window.foreign_new_for_display(screen,windowID);
