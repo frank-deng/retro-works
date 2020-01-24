@@ -55,13 +55,13 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
 
 新年快乐 Happy New Year  
-![Poem](http://frank-deng.github.io/retro-works/screenshots/New_Year.png)
+![Happy New Year](http://frank-deng.github.io/retro-works/screenshots/New_Year.png)
 
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
-![Poem](http://frank-deng.github.io/retro-works/screenshots/Poem_UCDOS.png)
+![Poem for UCDOS](http://frank-deng.github.io/retro-works/screenshots/Poem_UCDOS.png)
 
 新年快乐（使用UCDOS特显程序） Happy New Year (Using UCDOS Special Display Tool)  
-![Poem](http://frank-deng.github.io/retro-works/screenshots/New_Year_UCDOS.png)
+![Happy New Year for UCDOS](http://frank-deng.github.io/retro-works/screenshots/New_Year_UCDOS.png)
 
 
 实用命令 Useful Commands
