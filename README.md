@@ -64,6 +64,54 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ![Happy New Year for UCDOS](http://frank-deng.github.io/retro-works/screenshots/New_Year_UCDOS.png)
 
 
+被模拟的PC Emulated PCs
+-----------------------
+
+### 1992's PC
+
+配置 Configuration
+
+* V30 (80186) CPU
+* 640k RAM
+* 5.25" 1.2M High Density Floppy Drive
+* 5.25" 360k Double Side Floppy Drive
+* CGA Display Adapter with green monochrome monitor
+
+主要用途 Main Usage
+
+* 中英文文字处理 Chinese & English text processing
+* BASIC编程 BASIC Programming
+* 俄罗斯方块游戏 Tetris game
+* 2048游戏 2048 Game
+* 打字练习 Typing training
+* 五笔打字练习 Wubi input training
+
+
+### 1997's PC
+
+配置 Configuration
+
+* CPU 80486SX 33MHz
+* 8M RAM
+* 256M HDD
+* S3 864 Graphics Adapter with 384k VRAM, capable of handling 640x480 256-color video mode.
+* CD-ROM
+* Sound Blaster 16
+* Mouse
+
+主要用途 Main Usage
+
+* 英语学习 English learning
+* 英汉字典 English-Chinese dictionary
+* 中英文文字处理 Chinese & English text processing
+* BASIC编程 BASIC Programming
+* 多媒体光盘浏览 Viewing multimedia CDs
+* 图片浏览 Image viewing
+* 音乐播放 Music playback
+* 视频播放 Video playback
+* （禁止游戏 No Gaming）
+
+
 实用命令 Useful Commands
 ------------------------
 

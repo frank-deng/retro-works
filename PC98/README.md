@@ -24,12 +24,6 @@ Countdown Timer
 
 A simple countdown timer for NEC PC-9800 Series, using beep speaker for alarming.
 
-### How To Build
-
-1. Download [LSI C-86](https://www.lsi-j.co.jp/freesoft/index.html).
-2. Copy `lsic330c.lzh` to your PC98 environment, then extract it to directory `A:\LSIC86\`.
-3. Compile with command `lcc -o TIMER.EXE TIMER.C`.
-
 ### Screenshots
 
 ![Countdown Timer](https://frank-deng.github.io/retro-works/PC98/screenshots/timer1.png)
