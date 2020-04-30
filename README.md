@@ -71,7 +71,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 
 配置 Configuration
 
-* V30 (80186) CPU
+* V30 (80186 Compatible) CPU
 * 640k RAM
 * 5.25" 1.2M High Density Floppy Drive
 * 5.25" 360k Double Side Floppy Drive
@@ -139,25 +139,8 @@ DOSBox使用的Autoexec命令，用于挂载原始硬盘镜像和软盘镜像
 DOSBox autoexec command for mounting raw harddisk image and floppy image
 
 	@imgmount 0 /home/frank/.dosbox/floppy.img -fs none
-	@imgmount 2 /home/frank/.dosbox/dos620jp.img -fs none -t hdd -size 512,63,16,X
+	@imgmount 2 /home/frank/.dosbox/hdd.img -fs none -t hdd -size 512,63,16,X
 
-
-### 启用Linux的串口终端 Enable serial console under Linux
-
-临时为`/dev/ttyS0`启用串口登录（重启后失效）：  
-Temporarily enable serial console on `/dev/ttyS0` (Disabled after reboot):
-
-    systemctl start getty@ttyS0.service
-
-永久为`/dev/ttyS0`启用串口登录：  
-Permanently enable serial console on `/dev/ttyS0`:
-
-    systemctl enable serial-getty@ttyS0.service
-
-查看`/dev/ttyS0`的串口登录功能是否启用：  
-Check whether serial console is enabled on `/dev/ttyS0`:
-
-    systemctl status serial-getty@ttyS0.service
 
 ### 如何在Windows 3.x下安装S3显卡驱动 How to install S3 video driver for Windows 3.x
 
