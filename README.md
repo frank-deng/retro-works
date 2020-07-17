@@ -109,6 +109,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 * 图片浏览 Image viewing
 * 音乐播放 Music playback
 * 视频播放 Video playback
+* 网上冲浪 Surfing Online
 * （禁止游戏 No Gaming）
 
 
