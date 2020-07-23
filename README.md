@@ -98,6 +98,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 * CD-ROM
 * Sound Blaster 16
 * Mouse
+* 33.6k Modem
 
 主要用途 Main Usage
 
@@ -109,8 +110,8 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 * 图片浏览 Image viewing
 * 音乐播放 Music playback
 * 视频播放 Video playback
-* 网上冲浪 Surfing Online
-* （禁止游戏 No Gaming）
+* 拨号上网 Surfing online via dial-up network
+* （禁止游戏 NO GAMING）
 
 
 实用命令 Useful Commands
