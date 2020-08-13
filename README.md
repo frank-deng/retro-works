@@ -83,9 +83,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 * BASIC编程 BASIC Programming
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
-* 打字练习 Typing training
 * 五笔打字练习 Wubi input training
-
 
 ### 1997's PC
 
