@@ -1,31 +1,37 @@
 <?php require('config.php');
-$suggestion_text=array(
-  'air'=>'空气污染指数：',
-  'comf'=>'人体舒适指数：',
-  'cw'=>'洗车指数：',
-  'drsg'=>'穿衣指数：',
-  'flu'=>'感冒指数：',
-  'sport'=>'运动指数：',
-  'trav'=>'旅行指数：',
-  'uv'=>'紫外线指数：'
-);
+try{
+  $suggestion_text=array(
+    'air'=>'空气污染指数：',
+    'comf'=>'人体舒适指数：',
+    'cw'=>'洗车指数：',
+    'drsg'=>'穿衣指数：',
+    'flu'=>'感冒指数：',
+    'sport'=>'运动指数：',
+    'trav'=>'旅行指数：',
+    'uv'=>'紫外线指数：'
+  );
 
-$ch=curl_init();
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_URL, 'https://free-api.heweather.com/v5/weather');
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-  'city'=>$_CONFIG['HEWEATHER_CITY'],
-  'key'=>$_CONFIG['HEWEATHER_KEY']
-)));
-$output = curl_exec($ch);
-curl_close($ch);
-$weather=json_decode($output,true);
-$weather = $weather['HeWeather5'][0];
+  $ch=curl_init();
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+  curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+  curl_setopt($ch, CURLOPT_POST, 1);
+  curl_setopt($ch, CURLOPT_URL, 'https://free-api.heweather.com/v5/weather');
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
+    'city'=>$_CONFIG['HEWEATHER_CITY'],
+    'key'=>$_CONFIG['HEWEATHER_KEY']
+  )));
+  $output = curl_exec($ch);
+  curl_close($ch);
+  $weather=json_decode($output,true);
+  $weather = $weather['HeWeather5'][0];
 
-$_TITLE=$_HEADER=$weather['basic']['city'].'天气';
+  $_TITLE=$_HEADER=$weather['basic']['city'].'天气';
+}catch(Exception $e){
+  die($e->getMessage());
+}
 
 require('header.php');
 ?><table>
@@ -72,7 +78,7 @@ require('header.php');
     <th align='left'>风向</th>
     <th align='left'>风速</th>
   </tr>
-<?php foreach ($weather['daily_forecast'] as $forecast){ ?>
+<?php foreach ($weather['daily_forecast'] as $idx=>$forecast){ if($idx>0){ ?>
   <tr>
     <td><?=$forecast['date']?></td>
     <td><?=$forecast['cond']['txt_d'].'/'.$forecast['cond']['txt_n']?></td>
@@ -83,7 +89,7 @@ require('header.php');
     <td><?=$forecast['wind']['dir']?></td>
     <td><?=$forecast['wind']['sc']?>级</td>
 	</tr>
-<?php } ?>
+<?php }} ?>
 </table>
 <div align='center'><img src='/static/ELEGLINE.GIF'/></div>
 <h3>气象指数</h3>

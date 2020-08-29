@@ -8,8 +8,8 @@ ob_start('mb_output_handler');
 header('content-type: text/html; charset=GB2312');
 $_CONFIG=array(
   'HEWEATHER_CITY'=>"南京",
-  'HEWEATHER_KEY'=>"ba1326589c0f458690c86e27f52b6a74",
-  'TIANAPI_KEY'=>"f1cdbc5696f7bb76280621f98e388c21",
+  'HEWEATHER_KEY'=>"123456",
+  'TIANAPI_KEY'=>"123456",
   'REQUEST_TIMEOUT'=>7,
   'LINKS'=>array(
     array(
