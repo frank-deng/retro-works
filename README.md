@@ -64,6 +64,56 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ![Happy New Year for UCDOS](http://frank-deng.github.io/retro-works/screenshots/New_Year_UCDOS.png)
 
 
+Retro-Site
+----------
+
+一个简单的HTML站点，主要兼容IE3浏览器，并配有类似Jekyll的静态博客网站生成器。  
+A simple HTML site optimized for IE3 browser, equipped with a Jekyll-like static blog site generator.
+
+### Linux服务器端配置 Linux Server Configuration
+
+执行以下命令：  
+Execute the following commands:
+
+	sudo apt-get install tcpser pppd nginx-light php-fpm php-mbstring
+	sudo cp pppd.py /usr/local/bin
+
+在`/etc/crontab`中加入以下命令，实现开机时自动启动`pppd.py`和`tcpser`：  
+Add the following command to `/etc/crontab`, so as to start `pppd.py` and `tcpser` on boot:
+
+	@reboot frank	/usr/local/bin/pppd.py -H 127.0.0.1 -P 2333 defaultroute mtu 576 192.168.1.102:192.168.7.2 noauth
+	@reboot frank /usr/bin/tcpser -v 6401 -s 19200 -n"92163=127.0.0.1:2333"
+
+其中`192.168.7.2`是DOSBox中的PPP拨号客户端使用的IP；`192.168.1.102`则是主机或目标站点的IP。  
+`192.168.7.2` is the IP address used by PPP client inside DOSBox, while `192.168.1.102` is the IP address of the host machine or the target site.
+
+### DOSBox串口配置 Configure DOSBox's Serial Interface
+
+将DOSBox配置中`[serial]`小节下的`serial1`配置项做如下修改：  
+Change DOSBox configuration `serial1` under seciton `[serial]`:
+
+	serial1 = nullmodem server:127.0.0.1 port:6401 rxdelay:0 txdelay:0
+
+### Windows 3.x客户端使用方法 Windows 3.x Client Usage
+
+设置新的PPP连接时需要将电话号码设置成`92163`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
+When setting up new PPP connection, set phone number with `92163`, set IP address with `192.168.7.2`, leave username and password blank.
+
+当连接成功时，打开浏览器，使用URL`http://目标站点IP`访问目标站点。  
+When connection established, open browser and use URL `http://Target IP` to access the target site.
+
+### 截图欣赏 Screenshots
+
+天气预报 Weather Forecast  
+![Weather Forecast](http://frank-deng.github.io/retro-works/screenshots/retro-site_1.png)
+
+我的博客 My Blog  
+![My Blog](http://frank-deng.github.io/retro-works/screenshots/retro-site_2.png)
+
+带数学公式的文章 Article with Equation  
+![Math](http://frank-deng.github.io/retro-works/screenshots/retro-site_3.png)
+
+
 被模拟的PC Emulated PCs
 -----------------------
 
@@ -158,4 +208,21 @@ Add the following code to `/etc/xorg.conf`:
 	Section "ServerFlags"
 	    Option "DontVTSwitch" "true"
 	EndSection
+
+### 启用Linux的串口终端 Enable serial console under Linux
+
+临时为`/dev/ttyS0`启用串口登录（重启后失效）：  
+Temporarily enable serial console on `/dev/ttyS0` (Disabled after reboot):
+
+    systemctl start getty@ttyS0.service
+
+永久为`/dev/ttyS0`启用串口登录：  
+Permanently enable serial console on `/dev/ttyS0`:
+
+    systemctl enable serial-getty@ttyS0.service
+
+查看`/dev/ttyS0`的串口登录功能是否启用：  
+Check whether serial console is enabled on `/dev/ttyS0`:
+
+    systemctl status serial-getty@ttyS0.service
 
