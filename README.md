@@ -63,6 +63,9 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 新年快乐（使用UCDOS特显程序） Happy New Year (Using UCDOS Special Display Tool)  
 ![Happy New Year for UCDOS](http://frank-deng.github.io/retro-works/screenshots/New_Year_UCDOS.png)
 
+**PS:**  
+截图中显示内容为绿色且有扫描线效果的，为CGA显示方式配上绿色单色显示器时的显示效果。  
+Screenshots in green with scanline effect are CGA mode graphics with green monochrome monitor.
 
 Retro-Site
 ----------
