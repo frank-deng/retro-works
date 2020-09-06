@@ -43,6 +43,50 @@ function svg2gif(svgData){
     convert.stdin.end();
   });
 }
+function applyFont(document,text){
+  let _apply=(text,charType)=>{
+    let node;
+    switch(charType){
+      case 'ascii':
+        node=document.createElement('font');
+        node.setAttribute('face', 'Times New Roman');
+        node.appendChild(document.createTextNode(textProc));
+      break;
+      default:
+        node=document.createTextNode(textProc);
+      break;
+    }
+    return node;
+  }
+
+  let textProc='', lastCharType=null, result=document.createDocumentFragment();
+  for(let i=0; i<text.length; i++){
+    let ch=text[i], charCode=text.charCodeAt(i), charType=null;
+    if(charCode <= 0x7f){
+      charType='ascii';
+    }else{
+      charType='cjk';
+    }
+
+    if(charType===lastCharType){
+      textProc+=ch;
+      continue;
+    }else if(!textProc.length){
+      textProc+=ch;
+      lastCharType=charType;
+      continue;
+    }
+
+    result.appendChild(_apply(textProc, charType));
+
+    textProc='';
+    lastCharType=charType;
+  }
+  if(textProc){
+    result.appendChild(_apply(textProc, lastCharType));
+  }
+  return result;
+}
 async function processHTML(content,params={}){
   //Replace equations with corresponding images
   var dom=new JSDOM(content);
@@ -92,6 +136,32 @@ async function processHTML(content,params={}){
     });
   }
   */
+
+  //Walk through the whole dom
+  let tagNameBlacklist={
+    'CODE':true,
+    'PRE':true,
+    'IMG':true
+  };
+  let _procDom=(nodeList)=>{
+    for(let node of nodeList){
+      if(tagNameBlacklist[node.tagName]){
+        continue;
+      }
+
+      //Process child nodes
+      if(1==node.nodeType){
+        _procDom(node.childNodes);
+        continue;
+      }
+
+      //Replace child node with font applied
+      if(3==node.nodeType){
+        node.parentNode.replaceChild(applyFont(document, node.nodeValue),node);
+      }
+    }
+  }
+  _procDom(document.body.childNodes);
 
   //Add template
   let html=document.body.innerHTML;

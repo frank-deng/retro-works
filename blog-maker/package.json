@@ -17,5 +17,8 @@
     "mathjax-full": "^3.0.5",
     "ncp": "^2.0.0",
     "rimraf": "^3.0.2"
+  },
+  "devDependencies": {
+    "html-prettify": "^1.0.3"
   }
 }
