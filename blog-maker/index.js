@@ -6,7 +6,7 @@ const ejs=require('ejs');
 const iconv=require('iconv-lite');
 const parseFile=require('./util').parseFile;
 
-let config={
+var config={
   "staticDir":"static",
   "sourceDir":"_posts",
   "sourceEncoding":"UTF-8",
@@ -43,7 +43,8 @@ async function processPost(name,idx){
     targetEncoding:config.targetEncoding,
     template,
     title: (localConfig.title || name),
-    scale: (localConfig.scale || config.scale)
+    scale: (localConfig.scale || config.scale),
+    font: (config.font||{})
   });
 
   //Generate filename

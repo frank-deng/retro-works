@@ -1,4 +1,6 @@
-const Markdown=require('markdown-it')();
+const Markdown=require('markdown-it')({
+  html:true
+});
 const JSDOM=require('jsdom').JSDOM;
 const ejs=require('ejs');
 const iconv=require('iconv-lite');
@@ -43,18 +45,15 @@ function svg2gif(svgData){
     convert.stdin.end();
   });
 }
-function applyFont(document,text){
+function applyFont(document,text,fontTable={}){
   let _apply=(text,charType)=>{
     let node;
-    switch(charType){
-      case 'ascii':
-        node=document.createElement('font');
-        node.setAttribute('face', 'Times New Roman');
-        node.appendChild(document.createTextNode(textProc));
-      break;
-      default:
-        node=document.createTextNode(textProc);
-      break;
+    if(fontTable[charType]){
+      node=document.createElement('font');
+      node.setAttribute('face', fontTable[charType]);
+      node.appendChild(document.createTextNode(textProc));
+    }else{
+      node=document.createTextNode(textProc);
     }
     return node;
   }
@@ -62,13 +61,15 @@ function applyFont(document,text){
   let textProc='', lastCharType=null, result=document.createDocumentFragment();
   for(let i=0; i<text.length; i++){
     let ch=text[i], charCode=text.charCodeAt(i), charType=null;
-    if(charCode <= 0x7f){
+    if(charCode>=0x20 && charCode <= 0x7f){
       charType='ascii';
-    }else{
+    }else if(charCode>0x7f){
       charType='cjk';
+    }else{
+      charType=null;
     }
 
-    if(charType===lastCharType){
+    if(charType==lastCharType){
       textProc+=ch;
       continue;
     }else if(!textProc.length){
@@ -77,9 +78,9 @@ function applyFont(document,text){
       continue;
     }
 
-    result.appendChild(_apply(textProc, charType));
+    result.appendChild(_apply(textProc, lastCharType));
 
-    textProc='';
+    textProc=ch;
     lastCharType=charType;
   }
   if(textProc){
@@ -141,10 +142,15 @@ async function processHTML(content,params={}){
   let tagNameBlacklist={
     'CODE':true,
     'PRE':true,
-    'IMG':true
+    'IMG':true,
+    'BR':true
   };
   let _procDom=(nodeList)=>{
-    for(let node of nodeList){
+    let nodeListCopy=[];
+    for(let item of nodeList){
+      nodeListCopy.push(item);
+    }
+    for(let node of nodeListCopy){
       if(tagNameBlacklist[node.tagName]){
         continue;
       }
@@ -157,7 +163,7 @@ async function processHTML(content,params={}){
 
       //Replace child node with font applied
       if(3==node.nodeType){
-        node.parentNode.replaceChild(applyFont(document, node.nodeValue),node);
+        node.parentNode.replaceChild(applyFont(document, node.nodeValue, params.font),node);
       }
     }
   }
