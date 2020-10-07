@@ -25,7 +25,7 @@ const svg = new SVG({fontCache:'none', internalSpeechTitles:false});
 
 function svg2gif(svgData){
   return new Promise((resolve,reject)=>{
-    let convert=spawn('convert',['-background','white','-','+antialias','-colors','16','GIF:-']);
+    let convert=spawn('convert',['-background','white','+dither','-','+antialias','-colors','16','GIF:-']);
     let errorMsg='', result=Buffer.alloc(0,0,'binary');
     convert.stderr.on('data', function(data){
       errorMsg+=data;

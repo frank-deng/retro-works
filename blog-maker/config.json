@@ -1,7 +1,7 @@
 {
   "targetEncoding":"GB2312",
   "layout":"post",
-  "scale":10,
+  "scale":8,
   "font":{
     "ascii":"Times New Roman",
     "cjk":"宋体"
