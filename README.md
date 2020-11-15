@@ -73,13 +73,19 @@ Retro-Site
 一个简单的HTML站点，主要兼容IE3浏览器，并配有类似Jekyll的静态博客网站生成器。  
 A simple HTML site optimized for IE3 browser, equipped with a Jekyll-like static blog site generator.
 
+PPP服务器和静态博客网站生成器需要在Linux环境（如Debian、Ubuntu）中运行。  
+PPP Server and static blog site generator require running under Linux environments like Debian, Ubuntu.
+
 ### Linux服务器端配置 Linux Server Configuration
 
-执行以下命令：  
-Execute the following commands:
+执行以下命令安装所需软件：  
+Execute the following commands to install softwares required:
 
-	sudo apt-get install tcpser pppd nginx-light php-fpm php-mbstring
+	sudo apt-get install tcpser python3 pppd nginx-light php-fpm php-mbstring
 	sudo cp pppd.py /usr/local/bin
+
+`pppd.py`可以在代码库中的`misc`目录里找到。  
+`pppd.py` can be found at `misc` folder in this repository.
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`pppd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `pppd.py` and `tcpser` on boot:
@@ -104,6 +110,16 @@ When setting up new PPP connection, set phone number with `92163`, set IP addres
 
 当连接成功时，打开浏览器，使用URL`http://目标站点IP`访问目标站点。  
 When connection established, open browser and use URL `http://Target IP` to access the target site.
+
+### 配置博客生成器 Configure Blog Maker
+
+执行以下命令安装所需的软件：  
+Execute the following commands to install the softwares required:
+
+	sudo apt-get install nodejs imagemagick inkscape
+
+然后进入`blog-maker`目录运行`npm start`即可生成博客站点内容，生成结果在`dist`目录中。  
+Then enter `blog-maker` directory and run `npm start` to generate the blog site, generated files can be found at `dist` directory.
 
 ### 截图欣赏 Screenshots
 
