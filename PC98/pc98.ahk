@@ -6,6 +6,7 @@ RAlt::Send {vk1C}
 LCtrl & RAlt::Send ^{vk1C}
 RCtrl::LAlt
 LWin & LAlt::Send {vkF2}
+Ctrl & Space::ControlSend WinExist("A"),^{Space}
 
 ; Muhenkan (PC98 NFER key)
 ; Henkan (PC98 XFER key)
