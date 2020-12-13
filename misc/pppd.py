@@ -28,8 +28,8 @@ class Terminal:
 
     def __startProc(self):
         global args;
-        ptyPath=f"/proc/{os.getpid()}/fd/{self.__slave}";
-        self.__proc=subprocess.Popen(['pppd', ptyPath]+args.pppd_options);
+        ptyPath="/proc/"+str(os.getpid())+'/fd/'+str(self.__slave);
+        self.__proc=subprocess.Popen(['/usr/sbin/pppd', ptyPath]+args.pppd_options);
 
     def close(self):
         self.__active = False;

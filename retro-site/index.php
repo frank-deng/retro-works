@@ -30,15 +30,11 @@ curl_multi_add_handle($task,$ch_news);
 
 $status=$active=null;
 do{
-  $status=curl_multi_exec($task,$active);
-}while(CURLM_CALL_MULTI_PERFORM==$status);
-while($active && CURLM_OK==$status){
-  if(-1 != curl_multi_select($task)){
-    do {
-      $status=curl_multi_exec($task,$active);
-    } while (CURLM_CALL_MULTI_PERFORM==$status);
-  }
-}
+	$status=curl_multi_exec($task,$active);
+	if($active){
+		curl_multi_select($task);
+	}
+}while($active && CURLM_OK==$status);
 
 try{
   $news=json_decode(curl_multi_getcontent($ch_news),true)['newslist'];
