@@ -23,6 +23,9 @@ LWin & /::ControlSend,,{Blind}{vke2 Down}
 LWin & / up::ControlSend,,{Blind}{vke2 Up}
 
 ;IME ON/OF -> {vkF3}, {vkF4}
+
+;Close emulator
+LWin & Delete::WinClose
 #if
 
 #IfWinActive ahk_exe dosbox-x.exe

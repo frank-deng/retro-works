@@ -8,36 +8,7 @@ const TARGET_PORT = Number(process.argv[4]);
 const PIPE_PATH = `\\\\.\\pipe\\${PIPE_NAME}`;
 
 const _log = console.log;
-function _logbuf(value){
-    if(value>=0x20 && value<0x7f){
-        return String.fromCharCode(value);
-    }
-    return value;
-}
-
-var pipe,stream,client,targetBuffer=[];clientBuffer=[],buf=Buffer.alloc(1);
-
-function sendTarget(){
-  if(!targetBuffer.length){
-    return;
-  }
-  setImmediate(sendTarget);
-  if(client){
-    buf[0]=targetBuffer.shift();
-    client.write(buf);
-  }
-}
-function sendClient(){
-  if(!clientBuffer.length){
-    return;
-  }
-  setImmediate(sendClient);
-  if(stream){
-    buf[0]=clientBuffer.shift();
-    stream.write(buf);
-  }
-}
-sendClient();
+var pipe,stream,client;
 pipe=net.createServer((_stream)=>{
     client=net.connect({
         host:TARGET_HOST,
@@ -46,24 +17,8 @@ pipe=net.createServer((_stream)=>{
         _log('Remote connected');
     });
     stream=_stream;
-    stream.on('data',(s)=>{
-        if(!targetBuffer.length){
-            setImmediate(sendTarget);
-        }
-        let len=s.length;
-        for(let i=0; i<len; i++){
-            targetBuffer.push(s[i]);
-        }
-    });
-    client.on('data',(s)=>{
-        if(!clientBuffer.length){
-            setImmediate(sendClient);
-        }
-        let len=s.length;
-        for(let i=0; i<len; i++){
-            clientBuffer.push(s[i]);
-        }
-    });
+    stream.pipe(client);
+    client.pipe(stream);
     stream.on('end', function() {
         _log('Guest closed connection');
         client.destroy();
