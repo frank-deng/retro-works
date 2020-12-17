@@ -28,6 +28,17 @@ LWin & / up::ControlSend,,{Blind}{vke2 Up}
 LWin & Delete::WinClose
 #if
 
+#IfWinActive ahk_exe fgfs.exe
+*Up::ControlSend,,{Blind}{PgUp Down}
+*Up Up::ControlSend,,{Blind}{PgUp Up}
+*Down::ControlSend,,{Blind}{PgDn Down}
+*Down Up::ControlSend,,{Blind}{PgDn Up}
+*Left::ControlSend,,{Blind}{Insert Down}
+*Left Up::ControlSend,,{Blind}{Insert Up}
+*Right::ControlSend,,{Blind}{Enter Down}
+*Right Up::ControlSend,,{Blind}{Enter Up}
+#if
+
 #IfWinActive ahk_exe dosbox-x.exe
 LWin::F13
 LAlt::F14
