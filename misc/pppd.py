@@ -20,38 +20,29 @@ parser.add_argument('pppd_options', nargs=argparse.REMAINDER, help='Options for 
 args = parser.parse_args();
 
 class Terminal:
-    __active = False;
+    __closed=False;
     def __init__(self):
+        global args;
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
-        self.__startProc();
-
-    def __startProc(self):
-        global args;
         ptyPath="/proc/"+str(os.getpid())+'/fd/'+str(self.__slave);
-        self.__proc=subprocess.Popen(['/usr/sbin/pppd', ptyPath]+args.pppd_options);
+        subprocess.Popen(['/usr/sbin/pppd', ptyPath]+args.pppd_options);
 
     def close(self):
-        self.__active = False;
-        self.__proc.wait();
+        if self.__closed:
+            return;
         os.close(self.__slave);
         os.close(self.__master);
+        self.__closed=True;
 
     def read(self):
-        if (None != self.__proc.poll()):
-            self.__startProc();
         try:
             return os.read(self.__master, 65536);
         except BlockingIOError:
             return b'';
 
     def write(self, data):
-        if (None != self.__proc.poll()):
-            self.__startProc();
-        if self.__active:
-            os.write(self.__master, data);
-        else:
-            self.__active = True;
+        os.write(self.__master, data);
 
 inputs = [];
 outputs = [];
@@ -67,6 +58,17 @@ except OSError as e:
     print(str(e));
     exit(1);
 
+def closeConnection(socket):
+    global inputs,outputs,terms;
+    fileno=str(socket.fileno());
+    if socket in inputs:
+        inputs.remove(socket);
+    if socket in outputs:
+        outputs.remove(socket);
+    if fileno in terms:
+        terms.pop(fileno).close();
+    socket.close();
+
 try:
     while True:
         time.sleep(0.1);
@@ -79,40 +81,24 @@ try:
                 terms[str(conn.fileno())] = Terminal();
             else:
                 try:
-                    data = s.recv(1024);
-                    if data:
-                        terms[str(s.fileno())].write(data);
-                        if s not in outputs:
-                            outputs.append(s);
-                except (ConnectionAbortedError, ConnectionResetError, KeyError):
-                    if str(s.fileno()) in terms:
-                        terms.pop(str(s.fileno())).close();
-                    if s in inputs:
-                        inputs.remove(s);
-                    if s in outputs:
-                        outputs.remove(s);
-                    s.close();
+                    terms[str(s.fileno())].write(s.recv(1024));
+                    if s not in outputs:
+                        outputs.append(s);
+                except Exception as e:
+                    print(e);
+                    closeConnection(s);
 
         for s in writable:
             try:
                 s.sendall(terms[str(s.fileno())].read());
-            except (BrokenPipeError, KeyError):
-                if str(s.fileno()) in terms:
-                    terms.pop(str(s.fileno())).close();
-                if s in inputs:
-                    inputs.remove(s);
                 if s in outputs:
                     outputs.remove(s);
-                s.close();
+            except Exception as e:
+                print(e);
+                closeConnection(s);
 
         for s in exceptional:
-            if str(s.fileno()) in terms:
-                terms.pop().close();
-            if s in inputs:
-                inputs.remove(s);
-            if s in outputs:
-                outputs.remove(s);
-            s.close();
+            closeConnection(s);
 
 except KeyboardInterrupt:
     pass;
