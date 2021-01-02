@@ -67,7 +67,7 @@ module.exports=class{
             }
 
             await new Promise((_continue)=>{
-                setTimeout(_continue, 1000);
+                setTimeout(_continue, 500);
             });
 
             //等待输入用户名，未输入文本时，3s后重来，输入文本后30s内不按回车则重来

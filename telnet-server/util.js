@@ -18,8 +18,20 @@ class Terminal{
     clrscr(){
         this.stream.write('\x1b[2J');
     }
+    clrline(){
+        this.stream.write('\x1b[0K\x1b[1K');
+    }
+    setCursor(enable){
+        this.stream.write(enable ? '\x1b[>5l' : '\x1b[>5h');
+    }
     pc98SetBottomLine(enable){
         this.stream.write(enable ? '\x1b[>1l' : '\x1b[>1h');
+    }
+    reset(){
+        this.clrscr();
+        this.pc98SetBottomLine(true);
+        this.setCursor(true);
+        this.locate(0,0);
     }
 }
 function readln(stream,param={}){

@@ -1,4 +1,6 @@
+const axios=require('axios');
 const Terminal=require('./util').Terminal;
+const FGFS_HOST='http://localhost:8123/'
 module.exports=class{
     constructor(stream,_exit){
         this.terminal=new Terminal(stream,{
@@ -8,11 +10,69 @@ module.exports=class{
         this.terminal.pc98SetBottomLine(false);
         this.terminal.clrscr();
         this.terminal.locate(0,0);
-        this.terminal.print('飛行任務がありません。');
+        this.terminal.setCursor(false);
+        this.terminal.print('Loading...');
+        this.refresh();
+        this.drawFrame();
+        this.refreshTimer=setInterval(()=>{
+            this.refresh()
+        },1000);
+    }
+    drawFrame(){
+        const t=this.terminal;
+        this.terminal.clrscr();
+        this.terminal.locate(0,1);
+        this.terminal.print('飛行制御センター');
+        this.terminal.locate(0,25);
+        this.terminal.print('Press \'s\' to toggle sound.');
+    }
+    async refresh(){
+        let data=null;
+        try{
+            data=await axios({
+                method:'GET',
+                url:FGFS_HOST+'/json/fgreport'
+            });
+        }catch(e){
+            if(this.data){
+                this.data=null;
+                this.drawFrame();
+                this.terminal.locate(12,Math.floor((80-22)/2));
+                this.terminal.print('飛行任務がありません。');
+            }
+            return;
+        }
+
+        try{
+            let fgreport={};
+            for(let item of data.data.children){
+                fgreport[item.name]=item.value;
+            }
+
+            if(!this.data){
+                this.drawFrame();
+            }
+            this.data=fgreport;
+
+            this.terminal.locate(0,3);
+            this.terminal.print('機種：'+fgreport.aircraft+'        ');
+            this.terminal.locate(0,4);
+            this.terminal.print('経度：'+fgreport['longitude-deg']+'        ');
+            this.terminal.locate(0,5);
+            this.terminal.print('緯度：'+fgreport['latitude-deg']+'        ');
+            this.terminal.locate(0,6);
+            this.terminal.print('飛行時間：'+fgreport['flight-time-string']+'        ');
+            this.terminal.locate(0,7);
+            this.terminal.print('残り時間：'+fgreport['ete-string']+'        ');
+        }catch(e){
+            console.error(e);
+        }
     }
     destroy(){
-        this.terminal.pc98SetBottomLine(true);
-        this.terminal.clrscr();
+        if(this.refreshTimer){
+            clearInterval(this.refreshTimer);
+        }
+        this.terminal.reset();
         this._exit();
     }
     ondata(data){
