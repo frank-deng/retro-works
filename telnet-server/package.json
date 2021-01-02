@@ -8,5 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "frank-deng",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "iconv-lite": "^0.6.2"
+  }
 }

@@ -1,18 +1,64 @@
 const crypto = require("crypto");
+const fs = require('fs');
 const readln = require('./util').readln;
 const _log = console.log;
 
-const pppServer=require('./ppp');
+class UserManager{
+    _data={};
+    constructor(file){
+        this.jsonFile=file;
+        this._reload();
+        fs.watch(this.jsonFile,'utf8',()=>{
+            _log('Configuration updated');
+            this._reload();
+        });
+    }
+    async _reload(){
+        try{
+            let data=await new Promise((resolve,reject)=>{
+                fs.readFile(this.jsonFile,'utf8',(e,data)=>(e?reject(e):resolve(data)));
+            });
+            data=JSON.parse(data);
+            this._data={};
+            for(let username in data){
+                let moduleStr=data[username].module;
+                delete require.cache[require.resolve(moduleStr)];
+                this._data[username]={
+                    username,
+                    password:data[username].password,
+                    module:require(moduleStr)
+                };
+            }
+        }catch(e){
+            console.error(e);
+        }
+    }
+    get(username){
+        return this._data[username];
+    }
+}
+const userManager=new UserManager('./login.json');
 
 module.exports=class{
     running=true;
     stream=null;
+    instance=null;
+    _sendData=(data)=>{
+        try{
+            this.instance.ondata(data);
+        }catch(e){
+            console.error(e);
+        }
+    }
     constructor(stream){
         this.stream=stream;
         this.main();
     }
     destroy(){
         this.running=false;
+        if(this.instance && 'function'==typeof(this.instance.destroy)){
+            this.instance.destroy();
+        }
     }
     async main(){
         try{
@@ -20,10 +66,14 @@ module.exports=class{
                 return false;
             }
 
+            await new Promise((_continue)=>{
+                setTimeout(_continue, 1000);
+            });
+
             //等待输入用户名，未输入文本时，3s后重来，输入文本后30s内不按回车则重来
-            this.stream.write('Login:');
+            this.stream.write('\r\nLogin:');
             let username=await readln(this.stream,{
-                emptyTimeout:10,
+                emptyTimeout:3,
                 inactiveTimeout:30
             });
             if(!username){
@@ -31,7 +81,7 @@ module.exports=class{
                 return;
             }
 
-            //等待输入密码，30后无反应视为非法登录并要重新输入用户名
+            //等待输入密码，30s后无反应视为非法登录并要重新输入用户名
             this.stream.write('\r\nPassword:');
             let password=await readln(this.stream,{
                 emptyTimeout:30,
@@ -44,10 +94,30 @@ module.exports=class{
                 return;
             }
 
-            //根据用户名和密码查找对应的应用
-            this.stream.write('\r\nSuccess\r\n');
+            //将密码用sha256处理后，根据用户名和密码查找对应的应用
+            let passwordHash=crypto.createHash('sha256').update(password).digest('hex');
+            let loginInfo=userManager.get(username);
+            if(!loginInfo || passwordHash!=loginInfo.password){
+                this.stream.write('\r\nInvalid Login.\r\n');
+                setTimeout(this.main,2000); //防止密码被暴力破解试出来
+                return;
+            }
 
-            await pppServer(this.stream);
+            //运行该用户对应的程序
+            this.stream.write('\r\nSuccess\r\n');
+            await new Promise((_exit)=>{
+                try{
+                    this.instance=new (loginInfo.module)(this.stream,_exit);
+                    if('function'==typeof(this.instance.ondata)){
+                        this.stream.on('data',this._sendData);
+                    }
+                }catch(e){
+                    console.error(e);
+                    this.stream.write('Failed to start application.\r\n');
+                    _exit();
+                }
+            });
+            this.stream.off('data',this._sendData);
             this.main();
         }catch(e){
             console.error(e);

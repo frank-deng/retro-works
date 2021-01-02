@@ -16,33 +16,38 @@ function checkDisconnect(data){
     }
     return true;
 }
-module.exports=async function(stream){
-    return new Promise((_exit)=>{
-        //Redirect everything to ppp
+module.exports=class{
+    client=null;
+    constructor(stream,_exit){
+        this._exit=_exit;
         let client=net.connect({
             host:TARGET_HOST,
             port:TARGET_PORT
-        },function(){
+        },()=>{
             _log('PPP server connected');
-            let streamPipe=(data)=>{
-                client.write(data);
-            }
-            stream.on('data',streamPipe);
+            this.client=client;
             client.on('data',(data)=>{
                 if(checkDisconnect(data)){
-                    _log('PPP server disconnected')
-                    client.destroy();
-                    stream.off('data',streamPipe);
-                    _exit();
+                    _log('PPP server disconnected');
+                    this.destroy();
                 }else{
                     stream.write(data);
                 }
             });
             client.on('error',()=>{
-                client.destroy();
-                stream.off('data',streamPipe);
-                _exit();
+                this.destroy();
             });
         });
-    });
+    }
+    ondata(data){
+        if(this.client){
+            this.client.write(data);
+        }
+    }
+    destroy(){
+        if(this.client){
+            this.client.destroy();
+        }
+        this._exit();
+    }
 }
