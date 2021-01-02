@@ -71,14 +71,31 @@ module.exports=class{
     destroy(){
         if(this.refreshTimer){
             clearInterval(this.refreshTimer);
+            this.refreshTimer=null;
         }
         this.terminal.reset();
         this._exit();
     }
+    async toggleSound(){
+        let {data}=await axios({
+            method:'GET',
+            url:FGFS_HOST+'/json/sim/sound/enabled'
+        });
+        await axios({
+            method:'GET',
+            url:FGFS_HOST+`/props/sim/sound?submit=set&enabled=${data.value ? 'false' : 'true'}`
+        });
+    }
     ondata(data){
         try{
-            if(0x1b==data[0]){
-                this.destroy();
+            switch(data[0]){
+                case 0x1b:
+                    this.destroy();
+                    return;
+                break;
+                case 0x73:
+                    this.toggleSound();
+                break;
             }
         }catch(e){
             console.error(e);
