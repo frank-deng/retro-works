@@ -2,6 +2,7 @@ const axios=require('axios');
 const Terminal=require('./util').Terminal;
 const FGFS_HOST='http://localhost:8123/'
 module.exports=class{
+    data=undefined;
     constructor(stream,_exit){
         this.terminal=new Terminal(stream,{
             outputEncoding:'shift-jis'
@@ -19,7 +20,6 @@ module.exports=class{
         },1000);
     }
     drawFrame(){
-        const t=this.terminal;
         this.terminal.clrscr();
         this.terminal.locate(0,1);
         this.terminal.print('飛行制御センター');
@@ -34,10 +34,10 @@ module.exports=class{
                 url:FGFS_HOST+'/json/fgreport'
             });
         }catch(e){
-            if(this.data){
+            if(null!==this.data){
                 this.data=null;
                 this.drawFrame();
-                this.terminal.locate(12,Math.floor((80-22)/2));
+                this.terminal.locate(Math.floor((80-22)/2),12);
                 this.terminal.print('飛行任務がありません。');
             }
             return;
