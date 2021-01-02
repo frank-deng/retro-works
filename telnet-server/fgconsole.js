@@ -69,12 +69,17 @@ module.exports=class{
         }
     }
     destroy(){
-        if(this.refreshTimer){
-            clearInterval(this.refreshTimer);
-            this.refreshTimer=null;
+        try{
+            if(this.refreshTimer){
+                clearInterval(this.refreshTimer);
+                this.refreshTimer=null;
+            }
+            this.terminal.reset();
+        }catch(e){
+            console.error(e);
+        }finally{
+            this._exit();
         }
-        this.terminal.reset();
-        this._exit();
     }
     async toggleSound(){
         let {data}=await axios({
