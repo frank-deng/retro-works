@@ -3,6 +3,7 @@ const Terminal=require('./util').Terminal;
 const FGFS_HOST='http://localhost:8123/'
 module.exports=class{
     data=undefined;
+    running=true;
     constructor(stream,_exit){
         this.terminal=new Terminal(stream,{
             outputEncoding:'shift-jis'
@@ -14,10 +15,6 @@ module.exports=class{
         this.terminal.setcursor(false);
         this.terminal.print('Loading...');
         this.refresh();
-        this.drawFrame();
-        this.refreshTimer=setInterval(()=>{
-            this.refresh()
-        },1000);
     }
     drawFrame(){
         this.terminal.clrscr();
@@ -35,7 +32,10 @@ module.exports=class{
             this.terminal.print(' ');
         }
         this.terminal.locate(2,25);
-        this.terminal.print('Esc：終了    s:ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p:一時停止/再開');
+        this.terminal.print('Esc：終了');
+        if(this.data){
+            this.terminal.print('    s:ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p:一時停止/再開');
+        }
         this.terminal.setattr(0);
 
         //this.terminal.locate(0,25);
@@ -55,8 +55,18 @@ module.exports=class{
                 this.terminal.locate(Math.floor((80-22)/2),12);
                 this.terminal.print('飛行任務がありません。');
             }
+            setTimeout(()=>{
+                if(this.running){
+                    this.refresh();
+                }
+            },1000);
             return;
         }
+        setTimeout(()=>{
+            if(this.running){
+                this.refresh();
+            }
+        },1000);
 
         try{
             let fgreport={};
@@ -106,10 +116,7 @@ module.exports=class{
     }
     destroy(){
         try{
-            if(this.refreshTimer){
-                clearInterval(this.refreshTimer);
-                this.refreshTimer=null;
-            }
+            this.running=false;
             this.terminal.reset();
         }catch(e){
             console.error(e);
