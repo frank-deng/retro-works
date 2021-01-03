@@ -158,7 +158,7 @@ Then enter `blog-maker` directory and run `npm start` to generate the blog site,
 
 配置 Configuration
 
-* CPU 80486SX 33MHz
+* CPU 80486DX 33MHz
 * 8M RAM
 * 256M HDD
 * S3 864 Graphics Adapter with 384k VRAM, capable of handling 640x480 256-color video mode.
