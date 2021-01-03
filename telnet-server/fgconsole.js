@@ -75,9 +75,9 @@ module.exports=class{
             }
 
             if(!this.data){
+                this.data=fgreport;
                 this.drawFrame();
             }
-            this.data=fgreport;
             fgreport['longitude'] = Math.abs(fgreport['longitude-deg']).toFixed(6)+(fgreport['longitude-deg']>=0 ? 'E' : 'W');
             fgreport['latitude'] = Math.abs(fgreport['latitude-deg']).toFixed(6)+(fgreport['latitude-deg']>=0 ? 'N' : 'S');
             this.terminal.locate(0,3);
