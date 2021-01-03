@@ -58,6 +58,7 @@ module.exports=class{
         this.running=false;
         if(this.instance && 'function'==typeof(this.instance.destroy)){
             this.instance.destroy();
+            this.instance=null;
         }
     }
     async main(){

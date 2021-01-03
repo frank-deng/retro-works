@@ -13,7 +13,7 @@ class Terminal{
         this.stream.write(dataOutput);
     }
     locate(x,y){
-        this.stream.write(`\x1b[${y};${x}H`);
+        this.stream.write(`\x1b[${Math.round(y)};${Math.round(x)}H`);
     }
     clrscr(){
         this.stream.write('\x1b[2J');
@@ -21,8 +21,15 @@ class Terminal{
     clrline(){
         this.stream.write('\x1b[0K\x1b[1K');
     }
-    setCursor(enable){
+    setcursor(enable){
         this.stream.write(enable ? '\x1b[>5l' : '\x1b[>5h');
+    }
+    setattr(){
+        let attrs=[];
+        for(let i=0; i<arguments.length; i++){
+            attrs.push(arguments[i]);
+        }
+        this.stream.write('\x1b['+attrs.join(';')+'m');
     }
     pc98SetBottomLine(enable){
         this.stream.write(enable ? '\x1b[>1l' : '\x1b[>1h');
@@ -30,7 +37,8 @@ class Terminal{
     reset(){
         this.clrscr();
         this.pc98SetBottomLine(true);
-        this.setCursor(true);
+        this.setcursor(true);
+        this.setattr(0);
         this.locate(0,0);
     }
 }
