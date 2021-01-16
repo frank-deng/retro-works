@@ -117,7 +117,6 @@ module.exports=class{
     destroy(){
         try{
             this.running=false;
-            this.terminal.reset();
         }catch(e){
             console.error(e);
         }finally{
@@ -144,6 +143,7 @@ module.exports=class{
         try{
             switch(data[0]){
                 case 0x1b:
+                    this.terminal.reset();
                     this.destroy();
                     return;
                 break;
