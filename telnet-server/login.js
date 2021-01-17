@@ -8,15 +8,17 @@ class UserManager{
     _data={};
     constructor(file){
         this.jsonFile=file;
-        this._reload();
+        config.$on('load',()=>{
+            this._reload();
+        });
         config.$on('change',()=>{
             this._reload();
         });
     }
     async _reload(){
         try{
-            let data=config.get().login;
             this._data={};
+            let data=config.get().login;
             for(let username in data){
                 let moduleStr=data[username].module;
                 delete require.cache[require.resolve(moduleStr)];
