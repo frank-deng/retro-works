@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const fs = require('fs');
+const config=require('./config');
 const readln = require('./util').readln;
 const _log = console.log;
 
@@ -8,17 +9,13 @@ class UserManager{
     constructor(file){
         this.jsonFile=file;
         this._reload();
-        fs.watch(this.jsonFile,'utf8',()=>{
-            _log('Configuration updated');
+        config.$on('change',()=>{
             this._reload();
         });
     }
     async _reload(){
         try{
-            let data=await new Promise((resolve,reject)=>{
-                fs.readFile(this.jsonFile,'utf8',(e,data)=>(e?reject(e):resolve(data)));
-            });
-            data=JSON.parse(data);
+            let data=config.get().login;
             this._data={};
             for(let username in data){
                 let moduleStr=data[username].module;
@@ -26,9 +23,11 @@ class UserManager{
                 this._data[username]={
                     username,
                     password:data[username].password,
-                    module:require(moduleStr)
+                    module:require(moduleStr),
+                    param:data[username].param
                 };
             }
+            _log('login info updated');
         }catch(e){
             console.error(e);
         }
@@ -108,7 +107,7 @@ module.exports=class{
             this.stream.write('\r\nSuccess\r\n');
             await new Promise((_exit)=>{
                 try{
-                    this.instance=new (loginInfo.module)(this.stream,_exit);
+                    this.instance=new (loginInfo.module)(this.stream,_exit,loginInfo.param);
                     if('function'==typeof(this.instance.ondata)){
                         this.stream.on('data',this._sendData);
                     }

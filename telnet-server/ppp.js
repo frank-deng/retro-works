@@ -18,11 +18,12 @@ function checkDisconnect(data){
 }
 module.exports=class{
     client=null;
-    constructor(stream,_exit){
+    constructor(stream,_exit,param){
         this._exit=_exit;
+        _log('PPP server target',param.host,param.port);
         let client=net.connect({
-            host:TARGET_HOST,
-            port:TARGET_PORT
+            host:param.host,
+            port:Number(param.port)
         },()=>{
             _log('PPP server connected');
             this.client=client;
@@ -34,9 +35,10 @@ module.exports=class{
                     stream.write(data);
                 }
             });
-            client.on('error',()=>{
-                this.destroy();
-            });
+        });
+        client.on('error',()=>{
+            _log('PPP server connect failed');
+            this.destroy();
         });
     }
     ondata(data){

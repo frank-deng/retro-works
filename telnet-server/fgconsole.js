@@ -1,14 +1,14 @@
 const axios=require('axios');
 const Terminal=require('./util').Terminal;
-const FGFS_HOST='http://localhost:8123/'
 module.exports=class{
     data=undefined;
     running=true;
-    constructor(stream,_exit){
+    constructor(stream,_exit,param={}){
         this.terminal=new Terminal(stream,{
             outputEncoding:'shift-jis'
         });
         this._exit=_exit;
+        this.FGFS_HOST=param.FGFS_HOST;
         this.terminal.pc98SetBottomLine(false);
         this.terminal.clrscr();
         this.terminal.locate(0,0);
@@ -37,16 +37,13 @@ module.exports=class{
             this.terminal.print('    s:ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p:一時停止/再開');
         }
         this.terminal.setattr(0);
-
-        //this.terminal.locate(0,25);
-        //this.terminal.print('Press \'s\' to toggle sound.');
     }
     async refresh(){
         let data=null;
         try{
             data=await axios({
                 method:'GET',
-                url:FGFS_HOST+'/json/fgreport'
+                url:this.FGFS_HOST+'/json/fgreport'
             });
         }catch(e){
             if(null!==this.data){
@@ -126,17 +123,17 @@ module.exports=class{
     async toggleSound(){
         let {data}=await axios({
             method:'GET',
-            url:FGFS_HOST+'/json/sim/sound/enabled'
+            url:this.FGFS_HOST+'/json/sim/sound/enabled'
         });
         await axios({
             method:'GET',
-            url:FGFS_HOST+`/props/sim/sound?submit=set&enabled=${data.value ? 'false' : 'true'}`
+            url:this.FGFS_HOST+`/props/sim/sound?submit=set&enabled=${data.value ? 'false' : 'true'}`
         });
     }
     async togglePause(){
         await axios({
             method:'GET',
-            url:FGFS_HOST+'/run.cgi?value=pause'
+            url:this.FGFS_HOST+'/run.cgi?value=pause'
         });
     }
     ondata(data){
