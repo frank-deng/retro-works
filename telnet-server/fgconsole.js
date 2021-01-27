@@ -114,6 +114,7 @@ module.exports=class{
                 let text=this.lang.t('No Flight Mission');
                 this.terminal.locate(Math.floor((80-Terminal.strlen(text))/2),12);
                 this.terminal.print(text);
+                this.terminal.locate(80,1);
             }
             return;
         }
