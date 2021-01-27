@@ -2,10 +2,11 @@ const iconv=require('iconv-lite');
 
 class Terminal{
 	static strlen(str){
+        str=String(str);
 		let len=str.length, result=0;
 		for(let i=0; i<len; i++){
 			let c=str.charCodeAt(i);
-			if((c>=0x4e00 && c<=0x9fa5) || (c>=0xf900 && c<=0xfa2d)){
+			if((c>=0x3000 && c<=0x30ff) || (c>=0x4e00 && c<=0x9fa5) || (c>=0xf900 && c<=0xff9f)){
 				result++;
             }
             result++;
@@ -41,7 +42,7 @@ class Terminal{
         this.stream.write(`\x1b[${Math.round(y)};${Math.round(x)}H`);
     }
     clrscr(){
-        this.stream.write('\x1b[2J');
+        this.stream.write('\x1b[0m\x1b[2J');
     }
     clrline(){
         this.stream.write('\x1b[0K\x1b[1K');
@@ -126,7 +127,7 @@ class LanguagePack{
             if(!data){
                 return key;
             }
-            return data[key];
+            return data[key] || key;
         }catch(e){
             console.error(e);
         }

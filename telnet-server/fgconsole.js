@@ -8,7 +8,7 @@ const LANGUAGE_PACK_DATA={
         KEYBOARD_HELP_IDLE:'Esc：退出',
 		KEYBOARD_HELP:'Esc：退出    s:开启/关闭声音    p:暂停/继续',
 		'No Flight Mission':'没有飞行任务。',
-        'Aircraft Model:':'机种',
+        'Aircraft Model':'机种',
 		'Longitude':'经度',
         'Latitude':'纬度',
         'Flight Time':'飞行时间',
@@ -35,7 +35,7 @@ const LANGUAGE_PACK_DATA={
 		KEYBOARD_HELP_IDLE:'Esc：終了',
 		KEYBOARD_HELP:'Esc：終了    s:ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p:一時停止/再開',
 		'No Flight Mission':'飛行任務がありません。',
-		'Aircraft Model:':'機種：',
+		'Aircraft Model':'機種',
 		'Longitude':'経度',
         'Latitude':'緯度',
         'Flight Time':'飛行時間',
@@ -69,7 +69,6 @@ module.exports=class{
         this.lang=new LanguagePack(LANGUAGE_PACK_DATA,param.language);
         
         this.FGFS_HOST=param.FGFS_HOST;
-        this.terminal.pc98SetBottomLine(false);
         this.terminal.clrscr();
         this.terminal.locate(0,0);
         this.terminal.setcursor(false);
@@ -79,25 +78,27 @@ module.exports=class{
     drawFrame(){
         this.terminal.clrscr();
         this.terminal.locate(0,1);
-        this.terminal.setattr(1,7,36);
-        this.terminal.print(' '.repeat(80));
+        this.terminal.setattr(1,7,33,46);
+        this.terminal.print(' '.repeat(79));
         let title=this.lang.t('Flight Control Center');
         this.terminal.locate(Math.round((80-Terminal.strlen(title))/2),1);
         this.terminal.print(title);
         
         this.terminal.locate(0,25);
-        this.terminal.setattr(7,36);
-        this.terminal.print(' '.repeat(80));
-        this.terminal.locate(2,25);
+        this.terminal.setattr(1,7,33,46);
+        this.terminal.print(' '.repeat(79));
+        this.terminal.locate(2,24);
         this.terminal.print(this.lang.t(this.data ? 'KEYBOARD_HELP' : 'KEYBOARD_HELP_IDLE'));
         this.terminal.setattr(0);
     }
     async refresh(){
-        setTimeout(()=>{
-            if(this.running){
-                this.refresh();
-            }
-        },1000);
+        if(this.running){
+            setTimeout(()=>{
+                if(this.running){
+                    this.refresh();
+                }
+            },1000);
+        }
 
         let data=null;
         try{
@@ -109,7 +110,7 @@ module.exports=class{
             if(null!==this.data){
                 this.data=null;
                 this.drawFrame();
-                let text=this.lang.t('Flight Control Center');
+                let text=this.lang.t('No Flight Mission');
                 this.terminal.locate(Math.floor((80-Terminal.strlen(text))/2),12);
                 this.terminal.print(text);
             }
@@ -144,7 +145,7 @@ module.exports=class{
             this.terminal.locate(0,9);
             this.terminal.print(pad(this.lang.t('Remaining Distance'),padSize)+fgreport['distance-remaining-nm'].toFixed(1)+'nm        ');
             this.terminal.locate(0,10);
-            this.terminal.print(pad(this.lang.t('Flight Distance'),padSize)+(Number(fgreport['total-distance'])-Number(fgreport['distance-remaining-nm'])).toFixed(1)+'nm        ');
+            this.terminal.print(pad(this.lang.t('Elapsed Distance'),padSize)+(Number(fgreport['total-distance'])-Number(fgreport['distance-remaining-nm'])).toFixed(1)+'nm        ');
             
             this.terminal.locate(40,4);
             this.terminal.print(pad(this.lang.t('Direction'),padSize)+(Number(fgreport['heading-deg'])).toFixed(2)+'°        ');
@@ -153,7 +154,7 @@ module.exports=class{
             this.terminal.locate(40,6);
             this.terminal.print(pad(this.lang.t('AGL'),padSize)+(Number(fgreport['altitude-agl-ft'])).toFixed(1)+'ft        ');
             this.terminal.locate(40,7);
-            this.terminal.print(pad(this.lang.t('Vertical Speed'),padSize)+(Number(fgreport['vertical-speed-fps'])).toFixed(1)+'ft/s        ');
+            this.terminal.print(pad(this.lang.t('Vertical Speed'),padSize)+(Number(fgreport['vertical-speed-fps'])*60).toFixed(1)+'ft/min        ');
             if('ufo'==fgreport['flight-model']){
                 this.terminal.locate(40,8);
                 this.terminal.print(pad(this.lang.t('Speed'),padSize)+(Number(fgreport['vertical-speed-fps'])).toFixed(1)+'kts        ');
@@ -166,22 +167,23 @@ module.exports=class{
                 this.terminal.print(pad(this.lang.t('Mach'),padSize)+(Number(fgreport['mach'])).toFixed(4)+'     ');
                 this.terminal.locate(40,11);
                 let fuelPercentage=Number(fgreport['remain-fuel'])/Number(fgreport['initial-fuel'])*100;
-                this.terminal.print(pad(this.lang.t('Fuel'),padSize)+fuelPercentage.toFixed(2)+%     ');
+                this.terminal.print(pad(this.lang.t('Fuel'),padSize)+fuelPercentage.toFixed(2)+'%     ');
             }
 
-            this.terminal.locate(0,24);
+            this.terminal.locate(0,23);
             if(fgreport['crashed']){
                 this.terminal.setattr(1,5,33,41);
                 this.terminal.print(this.lang.t('Crashed'));
             }else if(fgreport['paused']){
-                this.terminal.setattr(33);
+                this.terminal.setattr(1,33);
                 this.terminal.print(this.lang.t('Paused'));
             }else{
-                this.terminal.setattr(32);
+                this.terminal.setattr(1,32);
                 this.terminal.print(this.lang.t('In Flight'));
             }
             this.terminal.setattr(0);
             this.terminal.print(' '.repeat(20));
+            this.terminal.locate(80,1);
         }catch(e){
             console.error(e);
         }
