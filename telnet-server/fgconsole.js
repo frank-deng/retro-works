@@ -8,17 +8,26 @@ const LANGUAGE_PACK_DATA={
         KEYBOARD_HELP_IDLE:'Esc：退出',
 		KEYBOARD_HELP:'Esc：退出    s:开启/关闭声音    p:暂停/继续',
 		'No Flight Mission':'没有飞行任务。',
-        'Aircraft Model:':'机种：',
-		'Longitude':'经度：',
-        'Latitude':'纬度：',
-        'Flight Time':'飞行时间：',
-        'Remaining Time':'剩余时间：',
-        'Total Distance':'总里程：',
-        'Remaining Distance':'剩余里程：',
-        'Elapsed Distance':'飞行里程：',
+        'Aircraft Model:':'机种',
+		'Longitude':'经度',
+        'Latitude':'纬度',
+        'Flight Time':'飞行时间',
+        'Remaining Time':'剩余时间',
+        'Total Distance':'总里程',
+        'Remaining Distance':'剩余里程',
+        'Elapsed Distance':'飞行里程',
         'In Flight':'飞行中',
-        'Paused':'暂停',
-        'Crashed':'已坠毁'
+        'Paused':'已暂停',
+        'Crashed':'已坠毁',
+        'Direction':'方向',
+        'AGL':'相对高度',
+        'Altitude':'海拔高度',
+        'Vertical Speed':'垂直速度',
+        'Speed':'速度',
+        'Airspeed':'空速',
+        'Groundspeed':'地速',
+        'Mach':'马赫数',
+        'Fuel':'燃料'
     },
 	'ja':{
 		'Flight Control Center':'飛行制御センター',
@@ -27,16 +36,25 @@ const LANGUAGE_PACK_DATA={
 		KEYBOARD_HELP:'Esc：終了    s:ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p:一時停止/再開',
 		'No Flight Mission':'飛行任務がありません。',
 		'Aircraft Model:':'機種：',
-		'Longitude':'経度：',
-        'Latitude':'緯度：',
-        'Flight Time':'飛行時間：',
-        'Remaining Time':'残り時間：',
-        'Total Distance':'総距離：',
-        'Remaining Distance':'残り距離：',
-        'Elapsed Distance':'飛行距離：',
+		'Longitude':'経度',
+        'Latitude':'緯度',
+        'Flight Time':'飛行時間',
+        'Remaining Time':'残り時間',
+        'Total Distance':'総距離',
+        'Remaining Distance':'残り距離',
+        'Elapsed Distance':'飛行距離',
         'In Flight':'飛行中',
         'Paused':'一時停止',
-        'Crashed':'墜落しました'
+        'Crashed':'墜落しました',
+        'Direction':'方向',
+        'AGL':'対地高度',
+        'Altitude':'海抜高度',
+        'Vertical Speed':'垂直速度',
+        'Speed':'速度',
+        'Airspeed':'対気速度',
+        'Groundspeed':'対地速度',
+        'Mach':'マッハ数',
+        'Fuel':'燃料'
     }
 }
 module.exports=class{
@@ -127,6 +145,29 @@ module.exports=class{
             this.terminal.print(pad(this.lang.t('Remaining Distance'),padSize)+fgreport['distance-remaining-nm'].toFixed(1)+'nm        ');
             this.terminal.locate(0,10);
             this.terminal.print(pad(this.lang.t('Flight Distance'),padSize)+(Number(fgreport['total-distance'])-Number(fgreport['distance-remaining-nm'])).toFixed(1)+'nm        ');
+            
+            this.terminal.locate(40,4);
+            this.terminal.print(pad(this.lang.t('Direction'),padSize)+(Number(fgreport['heading-deg'])).toFixed(2)+'°        ');
+            this.terminal.locate(40,5);
+            this.terminal.print(pad(this.lang.t('Altitude'),padSize)+(Number(fgreport['altitude-ft'])).toFixed(1)+'ft        ');
+            this.terminal.locate(40,6);
+            this.terminal.print(pad(this.lang.t('AGL'),padSize)+(Number(fgreport['altitude-agl-ft'])).toFixed(1)+'ft        ');
+            this.terminal.locate(40,7);
+            this.terminal.print(pad(this.lang.t('Vertical Speed'),padSize)+(Number(fgreport['vertical-speed-fps'])).toFixed(1)+'ft/s        ');
+            if('ufo'==fgreport['flight-model']){
+                this.terminal.locate(40,8);
+                this.terminal.print(pad(this.lang.t('Speed'),padSize)+(Number(fgreport['vertical-speed-fps'])).toFixed(1)+'kts        ');
+            }else{
+                this.terminal.locate(40,8);
+                this.terminal.print(pad(this.lang.t('Airspeed'),padSize)+(Number(fgreport['airspeed-kt'])).toFixed(1)+'kts        ');
+                this.terminal.locate(40,9);
+                this.terminal.print(pad(this.lang.t('Groundspeed'),padSize)+(Number(fgreport['groundspeed-kt'])).toFixed(1)+'kts        ');
+                this.terminal.locate(40,10);
+                this.terminal.print(pad(this.lang.t('Mach'),padSize)+(Number(fgreport['mach'])).toFixed(4)+'     ');
+                this.terminal.locate(40,11);
+                let fuelPercentage=Number(fgreport['remain-fuel'])/Number(fgreport['initial-fuel'])*100;
+                this.terminal.print(pad(this.lang.t('Fuel'),padSize)+fuelPercentage.toFixed(2)+%     ');
+            }
 
             this.terminal.locate(0,24);
             if(fgreport['crashed']){
