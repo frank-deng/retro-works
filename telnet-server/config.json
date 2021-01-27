@@ -17,7 +17,18 @@
             "password": "c74f923bab3ade699d2d9c5deb4107500ee3686b333077f93f34a0eb86bab7f4",
             "module": "./fgconsole",
             "param":{
-                "FGFS_HOST":"http://localhost:8123"
+                "FGFS_HOST":"http://localhost:8123",
+                "language":"zh-cn",
+                "encoding":"gb2312"
+            }
+        },
+        "fgfs98": {
+            "password": "c74f923bab3ade699d2d9c5deb4107500ee3686b333077f93f34a0eb86bab7f4",
+            "module": "./fgconsole",
+            "param":{
+                "FGFS_HOST":"http://localhost:8123",
+                "language":"ja",
+                "encoding":"shift-jis"
             }
         },
         "keytest": {
