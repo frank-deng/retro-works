@@ -60,6 +60,7 @@ const LANGUAGE_PACK_DATA={
 module.exports=class{
     data=undefined;
     running=true;
+    flightStatus=null;
     constructor(stream,_exit,param={}){
         this._exit=_exit;
         
@@ -84,11 +85,11 @@ module.exports=class{
         this.terminal.locate(Math.round((80-Terminal.strlen(title))/2),1);
         this.terminal.print(title);
         
-        this.terminal.locate(0,25);
+        this.terminal.locate(0,24);
         this.terminal.setattr(1,7,33,46);
         this.terminal.print(' '.repeat(79));
         this.terminal.locate(2,24);
-        this.terminal.print(this.lang.t(this.data ? 'KEYBOARD_HELP' : 'KEYBOARD_HELP_IDLE'));
+        this.terminal.print(this.lang.t(this.data ? 'KEYBOARD_HELP' : 'KEYBOARD_HELP_IDLE'),79);
         this.terminal.setattr(0);
     }
     async refresh(){
@@ -123,66 +124,126 @@ module.exports=class{
                 fgreport[item.name]=item.value;
             }
 
+            this.terminal.setattr(0);
+
+            //绘制框架
             if(!this.data){
                 this.data=fgreport;
                 this.drawFrame();
+
+                this.terminal.locate(0,3);
+                this.terminal.print(this.lang.t('Aircraft Model'));
+                this.terminal.locate(0,4);
+                this.terminal.print(this.lang.t('Longitude'));
+                this.terminal.locate(0,5);
+                this.terminal.print(this.lang.t('Latitude'));
+                this.terminal.locate(0,6);
+                this.terminal.print(this.lang.t('Flight Time'));
+                this.terminal.locate(0,7);
+                this.terminal.print(this.lang.t('Remaining Time'));
+                this.terminal.locate(0,8);
+                this.terminal.print(this.lang.t('Total Distance'));
+                this.terminal.locate(0,9);
+                this.terminal.print(this.lang.t('Remaining Distance'));
+                this.terminal.locate(0,10);
+                this.terminal.print(this.lang.t('Elapsed Distance'));
+
+                this.terminal.locate(40,4);
+                this.terminal.print(this.lang.t('Direction'));
+                this.terminal.locate(40,5);
+                this.terminal.print(this.lang.t('Altitude'));
+                this.terminal.locate(40,6);
+                this.terminal.print(this.lang.t('AGL'));
+                this.terminal.locate(40,7);
+                this.terminal.print(this.lang.t('Vertical Speed'));
+                if('ufo'==fgreport['flight-model']){
+                    this.terminal.locate(40,8);
+                    this.terminal.print(this.lang.t('Speed'));
+                }else{
+                    this.terminal.locate(40,8);
+                    this.terminal.print(this.lang.t('Airspeed'));
+                    this.terminal.locate(40,9);
+                    this.terminal.print(this.lang.t('Groundspeed'));
+                    this.terminal.locate(40,10);
+                    this.terminal.print(this.lang.t('Mach'));
+                    this.terminal.locate(40,11);
+                    this.terminal.print(this.lang.t('Fuel'));
+                }
             }
             fgreport['longitude'] = Math.abs(fgreport['longitude-deg']).toFixed(6)+(fgreport['longitude-deg']>=0 ? 'E' : 'W');
             fgreport['latitude'] = Math.abs(fgreport['latitude-deg']).toFixed(6)+(fgreport['latitude-deg']>=0 ? 'N' : 'S');
-            let pad=Terminal.rpad, padSize=11;
-            this.terminal.locate(0,3);
-            this.terminal.print(pad(this.lang.t('Aircraft Model'),padSize)+fgreport.aircraft+'        ');
-            this.terminal.locate(0,4);
-            this.terminal.print(pad(this.lang.t('Longitude'),padSize)+fgreport['longitude']+'        ');
-            this.terminal.locate(0,5);
-            this.terminal.print(pad(this.lang.t('Latitude'),padSize)+fgreport['latitude']+'        ');
-            this.terminal.locate(0,6);
-            this.terminal.print(pad(this.lang.t('Flight Time'),padSize)+fgreport['flight-time-string']+'        ');
-            this.terminal.locate(0,7);
-            this.terminal.print(pad(this.lang.t('Remaining Time'),padSize)+fgreport['ete-string']+'        ');
-            this.terminal.locate(0,8);
-            this.terminal.print(pad(this.lang.t('Total Distance'),padSize)+fgreport['total-distance'].toFixed(1)+'nm        ');
-            this.terminal.locate(0,9);
-            this.terminal.print(pad(this.lang.t('Remaining Distance'),padSize)+fgreport['distance-remaining-nm'].toFixed(1)+'nm        ');
-            this.terminal.locate(0,10);
-            this.terminal.print(pad(this.lang.t('Elapsed Distance'),padSize)+(Number(fgreport['total-distance'])-Number(fgreport['distance-remaining-nm'])).toFixed(1)+'nm        ');
+            let padSize=11;
+            this.terminal.locate(padSize,3);
+            this.terminal.print(fgreport.aircraft+'        ');
+            this.terminal.locate(padSize,4);
+            this.terminal.print(fgreport['longitude']+'        ');
+            this.terminal.locate(padSize,5);
+            this.terminal.print(fgreport['latitude']+'        ');
+            this.terminal.locate(padSize,6);
+            this.terminal.print(fgreport['flight-time-string']+'        ');
+            this.terminal.locate(padSize,7);
+            this.terminal.print(fgreport['ete-string']+'        ');
+            this.terminal.locate(padSize,8);
+            this.terminal.print(fgreport['total-distance'].toFixed(1)+'nm        ');
+            this.terminal.locate(padSize,9);
+            this.terminal.print(fgreport['distance-remaining-nm'].toFixed(1)+'nm        ');
+            this.terminal.locate(padSize,10);
+            this.terminal.print((Number(fgreport['total-distance'])-Number(fgreport['distance-remaining-nm'])).toFixed(1)+'nm        ');
             
-            this.terminal.locate(40,4);
-            this.terminal.print(pad(this.lang.t('Direction'),padSize)+(Number(fgreport['heading-deg'])).toFixed(2)+'°        ');
-            this.terminal.locate(40,5);
-            this.terminal.print(pad(this.lang.t('Altitude'),padSize)+(Number(fgreport['altitude-ft'])).toFixed(1)+'ft        ');
-            this.terminal.locate(40,6);
-            this.terminal.print(pad(this.lang.t('AGL'),padSize)+(Number(fgreport['altitude-agl-ft'])).toFixed(1)+'ft        ');
-            this.terminal.locate(40,7);
-            this.terminal.print(pad(this.lang.t('Vertical Speed'),padSize)+(Number(fgreport['vertical-speed-fps'])*60).toFixed(1)+'ft/min        ');
+            this.terminal.locate(40+padSize,4);
+            this.terminal.print((Number(fgreport['heading-deg'])).toFixed(2)+'°        ');
+            this.terminal.locate(40+padSize,5);
+            this.terminal.print((Number(fgreport['altitude-ft'])).toFixed(1)+'ft        ');
+            this.terminal.locate(40+padSize,6);
+            this.terminal.print((Number(fgreport['altitude-agl-ft'])).toFixed(1)+'ft        ');
+            this.terminal.locate(40+padSize,7);
+            this.terminal.print((Number(fgreport['vertical-speed-fps'])*60).toFixed(1)+'ft/min        ');
             if('ufo'==fgreport['flight-model']){
-                this.terminal.locate(40,8);
-                this.terminal.print(pad(this.lang.t('Speed'),padSize)+(Number(fgreport['vertical-speed-fps'])).toFixed(1)+'kts        ');
+                this.terminal.locate(40+padSize,8);
+                this.terminal.print((Number(fgreport['vertical-speed-fps'])).toFixed(1)+'kts        ');
             }else{
-                this.terminal.locate(40,8);
-                this.terminal.print(pad(this.lang.t('Airspeed'),padSize)+(Number(fgreport['airspeed-kt'])).toFixed(1)+'kts        ');
-                this.terminal.locate(40,9);
-                this.terminal.print(pad(this.lang.t('Groundspeed'),padSize)+(Number(fgreport['groundspeed-kt'])).toFixed(1)+'kts        ');
-                this.terminal.locate(40,10);
-                this.terminal.print(pad(this.lang.t('Mach'),padSize)+(Number(fgreport['mach'])).toFixed(4)+'     ');
-                this.terminal.locate(40,11);
+                this.terminal.locate(40+padSize,8);
+                this.terminal.print((Number(fgreport['airspeed-kt'])).toFixed(1)+'kts        ');
+                this.terminal.locate(40+padSize,9);
+                this.terminal.print((Number(fgreport['groundspeed-kt'])).toFixed(1)+'kts        ');
+                this.terminal.locate(40+padSize,10);
+                this.terminal.print((Number(fgreport['mach'])).toFixed(4)+'     ');
+                this.terminal.locate(40+padSize,11);
                 let fuelPercentage=Number(fgreport['remain-fuel'])/Number(fgreport['initial-fuel'])*100;
-                this.terminal.print(pad(this.lang.t('Fuel'),padSize)+fuelPercentage.toFixed(2)+'%     ');
+                this.terminal.print(fuelPercentage.toFixed(2)+'%     ');
             }
 
-            this.terminal.locate(0,23);
+            let status=null;
             if(fgreport['crashed']){
-                this.terminal.setattr(1,5,33,41);
-                this.terminal.print(this.lang.t('Crashed'));
+                status='crashed';
             }else if(fgreport['paused']){
-                this.terminal.setattr(1,33);
-                this.terminal.print(this.lang.t('Paused'));
+                status='paused';
             }else{
-                this.terminal.setattr(1,32);
-                this.terminal.print(this.lang.t('In Flight'));
+                status='running';
+            }
+            if(this.flightStatus!=status){
+                this.flightStatus=status;
+                this.terminal.locate(0,23);
+                switch(status){
+                    case 'crashed':
+                        this.terminal.setattr(1,5,33,41);
+                        this.terminal.clrline();
+                        this.terminal.print(this.lang.t('Crashed'));
+                    break;
+                    case 'paused':
+                        this.terminal.setattr(1,33);
+                        this.terminal.clrline();
+                        this.terminal.print(this.lang.t('Paused'));
+                    break;
+                    default:
+                        this.terminal.setattr(1,32);
+                        this.terminal.clrline();
+                        this.terminal.print(this.lang.t('In Flight'));
+                    break;
+                }
+                this.terminal.print(' '.repeat(20));
             }
             this.terminal.setattr(0);
-            this.terminal.print(' '.repeat(20));
             this.terminal.locate(80,1);
         }catch(e){
             console.error(e);

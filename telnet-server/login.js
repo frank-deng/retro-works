@@ -9,10 +9,18 @@ class UserManager{
     constructor(file){
         this.jsonFile=file;
         config.$on('load',()=>{
-            this._reload();
+            try{
+                this._reload();
+            }catch(e){
+                console.error(e);
+            }
         });
         config.$on('change',()=>{
-            this._reload();
+            try{
+                this._reload();
+            }catch(e){
+                console.error(e);
+            }
         });
     }
     async _reload(){
