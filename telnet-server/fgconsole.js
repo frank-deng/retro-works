@@ -1,3 +1,4 @@
+const fecha=require('fecha');
 const axios=require('axios');
 const Terminal=require('./util').Terminal;
 const LanguagePack=require('./util').LanguagePack;
@@ -9,6 +10,8 @@ const LANGUAGE_PACK_DATA={
 		KEYBOARD_HELP:'Esc：退出    s:开启/关闭声音    p:暂停/继续',
 		'No Flight Mission':'没有飞行任务。',
         'Aircraft Model':'机种',
+        'UTC Time':'UTC时间',
+        'Local Time':'本地时间',
 		'Longitude':'经度',
         'Latitude':'纬度',
         'Flight Time':'飞行时间',
@@ -36,6 +39,8 @@ const LANGUAGE_PACK_DATA={
 		KEYBOARD_HELP:'Esc：終了    s:ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p:一時停止/再開',
 		'No Flight Mission':'飛行任務がありません。',
 		'Aircraft Model':'機種',
+        'UTC Time':'UTC時間',
+        'Local Time':'地方時間',
 		'Longitude':'経度',
         'Latitude':'緯度',
         'Flight Time':'飛行時間',
@@ -86,20 +91,28 @@ module.exports=class{
         this.terminal.print(title);
         
         this.terminal.locate(0,24);
-        this.terminal.setattr(1,7,33,46);
+        this.terminal.setattr(7,33,46);
         this.terminal.print(' '.repeat(79));
         this.terminal.locate(2,24);
         this.terminal.print(this.lang.t(this.data ? 'KEYBOARD_HELP' : 'KEYBOARD_HELP_IDLE'),79);
         this.terminal.setattr(0);
     }
+    _drawTime(){
+        let timestr=fecha.format(new Date(),'YYYY-MM-DD hh:mm:ss');
+        this.terminal.setattr(7,37,46);
+        this.terminal.locate(80-timestr.length,1);
+        this.terminal.print(timestr);
+        this.terminal.setattr(0);
+    }
     async refresh(){
-        if(this.running){
-            setTimeout(()=>{
-                if(this.running){
-                    this.refresh();
-                }
-            },1000);
+        if(!this.running){
+            return;
         }
+        setTimeout(()=>{
+            if(this.running){
+                this.refresh();
+            }
+        },1000);
 
         let data=null;
         try{
@@ -107,6 +120,9 @@ module.exports=class{
                 method:'GET',
                 url:this.FGFS_HOST+'/json/fgreport'
             });
+            if(!this.running){
+                return;
+            }
         }catch(e){
             if(null!==this.data){
                 this.data=null;
@@ -114,8 +130,8 @@ module.exports=class{
                 let text=this.lang.t('No Flight Mission');
                 this.terminal.locate(Math.floor((80-Terminal.strlen(text))/2),12);
                 this.terminal.print(text);
-                this.terminal.locate(80,1);
             }
+            this._drawTime();
             return;
         }
 
@@ -135,18 +151,22 @@ module.exports=class{
                 this.terminal.locate(0,3);
                 this.terminal.print(this.lang.t('Aircraft Model'));
                 this.terminal.locate(0,4);
-                this.terminal.print(this.lang.t('Longitude'));
+                this.terminal.print(this.lang.t('UTC Time'));
                 this.terminal.locate(0,5);
-                this.terminal.print(this.lang.t('Latitude'));
+                this.terminal.print(this.lang.t('Local Time'));
                 this.terminal.locate(0,6);
-                this.terminal.print(this.lang.t('Flight Time'));
+                this.terminal.print(this.lang.t('Longitude'));
                 this.terminal.locate(0,7);
-                this.terminal.print(this.lang.t('Remaining Time'));
+                this.terminal.print(this.lang.t('Latitude'));
                 this.terminal.locate(0,8);
-                this.terminal.print(this.lang.t('Total Distance'));
+                this.terminal.print(this.lang.t('Flight Time'));
                 this.terminal.locate(0,9);
-                this.terminal.print(this.lang.t('Remaining Distance'));
+                this.terminal.print(this.lang.t('Remaining Time'));
                 this.terminal.locate(0,10);
+                this.terminal.print(this.lang.t('Total Distance'));
+                this.terminal.locate(0,11);
+                this.terminal.print(this.lang.t('Remaining Distance'));
+                this.terminal.locate(0,12);
                 this.terminal.print(this.lang.t('Elapsed Distance'));
 
                 this.terminal.locate(40,4);
@@ -177,18 +197,22 @@ module.exports=class{
             this.terminal.locate(padSize,3);
             this.terminal.print(fgreport.aircraft+'        ');
             this.terminal.locate(padSize,4);
-            this.terminal.print(fgreport['longitude']+'        ');
+            this.terminal.print(fgreport['gmt-string']+'        ');
             this.terminal.locate(padSize,5);
-            this.terminal.print(fgreport['latitude']+'        ');
+            this.terminal.print(fgreport['local-time-string']+'        ');
             this.terminal.locate(padSize,6);
-            this.terminal.print(fgreport['flight-time-string']+'        ');
+            this.terminal.print(fgreport['longitude']+'        ');
             this.terminal.locate(padSize,7);
-            this.terminal.print(fgreport['ete-string']+'        ');
+            this.terminal.print(fgreport['latitude']+'        ');
             this.terminal.locate(padSize,8);
-            this.terminal.print(fgreport['total-distance'].toFixed(1)+'nm        ');
+            this.terminal.print(fgreport['flight-time-string']+'        ');
             this.terminal.locate(padSize,9);
-            this.terminal.print(fgreport['distance-remaining-nm'].toFixed(1)+'nm        ');
+            this.terminal.print(fgreport['ete-string']+'        ');
             this.terminal.locate(padSize,10);
+            this.terminal.print(fgreport['total-distance'].toFixed(1)+'nm        ');
+            this.terminal.locate(padSize,11);
+            this.terminal.print(fgreport['distance-remaining-nm'].toFixed(1)+'nm        ');
+            this.terminal.locate(padSize,12);
             this.terminal.print((Number(fgreport['total-distance'])-Number(fgreport['distance-remaining-nm'])).toFixed(1)+'nm        ');
             
             this.terminal.locate(40+padSize,4);
@@ -244,8 +268,7 @@ module.exports=class{
                 }
                 this.terminal.print(' '.repeat(20));
             }
-            this.terminal.setattr(0);
-            this.terminal.locate(80,1);
+            this._drawTime();
         }catch(e){
             console.error(e);
         }
