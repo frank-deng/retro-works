@@ -91,7 +91,7 @@ module.exports=class{
         this.terminal.print(title);
         
         this.terminal.locate(0,24);
-        this.terminal.setattr(7,33,46);
+        this.terminal.setattr(0,7,37,46);
         this.terminal.print(' '.repeat(79));
         this.terminal.locate(2,24);
         this.terminal.print(this.lang.t(this.data ? 'KEYBOARD_HELP' : 'KEYBOARD_HELP_IDLE'),79);
