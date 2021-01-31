@@ -26,6 +26,9 @@ class UserManager{
     async _reload(){
         try{
             this._data={};
+            if(!config.get()){
+                return;
+            }
             let data=config.get().login;
             for(let username in data){
                 let moduleStr=data[username].module;
