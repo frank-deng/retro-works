@@ -7,7 +7,7 @@ const LANGUAGE_PACK_DATA={
 		'Flight Control Center':'飞控中心',
 		'Loading':'加载中……',
         KEYBOARD_HELP_IDLE:'Esc：退出',
-		KEYBOARD_HELP:'Esc：退出    s:开启/关闭声音    p:暂停/继续',
+		KEYBOARD_HELP:'Esc：退出    s：开启/关闭声音    p：暂停/继续',
 		'No Flight Mission':'没有飞行任务。',
         'Aircraft Model':'机种',
         'UTC Time':'UTC时间',
@@ -36,7 +36,7 @@ const LANGUAGE_PACK_DATA={
 		'Flight Control Center':'飛行制御センター',
 		'Loading':'Loading...',
 		KEYBOARD_HELP_IDLE:'Esc：終了',
-		KEYBOARD_HELP:'Esc：終了    s:ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p:一時停止/再開',
+		KEYBOARD_HELP:'Esc：終了    s：ｻｳﾝﾄﾞｵﾝ/ｵﾌ    p：一時停止/再開',
 		'No Flight Mission':'飛行任務がありません。',
 		'Aircraft Model':'機種',
         'UTC Time':'UTC時間',
@@ -91,7 +91,7 @@ module.exports=class{
         this.terminal.print(title);
         
         this.terminal.locate(0,24);
-        this.terminal.setattr(0,7,37,46);
+        this.terminal.setattr(0,7,30,46);
         this.terminal.print(' '.repeat(79));
         this.terminal.locate(2,24);
         this.terminal.print(this.lang.t(this.data ? 'KEYBOARD_HELP' : 'KEYBOARD_HELP_IDLE'),79);
@@ -99,7 +99,7 @@ module.exports=class{
     }
     _drawTime(){
         let timestr=fecha.format(new Date(),'YYYY-MM-DD hh:mm:ss');
-        this.terminal.setattr(7,37,46);
+        this.terminal.setattr(7,30,46);
         this.terminal.locate(80-timestr.length,1);
         this.terminal.print(timestr);
         this.terminal.setattr(0);
