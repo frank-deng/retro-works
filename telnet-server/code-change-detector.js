@@ -17,12 +17,9 @@ try{
             }
     
             //对发生变动的文件进行处理，即删除对应的require.cache，重新require该模块时新代码会生效
-            console.log('require.cache',Object.keys(require.cache));
-            console.log('_pathCache',Object.keys(module.constructor._pathCache));
-            console.log(fileName);
             if(require.cache[fileName]){
                 delete require.cache[fileName];
-                console.log('JS changed',fileName);
+                console.log('JS code changed:',fileName);
             }
         });
     }
