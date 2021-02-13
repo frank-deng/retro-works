@@ -11,11 +11,15 @@ class Config{
         this._reload().then(()=>{
             this.$emit('load',this._data);
         });
-        fs.watch(this.jsonFile,'utf8',()=>{
+        fs.watch(this.jsonFile,'utf8',(event)=>{
+            if('change'!=event){
+                return;
+            }
             console.log('Configuration updated');
             this._reload();
             this.$emit('change',this._data);
         });
+        console.log('Configuration initialized');
     }
     async _reload(){
         try{

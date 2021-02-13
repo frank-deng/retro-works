@@ -18,6 +18,7 @@ class UserManager{
         config.$on('change',()=>{
             try{
                 this._reload();
+                _log('login info updated');
             }catch(e){
                 console.error(e);
             }
@@ -31,16 +32,14 @@ class UserManager{
             }
             let data=config.get().login;
             for(let username in data){
-                let moduleStr=data[username].module;
-                delete require.cache[require.resolve(moduleStr)];
+                let userData=data[username];
                 this._data[username]={
                     username,
-                    password:data[username].password,
-                    module:require(moduleStr),
-                    param:data[username].param
+                    password:userData.password,
+                    module:userData.module,
+                    param:userData.param
                 };
             }
-            _log('login info updated');
         }catch(e){
             console.error(e);
         }
@@ -120,7 +119,7 @@ module.exports=class{
             this.stream.write('\r\nSuccess\r\n');
             await new Promise((_exit)=>{
                 try{
-                    this.instance=new (loginInfo.module)(this.stream,_exit,loginInfo.param);
+                    this.instance=new (require(loginInfo.module))(this.stream,_exit,loginInfo.param);
                     if('function'==typeof(this.instance.ondata)){
                         this.stream.on('data',this._sendData);
                     }

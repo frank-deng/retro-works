@@ -1,3 +1,4 @@
+require('./code-change-detector');
 const config=require('./config');
 const net = require('net');
 const LoginManager=require('./login');
