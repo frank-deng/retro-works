@@ -68,6 +68,7 @@ module.exports=class{
     flightStatus=null;
     constructor(stream,_exit,param={}){
         this._exit=_exit;
+        this._timer=null;
         
         this.terminal=new Terminal(stream,{
             outputEncoding:param.encoding
@@ -108,7 +109,7 @@ module.exports=class{
         if(!this.running){
             return;
         }
-        setTimeout(()=>{
+        this._timer=setTimeout(()=>{
             if(this.running){
                 this.refresh();
             }
@@ -124,6 +125,9 @@ module.exports=class{
                 return;
             }
         }catch(e){
+            if(!this.running){
+                return;
+            }
             if(null!==this.data){
                 this.data=null;
                 this.drawFrame();
@@ -275,6 +279,9 @@ module.exports=class{
     destroy(){
         try{
             this.running=false;
+            if(this._timer){
+              clearTimeout(this._timer);
+            }
         }catch(e){
             console.error(e);
         }finally{
