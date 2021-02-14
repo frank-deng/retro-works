@@ -85,7 +85,7 @@ module.exports=class{
             //等待输入用户名，未输入文本时，3s后重来，输入文本后30s内不按回车则重来
             this.stream.write('\r\nLogin:');
             let username=await readln(this.stream,{
-                emptyTimeout:3,
+                emptyTimeout:30,
                 inactiveTimeout:30
             });
             if(!username){

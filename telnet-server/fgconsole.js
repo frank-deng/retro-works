@@ -249,23 +249,22 @@ module.exports=class{
             if(this.flightStatus!=status){
                 this.flightStatus=status;
                 this.terminal.locate(0,23);
+                this.terminal.clrline();
                 switch(status){
                     case 'crashed':
                         this.terminal.setattr(1,5,33,41);
-                        this.terminal.clrline();
                         this.terminal.print(this.lang.t('Crashed'));
                     break;
                     case 'paused':
                         this.terminal.setattr(1,33);
-                        this.terminal.clrline();
                         this.terminal.print(this.lang.t('Paused'));
                     break;
                     default:
                         this.terminal.setattr(1,32);
-                        this.terminal.clrline();
                         this.terminal.print(this.lang.t('In Flight'));
                     break;
                 }
+                this.terminal.setattr(0);
                 this.terminal.print(' '.repeat(20));
             }
             this._drawTime();

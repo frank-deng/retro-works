@@ -28,12 +28,7 @@ module.exports=class{
             _log('PPP server connected');
             this.client=client;
             client.on('data',(data)=>{
-                if(checkDisconnect(data)){
-                    _log('PPP server disconnected');
-                    this.destroy();
-                }else{
-                    stream.write(data);
-                }
+              stream.write(data);
             });
         });
         client.on('error',()=>{
