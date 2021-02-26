@@ -2,26 +2,43 @@ const Terminal=require('./util').Terminal;
 const LanguagePack=require('./util').LanguagePack;
 
 function funcReturn(throwError=false,returnFromTry=false,returnFromCatch=false,returnFromFinally=false){
+  let execSeq=[];
   try{
+    execSeq.push('try');
     if(throwError){
       throw new Error('InternalUse'); 
     }
     if(returnFromTry){
-      return 'try';
+      return {
+        execSeq,
+        from:'try'
+      };
     }
   }catch(e){
     if('InternalUse'!=e.message){
       console.error(e);
     }
+    execSeq.push('catch');
     if(returnFromCatch){
-      return 'catch';
+      return {
+        execSeq,
+        from:'catch'
+      };
     }
   }finally{
+    execSeq.push('finally');
     if(returnFromFinally){
-      return 'finally';
+      return {
+        execSeq,
+        from:'finally'
+      };
     }
   }
-  return 'outside';
+  execSeq.push('after');
+  return {
+    execSeq,
+    from:'outside'
+  };
 }
 
 function combinations(values,count,callback){
@@ -65,7 +82,7 @@ module.exports=class{
     this.terminal.print('catch');
     this.terminal.locate(24,2);
     this.terminal.print('finally');
-    this.terminal.locate(40,2);
+    this.terminal.locate(34,2);
     this.terminal.print('Return from');
     let row=3;
     combinations([false,true],4,(values)=>{
@@ -80,17 +97,19 @@ module.exports=class{
       this.terminal.print(returnFromCatch ? 'Yes' : 'No');
       this.terminal.locate(24,row);
       this.terminal.print(returnFromFinally ? 'Yes' : 'No');
-      this.terminal.locate(40,row);
 
       let result=funcReturn(throwError,returnFromTry,returnFromCatch,returnFromFinally);
-      switch(result){
+      this.terminal.locate(34,row);
+      switch(result.from){
         case 'outside':
           this.terminal.print('Outside');
         break;
         default:
-          this.terminal.print(result);
+          this.terminal.print(result.from);
         break;
       }
+      this.terminal.locate(46,row);
+      this.terminal.print(result.execSeq.join('->'));
       row++;
     });
 
