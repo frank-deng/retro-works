@@ -33,6 +33,10 @@
         "keytest": {
             "password": "a8db4cb3bb2819faba9207fd02744e5daa230e373eb23aea0c85628fd24a5ccd",
             "module": "./keytest"
+        },
+        "funcret": {
+            "password": "0da3a7d4ac0580c308b938fd6433fc3e53fb87f0cd530722f003ace7a9b634fa",
+            "module": "./funcReturn"
         }
     }
 }
