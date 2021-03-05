@@ -37,9 +37,20 @@ async function processPost(name,idx){
     template=__dirname+'/'+config.templateDir+'/'+template+'.tpl';
   }
 
+  //Get filename prefix
+  let postPrefix=`p${idx}`;
+  try{
+    let postPrefixMatch=/^\d{4}-\d{2}-\d{2}-([^\.]+)/.exec(name);
+    if(postPrefixMatch){
+      postPrefix=postPrefixMatch[1];
+    }
+  }catch(e){
+    console.error(e);
+  }
+
   //Process document
   let result=await processDocument(content,{
-    imagePrefix:config.equationDir+`/p${idx}`,
+    imagePrefix:config.equationDir+'/'+postPrefix,
     targetEncoding:config.targetEncoding,
     template,
     title: (localConfig.title || name),
@@ -48,7 +59,7 @@ async function processPost(name,idx){
   });
 
   //Generate filename
-  let fileName=`p${idx}.htm`;
+  let fileName=`${postPrefix}.htm`;
   try{
     let fileNameMatch=/\d{4}-\d{2}-\d{2}-([^\.]+)\.md/.exec(name);
     if(fileNameMatch){
