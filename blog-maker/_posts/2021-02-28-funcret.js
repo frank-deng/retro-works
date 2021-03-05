@@ -1,4 +1,4 @@
-const TARGET_FILE='2021-02-28-func-return.md';
+const TARGET_FILE='2021-02-28-funcret.md';
 const fs=require('fs');
 
 function funcReturn(throwError=false,returnFromTry=false,returnFromCatch=false,returnFromFinally=false){

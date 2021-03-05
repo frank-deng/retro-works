@@ -49,6 +49,14 @@ async function processPost(name,idx){
 
   //Generate filename
   let fileName=`p${idx}.htm`;
+  try{
+    let fileNameMatch=/\d{4}-\d{2}-\d{2}-([^\.]+)\.md/.exec(name);
+    if(fileNameMatch){
+      fileName=fileNameMatch[1];
+    }
+  }catch(e){
+    console.error(e);
+  }
 
   //Write to the target
   let target=config.target;
