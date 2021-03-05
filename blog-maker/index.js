@@ -50,7 +50,7 @@ async function processPost(name,idx){
 
   //Process document
   let result=await processDocument(content,{
-    imagePrefix:config.equationDir+'/'+postPrefix,
+    imagePrefix:config.equationDir+`/p${idx}`,
     targetEncoding:config.targetEncoding,
     template,
     title: (localConfig.title || name),
