@@ -12,7 +12,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "fecha": "^4.2.0",
-    "iconv-lite": "^0.6.2"
+    "iconv-lite": "^0.6.2",
+    "node-pty": "^0.10.0"
   },
   "devDependencies": {
     "node-watch": "^0.7.1"

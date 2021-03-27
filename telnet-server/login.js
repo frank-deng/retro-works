@@ -111,7 +111,9 @@ module.exports=class{
             let loginInfo=userManager.get(username);
             if(!loginInfo || passwordHash!=loginInfo.password){
                 this.stream.write('\r\nInvalid Login.\r\n');
-                setTimeout(this.main,2000); //防止密码被暴力破解试出来
+                setTimeout(()=>{
+                  this.main();
+                },2000); //防止密码被暴力破解试出来
                 return;
             }
 

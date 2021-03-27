@@ -30,6 +30,20 @@
                 "encoding":"shift-jis"
             }
         },
+        "frank":{
+          "password":"77646f5a4f3166637627abe998e7a1470fe72d8b430f067dafa86263f1f23f94",
+          "module": "./bash",
+          "param":{
+            "encoding":"gb2312"
+          }
+        },
+        "frank98":{
+          "password":"77646f5a4f3166637627abe998e7a1470fe72d8b430f067dafa86263f1f23f94",
+          "module": "./bash",
+          "param":{
+            "encoding":"shift-jis"
+          }
+        },
         "keytest": {
             "password": "a8db4cb3bb2819faba9207fd02744e5daa230e373eb23aea0c85628fd24a5ccd",
             "module": "./keytest"
