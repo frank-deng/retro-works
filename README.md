@@ -81,7 +81,7 @@ PPP Server and static blog site generator require running under Linux environmen
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
 
-	sudo apt-get install tcpser python3 pppd nginx-light php-fpm php-mbstring
+	sudo apt-get install python3 pppd nginx-light php-fpm php-mbstring
 	sudo cp pppd.py /usr/local/bin
 
 `pppd.py`可以在代码库中的`misc`目录里找到。  
@@ -90,23 +90,31 @@ Execute the following commands to install softwares required:
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`pppd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `pppd.py` and `tcpser` on boot:
 
-	@reboot root /usr/local/bin/pppd.py -H 127.0.0.1 -P 2333 defaultroute mtu 576 192.168.1.102:192.168.7.2 noauth
-	@reboot root /usr/bin/tcpser -v 6401 -s 19200 -n"92163=127.0.0.1:2333"
+	@reboot root /usr/local/bin/pppd.py -H 127.0.0.1 -P 2333 defaultroute mtu 576 10.0.2.15:192.168.7.2 noauth
 
-其中`192.168.7.2`是DOSBox中的PPP拨号客户端使用的IP；`192.168.1.102`则是主机或目标站点的IP。  
-`192.168.7.2` is the IP address used by PPP client inside DOSBox, while `192.168.1.102` is the IP address of the host machine or the target site.
+其中`192.168.7.2`是DOSBox中的PPP拨号客户端使用的IP；`10.0.2.15`则是主机或目标站点的IP。  
+`192.168.7.2` is the IP address used by PPP client inside DOSBox, while `10.0.2.15` is the IP address of the host machine or the target site.
 
 ### DOSBox串口配置 Configure DOSBox's Serial Interface
 
-将DOSBox配置中`[serial]`小节下的`serial1`配置项做如下修改：  
-Change DOSBox configuration `serial1` under seciton `[serial]`:
+在`dosbox-x.conf`所在目录中添加`phonebook.txt`，内容如下：  
+Create `phonebook.txt` at the same directory of `dosbox-x.conf`:
 
-	serial1 = nullmodem server:127.0.0.1 port:6401 rxdelay:0 txdelay:0
+	12345 127.0.0.1:2333
+
+将DOSBox配置中`[serial]`小节下的配置项做如下修改：  
+Change DOSBox configuration under seciton `[serial]`:
+
+	serial1 = modem
+	phonebookfile = phonebook.txt
 
 ### Windows 3.x客户端使用方法 Windows 3.x Client Usage
 
-设置新的PPP连接时需要将电话号码设置成`92163`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
-When setting up new PPP connection, set phone number with `92163`, set IP address with `192.168.7.2`, leave username and password blank.
+设置新的PPP连接时需要将电话号码设置成`12345`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
+When setting up new PPP connection, set phone number with `12345`, set IP address with `192.168.7.2`, leave username and password blank.
+
+检查“使用远程网上的默认网关”选项是否被选中，否则将无法连接目标服务器。  
+Check whether "Use default gateway on remote network" box is checked, or you'll be unable to connect to the target server.
 
 当连接成功时，打开浏览器，使用URL`http://目标站点IP`访问目标站点。  
 When connection established, open browser and use URL `http://Target IP` to access the target site.
@@ -131,6 +139,13 @@ Then enter `blog-maker` directory and run `npm start` to generate the blog site,
 
 带数学公式的文章 Article with Equation  
 ![Math](http://frank-deng.github.io/retro-works/screenshots/retro-site_3.png)
+
+
+Telnet-Server
+-------------
+
+一个简单的telnet服务器，可以使用Telix之类的客户端通过串口进行连接。  
+A simple telnet server, which can be connected via serial port using softwares like Telix.
 
 
 被模拟的PC Emulated PCs
@@ -173,6 +188,7 @@ Then enter `blog-maker` directory and run `npm start` to generate the blog site,
 * 英汉字典 English-Chinese dictionary
 * 中英文文字处理 Chinese & English text processing
 * BASIC编程 BASIC Programming
+* SQLite数据库编程 SQLite Database Programming
 * 多媒体光盘浏览 Viewing multimedia CDs
 * 图片浏览 Image viewing
 * 音乐播放 Music playback
