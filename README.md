@@ -144,8 +144,13 @@ Then enter `blog-maker` directory and run `npm start` to generate the blog site,
 Telnet-Server
 -------------
 
-一个简单的telnet服务器，可以使用Telix之类的客户端通过串口进行连接。  
-A simple telnet server, which can be connected via serial port using softwares like Telix.
+一个简单的telnet服务器，可以使用Telix、HyperTerminal之类的客户端通过串口进行连接。  
+A simple telnet server, which can be connected via serial port using softwares like Telix, HyperTerminal.
+
+服务端需要执行以下命令安装所需的软件：  
+Execute the following commands to install the softwares required at server side:
+
+	sudo apt-get install nodejs ncurses-term
 
 
 被模拟的PC Emulated PCs
@@ -194,6 +199,7 @@ A simple telnet server, which can be connected via serial port using softwares l
 * 音乐播放 Music playback
 * 视频播放 Video playback
 * 拨号上网 Surfing online via dial-up network
+* 拨号连接远程服务器 Connecting to remote server via dial-up network
 * （禁止游戏 NO GAMING）
 
 
