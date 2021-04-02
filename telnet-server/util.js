@@ -1,6 +1,26 @@
 const iconv=require('iconv-lite');
 
 class Terminal{
+  static RESET_ATTR=0;
+  static FG_BLACK=30;
+  static FG_RED=31;
+  static FG_GREEN=32;
+  static FG_YELLOW=33;
+  static FG_BLUE=34;
+  static FG_MAGENTA=35;
+  static FG_CYAN=36;
+  static FG_WHITE=37;
+  static BG_BLACK=40;
+  static BG_RED=41;
+  static BG_GREEN=42;
+  static BG_YELLOW=43;
+  static BG_BLUE=44;
+  static BG_MAGENTA=45;
+  static BG_CYAN=46;
+  static BG_WHITE=47;
+  static ATTR_BOLD=1;
+  static ATTR_UNDERLINE=4;
+  static ATTR_REVERSED=7;
 	static strlen(str){
         str=String(str);
 		let len=str.length, result=0;

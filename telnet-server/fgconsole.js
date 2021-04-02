@@ -85,25 +85,25 @@ module.exports=class{
     drawFrame(){
         this.terminal.clrscr();
         this.terminal.locate(0,1);
-        this.terminal.setattr(1,7,33,46);
+        this.terminal.setattr(Terminal.ATTR_BOLD,Terminal.ATTR_REVERSED,Terminal.FG_YELLOW,Terminal.BG_CYAN);
         this.terminal.print(' '.repeat(79));
         let title=this.lang.t('Flight Control Center');
         this.terminal.locate(Math.round((80-Terminal.strlen(title))/2),1);
         this.terminal.print(title);
         
         this.terminal.locate(0,24);
-        this.terminal.setattr(0,7,30,46);
+        this.terminal.setattr(Terminal.RESET_ATTR,Terminal.ATTR_REVERSED,Terminal.FG_BLACK,Terminal.BG_CYAN);
         this.terminal.print(' '.repeat(79));
         this.terminal.locate(2,24);
         this.terminal.print(this.lang.t(this.data ? 'KEYBOARD_HELP' : 'KEYBOARD_HELP_IDLE'),79);
-        this.terminal.setattr(0);
+        this.terminal.setattr(Terminal.RESET_ATTR);
     }
     _drawTime(){
         let timestr=fecha.format(new Date(),'YYYY-MM-DD hh:mm:ss');
-        this.terminal.setattr(7,30,46);
+        this.terminal.setattr(Terminal.ATTR_REVERSED,Terminal.FG_BLACK,Terminal.BG_CYAN);
         this.terminal.locate(80-timestr.length,1);
         this.terminal.print(timestr);
-        this.terminal.setattr(0);
+        this.terminal.setattr(Terminal.RESET_ATTR);
     }
     async refresh(){
         if(!this.running){
@@ -145,7 +145,7 @@ module.exports=class{
                 fgreport[item.name]=item.value;
             }
 
-            this.terminal.setattr(0);
+            this.terminal.setattr(Terminal.RESET_ATTR);
 
             //绘制框架
             if(!this.data){
@@ -256,19 +256,19 @@ module.exports=class{
                 this.terminal.clrline();
                 switch(status){
                     case 'crashed':
-                        this.terminal.setattr(1,5,33,41);
+                        this.terminal.setattr(Terminal.ATTR_BOLD,Terminal.ATTR_UNDERLINE,Terminal.FG_YELLOW,Terminal.BG_RED);
                         this.terminal.print(this.lang.t('Crashed'));
                     break;
                     case 'paused':
-                        this.terminal.setattr(1,33);
+                        this.terminal.setattr(Terminal.ATTR_BOLD,Terminal.FG_YELLOW);
                         this.terminal.print(this.lang.t('Paused'));
                     break;
                     default:
-                        this.terminal.setattr(1,32);
+                        this.terminal.setattr(Terminal.ATTR_BOLD,Terminal.FG_GREEN);
                         this.terminal.print(this.lang.t('In Flight'));
                     break;
                 }
-                this.terminal.setattr(0);
+                this.terminal.setattr(Terminal.RESET_ATTR);
                 this.terminal.print(' '.repeat(20));
             }
             this._drawTime();
