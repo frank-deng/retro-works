@@ -33,6 +33,7 @@ FUNCTION CHECK(N)
 END FUNCTION
 
 DIM G(8,2) : L=0
+PRINT "Hint: Enter ";CHR$(34);"0,0,0";CHR$(34);" to start calculation."
 DO
   INPUT "Guess,A,B:",IG,A,B
   IF IG=0 THEN
@@ -44,9 +45,13 @@ DO
   END IF
 LOOP WHILE L<8
 IF L<=0 THEN END
-  
-PRINT ""
+
+PRINT "":PRINT "Calculation started, press Esc to cancel."
 FOR N = 123 TO 9876 STEP 1
+  IF CHR$(27)=INKEY$ THEN
+    PRINT "":PRINT "Calculation Cancelled."
+    END
+  END IF
   IF CHECK(N)=1 THEN
     PASSED = 1
     FOR I = 0 TO L-1 STEP 1
@@ -55,7 +60,13 @@ FOR N = 123 TO 9876 STEP 1
         EXIT FOR
       END IF
     NEXT I
-    IF PASSED = 1 THEN PRINT USING "#####";N;
+    IF PASSED = 1 THEN
+      IF N<=999 THEN
+        PRINT " 0";:PRINT USING "###";N;
+      ELSE
+        PRINT USING "#####";N;
+      END IF
+    END IF
   END IF
 NEXT N
-PRINT ""
+PRINT "Calculation Finished."
