@@ -69,4 +69,4 @@ FOR N = 123 TO 9876 STEP 1
     END IF
   END IF
 NEXT N
-PRINT "Calculation Finished."
+PRINT "":PRINT "Calculation Finished."
