@@ -193,7 +193,6 @@ Execute the following commands to install the softwares required at server side:
 * 英汉字典 English-Chinese dictionary
 * 中英文文字处理 Chinese & English text processing
 * BASIC编程 BASIC Programming
-* SQLite数据库编程 SQLite Database Programming
 * 多媒体光盘浏览 Viewing multimedia CDs
 * 图片浏览 Image viewing
 * 音乐播放 Music playback
