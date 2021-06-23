@@ -1,13 +1,12 @@
 TARGET=nyancat.com
-OBJS=nyancat.obj
-CFLAGS=-q -0 -bc -d0 -ecc -ms -s -zc -za -ze -zld -zls
-LDFLAGS=-lr -mt
 
-$(TARGET): $(OBJS)
-	wcl $(CFLAGS) $(LDFLAGS) -fe=$@ $**
+$(TARGET): nyancat.asm frames.inc
+	nasm -o $@ $<
 
-nyancat.obj: nyancat.c
-	wcc $(CFLAGS) -fo=$@ $**
+nyancat.asm:frames.inc
+	python3 imagegen.py frames.inc
 
+.PHONY:clean
 clean:
-	-del $(OBJS) $(TARGET)
+	-rm $(TARGET)
+
