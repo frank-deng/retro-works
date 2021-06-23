@@ -5,6 +5,10 @@ node_modules
 *.COM
 *.com
 *.so
+*.obj
+*.com
+*.exe
+*.err
 config.py
 config.php
 test.py
