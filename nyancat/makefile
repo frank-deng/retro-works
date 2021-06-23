@@ -1,6 +1,6 @@
 TARGET=nyancat.com
 OBJS=nyancat.obj
-CFLAGS=-q -0 -bc -d0
+CFLAGS=-q -0 -bc -d0 -ecc -ms -s -zc -za -ze -zld -zls
 LDFLAGS=-lr -mt
 
 $(TARGET): $(OBJS)
