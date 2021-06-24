@@ -1,12 +1,15 @@
 TARGET=nyancat.com
 
-$(TARGET): nyancat.asm frames.inc
+$(TARGET): nyancat.asm frames.inc music.inc
 	nasm -o $@ $<
 
-nyancat.asm:frames.inc
-	python3 imagegen.py frames.inc
+frames.inc: imagegen.py
+	python3 $^ $@
+
+music.inc: musicgen.py nyancat.musicxml
+	python3 $^ $@
 
 .PHONY:clean
 clean:
-	-rm $(TARGET)
+	-rm $(TARGET) 
 

@@ -17,6 +17,14 @@ add bx,2
 cmp bx,4000
 jnae initScreen
 
+;Initialize speaker
+in al,0x61
+mov [Port61hValueOrig],al
+or al,0x3
+out 0x16,al
+mov al,0xb6
+out 0x43,al
+
 ;Start looping frames
 mainLoop:
 
@@ -47,6 +55,14 @@ inc si
 cmp bx,4000
 jnae DrawFrame
 
+;Set speaker frequency
+mov si,FrequencyList
+add si,word[CurrentMusicNote]
+mov ax,word[si]
+out 0x43,al
+mov ah,al
+out 0x43,al
+
 ;Sleep 100ms
 push cx
 mov ax,0x8600
@@ -54,6 +70,16 @@ mov cx,1
 mov dx,8600
 int 15h
 pop cx
+
+;Next Note
+mov ax,[MusicLength]
+cmp word[CurrentMusicNote],ax
+jne UseNextNote
+mov word[CurrentMusicNote],0
+jmp NextNoteEnd
+UseNextNote:
+inc word[CurrentMusicNote]
+NextNoteEnd:
 
 ;Next frame
 cmp byte[FrameIdx],11
@@ -65,6 +91,18 @@ inc byte[FrameIdx]
 jmp mainLoop
 
 exitProgram:
+
+;Revert speaker status
+mov al,[Port61hValueOrig]
+out 0x16,al
+
+;revert sound frequency to 1000hz
+mov al,0xb6
+out 0x43,al
+mov al,0xff
+out 0x42,al
+mov al,0x03
+out 0x42,al
 
 ;Clear screen
 mov bx,0
@@ -86,6 +124,14 @@ int 21h
 FrameIdx:
 db 0
 
+CurrentMusicNote:
+dw 0
+
+Port61hValueOrig:
+db 0
+
 FrameData:
 %include "frames.inc"
+
+%include "music.inc"
 
