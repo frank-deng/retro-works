@@ -1,5 +1,5 @@
-%define MusicDelay 4
-%define FrameDelay 3
+%define MusicDelay 1
+%define FrameDelay 0
 
 org 100h
 jmp start
@@ -15,12 +15,22 @@ FrameDelayTicks:
 db 0
 MusicDelayTicks:
 db 0
+PrevTimerLo:
+dw 0
+PrevTimerHi:
+dw 0
 FrameData:
 %include "frames.inc"
 %include "music.inc"
 
 ;Code starts
 start:
+
+;Initialize timer
+mov ax,0
+int 1ah
+mov [PrevTimerHi],cx
+mov [PrevTimerLo],dx
 
 ;Enable 16 color for background
 mov ax,0x1003
@@ -90,15 +100,22 @@ out 0x42,al
 mov al,ah
 out 0x42,al
 
-
 ;Sleep 100ms
 push cx
-mov ax,0x8600
-;mov cx,1
-;mov dx,0x2198
-mov cx,0
-mov dx,0x4866
-int 15h
+push dx
+WaitLoop:
+hlt
+mov ax,0
+int 1ah
+cmp cx,[PrevTimerHi]
+jne WaitEnd
+cmp dx,[PrevTimerLo]
+jne WaitEnd
+jmp WaitLoop
+WaitEnd:
+mov [PrevTimerHi],cx
+mov [PrevTimerLo],dx
+pop dx
 pop cx
 
 ;Next Note
