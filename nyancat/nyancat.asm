@@ -21,9 +21,7 @@ jnae initScreen
 in al,0x61
 mov [Port61hValueOrig],al
 or al,0x3
-out 0x16,al
-mov al,0xb6
-out 0x43,al
+out 0x61,al
 
 ;Start looping frames
 mainLoop:
@@ -56,12 +54,15 @@ cmp bx,4000
 jnae DrawFrame
 
 ;Set speaker frequency
-mov si,FrequencyList
-add si,word[CurrentMusicNote]
+mov al,0xb6
+out 0x43,al
+mov si,word[CurrentMusicNote]
+shl si,1
+add si,FrequencyList
 mov ax,word[si]
-out 0x43,al
+out 0x42,al
 mov ah,al
-out 0x43,al
+out 0x42,al
 
 ;Sleep 100ms
 push cx
@@ -94,7 +95,7 @@ exitProgram:
 
 ;Revert speaker status
 mov al,[Port61hValueOrig]
-out 0x16,al
+out 0x61,al
 
 ;revert sound frequency to 1000hz
 mov al,0xb6
