@@ -13,3 +13,6 @@ music.inc: musicgen.py nyancat.musicxml
 clean:
 	-rm $(TARGET) 
 
+.PHONY:deploy
+deploy: nyancat.com
+	-mcopy -i /mnt/win3x/data.img $< ::/

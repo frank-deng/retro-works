@@ -1,4 +1,26 @@
+%define MusicDelay 4
+%define FrameDelay 3
+
 org 100h
+jmp start
+
+;Data area
+FrameIdx:
+db 0
+CurrentMusicNote:
+dw 0
+Port61hValueOrig:
+db 0
+FrameDelayTicks:
+db 0
+MusicDelayTicks:
+db 0
+FrameData:
+%include "frames.inc"
+%include "music.inc"
+
+;Code starts
+start:
 
 ;Enable 16 color for background
 mov ax,0x1003
@@ -22,6 +44,8 @@ in al,0x61
 mov [Port61hValueOrig],al
 or al,0x3
 out 0x61,al
+mov al,0xb6
+out 0x43,al
 
 ;Start looping frames
 mainLoop:
@@ -54,41 +78,61 @@ cmp bx,4000
 jnae DrawFrame
 
 ;Set speaker frequency
-mov al,0xb6
-out 0x43,al
 mov si,word[CurrentMusicNote]
-shl si,1
+add si,MusicData
+mov ch,0
+mov cl,byte[si]
+shl cx,1
+mov si,cx
 add si,FrequencyList
 mov ax,word[si]
 out 0x42,al
-mov ah,al
+mov al,ah
 out 0x42,al
+
 
 ;Sleep 100ms
 push cx
 mov ax,0x8600
-mov cx,1
-mov dx,8600
+;mov cx,1
+;mov dx,0x2198
+mov cx,0
+mov dx,0x4866
 int 15h
 pop cx
 
 ;Next Note
-mov ax,[MusicLength]
-cmp word[CurrentMusicNote],ax
-jne UseNextNote
+cmp byte[MusicDelayTicks],0
+jne SkipNextNote
+mov byte[MusicDelayTicks],MusicDelay
+
+inc word[CurrentMusicNote]
+cmp word[CurrentMusicNote],MusicLength
+jnae NextNoteEnd
 mov word[CurrentMusicNote],0
 jmp NextNoteEnd
-UseNextNote:
-inc word[CurrentMusicNote]
+
+SkipNextNote:
+dec byte[MusicDelayTicks]
 NextNoteEnd:
 
 ;Next frame
+cmp byte[FrameDelayTicks],0
+jne SkipNextFrame
+mov byte[FrameDelayTicks],FrameDelay
+
 cmp byte[FrameIdx],11
 jnae UseNextFrame
 mov byte[FrameIdx],0
-jmp mainLoop
+jmp NextFrameEnd
 UseNextFrame:
 inc byte[FrameIdx]
+jmp NextFrameEnd
+
+SkipNextFrame:
+dec byte[FrameDelayTicks]
+NextFrameEnd:
+
 jmp mainLoop
 
 exitProgram:
@@ -121,18 +165,4 @@ int 10h
 ;Exit to dos
 mov ah,4ch
 int 21h
-
-FrameIdx:
-db 0
-
-CurrentMusicNote:
-dw 0
-
-Port61hValueOrig:
-db 0
-
-FrameData:
-%include "frames.inc"
-
-%include "music.inc"
 

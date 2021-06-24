@@ -55,8 +55,7 @@ for freq in freqList:
 
 result='''FrequencyList:
 dw %s
-MusicLength:
-dw %d
+%%define MusicLength %d
 MusicData:
 db %s
 '''%(
