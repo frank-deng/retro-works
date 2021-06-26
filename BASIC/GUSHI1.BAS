@@ -14,7 +14,7 @@ TX ("M18CU1,0KB1,0CL0CO7B0,0,640,480")
 T1$ = "长风破浪会有时，" : T2$ = "直挂云帆济沧海。" : L = LEN(T1$)
 SIZE = 72: X = (640 - SIZE * L / 2) / 2 + (SIZE / 4) : Y1=480/2-SIZE : Y2=480/2
 
-TX ("{=0%1@" + n$(SIZE) + "," + n$(SIZE) + "}")
+TX ("{=3%1@" + n$(SIZE) + "," + n$(SIZE) + "}")
 TX ("{(15}"): CALL DrawText(X-1,Y1-1,T1$): CALL DrawText(X-1,Y2-1,T2$)
 TX ("{(0}"): CALL DrawText(X+1,Y1+1,T1$): CALL DrawText(X+1,Y2+1,T2$)
 TX ("{(9}"): CALL DrawText(X,Y1,T1$): CALL DrawText(X,Y2,T2$)
