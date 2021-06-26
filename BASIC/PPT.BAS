@@ -2,10 +2,10 @@ DEFINT A-Z
 TYPE ActionT
   SLIDE AS INTEGER
   EXTERNAL AS INTEGER
-  TARGET AS STRING*20
-  TRIGGER AS STRING*20
+  TARGET AS STRING*40
+  TRIGGER AS STRING*10
 END TYPE
-COMMON SHARED SLIDECOUNT,ACTIONCOUNT,CURRENTSLIDE
+COMMON SHARED SLIDECOUNT,ACTIONCOUNT,CURRENTSLIDE,ACTION$
 DECLARE SUB TestTX ()
 DECLARE FUNCTION n$ (n%)
 DECLARE SUB TX (s AS STRING)
@@ -18,11 +18,12 @@ SLIDECOUNT=0
 ACTIONCOUNT=0
 DIM SHARED NAMELIST(64) AS STRING
 DIM SHARED CONTENTLIST(64) AS STRING
-DIM SHARED ACTIONLIST(256) AS ActionT
+DIM SHARED ACTIONLIST(512) AS ActionT
 CURRENTSLIDE=0
+ACTION$=""
 
 InitTX
-INPUT "请输入文件名：",FILENAME$
+CLS:INPUT "请输入文件名：",FILENAME$
 IF FILENAME$="" THEN FILENAME$="PPT.TXT"
 PRINT "加载中……"
 CALL LoadData(FILENAME$)
@@ -68,6 +69,7 @@ SUB ProcessLine(MODE AS STRING, DATATEXT AS STRING)
         CASE ".ACTION"
             ACTIONCOUNT=ACTIONCOUNT+1: I=ACTIONCOUNT-1
             ACTIONLIST(I).SLIDE=SLIDECOUNT-1
+            PRINT DATATEXT
             ACTIONLIST(I).TRIGGER=UCASE$(LEFT$(DATATEXT,INSTR(DATATEXT,":")-1))
             ACTIONLIST(I).EXTERNAL=SLIDECOUNT-1
             TARGET$=RIGHT$(DATATEXT,LEN(DATATEXT)-INSTR(DATATEXT,":"))
@@ -84,6 +86,7 @@ SUB LoadData(FILENAME AS STRING)
     MODE$=""
     DO
         LINE INPUT #2,DATATEXT$
+        DATATEXT$=LTRIM$(RTRIM$(DATATEXT$))
         SELECT CASE DATATEXT$
             CASE ""
             CASE ".SLIDE"
@@ -105,28 +108,106 @@ SUB DisplaySlide(ID as INTEGER)
     CALL TX(CONTENTLIST(ID))
 END SUB
 
+FUNCTION GetSlideIdx% (N AS STRING)
+    GetSlideIdx%=-1
+    FOR I=0 TO SLIDECOUNT-1 STEP 1
+        IF N=NAMELIST(I) THEN
+            GetSlideIdx%=I: EXIT FUNCTION
+        END IF
+    NEXT I
+END FUNCTION
+
+SUB ProcessTarget(TARGET AS STRING)
+    TARGETSLIDE=GetSlideIdx%(RTRIM$(TARGET))
+    IF -1 <> TARGETSLIDE THEN CURRENTSLIDE=TARGETSLIDE: ACTION$="SWITCHSLIDE"
+END SUB
+SUB ProcessKeyboard(K AS STRING)
+    KEY$=K
+    FOR I=0 TO ACTIONCOUNT-1 STEP 1
+        IF ACTIONLIST(I).SLIDE = CURRENTSLIDE THEN
+            TRIGGER$=RTRIM$(ACTIONLIST(I).TRIGGER)
+            IF TRIGGER$=KEY$ THEN
+                CALL ProcessTarget(ACTIONLIST(I).TARGET)
+                EXIT SUB
+            END IF
+        END IF
+    NEXT I
+    FOR I=0 TO ACTIONCOUNT-1 STEP 1
+        IF ACTIONLIST(I).SLIDE=CURRENTSLIDE AND "ANYKEY"=RTRIM$(ACTIONLIST(I).TRIGGER) THEN
+            CALL ProcessTarget(ACTIONLIST(I).TARGET)
+            EXIT SUB
+        END IF
+    NEXT I
+    SELECT CASE KEY$
+        CASE "LEFT"
+            IF CURRENTSLIDE>0 THEN CURRENTSLIDE=CURRENTSLIDE-1: ACTION$="SWITCHSLIDE"
+        CASE "BACKSPACE"
+            IF CURRENTSLIDE>0 THEN CURRENTSLIDE=CURRENTSLIDE-1: ACTION$="SWITCHSLIDE"
+        CASE "RIGHT"
+            IF CURRENTSLIDE<SLIDECOUNT-1 THEN CURRENTSLIDE=CURRENTSLIDE+1: ACTION$="SWITCHSLIDE"
+        CASE "SPACE"
+            IF CURRENTSLIDE<SLIDECOUNT-1 THEN CURRENTSLIDE=CURRENTSLIDE+1: ACTION$="SWITCHSLIDE"
+    END SELECT
+END SUB
+
 SUB MainLoop
+    CALL DisplaySlide(CURRENTSLIDE)
     DO
-        CALL DisplaySlide(CURRENTSLIDE)
         'Handle keyboard action
         K$ = ""
         DO
             K$=INKEY$
         LOOP WHILE K$=""
+
+        SELECT CASE K$
+            CASE " "
+                K$="SPACE"
+            CASE CHR$(27)
+                K$="ESC"
+            CASE CHR$(9)
+                K$="TAB"
+            CASE CHR$(0) + "G"
+                K$="HOME"
+            CASE CHR$(0) + "O"
+                K$="END"
+            CASE CHR$(0) + "I"
+                K$="PAGEUP"
+            CASE CHR$(0) + "Q"
+                K$="PAGEDOWN"
+            CASE CHR$(0) + "H"
+                K$="UP"
+            CASE CHR$(0) + "P"
+                K$="DOWN"
+            CASE CHR$(0) + "K"
+                K$="LEFT"
+            CASE CHR$(0) + "M"
+                K$="RIGHT"
+            CASE CHR$(0) + "R"
+                K$="INSERT"
+            CASE CHR$(0) + "S"
+                K$="DELETE"
+        END SELECT
+
         SELECT CASE K$
             CASE ""
-            CASE CHR$(27)
+            CASE "ESC"
                 EXIT SUB
-            CASE CHR$(0) + "G"
-                CURRENTSLIDE=0
-            CASE CHR$(0) + "O"
-                CURRENTSLIDE=SLIDECOUNT-1
-            CASE CHR$(0) + "I"
-                IF CURRENTSLIDE>0 THEN CURRENTSLIDE=CURRENTSLIDE-1
-            CASE CHR$(0) + "Q"
-                IF CURRENTSLIDE<SLIDECOUNT-1 THEN CURRENTSLIDE=CURRENTSLIDE+1
+            CASE "HOME"
+                CURRENTSLIDE=0: ACTION$="SWITCHSLIDE"
+            CASE "END"
+                CURRENTSLIDE=SLIDECOUNT-1: ACTION$="SWITCHSLIDE"
+            CASE "PAGEUP"
+                IF CURRENTSLIDE>0 THEN CURRENTSLIDE=CURRENTSLIDE-1: ACTION$="SWITCHSLIDE"
+            CASE "PAGEDOWN"
+                IF CURRENTSLIDE<SLIDECOUNT-1 THEN CURRENTSLIDE=CURRENTSLIDE+1: ACTION$="SWITCHSLIDE"
             CASE ELSE
-
+                CALL ProcessKeyboard(K$)
         END SELECT
+
+        SELECT CASE ACTION$
+            CASE "SWITCHSLIDE"
+                CALL DisplaySlide(CURRENTSLIDE)
+        END SELECT
+        ACTION$=""
     LOOP
 END SUB
