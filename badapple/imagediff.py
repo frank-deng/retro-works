@@ -1,7 +1,7 @@
 import sys,math, os;
 from PIL import Image,ImagePalette;
 
-FRAME_SIZE=(320,200)
+FRAME_SIZE=(160,104)
 sourceFolder=sys.argv[1];
 #targetFolder=sys.argv[2];
 
