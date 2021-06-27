@@ -19,45 +19,57 @@ def diffBlock(screen,image,bx,by):
     different=False;
     blackCount=0;
     whiteCount=0;
+    blockData=[];
     for y in range(8):
+        pixelData=0;
         for x in range(8):
             pixelScreen=screen.getpixel((bx+x,by+y));
             pixelImage=image.getpixel((bx+x,by+y));
             if pixelScreen!=pixelImage:
                 different=True;
+            pixelData>>=1;
             if pixelImage>128:
-                whiteCount+=0;
+                pixelData|=0x80;
+                whiteCount+=1;
             else:
                 blackCount+=1;
-            #Speed up operation
-            if different and blackCount>0 and whiteCount>0:
-                break;
-        #Speed up operation
-        if different and blackCount>0 and whiteCount>0:
-            break;
+        blockData.append(pixelData);
     if not different:
-        return 0;
-    elif 0==blackCount or 0==whiteCount:
-        return 2;
+        return None; #Use original content
+    elif 0==whiteCount:
+        return 1; #All black block
+    elif 0==blackCount:
+        return 2; #All white block
     else:
-        return 10;
+        return bytes(blockData); #Block with data
 
 def diffFrame(screen,image):
-    frameSize=0;
+    frameData=b'';
     for blockY in range(FRAME_SIZE[1]>>3):
         for blockX in range(FRAME_SIZE[0]>>3):
-            frameSize+=diffBlock(screen,image,blockX<<3,blockY<<3);
-    return frameSize;
+            addr=blockY*40+blockX;
+            block=diffBlock(screen,image,blockX<<3,blockY<<3);
+            if(None==block):
+                pass;
+            elif(1==block):
+                frameData+=((addr|0x4000).to_bytes(2,'little'));
+            elif(2==block):
+                frameData+=((addr|0x8000).to_bytes(2,'little'));
+            else:
+                frameData+=(addr.to_bytes(2,'little')+block);
+    return frameData;
 
 def main():
     screen=Image.new('1',FRAME_SIZE,0);
+    videoData=[];
     totalSize=0;
     try:
         for frameIdx in range(getFramesCount(sourceFolder)-1):
             print('Processing frame %d'%frameIdx);
             image=openFrame(sourceFolder,frameIdx);
-            frameSize=diffFrame(screen,image);
-            totalSize+=frameSize;
+            frameData=diffFrame(screen,image);
+            videoData.append(frameData);
+            totalSize+=len(frameData);
             screen.paste(image);
             image.close();
     except Exception as e:
