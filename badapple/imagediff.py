@@ -3,7 +3,7 @@ from PIL import Image,ImagePalette;
 
 FRAME_SIZE=(160,104)
 sourceFolder=sys.argv[1];
-#targetFolder=sys.argv[2];
+targetFile=sys.argv[2];
 
 def getFramesCount(source):
     count=0;
@@ -59,22 +59,38 @@ def diffFrame(screen,image):
                 frameData+=(addr.to_bytes(2,'little')+block);
     return frameData;
 
+def getFrameOffset(allFrames,frameIdx):
+    offset=len(allFrames)*6+2+4;
+    for frame in allFrames[0:frameIdx]:
+        offset+=len(frame);
+    return offset;
+
 def main():
     screen=Image.new('1',FRAME_SIZE,0);
-    videoData=[];
-    totalSize=0;
+    frameData=[];
     try:
-        for frameIdx in range(getFramesCount(sourceFolder)-1):
+        for frameIdx in range(getFramesCount(sourceFolder)):
             print('Processing frame %d'%frameIdx);
             image=openFrame(sourceFolder,frameIdx);
-            frameData=diffFrame(screen,image);
-            videoData.append(frameData);
-            totalSize+=len(frameData);
+            frameData.append(diffFrame(screen,image));
             screen.paste(image);
             image.close();
     except Exception as e:
         print(e);
-    print('Estimated bytes of video data: %d'%totalSize);
+
+    print('Generate data file');
+    frameMetaData=b'';
+    for frameIdx in range(len(frameData)):
+        length=len(frameData[frameIdx]);
+        if 0==length:
+            offset=0;
+        else:
+            offset=getFrameOffset(frameData,frameIdx);
+        frameMetaData+=(length.to_bytes(2,'little')+offset.to_bytes(4,'little'));
+
+    with open(targetFile,'wb') as fp:
+        fp.write(b'BA\x00\x00'+len(frameData).to_bytes(2,'little')+frameMetaData+b''.join(frameData));
+
     return 0;
 
 #执行main方法，当C语言中的main()占坑用
