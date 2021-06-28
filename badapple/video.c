@@ -34,37 +34,74 @@ void initVideo(){
 void closeVideo(){
     setVideoMode(3);
 }
-static void drawBlock(unsigned char x, unsigned char y, unsigned char *data){
-    unsigned char i;
-    unsigned int baseOffset=(y*40*4)+x;
+static __inline void drawBlock(unsigned int baseOffset, unsigned char *data){
+    //unsigned int baseOffset=(y*40*4)+x;
+    unsigned char *pdata=data;
     unsigned int __far *vmem_ptr = vmem+baseOffset;
     //Odd lines
-    for(i=0;i<7;i+=2){
-        *vmem_ptr=valueConvertTable[data[i]];
-        vmem_ptr+=40;
-    }
+    *vmem_ptr=valueConvertTable[*pdata];
+    vmem_ptr+=40;
+    pdata++;
+    *vmem_ptr=valueConvertTable[*pdata];
+    vmem_ptr+=40;
+    pdata++;
+    *vmem_ptr=valueConvertTable[*pdata];
+    vmem_ptr+=40;
+    pdata++;
+    *vmem_ptr=valueConvertTable[*pdata];
+    pdata++;
     //Even lines
     vmem_ptr = vmem+4096+baseOffset;
-    for(i=1;i<8;i+=2){
-        *vmem_ptr=valueConvertTable[data[i]];
-        vmem_ptr+=40;
-    }
+    *vmem_ptr=valueConvertTable[*pdata];
+    vmem_ptr+=40;
+    pdata++;
+    *vmem_ptr=valueConvertTable[*pdata];
+    vmem_ptr+=40;
+    pdata++;
+    *vmem_ptr=valueConvertTable[*pdata];
+    vmem_ptr+=40;
+    pdata++;
+    *vmem_ptr=valueConvertTable[*pdata];
 }
-void drawBlankBlock(unsigned char x, unsigned char y, unsigned char color){
-    unsigned char i;
-    unsigned int baseOffset=baseOffset=(y*40*4)+x, colorValue=color?0xffff:0;
+static __inline void drawBlackBlock(unsigned int baseOffset){
     unsigned int __far *vmem_ptr = vmem+baseOffset;
     //Odd lines
-    for(i=0;i<7;i+=2){
-        *vmem_ptr=colorValue;
-        vmem_ptr+=40;
-    }
+    *vmem_ptr=0;
+    vmem_ptr+=40;
+    *vmem_ptr=0;
+    vmem_ptr+=40;
+    *vmem_ptr=0;
+    vmem_ptr+=40;
+    *vmem_ptr=0;
     //Even lines
     vmem_ptr = vmem+4096+baseOffset;
-    for(i=1;i<8;i+=2){
-        *vmem_ptr=colorValue;
-        vmem_ptr+=40;
-    }
+    *vmem_ptr=0;
+    vmem_ptr+=40;
+    *vmem_ptr=0;
+    vmem_ptr+=40;
+    *vmem_ptr=0;
+    vmem_ptr+=40;
+    *vmem_ptr=0;
+}
+static __inline void drawWhiteBlock(unsigned int baseOffset){
+    unsigned int __far *vmem_ptr = vmem+baseOffset;
+    //Odd lines
+    *vmem_ptr=0xffff;
+    vmem_ptr+=40;
+    *vmem_ptr=0xffff;
+    vmem_ptr+=40;
+    *vmem_ptr=0xffff;
+    vmem_ptr+=40;
+    *vmem_ptr=0xffff;
+    //Even lines
+    vmem_ptr = vmem+4096+baseOffset;
+    *vmem_ptr=0xffff;
+    vmem_ptr+=40;
+    *vmem_ptr=0xffff;
+    vmem_ptr+=40;
+    *vmem_ptr=0xffff;
+    vmem_ptr+=40;
+    *vmem_ptr=0xffff;
 }
 void drawFrame(unsigned char *data,unsigned int len){
     unsigned int mark,offset;
@@ -74,14 +111,12 @@ void drawFrame(unsigned char *data,unsigned int len){
         p+=2;
         offset=mark&0x3fff;
         //Convert offset of original video to the one used by CGA
-        bx=(offset % (FRAME_WIDTH/8))+10;
-        by=(offset / (FRAME_WIDTH/8))+6;
         if(mark & 0x4000){
-            drawBlankBlock(bx,by,0);
+            drawBlackBlock(offset);
         }else if(mark & 0x8000){
-            drawBlankBlock(bx,by,1);
+            drawWhiteBlock(offset);
         }else{
-            drawBlock(bx,by,p);
+            drawBlock(offset,p);
             p+=8;
         }
     }

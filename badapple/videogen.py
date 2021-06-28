@@ -21,6 +21,7 @@ def diffBlock(screen,image,bx,by):
     blackCount=0;
     whiteCount=0;
     blockData=[];
+    blockDataEven=[];
     for y in range(8):
         pixelData=0;
         for x in range(8):
@@ -35,7 +36,11 @@ def diffBlock(screen,image,bx,by):
                 blackCount+=1;
             if x<7:
                 pixelData<<=1;
-        blockData.append(pixelData);
+        if y&1:
+            blockDataEven.append(pixelData);
+        else:
+            blockData.append(pixelData);
+    blockData+=blockDataEven;
     if not different:
         return None; #Use original content
     elif 0==whiteCount:
@@ -51,7 +56,7 @@ def diffFrame(screen,image):
     blockYCount=FRAME_SIZE[1]>>3;
     for blockY in range(blockYCount):
         for blockX in range(blockXCount):
-            addr=blockY*blockXCount+blockX;
+            addr=(blockY+6)*40*4+(blockX+10);
             block=diffBlock(screen,image,blockX<<3,blockY<<3);
             if(None==block):
                 pass;
