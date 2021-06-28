@@ -3,6 +3,6 @@
 
 void initTimer();
 void closeTimer();
-unsigned char waitTimer();
+int waitTimer(unsigned int cycles);
 
 #endif

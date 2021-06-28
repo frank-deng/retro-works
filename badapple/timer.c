@@ -6,9 +6,9 @@ void hlt();
 #pragma aux hlt = "hlt";
 
 static void (__interrupt __far * timerHandlerOrig)();
-static unsigned char waitFlag=1;
+static unsigned long timerCycles=0;
 void __interrupt timerHandler(){
-    waitFlag=0;
+    timerCycles++;
     (*timerHandlerOrig)();
 }
 void initTimer(){
@@ -24,12 +24,14 @@ void closeTimer(){
     outp(0x40,0xff);
     outp(0x40,0xff);
 }
-unsigned char waitTimer(unsigned int cycles){
-    unsigned char stuck=1;
-    while(waitFlag){
-        stuck=0;
+int waitTimer(unsigned int cycles){
+    unsigned int stuckCycles=0;
+    while(timerCycles<cycles){
         hlt();
     }
-    waitFlag=0;
-    return stuck;
+    if(timerCycles>cycles){
+        stuckCycles=timerCycles-cycles;
+    }
+    timerCycles=0;
+    return stuckCycles;
 }
