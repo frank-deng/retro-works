@@ -24,9 +24,12 @@ void closeTimer(){
     outp(0x40,0xff);
     outp(0x40,0xff);
 }
-void waitTimer(){
+unsigned char waitTimer(unsigned int cycles){
+    unsigned char stuck=1;
     while(waitFlag){
+        stuck=0;
         hlt();
     }
-    waitFlag=1;
+    waitFlag=0;
+    return stuck;
 }

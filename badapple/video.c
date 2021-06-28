@@ -76,7 +76,6 @@ void drawFrame(unsigned char *data,unsigned int len){
         //Convert offset of original video to the one used by CGA
         bx=(offset % (FRAME_WIDTH/8))+10;
         by=(offset / (FRAME_WIDTH/8))+6;
-        //printf("%4d:%2d,%2d %04x\t",offset,bx,by,mark);
         if(mark & 0x4000){
             drawBlankBlock(bx,by,0);
         }else if(mark & 0x8000){

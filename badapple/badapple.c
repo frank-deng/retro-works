@@ -10,7 +10,7 @@
 static unsigned char frame_buffer[FRAME_WIDTH*FRAME_HEIGHT/8+FRAME_WIDTH*FRAME_HEIGHT/64*2];
 
 int main(){
-    unsigned int curFrame=0, frameDataLen=0;
+    unsigned int curFrame=0, frameDataLen=0, cycles=0;
     //Initialization
     if(!initFrame()){
         return 1;
@@ -27,11 +27,16 @@ int main(){
 #endif
 #ifndef _console_debug
     while(0x01!=getKeypressed()){
-        if(curFrame<getFrameCount()){
-            frameDataLen=getFrameData(frame_buffer,curFrame);
-            drawFrame(frame_buffer,frameDataLen);
-            curFrame++;
-        }
+        if(cycles<4){
+            cycles++;
+        }else{
+            cycles=0;
+            if(curFrame<getFrameCount()){
+                frameDataLen=getFrameData(frame_buffer,curFrame);
+                drawFrame(frame_buffer,frameDataLen);
+                curFrame++;
+            }
+        } 
         waitTimer();
     }
 #endif
