@@ -28,12 +28,13 @@ def diffBlock(screen,image,bx,by):
             pixelImage=image.getpixel((bx+x,by+y));
             if pixelScreen!=pixelImage:
                 different=True;
-            pixelData>>=1;
             if pixelImage>128:
-                pixelData|=0x80;
+                pixelData|=1;
                 whiteCount+=1;
             else:
                 blackCount+=1;
+            if x<7:
+                pixelData<<=1;
         blockData.append(pixelData);
     if not different:
         return None; #Use original content
@@ -46,9 +47,11 @@ def diffBlock(screen,image,bx,by):
 
 def diffFrame(screen,image):
     frameData=b'';
-    for blockY in range(FRAME_SIZE[1]>>3):
-        for blockX in range(FRAME_SIZE[0]>>3):
-            addr=blockY*40+blockX;
+    blockXCount=FRAME_SIZE[0]>>3;
+    blockYCount=FRAME_SIZE[1]>>3;
+    for blockY in range(blockYCount):
+        for blockX in range(blockXCount):
+            addr=blockY*blockXCount+blockX;
             block=diffBlock(screen,image,blockX<<3,blockY<<3);
             if(None==block):
                 pass;

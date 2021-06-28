@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <errno.h>
 #include "frame.h"
 
 typedef struct frame_meta_t_def{
-    unsigned int length;
+    unsigned short datalen;
     unsigned long offset;
 } frame_meta_t;
 static frame_meta_t *frameMetaData=NULL;
@@ -12,9 +13,9 @@ static unsigned int frameCount=0;
 
 unsigned char initFrame(){
     //Open data file
-    FILE *fp=fopen("badapple.dat","rb");
+    fp=fopen("badapple.dat","rb");
     if(NULL==fp){
-        puts("Failed to load video data");
+        perror("Failed to load video data");
         return 0;
     }
 
@@ -23,9 +24,9 @@ unsigned char initFrame(){
     fread(&frameCount,sizeof(unsigned int),1,fp);
 
     //Load meta data
-    frameMetaData=malloc(sizeof(frame_meta_t)*frameCount);
+    frameMetaData=(frame_meta_t*)malloc(sizeof(frame_meta_t)*frameCount);
     if(NULL==frameMetaData){
-        puts("Out of memory");
+        perror("Out of memory");
         return 0;
     }
     fseek(fp,6,SEEK_SET);
@@ -44,10 +45,9 @@ unsigned int getFrameCount(){
     return frameCount;
 }
 unsigned int getFrameData(unsigned char *buffer, unsigned int frameIdx){
-    unsigned int length=(frameMetaData[frameIdx].length);
+    unsigned short length=frameMetaData[frameIdx].datalen;
     fseek(fp,frameMetaData[frameIdx].offset,SEEK_SET);
     fread(buffer,sizeof(unsigned char),length,fp);
-    printf("%u %x %u\n",frameIdx,frameMetaData[frameIdx].offset,frameMetaData[frameIdx].length);
     return length;
 }
 

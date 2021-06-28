@@ -1,5 +1,5 @@
 TARGET=badapple.exe
-OBJS=badapple.obj keyboard.obj timer.obj video.obj frame.obj
+OBJS=badapple.obj keyboard.obj timer.obj video.obj frame.obj debug.obj
 CFLAGS=-mh -0 -q
 
 $(TARGET): $(OBJS)
@@ -14,6 +14,8 @@ timer.obj: timer.c timer.h
 video.obj: video.c video.h
 	wcc $(CFLAGS) -fo=$@ $*
 frame.obj: frame.c frame.h
+	wcc $(CFLAGS) -fo=$@ $*
+debug.obj: debug.c
 	wcc $(CFLAGS) -fo=$@ $*
 
 clean:

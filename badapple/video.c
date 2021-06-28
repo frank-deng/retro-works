@@ -1,4 +1,5 @@
 #include "video.h"
+#include "frame.h"
 
 static unsigned int __far *vmem=0xb8000000L;
 static unsigned int valueConvertTable[256];
@@ -33,9 +34,9 @@ void initVideo(){
 void closeVideo(){
     setVideoMode(3);
 }
-void drawBlock(unsigned int blockOffset, unsigned char *data){
+static void drawBlock(unsigned char x, unsigned char y, unsigned char *data){
     unsigned char i;
-    unsigned int baseOffset=(blockOffset / 40) * 160 + (blockOffset % 20);
+    unsigned int baseOffset=(y*40*4)+x;
     unsigned int __far *vmem_ptr = vmem+baseOffset;
     //Odd lines
     for(i=0;i<7;i+=2){
@@ -49,9 +50,9 @@ void drawBlock(unsigned int blockOffset, unsigned char *data){
         vmem_ptr+=40;
     }
 }
-void drawBlankBlock(unsigned int blockOffset, unsigned char color){
+void drawBlankBlock(unsigned char x, unsigned char y, unsigned char color){
     unsigned char i;
-    unsigned int baseOffset=(blockOffset / 40) * 160 + (blockOffset % 20), colorValue=color?0xffff:1;
+    unsigned int baseOffset=baseOffset=(y*40*4)+x, colorValue=color?0xffff:0;
     unsigned int __far *vmem_ptr = vmem+baseOffset;
     //Odd lines
     for(i=0;i<7;i+=2){
@@ -67,21 +68,21 @@ void drawBlankBlock(unsigned int blockOffset, unsigned char color){
 }
 void drawFrame(unsigned char *data,unsigned int len){
     unsigned int mark,offset;
-    unsigned char *p=data;
+    unsigned char *p=data, bx, by;
     while(p<data+len){
-        mark=*(unsigned int *)p;
-        printf("%x %x\n",*p,*p+1);
+        mark=*((unsigned int *)p);
         p+=2;
         offset=mark&0x3fff;
+        //Convert offset of original video to the one used by CGA
+        bx=(offset % (FRAME_WIDTH/8))+10;
+        by=(offset / (FRAME_WIDTH/8))+6;
+        //printf("%4d:%2d,%2d %04x\t",offset,bx,by,mark);
         if(mark & 0x4000){
-            printf("draw black at %d\n",offset);
-            //drawBlankBlock(offset,0);
+            drawBlankBlock(bx,by,0);
         }else if(mark & 0x8000){
-            printf("draw white at %d\n",offset);
-            //drawBlankBlock(offset,1);
+            drawBlankBlock(bx,by,1);
         }else{
-            printf("draw data at %d\n",offset);
-            //drawBlock(offset,p);
+            drawBlock(bx,by,p);
             p+=8;
         }
     }
