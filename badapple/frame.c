@@ -43,9 +43,11 @@ void closeFrame(){
 unsigned int getFrameCount(){
     return frameCount;
 }
-void getFrameData(unsigned char *buffer, unsigned int frameIdx){
+unsigned int getFrameData(unsigned char *buffer, unsigned int frameIdx){
     unsigned int length=(frameMetaData[frameIdx].length);
     fseek(fp,frameMetaData[frameIdx].offset,SEEK_SET);
     fread(buffer,sizeof(unsigned char),length,fp);
+    printf("%u %x %u\n",frameIdx,frameMetaData[frameIdx].offset,frameMetaData[frameIdx].length);
+    return length;
 }
 

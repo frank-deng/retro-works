@@ -3,5 +3,7 @@
 
 void initVideo();
 void closeVideo();
+void drawBlock(unsigned int blockOffset, unsigned char *data);
+void drawFrame(unsigned char *data,unsigned int len);
 
 #endif

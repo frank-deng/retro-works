@@ -4,6 +4,7 @@ from PIL import Image,ImagePalette;
 FRAME_SIZE=(160,104)
 sourceFolder=sys.argv[1];
 targetFile=sys.argv[2];
+reportFile=sys.argv[3];
 
 def getFramesCount(source):
     count=0;
@@ -80,13 +81,15 @@ def main():
 
     print('Generate data file');
     frameMetaData=b'';
-    for frameIdx in range(len(frameData)):
-        length=len(frameData[frameIdx]);
-        if 0==length:
-            offset=0;
-        else:
-            offset=getFrameOffset(frameData,frameIdx);
-        frameMetaData+=(length.to_bytes(2,'little')+offset.to_bytes(4,'little'));
+    with open(reportFile,'w') as fpreport:
+        for frameIdx in range(len(frameData)):
+            length=len(frameData[frameIdx]);
+            if 0==length:
+                offset=0;
+            else:
+                offset=getFrameOffset(frameData,frameIdx);
+            frameMetaData+=(length.to_bytes(2,'little')+offset.to_bytes(4,'little'));
+            fpreport.write('Frame %d at offset %x length %d\n'%(frameIdx,offset,length));
 
     with open(targetFile,'wb') as fp:
         fp.write(b'BA\x00\x00'+len(frameData).to_bytes(2,'little')+frameMetaData+b''.join(frameData));

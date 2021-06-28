@@ -7,6 +7,6 @@
 unsigned char initFrame();
 void closeFrame();
 unsigned int getFrameCount();
-void getFrameData(unsigned char *buffer, unsigned int frameIdx);
+unsigned int getFrameData(unsigned char *buffer, unsigned int frameIdx);
 
 #endif
