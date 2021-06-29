@@ -20,7 +20,9 @@ static void __interrupt keyboardHandler(){
     while(inp(0x64)&0x1){
         keypressed=inp(0x60);
     }
-    (*keyboardHandlerOrig)();
+    outp(0xa0,0x20);
+    outp(0x20,0x20);
+    //(*keyboardHandlerOrig)();
 }
 void initKeyboard(){
     keyboardHandlerOrig=_dos_getvect(0x09);

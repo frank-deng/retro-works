@@ -9,7 +9,8 @@ static void (__interrupt __far * timerHandlerOrig)();
 static unsigned long timerCycles=0;
 void __interrupt timerHandler(){
     timerCycles++;
-    (*timerHandlerOrig)();
+    outp(0x20,0x20);
+    //(*timerHandlerOrig)();
 }
 void initTimer(){
     timerHandlerOrig=_dos_getvect(0x08);

@@ -9,8 +9,10 @@
 int main(){
     unsigned int stuck=0;
     unsigned char hasNextFrame=1;
-    frame_t *frame=initFrame();
+    frame_t *frame;
     //Initialization
+    puts("Loading...");
+    frame=initFrame();
     if(NULL==frame){
         return 1;
     }
