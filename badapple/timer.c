@@ -6,7 +6,7 @@ void hlt();
 #pragma aux hlt = "hlt";
 
 static void (__interrupt __far * timerHandlerOrig)();
-static unsigned long timerCycles=0;
+static unsigned int timerCycles=0;
 void __interrupt timerHandler(){
     timerCycles++;
     outp(0x20,0x20);
