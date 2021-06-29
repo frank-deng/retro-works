@@ -1,3 +1,3 @@
 @echo off
-wcl -mt -0 -fe=wavplay.com wavplay.c
+wcl -ms -0 -fe=__test__\wavplay.exe wavplay.c
 pause

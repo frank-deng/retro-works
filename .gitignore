@@ -1,5 +1,6 @@
 __pycache__
 node_modules
+__test__
 *.swp
 *.o
 *.COM
