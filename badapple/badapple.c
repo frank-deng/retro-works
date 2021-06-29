@@ -3,19 +3,17 @@
 #include "keyboard.h"
 #include "timer.h"
 #include "video.h"
-#include "frame.h"
 
 //#define _console_debug
 
-static unsigned char frame_buffer[FRAME_WIDTH*FRAME_HEIGHT/8+FRAME_WIDTH*FRAME_HEIGHT/64*2];
-
 int main(){
-    unsigned int curFrame=0, frameCount=0, frameDataLen=0, stuck=0;
+    unsigned int stuck=0;
+    unsigned char hasNextFrame=1;
+    frame_t *frame=initFrame();
     //Initialization
-    if(!initFrame()){
+    if(NULL==frame){
         return 1;
     }
-    frameCount=getFrameCount();
 #ifndef _console_debug
     initKeyboard();
     initTimer();
@@ -29,17 +27,14 @@ int main(){
 #ifndef _console_debug
     waitTimer(1);
     while(0x01!=getKeypressed()){
-        if(curFrame<frameCount){
-            frameDataLen=getFrameData(frame_buffer,curFrame);
-            drawFrame(frame_buffer,frameDataLen);
-            curFrame++;
+        if(hasNextFrame){
+            drawFrame(frame);
+            hasNextFrame=loadNextFrame();
         }
         stuck=waitTimer(4);
-        /*
         if(stuck){
-            printf("S%d,%d\n",curFrame-1,stuck);
+            printf("%d\n",stuck);
         }
-        */
     }
 #endif
 

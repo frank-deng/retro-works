@@ -3,20 +3,23 @@
 #include <errno.h>
 #include "frame.h"
 
-typedef struct frame_meta_t_def{
+typedef struct{
     unsigned short datalen;
     unsigned long offset;
 } frame_meta_t;
-static frame_meta_t *frameMetaData=NULL;
+static frame_meta_t *frameMetaData=NULL, *currentFramePtr;
+static unsigned int frameCount=0, currentFrame=0;
 static FILE* fp=NULL;
-static unsigned int frameCount=0;
+static frame_t frameBuffer;
 
-unsigned char initFrame(){
+__inline void getFrameData(frame_t *frame, frame_meta_t* currentFramePtr);
+frame_t* initFrame(){
+    unsigned int largestFrameDataSize=0,datalen,i;
     //Open data file
     fp=fopen("badapple.dat","rb");
     if(NULL==fp){
         perror("Failed to load video data");
-        return 0;
+        return NULL;
     }
 
     //Get how many frames
@@ -24,30 +27,51 @@ unsigned char initFrame(){
     fread(&frameCount,sizeof(unsigned int),1,fp);
 
     //Load meta data
-    frameMetaData=(frame_meta_t*)malloc(sizeof(frame_meta_t)*frameCount);
+    currentFramePtr=frameMetaData=(frame_meta_t*)malloc(sizeof(frame_meta_t)*frameCount);
     if(NULL==frameMetaData){
         perror("Out of memory");
-        return 0;
+        return NULL;
     }
     fseek(fp,6,SEEK_SET);
     fread(frameMetaData,sizeof(frame_meta_t),frameCount,fp);
 
-    //Init meta data
-    return 1;
+    //Get the lagest frame data, then allocate the appropriate size
+    for(i=0;i<frameCount;i++){
+        datalen=frameMetaData[i].datalen;
+        if(datalen>largestFrameDataSize){
+            largestFrameDataSize=datalen;
+        }
+    }
+    frameBuffer.data=(unsigned char *)malloc(sizeof(unsigned char)*largestFrameDataSize);
+    if(NULL==frameBuffer.data){
+        perror("Out of memory");
+        return NULL;
+    }
+
+    //Load the first frame
+    getFrameData(&frameBuffer,currentFramePtr);
+
+    return &frameBuffer;
 }
 void closeFrame(){
     fclose(fp);
+    free(frameBuffer.data);
     free(frameMetaData);
     frameMetaData=NULL;
     frameCount=0;
 }
-unsigned int getFrameCount(){
-    return frameCount;
+__inline void getFrameData(frame_t *frame, frame_meta_t* currentFramePtr){
+    fseek(fp,currentFramePtr->offset,SEEK_SET);
+    frame->length=currentFramePtr->datalen;
+    fread(frame->data,sizeof(unsigned char),frame->length,fp);
 }
-unsigned int getFrameData(unsigned char *buffer, unsigned int frameIdx){
-    unsigned short length=frameMetaData[frameIdx].datalen;
-    fseek(fp,frameMetaData[frameIdx].offset,SEEK_SET);
-    fread(buffer,sizeof(unsigned char),length,fp);
-    return length;
+unsigned char loadNextFrame(){
+    currentFrame++;
+    if(currentFrame>=frameCount){
+        return 0;
+    }
+    currentFramePtr++;
+    getFrameData(&frameBuffer,currentFramePtr);
+    return 1;
 }
 

@@ -1,5 +1,4 @@
 #include "video.h"
-#include "frame.h"
 
 static unsigned int __far *vmem=0xb8000000L;
 static unsigned int valueConvertTable[256];
@@ -103,14 +102,13 @@ static __inline void drawWhiteBlock(unsigned int baseOffset){
     vmem_ptr+=40;
     *vmem_ptr=0xffff;
 }
-void drawFrame(unsigned char *data,unsigned int len){
+void drawFrame(frame_t *frame){
     unsigned int mark,offset;
-    unsigned char *p=data, bx, by;
-    while(p<data+len){
+    unsigned char *p=frame->data, *dataend=(frame->data+frame->length);
+    while(p<dataend){
         mark=*((unsigned int *)p);
         p+=2;
         offset=mark&0x3fff;
-        //Convert offset of original video to the one used by CGA
         if(mark & 0x4000){
             drawBlackBlock(offset);
         }else if(mark & 0x8000){
