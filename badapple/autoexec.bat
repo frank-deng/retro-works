@@ -1,3 +1,3 @@
 @echo off
-echo Loading badapple.exe
+echo Loading Bad Apple!!
 badapple.exe

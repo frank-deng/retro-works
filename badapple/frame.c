@@ -10,7 +10,7 @@ typedef struct{
 static frame_meta_t *frameMetaData=NULL, *currentFramePtr;
 static unsigned int frameCount=0, currentFrame=0;
 static FILE* fp=NULL;
-static frame_t frameBuffer;
+static frame_t frameBuffer={0,NULL};
 
 __inline void getFrameData(frame_t *frame, frame_meta_t* currentFramePtr);
 frame_t* initFrame(){
@@ -54,11 +54,21 @@ frame_t* initFrame(){
     return &frameBuffer;
 }
 void closeFrame(){
-    fclose(fp);
-    free(frameBuffer.data);
-    free(frameMetaData);
-    frameMetaData=NULL;
+    if(NULL!=fp){
+        fclose(fp);
+        fp=NULL;
+    }
+    if(NULL!=frameBuffer.data){
+        free(frameBuffer.data);
+        frameBuffer.length=0;
+        frameBuffer.data=NULL;
+    }
+    if(NULL!=frameMetaData){
+        free(frameMetaData);
+        frameMetaData=NULL;
+    }
     frameCount=0;
+    currentFrame=0;
 }
 __inline void getFrameData(frame_t *frame, frame_meta_t* currentFramePtr){
     fseek(fp,currentFramePtr->offset,SEEK_SET);
