@@ -3,6 +3,7 @@
 #include "keyboard.h"
 #include "timer.h"
 #include "video.h"
+#include "wav.h"
 
 //#define _console_debug
 
@@ -10,15 +11,21 @@ int main(){
     unsigned int stuck=0;
     unsigned char hasNextFrame=1;
     frame_t *frame;
+    wav_t *wav=NULL;
+
     //Initialization
     puts("Loading...");
     frame=initFrame();
     if(NULL==frame){
         return 1;
     }
+    wav=openWAV("B:\\badapple.wav");
+    if(NULL==wav){
+        return 1;
+    }
 #ifndef _console_debug
     initKeyboard();
-    initTimer();
+    initTimer(wav);
     initVideo();
 #endif
 
@@ -32,8 +39,12 @@ int main(){
         if(hasNextFrame){
             drawFrame(frame);
             hasNextFrame=loadNextFrame();
+            if(hasNextFrame){
+                waitBufferUpdate(wav);
+                readWAVBuffer(wav);
+            }
         }
-        stuck=waitTimer(4);
+        stuck=waitTimer(512);
         if(stuck){
             printf("%d\n",stuck);
         }
@@ -42,6 +53,7 @@ int main(){
 
     //Clean up works
 #ifndef _console_debug
+    closeWAV(wav);
     closeVideo();
     closeTimer();
     closeKeyboard();

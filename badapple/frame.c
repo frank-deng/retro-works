@@ -3,6 +3,11 @@
 #include <errno.h>
 #include "frame.h"
 
+static __inline void cli();
+#pragma aux cli = "cli";
+static __inline void sti();
+#pragma aux sti = "sti";
+
 typedef struct{
     unsigned short datalen;
     unsigned long offset;
@@ -71,9 +76,11 @@ void closeFrame(){
     currentFrame=0;
 }
 __inline void getFrameData(frame_t *frame, frame_meta_t* currentFramePtr){
+    cli();
     fseek(fp,currentFramePtr->offset,SEEK_SET);
     frame->length=currentFramePtr->datalen;
     fread(frame->data,sizeof(unsigned char),frame->length,fp);
+    sti();
 }
 unsigned char loadNextFrame(){
     currentFrame++;
