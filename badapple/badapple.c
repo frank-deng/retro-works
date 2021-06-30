@@ -34,20 +34,22 @@ int main(){
     dumpData(frame_buffer,frameDataLen);
 #endif
 #ifndef _console_debug
-    waitTimer(1);
     while(0x01!=getKeypressed()){
         if(hasNextFrame){
+            switchWAVBuffer(wav);
             drawFrame(frame);
             hasNextFrame=loadNextFrame();
             if(hasNextFrame){
-                waitBufferUpdate(wav);
                 readWAVBuffer(wav);
             }
         }
+        waitTimer(512);
+        /*
         stuck=waitTimer(512);
         if(stuck){
             printf("%d\n",stuck);
         }
+        */
     }
 #endif
 

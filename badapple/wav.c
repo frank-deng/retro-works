@@ -3,13 +3,6 @@
 #include <errno.h>
 #include "wav.h"
 
-static __inline void hlt();
-#pragma aux hlt = "hlt";
-static __inline void cli();
-#pragma aux cli = "cli";
-static __inline void sti();
-#pragma aux sti = "sti";
-
 wav_t* openWAV(char *path){
     audio_format_t audioFormat;
     wav_t* wav;
@@ -20,6 +13,10 @@ wav_t* openWAV(char *path){
         perror("Out of memory");
         return NULL;
     }
+    wav->audioBufferUse=wav->audioBuffer;
+    wav->audioBufferLoad=wav->audioBuffer+1;
+    wav->audioBufferUse->length=wav->audioBufferUse->offset=0;
+    wav->audioBufferLoad->length=wav->audioBufferLoad->offset=0;
 
     //Open file
     wav->fp=fopen(path,"rb");
@@ -36,12 +33,8 @@ wav_t* openWAV(char *path){
 
     //Initialize audio buffer
     fseek(wav->fp,WAV_DATA_OFFSET,SEEK_SET);
-    wav->audioBuffer[0].length=wav->audioBuffer[0].offset=0;
-    wav->audioBuffer[1].length=wav->audioBuffer[1].offset=0;
-    wav->status=1;
     readWAVBuffer(wav);
-    wav->status=0;
-    readWAVBuffer(wav);
+    switchWAVBuffer(wav);
 
     return wav;
 }
@@ -52,44 +45,23 @@ void closeWAV(wav_t* wav){
     free(wav);
 }
 uint8_t getSample(wav_t *wav){
-    unsigned char audioBufferUse=(wav->status & 1 ? 1 : 0);
-    audio_buffer_t *audio_buffer=wav->audioBuffer+audioBufferUse;
+    audio_buffer_t *audio_buffer=wav->audioBufferUse;
     uint8_t value;
-    if(!audio_buffer->length){
-        return 0;
+    if(audio_buffer->offset >= audio_buffer->length){
+        return audio_buffer->data[audio_buffer->length-1];
     }
     value=audio_buffer->data[audio_buffer->offset];
     audio_buffer->offset++;
-    //Switch to another buffer, then discard current buffer
-    if(audio_buffer->offset >= audio_buffer->length){
-        audio_buffer->offset=audio_buffer->length=0;
-        if(audioBufferUse){
-            wav->status&=0xfe;
-        }else{
-            wav->status|=0x1;
-        }
-        wav->status |= 0x2;
-    }
     return value;
 }
-void waitBufferUpdate(wav_t *wav){
-    while(!(wav->status & 0x2)){
-        hlt();
-    }
-    wav->status &= (~0x2);
+void switchWAVBuffer(wav_t *wav){
+    audio_buffer_t *temp=wav->audioBufferUse;
+    wav->audioBufferUse=wav->audioBufferLoad;
+    wav->audioBufferLoad=temp;
 }
 uint8_t readWAVBuffer(wav_t *wav){
-    audio_buffer_t *audio_buffer=wav->audioBuffer;
-    cli();
-    if(!(wav->status&1)){
-        audio_buffer++;
-    }
-    if(0!=audio_buffer->length){
-        sti();
-        return 0;
-    }
+    audio_buffer_t *audio_buffer=wav->audioBufferLoad;
     audio_buffer->length=fread(audio_buffer->data, sizeof(uint8_t), WAV_BUFFER_SIZE, wav->fp);
     audio_buffer->offset=0;
-    sti();
     return 1;
 }

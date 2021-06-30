@@ -24,15 +24,16 @@ typedef struct{
 }audio_buffer_t;
 typedef struct{
     FILE *fp;
-    uint8_t status; //bit0: Which buffer to use, bit1:allow read new content
     uint16_t frequency;
     audio_buffer_t audioBuffer[2];
+    audio_buffer_t* audioBufferUse;
+    audio_buffer_t* audioBufferLoad;
 }wav_t;
 
 wav_t* openWAV(char *path);
 void closeWAV(wav_t* wav);
 uint8_t getSample(wav_t *wav);
+void switchWAVBuffer(wav_t *wav);
 uint8_t readWAVBuffer(wav_t *wav);
-void waitBufferUpdate(wav_t *wav);
 
 #endif

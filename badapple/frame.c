@@ -3,11 +3,6 @@
 #include <errno.h>
 #include "frame.h"
 
-static __inline void cli();
-#pragma aux cli = "cli";
-static __inline void sti();
-#pragma aux sti = "sti";
-
 typedef struct{
     unsigned short datalen;
     unsigned long offset;
@@ -17,7 +12,6 @@ static unsigned int frameCount=0, currentFrame=0;
 static FILE* fp=NULL;
 static frame_t frameBuffer={0,NULL};
 
-__inline void getFrameData(frame_t *frame, frame_meta_t* currentFramePtr);
 frame_t* initFrame(){
     unsigned int largestFrameDataSize=0,datalen,i;
     //Open data file
@@ -54,7 +48,8 @@ frame_t* initFrame(){
     }
 
     //Load the first frame
-    getFrameData(&frameBuffer,currentFramePtr);
+    fseek(fp,6+sizeof(frame_meta_t)*frameCount,SEEK_SET);
+    loadNextFrame();
 
     return &frameBuffer;
 }
@@ -75,20 +70,15 @@ void closeFrame(){
     frameCount=0;
     currentFrame=0;
 }
-__inline void getFrameData(frame_t *frame, frame_meta_t* currentFramePtr){
-    cli();
-    fseek(fp,currentFramePtr->offset,SEEK_SET);
-    frame->length=currentFramePtr->datalen;
-    fread(frame->data,sizeof(unsigned char),frame->length,fp);
-    sti();
-}
 unsigned char loadNextFrame(){
-    currentFrame++;
+    unsigned short length=currentFramePtr->datalen;
     if(currentFrame>=frameCount){
         return 0;
     }
+    frameBuffer.length=length;
+    fread(frameBuffer.data,sizeof(unsigned char),length,fp);
+    currentFrame++;
     currentFramePtr++;
-    getFrameData(&frameBuffer,currentFramePtr);
     return 1;
 }
 
