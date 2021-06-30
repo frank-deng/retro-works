@@ -8,9 +8,17 @@ Hardware requirement
 
 * CPU: 80286 12MHz or faster (e.g. DOSBox with CPU speed beyond 1510 cycles/ms)
 * Graphics: CGA/EGA/VGA
+* PC Speaker required for playing music
 * Floppy A: 5.25inch 1.2M or 3.5inch 1.44M
 * Floppy B: 5.25inch 1.2M or 3.5inch 1.44M
-* PC Speaker required for playing music
+* Hard drive larger than 10M (Optional)
+
+Deployment and running
+----------------------
+
+When using hard drive, simply put `badapple.exe`, `badapple.dat`, `badapple.wav` in the same folder, then switch to the folder and run `badapple.exe`.
+
+When using floppy drives, put `badapple.exe`, `badapple.dat` in floppy A, `badapple.wav` in floppy B, then switch to `A:` and run `badapple.exe`.
 
 Technical information
 ---------------------
