@@ -62,53 +62,64 @@ static __inline void drawBlock(unsigned int baseOffset, unsigned char *data){
     pdata++;
     *vmem_ptr=valueConvertTable[*pdata];
 }
-static __inline void drawBlackBlock(unsigned int baseOffset){
-    unsigned int __far *vmem_ptr = vmem+baseOffset;
-    //Odd lines
-    *vmem_ptr=0;
-    vmem_ptr+=40;
-    *vmem_ptr=0;
-    vmem_ptr+=40;
-    *vmem_ptr=0;
-    vmem_ptr+=40;
-    *vmem_ptr=0;
-    //Even lines
-    vmem_ptr = vmem+4096+baseOffset;
-    *vmem_ptr=0;
-    vmem_ptr+=40;
-    *vmem_ptr=0;
-    vmem_ptr+=40;
-    *vmem_ptr=0;
-    vmem_ptr+=40;
-    *vmem_ptr=0;
-}
-static __inline void drawWhiteBlock(unsigned int baseOffset){
-    unsigned int __far *vmem_ptr = vmem+baseOffset;
-    //Odd lines
-    *vmem_ptr=0xffff;
-    vmem_ptr+=40;
-    *vmem_ptr=0xffff;
-    vmem_ptr+=40;
-    *vmem_ptr=0xffff;
-    vmem_ptr+=40;
-    *vmem_ptr=0xffff;
-    //Even lines
-    vmem_ptr = vmem+4096+baseOffset;
-    *vmem_ptr=0xffff;
-    vmem_ptr+=40;
-    *vmem_ptr=0xffff;
-    vmem_ptr+=40;
-    *vmem_ptr=0xffff;
-    vmem_ptr+=40;
-    *vmem_ptr=0xffff;
-}
+
+static __inline void drawBlackBlock(unsigned int baseOffset);
+#pragma aux drawBlackBlock=\
+    "shl cx,1"\
+    "mov bx,0xb800"\
+    "mov es,bx"\
+    "mov bx,cx"\
+    "mov word ptr[es:bx],0"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0"\
+    "mov bx,8192"\
+    "add bx,cx"\
+    "mov word ptr[es:bx],0"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0"\
+    modify [es bx]\
+    parm [cx];
+
+static __inline void drawWhiteBlock(unsigned int baseOffset);
+#pragma aux drawWhiteBlock=\
+    "shl cx,1"\
+    "mov bx,0xb800"\
+    "mov es,bx"\
+    "mov bx,cx"\
+    "mov word ptr[es:bx],0xffff"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0xffff"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0xffff"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0xffff"\
+    "mov bx,8192"\
+    "add bx,cx"\
+    "mov word ptr[es:bx],0xffff"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0xffff"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0xffff"\
+    "add bx,80"\
+    "mov word ptr[es:bx],0xffff"\
+    modify [es bx]\
+    parm [cx];
+
 void drawFrame(frame_t *frame){
     unsigned int mark,offset;
     unsigned char *p=frame->buffer, *dataend=(frame->buffer+frame->bufferLength);
     while(p<dataend){
         mark=*((unsigned int *)p);
         p+=2;
-        offset=mark&0x3fff;
+        offset=(mark&0x3fff);
         if(mark & 0x4000){
             drawBlackBlock(offset);
         }else if(mark & 0x8000){
