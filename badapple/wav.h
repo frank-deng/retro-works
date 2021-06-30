@@ -2,9 +2,10 @@
 #define __wav_h__
 
 #include <stdio.h>
+#include <io.h>
 
 typedef unsigned char uint8_t;
-typedef unsigned int uint16_t;
+//typedef unsigned int uint16_t;
 typedef unsigned long uint32_t;
 
 #define WAV_BUFFER_SIZE 512

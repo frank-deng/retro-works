@@ -2,8 +2,9 @@
 #define __frame_h__
 
 #include <stdio.h>
+#include <io.h>
 typedef unsigned char uint8_t;
-typedef unsigned int uint16_t;
+//typedef unsigned int uint16_t;
 typedef struct{
     FILE *fp;
     uint16_t frameCount;

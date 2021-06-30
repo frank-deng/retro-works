@@ -1,17 +1,27 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <io.h>
 #include "keyboard.h"
 #include "timer.h"
 #include "video.h"
 #include "wav.h"
 
 //#define _console_debug
-
+char* getWavFile(){
+    if(!access("badapple.wav",R_OK)){
+        return "badapple.wav";
+    }
+    if(!access("B:\\badapple.wav",R_OK)){
+        return "B:\\badapple.wav";
+    }
+    return NULL;
+}
 int main(){
     unsigned int stuck=0;
     unsigned char hasNextFrame=1;
     frame_t *frame;
     wav_t *wav=NULL;
+    char *wavFilePath=NULL;
 
     //Initialization
     puts("Loading...");
@@ -19,7 +29,12 @@ int main(){
     if(NULL==frame){
         return 1;
     }
-    wav=openWAV("B:\\badapple.wav");
+    wavFilePath=getWavFile();
+    if(NULL==wavFilePath){
+        perror("Unable to find music WAV file badapple.wav or B:\\badapple.wav");
+        return 1;
+    }
+    wav=openWAV(wavFilePath);
     if(NULL==wav){
         closeFrame();
         return 1;
