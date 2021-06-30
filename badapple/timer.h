@@ -8,5 +8,6 @@ void closeTimer();
 int waitTimer(unsigned int cycles);
 void soundOn();
 void soundOff();
+void timerUpdateBuffer();
 
 #endif

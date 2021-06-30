@@ -53,6 +53,7 @@ int main(){
     while(0x01!=getKeypressed()){
         if(hasNextFrame){
             switchWAVBuffer(wav);
+            timerUpdateBuffer();
             if(frame->bufferLength){
                 drawFrame(frame);
             }
@@ -64,12 +65,6 @@ int main(){
             }
         }
         waitTimer(512);
-        /*
-        stuck=waitTimer(512);
-        if(stuck){
-            printf("%d\n",stuck);
-        }
-        */
     }
 #endif
 
