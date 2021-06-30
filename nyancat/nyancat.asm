@@ -9,8 +9,6 @@ FrameIdx:
 db 0
 CurrentMusicNote:
 dw 0
-Port61hValueOrig:
-db 0
 FrameDelayTicks:
 db 0
 MusicDelayTicks:
@@ -51,7 +49,6 @@ jnae initScreen
 
 ;Initialize speaker
 in al,0x61
-mov [Port61hValueOrig],al
 or al,0x3
 out 0x61,al
 mov al,0xb6
@@ -155,7 +152,8 @@ jmp mainLoop
 exitProgram:
 
 ;Revert speaker status
-mov al,[Port61hValueOrig]
+in al,0x61
+and al,0xFC
 out 0x61,al
 
 ;revert sound frequency to 1000hz

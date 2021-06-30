@@ -44,6 +44,8 @@ int main(){
             hasNextFrame=loadNextFrame(frame);
             if(hasNextFrame){
                 readWAVBuffer(wav);
+            }else{
+                soundOff();
             }
         }
         waitTimer(512);

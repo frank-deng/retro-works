@@ -30,18 +30,24 @@ void initTimer(wav_t *wav){
 	outp(0x43,0x34);
     outp(0x40,0x23);
     outp(0x40,0x1);
-    outp(0x61,inp(0x61)|0x3); //Enable speaker
+    soundOn();
     /*
     outp(0x40,0xa7);
     outp(0x40,0x91);
     */
 }
 void closeTimer(){
-    outp(0x61,inp(0x61)&(~0x3)); //Disable speaker
+    soundOff();
     _dos_setvect(0x08,timerHandlerOrig);
 	outp(0x43,0x34);
     outp(0x40,0xff);
     outp(0x40,0xff);
+}
+void soundOn(){
+    outp(0x61,inp(0x61)|0x3); //Enable speaker
+}
+void soundOff(){
+    outp(0x61,inp(0x61)&(~0x3)); //Disable speaker
 }
 int waitTimer(unsigned int cycles){
     unsigned int stuckCycles=0;
