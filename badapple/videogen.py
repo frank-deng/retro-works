@@ -69,7 +69,7 @@ def diffFrame(screen,image):
     return frameData;
 
 def getFrameOffset(allFrames,frameIdx):
-    offset=len(allFrames)*6+2+4;
+    offset=len(allFrames)*2+2+4;
     for frame in allFrames[0:frameIdx]:
         offset+=len(frame);
     return offset;
@@ -96,7 +96,8 @@ def main():
                 offset=0;
             else:
                 offset=getFrameOffset(frameData,frameIdx);
-            frameMetaData+=(length.to_bytes(2,'little')+offset.to_bytes(4,'little'));
+            #frameMetaData+=(length.to_bytes(2,'little')+offset.to_bytes(4,'little'));
+            frameMetaData+=(length.to_bytes(2,'little'));
             fpreport.write('Frame %d at offset %x length %d\n'%(frameIdx,offset,length));
 
     with open(targetFile,'wb') as fp:

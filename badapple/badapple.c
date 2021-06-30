@@ -21,6 +21,7 @@ int main(){
     }
     wav=openWAV("B:\\badapple.wav");
     if(NULL==wav){
+        closeFrame();
         return 1;
     }
 #ifndef _console_debug
@@ -37,8 +38,10 @@ int main(){
     while(0x01!=getKeypressed()){
         if(hasNextFrame){
             switchWAVBuffer(wav);
-            drawFrame(frame);
-            hasNextFrame=loadNextFrame();
+            if(frame->bufferLength){
+                drawFrame(frame);
+            }
+            hasNextFrame=loadNextFrame(frame);
             if(hasNextFrame){
                 readWAVBuffer(wav);
             }

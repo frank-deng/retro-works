@@ -104,7 +104,7 @@ static __inline void drawWhiteBlock(unsigned int baseOffset){
 }
 void drawFrame(frame_t *frame){
     unsigned int mark,offset;
-    unsigned char *p=frame->data, *dataend=(frame->data+frame->length);
+    unsigned char *p=frame->buffer, *dataend=(frame->buffer+frame->bufferLength);
     while(p<dataend){
         mark=*((unsigned int *)p);
         p+=2;
