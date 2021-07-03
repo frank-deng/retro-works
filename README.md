@@ -22,43 +22,43 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ### 截图欣赏 Screenshots
 
 2048游戏 2048 Game  
-<img src="http://frank-deng.github.io/retro-works/screenshots/2048.png" alt="2048" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/2048.png" alt="2048" width="640" height="480" style="border:10px solid #000000;"/>
 
 猜数字游戏 Bulls and Cows  
-<img src="http://frank-deng.github.io/retro-works/screenshots/guessnum.png" alt="Bulls and Cows" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/guessnum.png" alt="Bulls and Cows" width="640" height="480" style="border:10px solid #000000;"/>
 
 九九乘法表 9x9 Multiplication Table  
-<img src="http://frank-deng.github.io/retro-works/screenshots/Chengfa.png" alt="Multiplication Table" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/Chengfa.png" alt="Multiplication Table" width="640" height="480" style="border:10px solid #000000;"/>
 
 求1000以内的质数 Get prime numbers under 1000  
-<img src="http://frank-deng.github.io/retro-works/screenshots/primes.png" alt="Prime Numbers" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/primes.png" alt="Prime Numbers" width="640" height="480" style="border:10px solid #000000;"/>
 
 显示杨辉三角 Display Yanghui Triangle  
-<img src="http://frank-deng.github.io/retro-works/screenshots/Yanghui.png" alt="Yanghui Triangle" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/Yanghui.png" alt="Yanghui Triangle" width="640" height="480" style="border:10px solid #000000;"/>
 
 条形图 Bar Chart  
-<img src="http://frank-deng.github.io/retro-works/screenshots/barchart.png" alt="Bar Chart" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/barchart.png" alt="Bar Chart" width="640" height="480" style="border:10px solid #000000;"/>
 
 饼图 Pie Chart  
-<img src="http://frank-deng.github.io/retro-works/screenshots/piechart.png" alt="Pie Chart" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/piechart.png" alt="Pie Chart" width="640" height="480" style="border:10px solid #000000;"/>
 
 俄罗斯方块 Tetris  
-<img src="http://frank-deng.github.io/retro-works/screenshots/Tetris.png" alt="Tetris" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/Tetris.png" alt="Tetris" width="640" height="480" style="border:10px solid #000000;"/>
 
 绘制几何形状 Drawing Geometric Shapes  
-<img src="http://frank-deng.github.io/retro-works/screenshots/Shapes.png" alt="Shapes" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/Shapes.png" alt="Shapes" width="640" height="480" style="border:10px solid #000000;"/>
 
 屏保 Screensaver  
-<img src="http://frank-deng.github.io/retro-works/screenshots/lines.png" alt="Screensaver" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/lines.png" alt="Screensaver" width="640" height="480" style="border:10px solid #000000;"/>
 
 谢尔宾斯基地毯 Sierpinski Carpet  
-<img src="http://frank-deng.github.io/retro-works/screenshots/Carpet.png" alt="Sierpinski Carpet" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/Carpet.png" alt="Sierpinski Carpet" width="640" height="480" style="border:10px solid #000000;"/>
 
 显示古诗 Poem Showing  
-<img src="http://frank-deng.github.io/retro-works/screenshots/poem.png" alt="Poem" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/poem.png" alt="Poem" width="640" height="480" style="border:10px solid #000000;"/>
 
 新年快乐 Happy New Year  
-<img src="http://frank-deng.github.io/retro-works/screenshots/New_Year.png" alt="Happy New Year" width="640" height="480"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/New_Year.png" alt="Happy New Year" width="640" height="480" style="border:10px solid #000000;"/>
 
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](http://frank-deng.github.io/retro-works/screenshots/Poem_UCDOS.png)
