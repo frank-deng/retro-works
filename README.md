@@ -22,7 +22,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ### 截图欣赏 Screenshots
 
 2048游戏 2048 Game  
-<img src="http://frank-deng.github.io/retro-works/screenshots/2048.png" alt="2048" width="640" height="480" style="border:10px solid #000000;"/>
+<img src="http://frank-deng.github.io/retro-works/screenshots/2048.png" alt="2048" width="640" height="480" border="10" bordercolor="#000000"/>
 
 猜数字游戏 Bulls and Cows  
 <img src="http://frank-deng.github.io/retro-works/screenshots/guessnum.png" alt="Bulls and Cows" width="640" height="480" style="border:10px solid #000000;"/>
