@@ -22,34 +22,37 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 ### 截图欣赏 Screenshots
 
 2048游戏 2048 Game  
-![2048](http://frank-deng.github.io/retro-works/screenshots/2048.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/2048.png" alt="2048" width="640" height="480"/>
 
 猜数字游戏 Bulls and Cows  
-![Bulls and Cows](http://frank-deng.github.io/retro-works/screenshots/guessnum.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/guessnum.png" alt="Bulls and Cows" width="640" height="480"/>
 
 九九乘法表 9x9 Multiplication Table  
-![Sudoku](http://frank-deng.github.io/retro-works/screenshots/Chengfa.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/Chengfa.png" alt="Multiplication Table" width="640" height="480"/>
 
 求1000以内的质数 Get prime numbers under 1000  
-![Prime Numbers](http://frank-deng.github.io/retro-works/screenshots/primes.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/primes.png" alt="Prime Numbers" width="640" height="480"/>
 
 显示杨辉三角 Display Yanghui Triangle  
-![Yanghui Triangle](http://frank-deng.github.io/retro-works/screenshots/Yanghui.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/Yanghui.png" alt="Yanghui Triangle" width="640" height="480"/>
 
 条形图 Bar Chart  
-![Bar Chart](http://frank-deng.github.io/retro-works/screenshots/barchart.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/barchart.png" alt="Bar Chart" width="640" height="480"/>
 
 饼图 Pie Chart  
-![Pie Chart](http://frank-deng.github.io/retro-works/screenshots/piechart.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/piechart.png" alt="Pie Chart" width="640" height="480"/>
 
 俄罗斯方块 Tetris  
-![Tetris](http://frank-deng.github.io/retro-works/screenshots/Tetris.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/Tetris.png" alt="Tetris" width="640" height="480"/>
 
 绘制几何形状 Drawing Geometric Shapes  
-![Shapes](http://frank-deng.github.io/retro-works/screenshots/Shapes.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/Shapes.png" alt="Shapes" width="640" height="480"/>
 
 屏保 Screensaver  
-![Screensaver](http://frank-deng.github.io/retro-works/screenshots/lines.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/lines.png" alt="Screensaver" width="640" height="480"/>
+
+谢尔宾斯基地毯 Sierpinski Carpet  
+<img src="http://frank-deng.github.io/retro-works/screenshots/Carpet.png" alt="Sierpinski Carpet" width="640" height="480"/>
 
 显示古诗 Poem Showing  
 ![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
@@ -63,9 +66,9 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 新年快乐（使用UCDOS特显程序） Happy New Year (Using UCDOS Special Display Tool)  
 ![Happy New Year for UCDOS](http://frank-deng.github.io/retro-works/screenshots/New_Year_UCDOS.png)
 
-**PS:**  
-截图中显示内容为绿色且有扫描线效果的，为CGA显示方式配上绿色单色显示器时的显示效果。  
-Screenshots in green with scanline effect are CGA mode graphics with green monochrome monitor.
+2048游戏（使用UCDOS特显程序） 2048 Game (Using UCDOS Special Display Tool)  
+![Happy New Year](http://frank-deng.github.io/retro-works/screenshots/2048_UCDOS.png)
+
 
 Retro-Site
 ----------
