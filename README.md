@@ -55,10 +55,10 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 <img src="http://frank-deng.github.io/retro-works/screenshots/Carpet.png" alt="Sierpinski Carpet" width="640" height="480"/>
 
 显示古诗 Poem Showing  
-![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/poem.png" alt="Poem" width="640" height="480"/>
 
 新年快乐 Happy New Year  
-![Happy New Year](http://frank-deng.github.io/retro-works/screenshots/New_Year.png)
+<img src="http://frank-deng.github.io/retro-works/screenshots/New_Year.png" alt="Happy New Year" width="640" height="480"/>
 
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](http://frank-deng.github.io/retro-works/screenshots/Poem_UCDOS.png)
