@@ -35,8 +35,6 @@ class BMPFile:
         bpp = header[6];
         if (640 != self.width or 200 != self.height or 1 != bpp):
             raise Exception('BMP file must be in 640x200 monochrome format.');
-        if (0 != header[7]):
-            raise Exception('Compressed BMP not supported.');
         self.__lineBytes = int(self.width * bpp / 8);
         self.__lineBytesPadded = self.__lineBytes + self.__lineBytes % 4;
 
