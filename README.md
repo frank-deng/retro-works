@@ -57,6 +57,9 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 显示古诗 Poem Showing  
 ![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
 
+显示古诗（使用BSAVE数据） Poem Showing (Using BSAVE Image Data)  
+![Poem 2](http://frank-deng.github.io/retro-works/screenshots/poem2.png)
+
 新年快乐 Happy New Year  
 ![Happy New Year](http://frank-deng.github.io/retro-works/screenshots/New_Year.png)
 
@@ -69,6 +72,8 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 2048游戏（使用UCDOS特显程序） 2048 Game (Using UCDOS Special Display Tool)  
 ![Happy New Year](http://frank-deng.github.io/retro-works/screenshots/2048_UCDOS.png)
 
+UCDOS特显程序256色列表 (256-Color Table of UCDOS Special Display Tool)  
+![Color Table](http://frank-deng.github.io/retro-works/screenshots/TX.png)
 
 Retro-Site
 ----------
