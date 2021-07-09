@@ -222,6 +222,30 @@ SUB MainLoop
                 K$="INSERT"
             CASE CHR$(0) + "S"
                 K$="DELETE"
+            CASE CHR$(0) + ";"
+                K$="F1"
+            CASE CHR$(0) + "<"
+                K$="F2"
+            CASE CHR$(0) + "="
+                K$="F3"
+            CASE CHR$(0) + ">"
+                K$="F4"
+            CASE CHR$(0) + "?"
+                K$="F5"
+            CASE CHR$(0) + "@"
+                K$="F6"
+            CASE CHR$(0) + "A"
+                K$="F7"
+            CASE CHR$(0) + "B"
+                K$="F8"
+            CASE CHR$(0) + "C"
+                K$="F9"
+            CASE CHR$(0) + "D"
+                K$="F10"
+            CASE CHR$(0) + CHR$(133)
+                K$="F11"
+            CASE CHR$(0) + CHR$(134)
+                K$="F12"
         END SELECT
 
         SELECT CASE K$

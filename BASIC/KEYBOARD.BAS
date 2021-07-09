@@ -26,7 +26,14 @@ DO
     CASE CHR$(0) + "S"
       PRINT "Delete"
     CASE ELSE
-      PRINT K$
+      PrintCharCode(K$)
+      PRINT ""
   END SELECT
 LOOP
 
+SUB PrintCharCode(str AS STRING)
+  FOR I=1 TO LEN(str)
+    PRINT ASC(MID$(str,I,1));
+  NEXT I
+  PRINT "   ";str;
+END SUB

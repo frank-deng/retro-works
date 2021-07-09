@@ -66,13 +66,16 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](http://frank-deng.github.io/retro-works/screenshots/Poem_UCDOS.png)
 
+显示带插图的古诗（使用UCDOS特显程序） Poem With Picture (Using UCDOS Special Display Tool)  
+![Poem for UCDOS](http://frank-deng.github.io/retro-works/screenshots/Poem2_UCDOS.png)
+
 新年快乐（使用UCDOS特显程序） Happy New Year (Using UCDOS Special Display Tool)  
 ![Happy New Year for UCDOS](http://frank-deng.github.io/retro-works/screenshots/New_Year_UCDOS.png)
 
 2048游戏（使用UCDOS特显程序） 2048 Game (Using UCDOS Special Display Tool)  
 ![Happy New Year](http://frank-deng.github.io/retro-works/screenshots/2048_UCDOS.png)
 
-UCDOS特显程序256色列表 (256-Color Table of UCDOS Special Display Tool)  
+UCDOS特显程序256色列表 256-Color Table of UCDOS Special Display Tool  
 ![Color Table](http://frank-deng.github.io/retro-works/screenshots/TX.png)
 
 Retro-Site
