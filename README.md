@@ -57,7 +57,7 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 显示古诗 Poem Showing  
 ![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
 
-显示古诗（使用BSAVE数据） Poem Showing (Using BSAVE Image Data)  
+显示古诗（使用BSAVE图像数据） Poem Showing (Using BSAVE Image Data)  
 ![Poem 2](http://frank-deng.github.io/retro-works/screenshots/poem2.png)
 
 新年快乐 Happy New Year  
