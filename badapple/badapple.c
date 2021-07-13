@@ -18,7 +18,7 @@ char* getWavFile(){
 }
 int main(){
     unsigned int stuck=0;
-    unsigned char hasNextFrame=1;
+    unsigned char hasNextFrame=1, keyboardNoRespondFrames=6;
     frame_t *frame;
     wav_t *wav=NULL;
     char *wavFilePath=NULL;
@@ -50,7 +50,7 @@ int main(){
     dumpData(frame_buffer,frameDataLen);
 #endif
 #ifndef _console_debug
-    while(0x01!=getKeypressed()){
+    while(keyboardNoRespondFrames || !getKeypressed()){
         if(hasNextFrame){
             switchWAVBuffer(wav);
             timerUpdateBuffer();
@@ -63,6 +63,10 @@ int main(){
             }else{
                 soundOff();
             }
+        }
+        if(keyboardNoRespondFrames){
+            keyboardNoRespondFrames--;
+            getKeypressed();
         }
         waitTimer(512);
     }

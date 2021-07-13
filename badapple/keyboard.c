@@ -27,6 +27,7 @@ static void __interrupt keyboardHandler(){
 void initKeyboard(){
     keyboardHandlerOrig=_dos_getvect(0x09);
     _dos_setvect(0x09,keyboardHandler);
+    keypressed=0;
 }
 void closeKeyboard(){
     _dos_setvect(0x09,keyboardHandlerOrig);
