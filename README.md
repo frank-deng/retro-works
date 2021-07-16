@@ -234,7 +234,7 @@ Mount floppy image under Linux (Use GB2312 for filename encoding)
 使用ffmpeg制作可在Windows 3.1下播放的视频  
 Convert video into format accepted by Windows 3.1
 
-	ffmpeg -i input.mp4 -c:v cinepak -c:a pcm_s16le|adpcm_ima_wav|pcm_u8\
+	ffmpeg -i input.mp4 -c:v cinepak|msvideo1 -c:a pcm_s16le|pcm_u8|adpcm_ima_wav\
 		-vf "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2"\
 		-r 12 -ac 1 -ar 22050 -y output.avi
 
