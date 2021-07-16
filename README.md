@@ -183,20 +183,21 @@ Execute the following commands to install the softwares required at server side:
 * BASIC编程 BASIC Programming
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
+* 英文打字练习 English typing training
 * 五笔打字练习 Wubi input training
 
 ### 1997's PC
 
 配置 Configuration
 
-* CPU 80486DX 33MHz
+* CPU 80486DX 66MHz
 * 8M RAM
 * 256M HDD
 * S3 864 Graphics Adapter with 384k VRAM, capable of handling 640x480 256-color video mode.
 * CD-ROM
 * Sound Blaster 16
 * Mouse
-* 33.6k Modem
+* 56k Modem
 
 主要用途 Main Usage
 
