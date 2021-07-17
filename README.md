@@ -179,8 +179,8 @@ Execute the following commands to install the softwares required at server side:
 
 主要用途 Main Usage
 
-* 中英文文字处理 Chinese & English text processing
 * BASIC编程 BASIC Programming
+* 中英文文字处理 Chinese & English text processing
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
 * 英文打字练习 English typing training
@@ -201,14 +201,15 @@ Execute the following commands to install the softwares required at server side:
 
 主要用途 Main Usage
 
+* BASIC编程 BASIC Programming
 * 英语学习 English learning
 * 英汉字典 English-Chinese dictionary
+* 英文打字练习 English typing training
 * 中英文文字处理 Chinese & English text processing
-* BASIC编程 BASIC Programming
+* 电子表格和图表处理 Spreadsheet and chart processing
 * 多媒体光盘浏览 Viewing multimedia CDs
 * 图片浏览 Image viewing
-* 音乐播放 Music playback
-* 视频播放 Video playback
+* 音乐和视频播放 Music & video playback
 * 拨号上网 Surfing online via dial-up network
 * 拨号连接远程服务器 Connecting to remote server via dial-up network
 * （禁止游戏 NO GAMING）

@@ -172,7 +172,7 @@ add bx,2
 cmp bx,4000
 jnae clearScreen
 
-;Enable 16 color for background
+;Revert 16 color for background
 mov ax,0x1003
 mov bl,1
 int 10h
