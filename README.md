@@ -54,6 +54,9 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 谢尔宾斯基地毯 Sierpinski Carpet  
 ![Sierpinski Carpet](http://frank-deng.github.io/retro-works/screenshots/Carpet.png)
 
+数独求解程序 Sudoku Solver  
+![Sudoku Solver](http://frank-deng.github.io/retro-works/screenshots/Sudoku_Solver.png)
+
 显示古诗 Poem Showing  
 ![Poem](http://frank-deng.github.io/retro-works/screenshots/poem.png)
 

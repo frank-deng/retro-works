@@ -1,14 +1,30 @@
 DEFINT A-Z
 
-FUNCTION COMP(M,N)
-  STATIC I,J,A,B
+FUNCTION COMP(M0,N0)
+  STATIC I,J,A,B: DIM M(4): DIM N(4)
   A = 0 : B = 0
+  
+  REM Extract digits from two numbers
+  FOR I=0 TO 3
+    M(I)=(M0\(10^I) MOD 10)
+    N(I)=(N0\(10^I) MOD 10)
+  NEXT I
+
+  REM Check M0 for duplicated digits whild N0 has already been checked during input
+  FOR I = 0 TO 2 STEP 1
+    FOR J = I+1 TO 3 STEP 1
+      IF M(I) = M(J) THEN
+        COMP = -1 : EXIT FUNCTION
+      END IF
+    NEXT J
+  NEXT I
+
   FOR I = 0 TO 3 STEP 1
-    IF (M\(10^I) MOD 10) = (N\(10^I) MOD 10) THEN
+    IF M(I) = N(I) THEN
       A = A+1
     ELSE
       FOR J = 0 TO 3 STEP 1
-        IF (I<>J) AND ((M\(10^I) MOD 10) = (N\(10^J) MOD 10)) THEN
+        IF (I<>J) AND M(I) = N(J) THEN
           B = B+1
         END IF
       NEXT J
@@ -17,14 +33,17 @@ FUNCTION COMP(M,N)
   COMP = A * 10 + B
 END FUNCTION
 
-FUNCTION CHECK(N)
-  STATIC I,J
-  IF N<123 OR N>9876 THEN
+FUNCTION CHECK(N0)
+  STATIC I,J: DIM N(4)
+  IF N0<123 OR N0>9876 THEN
     CHECK = 0 : EXIT FUNCTION
   END IF
+  FOR I=0 TO 3
+    N(I)=(N0\(10^I) MOD 10)
+  NEXT I
   FOR I = 0 TO 2 STEP 1
     FOR J = I+1 TO 3 STEP 1
-      IF (N\(10^I) MOD 10) = (N\(10^J) MOD 10) THEN
+      IF N(I) = N(J) THEN
         CHECK = 0 : EXIT FUNCTION
       END IF
     NEXT J
@@ -52,20 +71,18 @@ FOR N = 123 TO 9876 STEP 1
     PRINT "":PRINT "Calculation Cancelled."
     END
   END IF
-  IF CHECK(N)=1 THEN
-    PASSED = 1
-    FOR I = 0 TO L-1 STEP 1
-      IF COMP(N,G(I,0)) <> G(I,1) THEN
-        PASSED = 0
-        EXIT FOR
-      END IF
-    NEXT I
-    IF PASSED = 1 THEN
-      IF N<=999 THEN
-        PRINT " 0";:PRINT USING "###";N;
-      ELSE
-        PRINT USING "#####";N;
-      END IF
+  PASSED = 1
+  FOR I = 0 TO L-1 STEP 1
+    IF COMP(N,G(I,0)) <> G(I,1) THEN
+      PASSED = 0
+      EXIT FOR
+    END IF
+  NEXT I
+  IF PASSED = 1 THEN
+    IF N<=999 THEN
+      PRINT " 0";:PRINT USING "###";N;
+    ELSE
+      PRINT USING "#####";N;
     END IF
   END IF
 NEXT N

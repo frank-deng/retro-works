@@ -92,7 +92,9 @@ END FUNCTION
 
 SUB main
   DIM N(4) AS SINGLE: FOUND = 0
-  INPUT "A,B,C,D,Goal:", N(0), N(1), N(2), N(3), goal
+  INPUT "Input 4 numbers:", N(0), N(1), N(2), N(3)
+  INPUT "Input goal number (24 by default):", goal$
+  IF ""=goal$ THEN goal=24 ELSE goal=VAL(goal$)
   FOR i = 0 TO 3: FOR j = 0 TO 3
     IF i <> j THEN
       FOR k = 0 TO 3
