@@ -1,5 +1,4 @@
 import sys,time,socket,select;
-from traceback import print_exc;
 
 class SocketServer:
     __addr=('0,0,0,0',8080);
@@ -53,6 +52,7 @@ class SocketServer:
                         self.__inputs.append(conn);
                         instance=self.__handler(*self.__handlerArgs);
                         self.__instances[str(conn.fileno())] = instance;
+                        #conn.sendall(instance.write());
                     except Exception as e:
                         self.__error(e);
                 else:
@@ -87,4 +87,4 @@ class SocketServer:
 
             for s in exceptional:
                 self.__closeConnection(s);
-            time.sleep(0.05);
+            time.sleep(0.001);

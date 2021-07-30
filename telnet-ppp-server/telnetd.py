@@ -153,10 +153,10 @@ class LoginHandler:
         try:
             if 'ProxyApp'==loginInfo['module']:
                 self.__app=ProxyApp(loginInfo['host'],loginInfo['port']);
-                return b'Success.\r\n';
+                return b'Success.'+b'\r\n';
             if 'ProcessApp'==loginInfo['module']:
                 self.__app=ProcessApp(loginInfo['command'],loginInfo.get('cwd',os.environ['HOME']),loginInfo.get('environ',{}));
-                return b'Success.\r\n';
+                return b'Success.'+b'\r\n';
         except Exception as e:
             print('__processLogin',e);
             return b'Invalid Login.';
