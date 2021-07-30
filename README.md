@@ -97,9 +97,8 @@ Execute the following commands to install softwares required:
 
 	sudo apt-get install python3 pppd nginx-light php-fpm php-mbstring
 	sudo cp pppd.py /usr/local/bin
-
-`pppd.py`可以在代码库中的`misc`目录里找到。  
-`pppd.py` can be found at `misc` folder in this repository.
+	cd telnet-ppp-server
+	sudo python3 setup.py install
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`pppd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `pppd.py` and `tcpser` on boot:
