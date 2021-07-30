@@ -26,8 +26,7 @@ class SocketServer:
             self.__error(e);
 
     def __error(self,e):
-        print_exc();
-        #sys.stderr.write(str(e)+"\n");
+        sys.stderr.write(str(e)+"\n");
     
     def close(self):
         self.__running=False;
@@ -52,7 +51,6 @@ class SocketServer:
                         conn, addr = s.accept();
                         conn.setblocking(0);
                         self.__inputs.append(conn);
-                        self.__outputs.append(conn);
                         instance=self.__handler(*self.__handlerArgs);
                         self.__instances[str(conn.fileno())] = instance;
                     except Exception as e:
@@ -83,8 +81,6 @@ class SocketServer:
                         self.__closeConnection(s);
                     else:
                         s.sendall(content);
-                        if not len(content) and s in self.__outputs:
-                            self.__outputs.remove(s);
                 except Exception as e:
                     self.__error(e);
                     self.__closeConnection(s);

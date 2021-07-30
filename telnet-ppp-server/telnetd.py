@@ -2,7 +2,6 @@
 
 from serverLib import SocketServer;
 import hashlib;
-from traceback import print_exc;
 
 class Readline:
     __maxLength=60;
@@ -45,12 +44,14 @@ class Readline:
                 if(self.__echo):
                     self.__display+=val.to_bytes(1,'little');
 
-import socket;
+import socket,select;
 class ProxyApp:
     __socket=None;
     def __init__(self,host,port):
         self.__socket=socket.socket();
         self.__socket.connect((host,port));
+        self.__socket.setblocking(0)
+        self.__socket.settimeout(3);
 
     def read(self,content):
         if not self.__socket:
@@ -65,7 +66,11 @@ class ProxyApp:
         if not self.__socket:
             return None;
         try:
-            return self.__socket.recv(1024);
+            ready = select.select([self.__socket], [], [], 1);
+            if ready[0]:
+                return self.__socket.recv(1024);
+            else:
+                return b'';
         except Exception as e:
             return None;
 
@@ -116,18 +121,16 @@ class ProcessApp:
         if self.__process.poll() is not None:
             return None;
         try:
-            return os.read(self.__master, 1024);
+            content=os.read(self.__master, 1024);
+            return content;
         except BlockingIOError:
             return b'';
         except Exception as e:
+            print(e);
             return None;
 
 import json;
 class LoginHandler:
-    __inputTimeout=10;
-    __retryTimeout=2;
-    __retryTimestamp=None;
-    __inputTimestamp=None;
     __loginInfo={};
     __running=True;
     __readLine=Readline();
@@ -150,10 +153,10 @@ class LoginHandler:
         try:
             if 'ProxyApp'==loginInfo['module']:
                 self.__app=ProxyApp(loginInfo['host'],loginInfo['port']);
-                return b'Success.';
+                return b'Success.\r\n';
             if 'ProcessApp'==loginInfo['module']:
                 self.__app=ProcessApp(loginInfo['command'],loginInfo.get('cwd',os.environ['HOME']),loginInfo.get('environ',{}));
-                return b'Success.';
+                return b'Success.\r\n';
         except Exception as e:
             print('__processLogin',e);
             return b'Invalid Login.';
@@ -198,14 +201,14 @@ class LoginHandler:
         action=self.__action;
         if 'showLogin'==action:
             self.__action='inputUserName';
-            output+=b'\r\nLogin:';
+            output+=b'\r\n\r\nLogin:';
         elif 'showPassword'==action:
             self.__action='inputPassword';
             output+=b'\r\nPassword:';
             self.__readLine.setEcho(False);
         elif 'processLogin'==action:
             self.__action='showLogin';
-            output+=b'\r\n'+self.__processLogin(self.__username,self.__password)+b'\r\n';
+            output+=b'\r\n'+self.__processLogin(self.__username,self.__password);
         return output;
 
     def close(self):
