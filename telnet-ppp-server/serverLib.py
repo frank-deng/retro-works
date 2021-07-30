@@ -1,4 +1,5 @@
 import sys,time,socket,select;
+from traceback import print_exc;
 
 class SocketServer:
     __addr=('0,0,0,0',8080);
@@ -25,7 +26,8 @@ class SocketServer:
             self.__error(e);
 
     def __error(self,e):
-        sys.stderr.write(str(e)+"\n");
+        print_exc();
+        #sys.stderr.write(str(e)+"\n");
     
     def close(self):
         self.__running=False;
@@ -40,7 +42,7 @@ class SocketServer:
         server.setblocking(0);
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1);
         server.bind(self.__addr);
-        server.listen(5);
+        server.listen(1000);
         self.__inputs.append(server);
         while self.__running:
             readable, writable, exceptional = select.select(self.__inputs,self.__outputs,self.__inputs);
@@ -50,7 +52,9 @@ class SocketServer:
                         conn, addr = s.accept();
                         conn.setblocking(0);
                         self.__inputs.append(conn);
-                        self.__instances[str(conn.fileno())] = self.__handler(*self.__handlerArgs);
+                        self.__outputs.append(conn);
+                        instance=self.__handler(*self.__handlerArgs);
+                        self.__instances[str(conn.fileno())] = instance;
                     except Exception as e:
                         self.__error(e);
                 else:
@@ -79,7 +83,7 @@ class SocketServer:
                         self.__closeConnection(s);
                     else:
                         s.sendall(content);
-                        if s in self.__outputs:
+                        if not len(content) and s in self.__outputs:
                             self.__outputs.remove(s);
                 except Exception as e:
                     self.__error(e);
@@ -87,4 +91,4 @@ class SocketServer:
 
             for s in exceptional:
                 self.__closeConnection(s);
-            time.sleep(0.1);
+            time.sleep(0.05);
