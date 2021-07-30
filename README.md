@@ -104,10 +104,10 @@ Execute the following commands to install softwares required:
 在`/etc/crontab`中加入以下命令，实现开机时自动启动`pppd.py`和`tcpser`：  
 Add the following command to `/etc/crontab`, so as to start `pppd.py` and `tcpser` on boot:
 
-	@reboot root /usr/local/bin/pppd.py -H 127.0.0.1 -P 2333 defaultroute mtu 576 10.0.2.15:192.168.7.2 noauth
+	@reboot root /usr/local/bin/pppd.py -H 127.0.0.1 -P 2333 multilink enable-session defaultroute ipcp-accept-remote mtu 576 10.0.2.15: noauth
 
-其中`192.168.7.2`是DOSBox中的PPP拨号客户端使用的IP；`10.0.2.15`则是主机或目标站点的IP。  
-`192.168.7.2` is the IP address used by PPP client inside DOSBox, while `10.0.2.15` is the IP address of the host machine or the target site.
+其中`10.0.2.15`是主机或目标站点的IP。  
+While `10.0.2.15` is the IP address of the host machine or the target site.
 
 ### DOSBox串口配置 Configure DOSBox's Serial Interface
 
