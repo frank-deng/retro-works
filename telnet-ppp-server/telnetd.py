@@ -45,6 +45,7 @@ class Readline:
                     self.__display+=val.to_bytes(1,'little');
 
 import socket,select;
+from traceback import print_exc;
 class ProxyApp:
     __socket=None;
     def __init__(self,host,port):
@@ -79,7 +80,7 @@ class ProxyApp:
             self.__socket.close();
             self.__socket=None;
 
-import subprocess,pty,fcntl,os,ctypes;
+import subprocess,pty,fcntl,os,io,codecs;
 class ProcessApp:
     __process=None;
     def __init__(self,args,cwd,environ={}):
@@ -98,6 +99,11 @@ class ProcessApp:
             cwd=cwd,
             env=env
         );
+        try:
+            self.__encoder=codecs.getincrementalencoder('GB2312')('replace');
+            self.__decoder=codecs.getincrementaldecoder('UTF-8')('replace');
+        except Exception as e:
+            print_exc();
 
     def close(self):
         if self.__process is None:
@@ -122,11 +128,11 @@ class ProcessApp:
             return None;
         try:
             content=os.read(self.__master, 1024);
-            return content;
+            return self.__encoder.encode(self.__decoder.decode(content));
         except BlockingIOError:
             return b'';
         except Exception as e:
-            print(e);
+            print_exc();
             return None;
 
 import json;
