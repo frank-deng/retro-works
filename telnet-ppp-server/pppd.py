@@ -29,7 +29,7 @@ class PppdHandler:
         self.__process=subprocess.Popen([
             '/usr/sbin/pppd',
             ptyPath,
-            'nodetach',
+            'nodetach'
         ]+pppd_options);
 
     def close(self):
@@ -40,6 +40,8 @@ class PppdHandler:
         self.__process=None;
 
     def read(self, data):
+        if self.__process is None:
+            return None;
         try:
             os.write(self.__master, data);
             return True;
@@ -47,6 +49,8 @@ class PppdHandler:
             return None;
 
     def write(self):
+        if self.__process is None:
+            return None;
         try:
             return os.read(self.__master, 65536);
         except BlockingIOError:
