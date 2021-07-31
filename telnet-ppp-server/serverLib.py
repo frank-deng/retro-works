@@ -26,7 +26,7 @@ class SocketServer:
             self.__error(e);
 
     def __error(self,e):
-        sys.stderr.write(format_exc(e)+"\n");
+        sys.stderr.write(str(e)+"\n");
     
     def close(self):
         self.__running=False;
@@ -54,14 +54,6 @@ class SocketServer:
                         self.__outputs.append(conn);
                         instance=self.__handler(*self.__handlerArgs);
                         self.__instances[str(conn.fileno())] = instance;
-
-                        content=b'';
-                        try:
-                            content=self.__instances[str(conn.fileno())].write();
-                        except Exception as e:
-                            self.__error(e);
-                        if content is not None:
-                            conn.sendall(content);
                     except Exception as e:
                         self.__error(e);
                 else:
