@@ -83,7 +83,8 @@ class ProxyApp:
 import subprocess,pty,fcntl,os,io,codecs;
 class ProcessApp:
     __process=None;
-    def __init__(self,args,cwd,environ={}):
+    __rawMode=True;
+    def __init__(self,args,cwd,environ={},encoding=None):
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
         fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK);
@@ -99,11 +100,14 @@ class ProcessApp:
             cwd=cwd,
             env=env
         );
-        try:
-            self.__encoder=codecs.getincrementalencoder('GB2312')('replace');
-            self.__decoder=codecs.getincrementaldecoder('UTF-8')('replace');
-        except Exception as e:
-            print_exc();
+        if encoding is not None:
+            localEncoding=encoding['localEncoding'];
+            remoteEncoding=encoding['remoteEncoding'];
+            self.__rawMode=encoding.get('rawMode',False);
+            self.__localEncoder=codecs.getincrementalencoder(localEncoding)('replace');
+            self.__localDecoder=codecs.getincrementaldecoder(localEncoding)('replace');
+            self.__remoteEncoder=codecs.getincrementalencoder(remoteEncoding)('replace');
+            self.__remoteDecoder=codecs.getincrementaldecoder(remoteEncoding)('replace');
 
     def close(self):
         if self.__process is None:
@@ -115,24 +119,61 @@ class ProcessApp:
         self.__process=None;
 
     def read(self, data):
-        if self.__process.poll() is not None:
+        if self.__process is None or self.__process.poll() is not None:
             return None;
         try:
-            os.write(self.__master, data);
+            dataEncoded=data;
+            if not self.__rawMode:
+                dataEncoded=self.__remoteEncoder.encode(self.__localDecoder.decode(data));
+            os.write(self.__master, dataEncoded);
             return True;
         except Exception as e:
             return None;
 
+    def __handleRawMode(self,content):
+        RAW_MODE_ON,RAW_MODE_OFF=b'\x1b[>rl',b'\x1b[>rh';
+        posOn=content.find(RAW_MODE_ON);
+        posOff=content.find(RAW_MODE_OFF);
+        result=b'';
+
+        if -1==posOn and -1==posOff:
+            return None;
+
+        if -1!=posOn:
+            self.__rawMode=True;
+            contentBefore=content[0:posOn];
+            contentAfter=content[posOn:];
+            if self.__rawMode:
+                result=contentBefore;
+            else:
+                result=self.__localEncoder.encode(self.__remoteDecoder.decode(contentBefore));
+            result+=contentAfter;
+        elif -1!=posOff:
+            self.__rawMode=False;
+            contentBefore=content[0:posOff];
+            contentAfter=content[posOff:];
+            if self.__rawMode:
+                result=contentBefore;
+            else:
+                result=self.__localEncoder.encode(self.__remoteDecoder.decode(contentBefore));
+            result+=self.__localEncoder.encode(self.__remoteDecoder.decode(contentAfter));
+        
+        return result;
+
     def write(self):
-        if self.__process.poll() is not None:
+        if self.__process is None or self.__process.poll() is not None:
             return None;
         try:
             content=os.read(self.__master, 1024);
-            return self.__encoder.encode(self.__decoder.decode(content));
+            handleRawModeData=self.__handleRawMode(content);
+            if handleRawModeData is not None:
+                return handleRawModeData;
+            if self.__rawMode:
+                return content;
+            return self.__localEncoder.encode(self.__remoteDecoder.decode(content));
         except BlockingIOError:
             return b'';
         except Exception as e:
-            print_exc();
             return None;
 
 import json;
@@ -161,10 +202,19 @@ class LoginHandler:
                 self.__app=ProxyApp(loginInfo['host'],loginInfo['port']);
                 return b'Success.'+b'\r\n';
             if 'ProcessApp'==loginInfo['module']:
-                self.__app=ProcessApp(loginInfo['command'],loginInfo.get('cwd',os.environ['HOME']),loginInfo.get('environ',{}));
+                self.__app=ProcessApp(
+                    loginInfo['command'],
+                    loginInfo.get('cwd',os.environ['HOME']),
+                    loginInfo.get('environ',{}),
+                    {
+                        'rawMode':loginInfo.get('rawMode',False),
+                        'localEncoding':loginInfo.get('localEncoding','GB2312'),
+                        'remoteEncoding':loginInfo.get('remoteEncoding','UTF-8')
+                    }
+                );
                 return b'Success.'+b'\r\n';
         except Exception as e:
-            print('__processLogin',e);
+            print_exc();
             return b'Invalid Login.';
 
     def __closeApp(self):

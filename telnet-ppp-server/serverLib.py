@@ -1,4 +1,5 @@
-import sys,time,socket,select;
+import sys,time,socket,select
+from traceback import format_exc;
 
 class SocketServer:
     __addr=('0,0,0,0',8080);
@@ -25,7 +26,7 @@ class SocketServer:
             self.__error(e);
 
     def __error(self,e):
-        sys.stderr.write(str(e)+"\n");
+        sys.stderr.write(format_exc(e)+"\n");
     
     def close(self):
         self.__running=False;
@@ -50,9 +51,17 @@ class SocketServer:
                         conn, addr = s.accept();
                         conn.setblocking(0);
                         self.__inputs.append(conn);
+                        self.__outputs.append(conn);
                         instance=self.__handler(*self.__handlerArgs);
                         self.__instances[str(conn.fileno())] = instance;
-                        #conn.sendall(instance.write());
+
+                        content=b'';
+                        try:
+                            content=self.__instances[str(conn.fileno())].write();
+                        except Exception as e:
+                            self.__error(e);
+                        if content is not None:
+                            conn.sendall(content);
                     except Exception as e:
                         self.__error(e);
                 else:
