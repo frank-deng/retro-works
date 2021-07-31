@@ -1,5 +1,5 @@
 import sys,time,socket,select
-from traceback import format_exc;
+import traceback;
 
 class SocketServer:
     __addr=('0,0,0,0',8080);
@@ -25,8 +25,11 @@ class SocketServer:
         except Exception as e:
             self.__error(e);
 
-    def __error(self,e):
-        sys.stderr.write(str(e)+"\n");
+    def __error(self,*args):
+        try:
+            print(args,file=sys.stderr);
+        except Exception as e:
+            pass;
     
     def close(self):
         self.__running=False;
@@ -51,39 +54,39 @@ class SocketServer:
                         conn, addr = s.accept();
                         conn.setblocking(0);
                         self.__inputs.append(conn);
-                        self.__outputs.append(conn);
+                        #self.__outputs.append(conn);
                         instance=self.__handler(*self.__handlerArgs);
                         self.__instances[str(conn.fileno())] = instance;
                     except Exception as e:
-                        self.__error(e);
+                        self.__error('init',e);
                 else:
                     try:
-                        result=True;
-                        try:
-                            result=self.__instances[str(s.fileno())].read(s.recv(1024));
-                        except Exception as e:
-                            self.__error(e);
+                        fileno=s.fileno();
+                        if(-1==fileno):
+                            self.__closeConnection(s);
+                            continue;
+                        result=self.__instances[str(fileno)].read(s.recv(1024));
                         if result is None:
                             self.__closeConnection(s);
                         elif s not in self.__outputs:
                             self.__outputs.append(s);
                     except Exception as e:
-                        self.__error(e);
+                        self.__error('readable',e);
                         self.__closeConnection(s);
 
             for s in writable:
                 try:
-                    content=b'';
-                    try:
-                        content=self.__instances[str(s.fileno())].write();
-                    except Exception as e:
-                        self.__error(e);
+                    fileno=s.fileno();
+                    if(-1==fileno):
+                        self.__closeConnection(s);
+                        continue;
+                    content=self.__instances[str(s.fileno())].write();
                     if content is None:
                         self.__closeConnection(s);
                     else:
                         s.sendall(content);
                 except Exception as e:
-                    self.__error(e);
+                    self.__error('writable',e);
                     self.__closeConnection(s);
 
             for s in exceptional:

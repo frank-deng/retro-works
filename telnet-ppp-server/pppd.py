@@ -42,6 +42,8 @@ class PppdHandler:
     def read(self, data):
         if self.__process is None:
             return None;
+        if self.__process.poll() is not None:
+            return None;
         try:
             os.write(self.__master, data);
             return True;
@@ -50,6 +52,8 @@ class PppdHandler:
 
     def write(self):
         if self.__process is None:
+            return None;
+        if self.__process.poll() is not None:
             return None;
         try:
             return os.read(self.__master, 65536);

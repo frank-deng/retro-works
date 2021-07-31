@@ -50,8 +50,9 @@ class ProxyApp:
     __socket=None;
     def __init__(self,host,port):
         self.__socket=socket.socket();
+        self.__socket.settimeout(3);
         self.__socket.connect((host,port));
-        self.__socket.setblocking(0)
+        self.__socket.setblocking(0);
         self.__socket.settimeout(3);
 
     def read(self,content):
@@ -67,13 +68,16 @@ class ProxyApp:
         if not self.__socket:
             return None;
         try:
-            ready = select.select([self.__socket], [], [], 1);
-            if ready[0]:
-                return self.__socket.recv(1024);
-            else:
+            ready = select.select([self.__socket], [], [], 0.1);
+            if not ready[0]:
                 return b'';
+            content=self.__socket.recv(1024);
+            if len(content)<=0:
+                return None;
+            return content;
         except Exception as e:
             return None;
+        return b'';
 
     def close(self):
         if self.__socket:
@@ -216,12 +220,15 @@ class LoginHandler:
                 );
                 return b'Success.'+b'\r\n';
         except Exception as e:
-            sys.stderr.write(format_exc(e)+"\n");
+            sys.stderr.write('Error during creating application: '+str(e)+"\n");
             return b'Invalid Login.';
 
     def __closeApp(self):
         if self.__app:
-            self.__app.close();
+            try:
+                self.__app.close();
+            except Exception as e:
+                sys.stderr.write(format_exc(e)+"\n");
             self.__app=None;
         self.__action='showLogin';
     
@@ -229,8 +236,11 @@ class LoginHandler:
         if not self.__running:
             return None;
         if self.__app:
-            if self.__app.read(content) is not None:
-                return True;
+            try:
+                if self.__app.read(content) is not None:
+                    return True;
+            except Exception as e:
+                print('app-read',e,file=sys.stderr);
             self.__closeApp();
 
         self.__readLine.write(content);
@@ -250,9 +260,12 @@ class LoginHandler:
         if not self.__running:
             return None;
         if self.__app:
-            content=self.__app.write();
-            if content is not None:
-                return content;
+            try:
+                content=self.__app.write();
+                if content is not None:
+                    return content;
+            except Exception as e:
+                print('app-write',e,file=sys.stderr);
             self.__closeApp();
             
         output=self.__readLine.getDisplay();
@@ -273,8 +286,7 @@ class LoginHandler:
         if not self.__running:
             return;
         if self.__app:
-            self.__app.close();
-            self.__app=None;
+            self.__closeApp();
         self.__running=False;
 
 if '__main__'==__name__:
