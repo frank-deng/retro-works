@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 from serverLib import SocketServer;
-import hashlib;
+from traceback import format_exc;
+import hashlib,sys;
 
 class Readline:
     __maxLength=60;
@@ -45,7 +46,6 @@ class Readline:
                     self.__display+=val.to_bytes(1,'little');
 
 import socket,select;
-from traceback import print_exc;
 class ProxyApp:
     __socket=None;
     def __init__(self,host,port):
@@ -128,6 +128,7 @@ class ProcessApp:
             os.write(self.__master, dataEncoded);
             return True;
         except Exception as e:
+            sys.stderr.write(format_exc(e)+"\n");
             return None;
 
     def __handleRawMode(self,content):
@@ -174,6 +175,7 @@ class ProcessApp:
         except BlockingIOError:
             return b'';
         except Exception as e:
+            sys.stderr.write(format_exc(e)+"\n");
             return None;
 
 import json;
@@ -214,7 +216,7 @@ class LoginHandler:
                 );
                 return b'Success.'+b'\r\n';
         except Exception as e:
-            print_exc();
+            sys.stderr.write(format_exc(e)+"\n");
             return b'Invalid Login.';
 
     def __closeApp(self):

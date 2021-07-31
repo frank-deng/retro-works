@@ -90,20 +90,19 @@ A simple HTML site optimized for IE3 browser, equipped with a Jekyll-like static
 PPP服务器和静态博客网站生成器需要在Linux环境（如Debian、Ubuntu）中运行。  
 PPP Server and static blog site generator require running under Linux environments like Debian, Ubuntu.
 
-### Linux服务器端配置 Linux Server Configuration
+### Linux PPP服务器配置 Linux PPP Server Configuration
 
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
 
 	sudo apt-get install python3 pppd nginx-light php-fpm php-mbstring
-	sudo cp pppd.py /usr/local/bin
 	cd telnet-ppp-server
 	sudo python3 setup.py install
 
-在`/etc/crontab`中加入以下命令，实现开机时自动启动`pppd.py`和`tcpser`：  
-Add the following command to `/etc/crontab`, so as to start `pppd.py` and `tcpser` on boot:
+在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器：  
+Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
-	@reboot root /usr/local/bin/pppd.py -H 127.0.0.1 -P 2333 multilink enable-session defaultroute ipcp-accept-remote mtu 576 10.0.2.15: noauth
+	@reboot root /usr/local/bin/pppd.py -P 2333 multilink enable-session defaultroute ipcp-accept-remote mtu 576 10.0.2.15: noauth
 
 其中`10.0.2.15`是主机或目标站点的IP。  
 While `10.0.2.15` is the IP address of the host machine or the target site.

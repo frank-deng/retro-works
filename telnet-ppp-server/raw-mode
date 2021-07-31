@@ -1,0 +1,18 @@
+#!/bin/bash
+
+case $1 in
+  'on')
+    echo -e '\x1b[>rl';
+    clear;
+    echo 'Raw mode enabled.';
+  ;;
+  'off')
+    echo -e '\x1b[>rh';
+    clear;
+    echo 'Raw mode disabled.';
+  ;;
+  *)
+    echo "Usage: ${0} on|off";
+  ;;
+esac
+
