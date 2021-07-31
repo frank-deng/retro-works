@@ -81,16 +81,22 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 UCDOS特显程序256色列表 256-Color Table of UCDOS Special Display Tool  
 ![Color Table](http://frank-deng.github.io/retro-works/screenshots/TX.png)
 
-Retro-Site
-----------
+PPP服务器和Telnet服务器
+----------------------
 
-一个简单的HTML站点，主要兼容IE3浏览器，并配有类似Jekyll的静态博客网站生成器。  
-A simple HTML site optimized for IE3 browser, equipped with a Jekyll-like static blog site generator.
+IE3浏览器可通过PPP协议访问部署在服务端的HTML站点，并配有类似Jekyll的静态博客网站生成器。  
+IE3 browser can access the HTML site deployed at server side via PPP protocol. A Jekyll-like static blog site generator is also available.
 
-PPP服务器和静态博客网站生成器需要在Linux环境（如Debian、Ubuntu）中运行。  
-PPP Server and static blog site generator require running under Linux environments like Debian, Ubuntu.
+Telnet服务器可使用类似Telix、HyperTerminal的终端仿真程序通过拨号方式连接。  
+Use terminal emulators like Telix, HyperTerminal to dial to the Telnet server.
 
-### Linux PPP服务器配置 Linux PPP Server Configuration
+PPP服务器、Telnet服务器和静态博客网站生成器需要在Linux环境（如Debian、Ubuntu）中运行。  
+PPP Server, Telnet server and static blog site generator require running under Linux environments like Debian, Ubuntu.
+
+**严禁将PPP服务器或Telnet服务器部署到生产环境或含有敏感数据的环境！！！**  
+**DO NOT deploy PPP server or Telnet server to production environment or environment with sensitive data!!!**
+
+### Linux PPP服务器和Telnet服务器配置 Linux PPP Server Configuration
 
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
@@ -99,10 +105,11 @@ Execute the following commands to install softwares required:
 	cd telnet-ppp-server
 	sudo python3 setup.py install
 
-在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器：  
+在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
 	@reboot root /usr/local/bin/pppd.py -P 2333 multilink enable-session defaultroute ipcp-accept-remote mtu 576 10.0.2.15: noauth
+	@reboot user /usr/local/bin/telnetd.py -P 2345 -c path/to/telnetd.conf
 
 其中`10.0.2.15`是主机或目标站点的IP。  
 While `10.0.2.15` is the IP address of the host machine or the target site.
@@ -113,6 +120,7 @@ While `10.0.2.15` is the IP address of the host machine or the target site.
 Create `phonebook.txt` at the same directory of `dosbox-x.conf`:
 
 	12345 127.0.0.1:2333
+	16666 127.0.0.1:2345
 
 将DOSBox配置中`[serial]`小节下的配置项做如下修改：  
 Change DOSBox configuration under seciton `[serial]`:
@@ -151,18 +159,6 @@ Then enter `blog-maker` directory and run `npm start` to generate the blog site,
 
 带数学公式的文章 Article with Equation  
 ![Math](http://frank-deng.github.io/retro-works/screenshots/retro-site_3.png)
-
-
-Telnet-Server
--------------
-
-一个简单的telnet服务器，可以使用Telix、HyperTerminal之类的客户端通过串口进行连接。  
-A simple telnet server, which can be connected via serial port using softwares like Telix, HyperTerminal.
-
-服务端需要执行以下命令安装所需的软件：  
-Execute the following commands to install the softwares required at server side:
-
-	sudo apt-get install nodejs ncurses-term
 
 
 被模拟的PC Emulated PCs
