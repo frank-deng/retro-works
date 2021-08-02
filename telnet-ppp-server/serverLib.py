@@ -54,9 +54,13 @@ class SocketServer:
                         conn, addr = s.accept();
                         conn.setblocking(0);
                         self.__inputs.append(conn);
-                        #self.__outputs.append(conn);
+                        self.__outputs.append(conn);
                         instance=self.__handler(*self.__handlerArgs);
                         self.__instances[str(conn.fileno())] = instance;
+                        try:
+                            conn.sendall(instance.write());
+                        except Exception as e:
+                            pass;
                     except Exception as e:
                         self.__error('init',e);
                 else:

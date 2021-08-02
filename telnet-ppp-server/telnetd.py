@@ -202,7 +202,7 @@ class LoginHandler:
         self.__password=b'';
         loginInfo=self.__loginInfo.get(username);
         if (loginInfo is None) or password!=loginInfo['password']:
-            return b'Invalid Login.';
+            return b'Invalid Login.\r\n';
         try:
             if 'ProxyApp'==loginInfo['module']:
                 self.__app=ProxyApp(loginInfo['host'],loginInfo['port']);
@@ -221,7 +221,7 @@ class LoginHandler:
                 return b'Success.'+b'\r\n';
         except Exception as e:
             sys.stderr.write('Error during creating application: '+str(e)+"\n");
-            return b'Invalid Login.';
+            return b'Invalid Login.\r\n';
 
     def __closeApp(self):
         if self.__app:
@@ -243,13 +243,20 @@ class LoginHandler:
                 print('app-read',e,file=sys.stderr);
             self.__closeApp();
 
+        if not len(content):
+            return True;
+
         self.__readLine.write(content);
         inputContent=self.__readLine.get();
         if inputContent is None:
             return True;
         if 'inputUserName'==self.__action:
-            self.__username=inputContent;
-            self.__action='showPassword';
+            if not inputContent:
+                self.__username=b'';
+                self.__action='showLogin';
+            else:
+                self.__username=inputContent;
+                self.__action='showPassword';
         elif 'inputPassword'==self.__action:
             self.__readLine.setEcho(True);
             self.__password=inputContent;
@@ -259,6 +266,7 @@ class LoginHandler:
     def write(self):
         if not self.__running:
             return None;
+        output=b'';
         if self.__app:
             try:
                 content=self.__app.write();
@@ -267,12 +275,13 @@ class LoginHandler:
             except Exception as e:
                 print('app-write',e,file=sys.stderr);
             self.__closeApp();
+            output+=b'\r\n';
             
-        output=self.__readLine.getDisplay();
+        output+=self.__readLine.getDisplay();
         action=self.__action;
         if 'showLogin'==action:
             self.__action='inputUserName';
-            output+=b'\r\n\r\nLogin:';
+            output+=b'\r\nLogin:';
         elif 'showPassword'==action:
             self.__action='inputPassword';
             output+=b'\r\nPassword:';
