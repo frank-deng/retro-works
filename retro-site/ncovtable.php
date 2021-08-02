@@ -10,7 +10,7 @@ function display_incr($val){
     if($val>0){
         $val='+'.$val;
     }
-    $color='gray';
+    $color='#333333';
     return ' <font color=\''.$color.'\'>('.$val.')</font>';
 }
 ?><table width='100%' cellspacing='0'>
