@@ -72,7 +72,10 @@ foreach($ncov['news'] as $item){
   <td><img src='/static/BULLET3.GIF'/> <?=$item['title']?></td>
   </tr><?php
 }
-?></table></td></tr><tr><td colspan='2' height='28px' align='center'>
+?></table></td></tr><tr>
+  <tr><td colspan='2' height='5px'></td></tr>
+  <td colspan='2'><?php include('ncovtable.php'); ?></td>
+</tr><tr><td colspan='2' height='28px' align='center'>
   <img src='/static/CONTLINE.GIF'/>
 </td></tr><?php
 }

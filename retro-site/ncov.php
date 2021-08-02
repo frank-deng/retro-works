@@ -22,7 +22,8 @@ function display_paragraph($text){
     return $result;
 }
 require('header.php');
-?><h3>最新消息</h3><table width='100%'><?php
+include('ncovtable.php');
+?><hr><h3>最新消息</h3><table width='100%'><?php
 foreach($news as $idx=>$item){
 ?><?php
   if($idx){
@@ -32,7 +33,8 @@ foreach($news as $idx=>$item){
 <tr><td height='20px' valign='top'><font size='1' color='#0000ff'><?=$item['infoSource'].' '.$item['pubDateStr']?></font></td></tr>
 <tr><td><?=display_paragraph($item['summary'])?></td></tr><?php
 }
-?></table><hr><h3>高风险地区（<?=count($highriskarea,COUNT_NORMAL)?>个）</h3><?php
+?></table><?php
+?><hr><h3>高风险地区（<?=count($highriskarea,COUNT_NORMAL)?>个）</h3><?php
 if($highriskarea){
 ?><ul><?php foreach($highriskarea as $item){?><li><font color='red'><?=$item?></font></li><?php } ?></ul><?php
 }
