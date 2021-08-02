@@ -101,7 +101,7 @@ PPP Server, Telnet server and static blog site generator require running under L
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
 
-	sudo apt-get install python3 pppd nginx-light php-fpm php-mbstring
+	sudo apt-get install python3 pppd nginx-light php-fpm php-mbstring php-apcu
 	cd telnet-ppp-server
 	sudo python3 setup.py install
 

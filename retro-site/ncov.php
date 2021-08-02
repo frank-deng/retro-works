@@ -12,13 +12,12 @@ try{
   $output = curl_exec($ch);
   curl_close($ch);
 
-  session_start();
   $data=null;
   try{
     $data=json_decode($output,true)['newslist'][0];
-    $_SESSION['ncov_data']=$data;
+    apcu_store('ncov_data',$data);
   }catch(Exception $e){
-    $data=$_SESSION['ncov_data'];
+    $data=apcu_fetch('ncov_data');
   }
   if(!$data){
       die('Data not loaded');
@@ -51,11 +50,11 @@ foreach($news as $idx=>$item){
 <tr><td height='20px' valign='top'><font size='1' color='#0000ff'><?=$item['infoSource'].' '.$item['pubDateStr']?></font></td></tr>
 <tr><td><?=display_paragraph($item['summary'])?></td></tr><?php
 }
-?></table><hr><h3>高风险地区</h3><?php
+?></table><hr><h3>高风险地区（<?=count($highriskarea,COUNT_NORMAL)?>个）</h3><?php
 if($highriskarea){
 ?><ul><?php foreach($highriskarea as $item){?><li><font color='red'><?=$item?></font></li><?php } ?></ul><?php
 }
-?><hr><h3>中风险地区</h3><?php
+?><hr><h3>中风险地区（<?=count($midriskarea,COUNT_NORMAL)?>个）</h3><?php
 if($midriskarea){
 ?><ul><?php foreach($midriskarea as $item){?><li><?=$item?></li><?php } ?></ul><?php
 } 

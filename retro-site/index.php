@@ -47,21 +47,20 @@ do{
 	}
 }while($active && CURLM_OK==$status);
 
-session_start();
 $news=$ncov=null;
 $weatherStr='没有天气信息';
 try{
   try{
     $news=json_decode(curl_multi_getcontent($ch_news),true)['newslist'];
-    $_SESSION['news_data']=$news;
+    apcu_store('news_data',$news);
   }catch(Exception $e){
-    $news=$_SESSION['news_data'];
+    $news=apcu_fetch('news_data');
   }
   try{
     $ncov=json_decode(curl_multi_getcontent($ch_ncov),true)['newslist'][0];
-    $_SESSION['ncov_data']=$ncov;
+    apcu_store('ncov_data',$ncov);
   }catch(Exception $e){
-    $ncov=$_SESSION['ncov_data'];
+    $ncov=apcu_fetch('ncov_data');
   }
   try{
     $weather=json_decode(curl_multi_getcontent($ch_weather),true)['HeWeather5'][0];

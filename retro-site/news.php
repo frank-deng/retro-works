@@ -13,9 +13,9 @@ try{
   curl_close($ch);
   try{
     $news=json_decode($output,true)['newslist'];
-    $_SESSION['news_data']=$news;
+    apcu_store('news_data',$news);
   }catch(Exception $e){
-    $news=$_SESSION['news_data'];
+    $news=apcu_fetch('news_data');
   }
   $_TITLE=$_HEADER='今日热点';
 }catch(Exception $e){
