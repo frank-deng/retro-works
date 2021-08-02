@@ -1,26 +1,8 @@
-<?php require('config.php');
+<?php require('common.php');
 try{
-  $ch=curl_init();
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-  curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-  curl_setopt($ch, CURLOPT_POST, 1);
-  curl_setopt($ch, CURLOPT_URL, 'http://api.tianapi.com/txapi/ncov/index');
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-    'key'=>$_CONFIG['TIANAPI_KEY']
-  )));
-  $output = curl_exec($ch);
-  curl_close($ch);
-
-  $data=null;
-  try{
-    $data=json_decode($output,true)['newslist'][0];
-    apcu_store('ncov_data',$data);
-  }catch(Exception $e){
-    $data=apcu_fetch('ncov_data');
-  }
+  $data=apcu_fetch('ncov_data');
   if(!$data){
-      die('Data not loaded');
+    die('Failed to load ncov data.');
   }
 
   $news=$data['news'];

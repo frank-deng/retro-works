@@ -1,81 +1,18 @@
-<?php require('config.php');
+<?php require('common.php');
 $weatherStr='没有天气信息';
-
-$ch_weather=curl_init();
-curl_setopt($ch_weather, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-curl_setopt($ch_weather, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-curl_setopt($ch_weather, CURLOPT_POST, 1);
-curl_setopt($ch_weather, CURLOPT_URL, 'https://free-api.heweather.com/v5/weather');
-curl_setopt($ch_weather, CURLOPT_SSL_VERIFYPEER, FALSE);
-curl_setopt($ch_weather, CURLOPT_SSL_VERIFYHOST, FALSE);
-curl_setopt($ch_weather, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch_weather, CURLOPT_POSTFIELDS, http_build_query(array(
-  'city'=>$_CONFIG['HEWEATHER_CITY'],
-  'key'=>$_CONFIG['HEWEATHER_KEY']
-)));
-
-$ch_news=curl_init();
-curl_setopt($ch_news, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-curl_setopt($ch_news, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-curl_setopt($ch_news, CURLOPT_POST, 1);
-curl_setopt($ch_news, CURLOPT_URL, 'http://api.tianapi.com/bulletin/index');
-curl_setopt($ch_news, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch_news, CURLOPT_POSTFIELDS, http_build_query(array(
-  'key'=>$_CONFIG['TIANAPI_KEY']
-)));
-
-$ch_ncov=curl_init();
-curl_setopt($ch_ncov, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-curl_setopt($ch_ncov, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-curl_setopt($ch_ncov, CURLOPT_POST, 1);
-curl_setopt($ch_ncov, CURLOPT_URL, 'http://api.tianapi.com/txapi/ncov/index');
-curl_setopt($ch_ncov, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch_ncov, CURLOPT_POSTFIELDS, http_build_query(array(
-  'key'=>$_CONFIG['TIANAPI_KEY']
-)));
-
-$task=curl_multi_init();
-curl_multi_add_handle($task,$ch_weather);
-curl_multi_add_handle($task,$ch_news);
-curl_multi_add_handle($task,$ch_ncov);
-
-$status=$active=null;
-do{
-	$status=curl_multi_exec($task,$active);
-	if($active){
-		curl_multi_select($task);
-	}
-}while($active && CURLM_OK==$status);
-
-$news=$ncov=null;
-$weatherStr='没有天气信息';
+$news=apcu_fetch('news_data');
+$ncov=apcu_fetch('ncov_data');
 try{
-  try{
-    $news=json_decode(curl_multi_getcontent($ch_news),true)['newslist'];
-    apcu_store('news_data',$news);
-  }catch(Exception $e){
-    $news=apcu_fetch('news_data');
-  }
-  try{
-    $ncov=json_decode(curl_multi_getcontent($ch_ncov),true)['newslist'][0];
-    apcu_store('ncov_data',$ncov);
-  }catch(Exception $e){
-    $ncov=apcu_fetch('ncov_data');
-  }
-  try{
-    $weather=json_decode(curl_multi_getcontent($ch_weather),true)['HeWeather5'][0];
+  $weather=apcu_fetch('weather_data');
+  if($weather){
     $weatherStr=$weather['basic']['city'].'&nbsp;'
       .$weather['now']['cond']['txt'].'&nbsp;'
       .$weather['daily_forecast'][0]['tmp']['min'].'℃/'
       .$weather['daily_forecast'][0]['tmp']['max'].'℃';
     $weatherStr=$weatherStr.'&nbsp;AQI：'.$weather['aqi']['city']['aqi'].'&nbsp;'.$weather['aqi']['city']['qlty'];
-  }catch(Exception $e){}
-}finally{
-  curl_multi_remove_handle($task, $ch_news);
-  curl_multi_remove_handle($task, $ch_weather);
-  curl_close($ch_news);
-  curl_close($ch_weather);
-  curl_multi_close($task);
+  }
+}catch(Exception $e){
+  error_log('Error while processing weather data at index',$e);
 }
 
 $weekStr=array('星期日','星期一','星期二','星期三','星期四','星期五','星期六');

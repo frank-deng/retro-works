@@ -1,21 +1,8 @@
-<?php require('config.php');
+<?php require('common.php');
 try{
-  $ch=curl_init();
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-  curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-  curl_setopt($ch, CURLOPT_POST, 1);
-  curl_setopt($ch, CURLOPT_URL, 'http://api.tianapi.com/bulletin/index');
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-    'key'=>$_CONFIG['TIANAPI_KEY']
-  )));
-  $output = curl_exec($ch);
-  curl_close($ch);
-  try{
-    $news=json_decode($output,true)['newslist'];
-    apcu_store('news_data',$news);
-  }catch(Exception $e){
-    $news=apcu_fetch('news_data');
+  $news=apcu_fetch('news_data');
+  if(!is_array($news)){
+    $news=[];
   }
   $_TITLE=$_HEADER='今日热点';
 }catch(Exception $e){

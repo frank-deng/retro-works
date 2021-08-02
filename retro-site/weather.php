@@ -1,4 +1,4 @@
-<?php require('config.php');
+<?php require('common.php');
 try{
   $suggestion_text=array(
     'air'=>'空气污染指数：',
@@ -10,26 +10,14 @@ try{
     'trav'=>'旅行指数：',
     'uv'=>'紫外线指数：'
   );
-
-  $ch=curl_init();
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-  curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-  curl_setopt($ch, CURLOPT_POST, 1);
-  curl_setopt($ch, CURLOPT_URL, 'https://free-api.heweather.com/v5/weather');
-  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-    'city'=>$_CONFIG['HEWEATHER_CITY'],
-    'key'=>$_CONFIG['HEWEATHER_KEY']
-  )));
-  $output = curl_exec($ch);
-  curl_close($ch);
-  $weather=json_decode($output,true);
-  $weather = $weather['HeWeather5'][0];
+  $weather = apcu_fetch('weather_data');
+  if(!$weather){
+    die('Failed to load weather data.');
+  }
 
   $_TITLE=$_HEADER=$weather['basic']['city'].'天气';
 }catch(Exception $e){
+  error_log($e);
   die($e->getMessage());
 }
 
