@@ -24,9 +24,20 @@ curl_setopt($ch_news, CURLOPT_POSTFIELDS, http_build_query(array(
   'key'=>$_CONFIG['TIANAPI_KEY']
 )));
 
+$ch_ncov=curl_init();
+curl_setopt($ch_ncov, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+curl_setopt($ch_ncov, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+curl_setopt($ch_ncov, CURLOPT_POST, 1);
+curl_setopt($ch_ncov, CURLOPT_URL, 'http://api.tianapi.com/txapi/ncov/index');
+curl_setopt($ch_ncov, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch_ncov, CURLOPT_POSTFIELDS, http_build_query(array(
+  'key'=>$_CONFIG['TIANAPI_KEY']
+)));
+
 $task=curl_multi_init();
 curl_multi_add_handle($task,$ch_weather);
 curl_multi_add_handle($task,$ch_news);
+curl_multi_add_handle($task,$ch_ncov);
 
 $status=$active=null;
 do{
@@ -36,14 +47,28 @@ do{
 	}
 }while($active && CURLM_OK==$status);
 
+session_start();
+$news=$ncov=null;
+$weatherStr='没有天气信息';
 try{
-  $news=json_decode(curl_multi_getcontent($ch_news),true)['newslist'];
-  $weather=json_decode(curl_multi_getcontent($ch_weather),true)['HeWeather5'][0];
-  $weatherStr=$weather['basic']['city'].'&nbsp;'
-    .$weather['now']['cond']['txt'].'&nbsp;'
-    .$weather['daily_forecast'][0]['tmp']['min'].'℃/'
-    .$weather['daily_forecast'][0]['tmp']['max'].'℃';
   try{
+    $news=json_decode(curl_multi_getcontent($ch_news),true)['newslist'];
+    $_SESSION['news_data']=$news;
+  }catch(Exception $e){
+    $news=$_SESSION['news_data'];
+  }
+  try{
+    $ncov=json_decode(curl_multi_getcontent($ch_ncov),true)['newslist'][0];
+    $_SESSION['ncov_data']=$ncov;
+  }catch(Exception $e){
+    $ncov=$_SESSION['ncov_data'];
+  }
+  try{
+    $weather=json_decode(curl_multi_getcontent($ch_weather),true)['HeWeather5'][0];
+    $weatherStr=$weather['basic']['city'].'&nbsp;'
+      .$weather['now']['cond']['txt'].'&nbsp;'
+      .$weather['daily_forecast'][0]['tmp']['min'].'℃/'
+      .$weather['daily_forecast'][0]['tmp']['max'].'℃';
     $weatherStr=$weatherStr.'&nbsp;AQI：'.$weather['aqi']['city']['aqi'].'&nbsp;'.$weather['aqi']['city']['qlty'];
   }catch(Exception $e){}
 }finally{
@@ -85,18 +110,36 @@ if($news){
             <b>今日热点</b>　<a href='news.php'><font size='2'>查看详情&gt;&gt;</font></a></td>
           <td width='5px' rowspan='100'></td>
         </tr>
-        <tr><td height='5px'></td></tr><?php
+        <tr><td colspan='2' height='5px'></td></tr><?php
 foreach($news as $item){
 ?><tr>
   <td width='10px'></td>
   <td><img src='/static/BULLET3.GIF'/> <?=$item['title']?></td>
   </tr><?php
 }
-?></table></td></tr><?php
+?></table></td></tr><tr><td colspan='2' height='28px' align='center'>
+  <img src='/static/CONTLINE.GIF'/>
+</td></tr><?php
 }
-?><tr><td colspan='2' height='28px' align='center'>
-    <img src='/static/CONTLINE.GIF'/>
-  </td></tr>
-  <tr><td colspan='2' bgcolor='#ffff33' height='8px'></td></tr>
+if($ncov){
+?><tr><td colspan='2'><table width='100%'>
+  <tr>
+    <td colspan='2' height='24px' valign='middle'>
+      <img src='/static/BULL1A.GIF'/>
+      <b>抗击疫情</b>　<a href='ncov.php'><font size='2'>查看详情&gt;&gt;</font></a></td>
+    <td width='5px' rowspan='100'></td>
+  </tr>
+  <tr><td colspan='2' height='5px'></td></tr><?php
+foreach($ncov['news'] as $item){
+?><tr>
+  <td width='10px'></td>
+  <td><img src='/static/BULLET3.GIF'/> <?=$item['title']?></td>
+  </tr><?php
+}
+?></table></td></tr><tr><td colspan='2' height='28px' align='center'>
+  <img src='/static/CONTLINE.GIF'/>
+</td></tr><?php
+}
+?><tr><td colspan='2' bgcolor='#ffff33' height='8px'></td></tr>
 </table></body></html>
 

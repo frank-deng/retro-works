@@ -11,7 +11,12 @@ try{
   )));
   $output = curl_exec($ch);
   curl_close($ch);
-  $news=json_decode($output,true)['newslist'];
+  try{
+    $news=json_decode($output,true)['newslist'];
+    $_SESSION['news_data']=$news;
+  }catch(Exception $e){
+    $news=$_SESSION['news_data'];
+  }
   $_TITLE=$_HEADER='今日热点';
 }catch(Exception $e){
   die($e->getMessage());
