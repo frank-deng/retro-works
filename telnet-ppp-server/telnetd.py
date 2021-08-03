@@ -30,6 +30,11 @@ class Readline:
         self.__finished=False;
         return content;
 
+    def reset(self):
+        self.__inputContent=b'';
+        self.__display=b'';
+        self.__finished=False;
+
     def write(self,content):
         if self.__finished:
             return;
@@ -186,12 +191,12 @@ import json;
 class LoginHandler:
     __loginInfo={};
     __running=True;
-    __readLine=Readline();
     __action='showLogin';
     __username=b'';
     __password=b'';
     __app=None;
     def __init__(self,configFile):
+        self.__readLine=Readline();
         with open(configFile, 'r') as f:
             self.__loginInfo=json.load(f);
 
@@ -251,6 +256,7 @@ class LoginHandler:
         if inputContent is None:
             return True;
         if 'inputUserName'==self.__action:
+            self.__readLine.reset();
             if not inputContent:
                 self.__username=b'';
                 self.__action='showLogin';
@@ -258,6 +264,7 @@ class LoginHandler:
                 self.__username=inputContent;
                 self.__action='showPassword';
         elif 'inputPassword'==self.__action:
+            self.__readLine.reset();
             self.__readLine.setEcho(True);
             self.__password=inputContent;
             self.__action='processLogin';
@@ -281,10 +288,12 @@ class LoginHandler:
         action=self.__action;
         if 'showLogin'==action:
             self.__action='inputUserName';
+            self.__readLine.reset();
             output+=b'\r\nLogin:';
         elif 'showPassword'==action:
             self.__action='inputPassword';
             output+=b'\r\nPassword:';
+            self.__readLine.reset();
             self.__readLine.setEcho(False);
         elif 'processLogin'==action:
             self.__action='showLogin';

@@ -19,15 +19,15 @@ class SocketServer:
                 self.__inputs.remove(socket);
             if socket in self.__outputs:
                 self.__outputs.remove(socket);
+            socket.close();
             if fileno in self.__instances:
                 self.__instances.pop(fileno).close();
-            socket.close();
         except Exception as e:
-            self.__error(e);
+            self.__error('__closeConnection',e);
 
     def __error(self,*args):
         try:
-            print(args,file=sys.stderr);
+            print(*args,file=sys.stderr);
         except Exception as e:
             pass;
     
@@ -54,7 +54,6 @@ class SocketServer:
                         conn, addr = s.accept();
                         conn.setblocking(0);
                         self.__inputs.append(conn);
-                        self.__outputs.append(conn);
                         instance=self.__handler(*self.__handlerArgs);
                         self.__instances[str(conn.fileno())] = instance;
                         try:
@@ -84,7 +83,7 @@ class SocketServer:
                     if(-1==fileno):
                         self.__closeConnection(s);
                         continue;
-                    content=self.__instances[str(s.fileno())].write();
+                    content=self.__instances[str(fileno)].write();
                     if content is None:
                         self.__closeConnection(s);
                     else:
@@ -95,4 +94,4 @@ class SocketServer:
 
             for s in exceptional:
                 self.__closeConnection(s);
-            time.sleep(0.001);
+            time.sleep(0.01);
