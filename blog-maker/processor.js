@@ -182,6 +182,7 @@ async function processHTML(content,params={}){
       ejs.renderFile(params.template,{
         encoding:params.targetEncoding,
         title:params.title,
+        titleProcessed:processTitle(params.title,params),
         content:html
       },(e,data)=>(e?reject(e):resolve(data)));
     });
@@ -196,8 +197,7 @@ module.exports=async function(content,params={}){
   var html = mathjax.document(contentHTML, {InputJax: tex, OutputJax: svg});
   html.render();
   return await processHTML(adaptor.outerHTML(adaptor.root(html.document)),{
-    ...params,
-    titleProcessed:processTitle(params.title||'',params)
+    ...params
   });
 }
 
