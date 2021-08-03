@@ -28,56 +28,56 @@ tags: [HTML, JavaScript, Vue.js]
 以下是一个简单的对话框组件的代码：
 
 	<template>
-		<div class='dialog-container'
-			ref='dialogContainer'
-			v-show='this.visible'>
-			<slot v-if='this.visible || !this.destroyOnClose'></slot>
-		</div>
+	  <div class='dialog-container'
+	    ref='dialogContainer'
+	    v-show='this.visible'>
+	    <slot v-if='this.visible || !this.destroyOnClose'></slot>
+	  </div>
 	</template>
 	<script>
 	export default {
-		props:{
-			visible:{
-				type:Boolean,
-				default:false
-			},
-			destroyOnClose:{
-				type:Boolean,
-				default:false
-			}
-		},
-		data(){
-			return{
-				container:null
-			};
-		},
-		watch:{
-			visible(visible){
-				//当对话框被打开时，将对话框组件对应的DOM移动到body上
-				if(visible && !this.container){
-					this.$nextTick().then(()=>{
-						this.container=this.$refs.dialogContainer;
-						document.body.appendChild(this.container);
-					});
-				}
-			}
-		},
-		beforeDestroy(){
-			//如果对话框被打开过，就需要手动从body上删除对话框组件对应的DOM
-			if(this.container){
-				document.body.removeChild(this.container);
-				this.container=null;
-			}
-		}
+	  props:{
+	    visible:{
+	      type:Boolean,
+	      default:false
+	    },
+	    destroyOnClose:{
+	      type:Boolean,
+	      default:false
+	    }
+	  },
+	  data(){
+	    return{
+	      container:null
+	    };
+	  },
+	  watch:{
+	    visible(visible){
+	      //当对话框被打开时，将对话框组件对应的DOM移动到body上
+	      if(visible && !this.container){
+	        this.$nextTick().then(()=>{
+	          this.container=this.$refs.dialogContainer;
+	          document.body.appendChild(this.container);
+	        });
+	      }
+	    }
+	  },
+	  beforeDestroy(){
+	    //如果对话框被打开过，就需要手动从body上删除对话框组件对应的DOM
+	    if(this.container){
+	      document.body.removeChild(this.container);
+	      this.container=null;
+	    }
+	  }
 	}
 	</script>
 	<style lang="less" scoped>
 	.dialog-container{
-		position:fixed;
-		left:0;
-		right:0;
-		top:0;
-		bottom:0;
-		background: rgba(0,0,0,0.3);
+	  position:fixed;
+	  left:0;
+	  right:0;
+	  top:0;
+	  bottom:0;
+	  background: rgba(0,0,0,0.3);
 	}
 	</style>
