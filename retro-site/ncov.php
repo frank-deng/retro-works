@@ -17,7 +17,9 @@ function display_paragraph($text){
     $p_arr=explode("\n",$text);
     $result='';
     foreach($p_arr as $p){
-        $result=$result.'<div>　　'.$p.'</div>';
+        if($p){
+          $result=$result.'<div>　　'.$p.'</div>';
+        }
     }
     return $result;
 }
