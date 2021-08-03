@@ -9,7 +9,7 @@
     <% } %>
   </head>
   <body bgcolor='#ffffff'>
-    <h1 align='center'><%=title%></h1>
+    <h1 align='center'><%=titleProcessed%></h1>
     <%-content%>
   </body>
 </html>

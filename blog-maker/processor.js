@@ -88,6 +88,12 @@ function applyFont(document,text,fontTable={}){
   }
   return result;
 }
+function processTitle(title,params={}){
+  var dom=new JSDOM();
+  var document=dom.window.document;
+  document.body.appendChild(applyFont(document,title,params.font));
+  return document.body.innerHTML;
+}
 async function processHTML(content,params={}){
   //Replace equations with corresponding images
   var dom=new JSDOM(content);
@@ -190,7 +196,8 @@ module.exports=async function(content,params={}){
   var html = mathjax.document(contentHTML, {InputJax: tex, OutputJax: svg});
   html.render();
   return await processHTML(adaptor.outerHTML(adaptor.root(html.document)),{
-    ...params
+    ...params,
+    titleProcessed:processTitle(params.title||'',params)
   });
 }
 
