@@ -112,7 +112,7 @@ Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 	@reboot user /usr/local/bin/telnetd.py -P 2345 -c path/to/telnetd.conf
 
 其中`10.0.2.15`是主机或目标站点的IP。  
-While `10.0.2.15` is the IP address of the host machine or the target site.
+`10.0.2.15` is the IP address of the host machine or the target site.
 
 ### DOSBox串口配置 Configure DOSBox's Serial Interface
 
@@ -127,6 +127,26 @@ Change DOSBox configuration under seciton `[serial]`:
 
 	serial1 = modem
 	phonebookfile = phonebook.txt
+
+### VirtualBox NAT配置端口转发 Configure NAT Port Forwarding for VirtualBox
+
+如果Linux PPP服务器和Telnet服务器是部署在VirtualBox虚拟机里，且虚拟机网卡连接的是NAT网络，则需要在虚拟机网卡的端口转发设置中为虚拟机里的PPP服务器和Telnet服务器分别添加2条端口转发规则，以使得主机上的DOSBox-X能访问虚拟机里的服务。
+
+转发规则各个字段说明如下：
+
+* **主机IP**  
+可以不指定，也可以指定`127.0.0.1`以限制只有在主机上运行的程序可以访问对应的服务。
+* **主机端口**  
+可任意指定一个主机上未使用的端口。
+* **子系统IP**  
+在虚拟机的Linux里使用`ip address`命令查看虚拟机网卡对应的IP地址，一般是`10.0.2.15`
+* **子系统端口**  
+PPP服务器和Telnet服务器在虚拟机中使用的端口
+
+虚拟机里的程序可以通过 虚拟路由器IP+主机上的服务对应的端口号 来访问主机上的服务。虚拟路由器IP可通过以下步骤获得：
+
+1. 在虚拟机的Linux终端中输入`ip route show`命令。
+2. 在上一步的命令输出中找到`default via`后面的IP地址，该地址即为客户机的虚拟路由器IP，VirtualBox客户机中一般为`10.0.2.2`。
 
 ### Windows 3.x客户端使用方法 Windows 3.x Client Usage
 
