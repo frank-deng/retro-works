@@ -101,7 +101,7 @@ PPP server, Telnet server and static blog site generator require running under L
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
 
-	sudo apt-get install python3 pppd nginx-light php-fpm php-mbstring php-apcu
+	sudo apt-get install python3 ppp nginx-light php-fpm php-mbstring php-apcu
 	cd telnet-ppp-server
 	sudo python3 setup.py install
 
@@ -113,6 +113,11 @@ Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
 其中`10.0.2.15`是主机或目标站点的IP。  
 `10.0.2.15` is the IP address of the host machine or the target site.
+
+对于VIM用户，需要在`/etc/vim/vimrc`中添加以下配置以保证全角双引号和制表符能在终端中正常显示：  
+For VIM users, it's necessary to add the following configuration to `/etc/vim/vimrc` for properly displaying fullwidth quote marks and line drawing characters in terminal:
+
+	set ambiwidth=double
 
 ### DOSBox串口配置 Configure DOSBox's Serial Interface
 
