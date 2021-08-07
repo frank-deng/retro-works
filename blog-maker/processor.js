@@ -23,6 +23,25 @@ RegisterHTMLHandler(adaptor);
 const tex = new TeX({packages:require('mathjax-full/js/input/tex/AllPackages.js').AllPackages});
 const svg = new SVG({fontCache:'none', internalSpeechTitles:false});
 
+function processTexHanzi(content){
+  let regex=/\\text{[^}]+}/g, text=[], counter=10000;
+  while(counter--){
+    let match=regex.exec(content);
+    if(!match){
+      break;
+    }
+    content.slice(match.index);
+    text.push(match[0]);
+  }
+  if(counter<=0){
+    console.error('Dead loop!!!');
+  }
+  for(let item of text){
+    let itemNew=item.replace(/([\u1100-\u11F9\u3000-\u303F\u3041-\u3094\u3099-\u309E\u30A1-\u30FE\u3131-\u318E\u3190-\u319F\u3200-\u321C\u3220-\u3243\u3260-\u32B0\u32C0-\u3376\u337B-\u33DD\u33E0-\u33FE\u4E00-\u9FA5\uAC00-\uD7A3\uE000-\uE757\uF900-\uFA2D\uFE30-\uFE44\uFE49-\uFE52\uFE54-\uFE6B\uFF01-\uFF5E\uFFE0-\uFFE6])/g,'$1 ');
+    content=content.replace(item,itemNew);
+  }
+  return content;
+}
 function svg2gif(svgData){
   return new Promise((resolve,reject)=>{
     let convert=spawn('convert',['-background','white','+dither','-','+antialias','-colors','16','GIF:-']);
@@ -193,7 +212,7 @@ async function processHTML(content,params={}){
   };
 }
 module.exports=async function(content,params={}){
-  var contentHTML=Markdown.render(content);
+  var contentHTML=processTexHanzi(Markdown.render(content));
   var html = mathjax.document(contentHTML, {InputJax: tex, OutputJax: svg});
   html.render();
   return await processHTML(adaptor.outerHTML(adaptor.root(html.document)),{
