@@ -3,7 +3,7 @@ Retro Programming Works for NEC PC-9800 Series
 
 Some retro programming works for NEC PC-9800 Series.
 
-Use Turbo C++ 4.0J to compile all the C programs.
+Use Turbo C++ 4.0J to compile all the C programs (Disable memory managers like `EMM386.EXE` and only keep `HIMEM.SYS` in `CONFIG.SYS` before running Turbo C++ 4.0J).
 
 2048 For PC-98
 --------------
@@ -44,4 +44,13 @@ Strong in the Rain by Kenji Miyazawa
 
 ![雨ニモマケズ](https://frank-deng.github.io/retro-works/PC98/screenshots/poem1.png)
 
+Make PC98 Background Image in 16/256 color
+------------------------------------------
+
+1. On the host machine, use image processors like GIMP to create a BMP file in 640x400 resolution, indexed 16/256 color mode.  
+When exporting BMP file using GIMP, always expand **Compatibility Options** and check **Do not write color space information** option when "Export as BMP" dialog pops up, or exported BMP file will be incompatible with most of the softwares.
+2. Copy the saved BMP file to PC98, then run `mg .BMP.MAG export.bmp` at PC98 emulator side to convert `.BMP` file to `.MAG` file (in MAKI-chan image format).  
+`mg` can be downloaded from [here](https://www.vector.co.jp/soft/dos/art/se002524.html), `EMM386.EXE` must be loaded in `CONFIG.SYS` before running it.
+3. Use `mag256 export.mag` command to display `.MAG` image file on the graphic layer beneath text.  
+`MAG256.COM` can be downloaded from [here](https://www.vector.co.jp/soft/dos/art/se050872.html), `MOUSE.COM` must be loaded first or system crash will happen when running it.
 
