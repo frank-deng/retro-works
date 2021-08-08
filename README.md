@@ -184,10 +184,13 @@ When connection established, open browser and use URL `http://Target IP` to acce
 执行以下命令安装所需的软件：  
 Execute the following commands to install the softwares required:
 
-	sudo apt-get install nodejs imagemagick inkscape
+	sudo apt-get install nodejs imagemagick librsvg2-bin
 
-然后进入`blog-maker`目录运行`npm start`即可生成博客站点内容，生成结果在`dist`目录中。  
-Then enter `blog-maker` directory and run `npm start` to generate the blog site, generated files can be found at `dist` directory.
+然后进入`blog-maker`目录运行`npm install`安装所需的NodeJS包。  
+Then enter `blog-maker` directory and run `npm install` to install NodeJS packages required.
+
+之后运行`npm start`即可生成博客站点内容，生成结果在`dist`目录中。  
+After that, run `npm start` to generate the blog site, generated files can be found at `dist` directory.
 
 ### 截图欣赏 Screenshots
 
@@ -283,6 +286,8 @@ DOSBox autoexec command for mounting raw harddisk image and floppy image
 	@imgmount 0 /home/frank/.dosbox/floppy.img -fs none
 	@imgmount 2 /home/frank/.dosbox/hdd.img -fs none -t hdd -size 512,63,16,X
 
+对于一些BIN/CUE，MDF/MDS等非ISO格式的光盘映像文件，可以尝试在Linux下使用`iat`命令转换成ISO文件  
+For CD-ROM image files in non-ISO format like BIN/CUE, MDF/MDS, etc., try to use `iat` command under Linux to convert them into ISO file.
 
 ### 如何在Windows 3.x下安装S3显卡驱动 How to install S3 video driver for Windows 3.x
 
