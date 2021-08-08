@@ -120,7 +120,6 @@ function processSVG(document,svg){
     let ch=textNode.childNodes[0].nodeValue;
     let glyph=global.fontManager.getGlyph(ch,0,'HZKPSST.GBK');
     if(!glyph || !glyph.toSVG()){
-      textNode.parentNode.removeChild(textNode);
       continue;
     }
     let path=document.createElement('path'), fontSize=880;

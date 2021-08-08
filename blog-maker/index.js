@@ -5,7 +5,7 @@ const ncp=require('ncp').ncp;
 const ejs=require('ejs');
 const iconv=require('iconv-lite');
 const parseFile=require('./util').parseFile;
-const {initFontManager}=require('./fontlib');
+const {FontManager}=require('./ucfontlib');
 
 var config={
   "staticDir":"static",
@@ -90,7 +90,25 @@ async function processPost(name,idx){
 }
 async function main(){
   //Load font
-  global.fontManager=await initFontManager();
+  global.fontManager=new FontManager([
+    {
+      id:'HZKPSST.GBK',
+      name:'HZKPSST.GBK',
+      data:await new Promise((resolve,reject)=>{
+        fs.readFile('./HZKPSST.GBK',null,(err,data)=>{
+          if(err){
+            reject(err);
+            return;
+          }
+          let len=data.length, arrayBuffer=new ArrayBuffer(len), typedArray=new Uint8Array(arrayBuffer);
+          for(let i=0; i<len; i++){
+            typedArray[i]=data[i];
+          }
+          resolve(arrayBuffer);
+        });
+      })
+    }
+  ]);
 
   //Get master config
   getMasterConfig();
