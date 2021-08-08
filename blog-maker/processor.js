@@ -5,8 +5,6 @@ const JSDOM=require('jsdom').JSDOM;
 const ejs=require('ejs');
 const iconv=require('iconv-lite');
 
-const {Glyph}=require('./fontlib/font');
-
 //Tools for calling imagemagick convert
 const util = require('util');
 const spawn = require('child_process').spawn;
@@ -135,7 +133,7 @@ function processSVG(document,svg){
         break;
       }
     }
-    let scale=fontSize/Glyph.BASE_HEIGHT;
+    let scale=fontSize/glyph.BASE_HEIGHT;
     path.setAttribute(
       'transform',
       (path.getAttribute('transform')||'')
