@@ -5,6 +5,7 @@ const ncp=require('ncp').ncp;
 const ejs=require('ejs');
 const iconv=require('iconv-lite');
 const parseFile=require('./util').parseFile;
+const {initFontManager}=require('./fontlib');
 
 var config={
   "staticDir":"static",
@@ -88,6 +89,9 @@ async function processPost(name,idx){
   };
 }
 async function main(){
+  //Load font
+  global.fontManager=await initFontManager();
+
   //Get master config
   getMasterConfig();
   let target=config.target;

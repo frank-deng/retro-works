@@ -5,6 +5,8 @@ const JSDOM=require('jsdom').JSDOM;
 const ejs=require('ejs');
 const iconv=require('iconv-lite');
 
+const {Glyph}=require('./fontlib/font');
+
 //Tools for calling imagemagick convert
 const util = require('util');
 const spawn = require('child_process').spawn;
@@ -113,6 +115,37 @@ function processTitle(title,params={}){
   document.body.appendChild(applyFont(document,title,params.font));
   return document.body.innerHTML;
 }
+function processSVG(document,svg){
+  for(let textNode of svg.querySelectorAll('text')){
+    let ch=textNode.childNodes[0].nodeValue;
+    let glyph=global.fontManager.getGlyph(ch,0,'HZKPSST.GBK');
+    if(!glyph || !glyph.toSVG()){
+      textNode.parentNode.removeChild(textNode);
+      continue;
+    }
+    let path=document.createElement('path'), fontSize=880;
+    for(let attr of textNode.attributes){
+      switch(attr.nodeName){
+        case 'font-size':
+          fontSize=parseInt(attr.value);
+        break;
+        case 'font-family':
+        break;
+        default:
+          path.setAttribute(attr.nodeName,attr.nodeValue);
+        break;
+      }
+    }
+    let scale=fontSize/Glyph.BASE_HEIGHT;
+    path.setAttribute(
+      'transform',
+      (path.getAttribute('transform')||'')
+        .replace(/matrix\([^\)]*\)/g,`matrix(${scale} 0 0 ${-scale} 0 ${600+(fontSize-600)/2})`)
+    );
+    path.setAttribute('d',glyph.toSVG());
+    textNode.parentNode.replaceChild(path,textNode);
+  }
+}
 async function processHTML(content,params={}){
   //Replace equations with corresponding images
   var dom=new JSDOM(content);
@@ -128,6 +161,9 @@ async function processHTML(content,params={}){
     let scale=params.scale || 16;
     svg.setAttribute('width',`${width*scale}px`);
     svg.setAttribute('height',`${height*scale}px`);
+
+    //Convert Chinese characters to its correcct glyph
+    processSVG(document,svg);
     let svgContent='<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+item.innerHTML;
     
     //Replace svg with image tag
