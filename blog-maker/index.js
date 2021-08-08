@@ -153,7 +153,9 @@ async function main(){
 }
 
 try{
-  main().catch((e)=>{
+  main().then(()=>{
+    console.log('Site generation finished.');
+  }).catch((e)=>{
     console.error(e);
   });
 }catch(e){

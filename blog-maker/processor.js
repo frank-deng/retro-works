@@ -46,24 +46,24 @@ function processTexHanzi(content){
 }
 function svg2gif(svgData){
   return new Promise((resolve,reject)=>{
-    let convert=spawn('convert',['-background','white','+dither','-','+antialias','-colors','16','GIF:-']);
-    let errorMsg='', result=Buffer.alloc(0,0,'binary');
-    convert.stderr.on('data', function(data){
-      errorMsg+=data;
+    let rsvgConvert=spawn('rsvg-convert',['-b','#ffffff','-f','png']),
+      convert=spawn('convert',['-','+dither','+antialias','-colors','16','GIF:-']),
+      result=Buffer.alloc(0,0,'binary');
+    rsvgConvert.stderr.on('data',(data)=>{
+      console.error('rsvg:',data.toString());
     });
-    convert.stdout.setEncoding('binary');
+    convert.stderr.on('data',(data)=>{
+      console.error('convert:',data.toString());
+    });
+    rsvgConvert.stdout.pipe(convert.stdin);
     convert.stdout.on('data',(data)=>{
-      result=Buffer.concat([result,Buffer.from(data,'binary')]);
+      result=Buffer.concat([result,data]);
     });
-    convert.on('exit',(code)=>{
-      if(code){
-        reject(errorMsg);
-        return;
-      }
+    convert.on('close',()=>{
       resolve(result);
     });
-    convert.stdin.write(svgData);
-    convert.stdin.end();
+    rsvgConvert.stdin.write(svgData);
+    rsvgConvert.stdin.end();
   });
 }
 function applyFont(document,text,fontTable={}){
