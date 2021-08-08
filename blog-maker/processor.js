@@ -133,7 +133,7 @@ function processSVG(document,svg){
         break;
       }
     }
-    let scale=fontSize/glyph.BASE_HEIGHT;
+    let scale=fontSize/glyph.constructor.BASE_HEIGHT;
     path.setAttribute(
       'transform',
       (path.getAttribute('transform')||'')
