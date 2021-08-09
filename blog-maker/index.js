@@ -5,7 +5,7 @@ const ncp=require('ncp').ncp;
 const ejs=require('ejs');
 const iconv=require('iconv-lite');
 const parseFile=require('./util').parseFile;
-const {FontManager}=require('./ucfontlib');
+const {FontManager}=require('./fontlib');
 
 var config={
   "staticDir":"static",
