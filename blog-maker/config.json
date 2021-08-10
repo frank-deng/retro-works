@@ -2,6 +2,7 @@
   "targetEncoding":"GB2312",
   "layout":"post",
   "scale":8,
+  "mathFont":"宋体",
   "font":{
     "ascii":"Times New Roman",
     "cjk":"宋体"

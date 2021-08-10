@@ -21,27 +21,13 @@ const adaptor = liteAdaptor({
 RegisterHTMLHandler(adaptor);
 
 const tex = new TeX({packages:require('mathjax-full/js/input/tex/AllPackages.js').AllPackages});
-const svg = new SVG({fontCache:'none', internalSpeechTitles:false});
+const svg = new SVG({
+  mtextFont: $_CONFIG.mathFont,
+  fontCache:'none',
+  internalSpeechTitles:false
+});
+require('mathjax-full/js/util/entities/all.js');
 
-function processTexHanzi(content){
-  let regex=/\\text{[^}]+}/g, text=[], counter=10000;
-  while(counter--){
-    let match=regex.exec(content);
-    if(!match){
-      break;
-    }
-    content.slice(match.index);
-    text.push(match[0]);
-  }
-  if(counter<=0){
-    console.error('Dead loop!!!');
-  }
-  for(let item of text){
-    let itemNew=item.replace(/([\u1100-\u11F9\u3000-\u303F\u3041-\u3094\u3099-\u309E\u30A1-\u30FE\u3131-\u318E\u3190-\u319F\u3200-\u321C\u3220-\u3243\u3260-\u32B0\u32C0-\u3376\u337B-\u33DD\u33E0-\u33FE\u4E00-\u9FA5\uAC00-\uD7A3\uE000-\uE757\uF900-\uFA2D\uFE30-\uFE44\uFE49-\uFE52\uFE54-\uFE6B\uFF01-\uFF5E\uFFE0-\uFFE6])/g,'$1 ');
-    content=content.replace(item,itemNew);
-  }
-  return content;
-}
 function svg2gif(svgData){
   return new Promise((resolve,reject)=>{
     let rsvgConvert=spawn('rsvg-convert',['-b','#ffffff','-f','png']),
@@ -113,36 +99,6 @@ function processTitle(title,params={}){
   document.body.appendChild(applyFont(document,title,params.font));
   return document.body.innerHTML;
 }
-function processSVG(document,svg){
-  for(let textNode of svg.querySelectorAll('text')){
-    let ch=textNode.childNodes[0].nodeValue;
-    let glyph=global.fontManager.getGlyph(ch,0,'HZKPSST.GBK');
-    if(!glyph || !glyph.toSVG()){
-      continue;
-    }
-    let path=document.createElement('path'), fontSize=880;
-    for(let attr of textNode.attributes){
-      switch(attr.nodeName){
-        case 'font-size':
-          fontSize=parseInt(attr.value);
-        break;
-        case 'font-family':
-        break;
-        default:
-          path.setAttribute(attr.nodeName,attr.nodeValue);
-        break;
-      }
-    }
-    let scale=fontSize/glyph.constructor.BASE_HEIGHT;
-    path.setAttribute(
-      'transform',
-      (path.getAttribute('transform')||'')
-        .replace(/matrix\([^\)]*\)/g,`matrix(${scale} 0 0 ${-scale} 0 ${600+(fontSize-600)/2})`)
-    );
-    path.setAttribute('d',glyph.toSVG());
-    textNode.parentNode.replaceChild(path,textNode);
-  }
-}
 async function processHTML(content,params={}){
   //Replace equations with corresponding images
   var dom=new JSDOM(content);
@@ -160,7 +116,6 @@ async function processHTML(content,params={}){
     svg.setAttribute('height',`${height*scale}px`);
 
     //Convert Chinese characters to its correcct glyph
-    processSVG(document,svg);
     let svgContent='<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'+item.innerHTML;
     
     //Replace svg with image tag
@@ -245,7 +200,7 @@ async function processHTML(content,params={}){
   };
 }
 module.exports=async function(content,params={}){
-  var contentHTML=processTexHanzi(Markdown.render(content));
+  var contentHTML=Markdown.render(content);
   var html = mathjax.document(contentHTML, {InputJax: tex, OutputJax: svg});
   html.render();
   return await processHTML(adaptor.outerHTML(adaptor.root(html.document)),{

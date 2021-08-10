@@ -1,13 +1,4 @@
-const processDocument=require('./processor');
-const fs=require('fs');
-const rimraf=require('rimraf');
-const ncp=require('ncp').ncp;
-const ejs=require('ejs');
-const iconv=require('iconv-lite');
-const parseFile=require('./util').parseFile;
-const {FontManager}=require('./fontlib');
-
-var config={
+global.$_CONFIG={
   "staticDir":"static",
   "sourceDir":"_posts",
   "sourceEncoding":"UTF-8",
@@ -16,16 +7,19 @@ var config={
   "templateDir":"template",
   "layout":"post",
   "index":"index",
-  "equationDir":"equation"
+  "equationDir":"equation",
+  ...require('./config.json')
 };
+const config=$_CONFIG;
 
-async function getMasterConfig(){
-  let configFile=await new Promise((resolve,reject)=>{
-    fs.readFile(`${__dirname}/config.json`,'UTF-8',(e,data)=>(e?reject(e):resolve(data)));
-  });
-  Object.assign(config,JSON.parse(configFile));
-  return config;
-}
+const processDocument=require('./processor');
+const fs=require('fs');
+const rimraf=require('rimraf');
+const ncp=require('ncp').ncp;
+const ejs=require('ejs');
+const iconv=require('iconv-lite');
+const parseFile=require('./util').parseFile;
+
 async function processPost(name,idx){
   //Read content
   let [content,localConfig]=parseFile(await new Promise((resolve,reject)=>{
@@ -89,29 +83,7 @@ async function processPost(name,idx){
   };
 }
 async function main(){
-  //Load font
-  global.fontManager=new FontManager([
-    {
-      id:'HZKPSST.GBK',
-      name:'HZKPSST.GBK',
-      data:await new Promise((resolve,reject)=>{
-        fs.readFile('./HZKPSST.GBK',null,(err,data)=>{
-          if(err){
-            reject(err);
-            return;
-          }
-          let len=data.length, arrayBuffer=new ArrayBuffer(len), typedArray=new Uint8Array(arrayBuffer);
-          for(let i=0; i<len; i++){
-            typedArray[i]=data[i];
-          }
-          resolve(arrayBuffer);
-        });
-      })
-    }
-  ]);
-
   //Get master config
-  getMasterConfig();
   let target=config.target;
 
   //Clear and recreate destination folder structure
