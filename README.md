@@ -297,6 +297,15 @@ Use the basic VGA driver for the initial install, then change the video driver u
 安装显卡驱动时如果提示插入S3 Trio 64V Flat Mode Driver软盘，则此时需要将路径填写成`C:\WINDOWS\SYSTEM\`以完成显卡驱动的安装。  
 When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk, redirect the installer to `C:\WINDOWS\SYSTEM\` to complete the graphics driver install.
 
+### Linux下安装字体
+
+1. 将字体文件复制到`/usr/share/fonts`中，并将字体文件的权限改为`644`。  
+Copy font files to `/usr/share/fonts` and change the permission of the font files into `644`.
+2. 运行`sudo fc-cache -v`使得新添加的字体生效。  
+Run `sudo fc-cache -v` to activate newly added fonts.
+3. 运行`fc-list`查看新添加的字体是否生效。  
+Run `fc-list` to check whether the newly-added fonts are useable.
+
 ### X11禁止Ctrl+Alt+Fn键切换终端 Disable Switching TTY Via Ctrl+Alt+Fn Under X11
 
 将以下内容添加到`/etc/xorg.conf`：  
