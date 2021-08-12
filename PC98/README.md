@@ -39,10 +39,25 @@ Sudoku Solver
 ![Sudoku Solver](https://frank-deng.github.io/retro-works/PC98/screenshots/sudoku.png)
 
 
-Strong in the Rain by Kenji Miyazawa
+*Strong in the Rain* by Kenji Miyazawa
 ------------------------------------
 
 ![雨ニモマケズ](https://frank-deng.github.io/retro-works/PC98/screenshots/poem1.png)
+
+
+Add CD-ROM support
+------------------
+
+Add the following configuration to `CONFIG.SYS`:
+
+	DEVICEHIGH=A:¥DOS¥NECCDD.SYS /D:CD1
+	LASTDRIVE=Z
+
+Add the following command to `AUTOEXEC.BAT`:
+
+	MSCDEX.EXE /D:CD1 /L:Z
+
+`/L:Z` specifies the drive letter for CD-ROM.
 
 Make PC98 Background Image in 16/256 color
 ------------------------------------------

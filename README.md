@@ -289,6 +289,57 @@ DOSBox autoexec command for mounting raw harddisk image and floppy image
 对于一些BIN/CUE，MDF/MDS等非ISO格式的光盘映像文件，可以尝试在Linux下使用`iat`命令转换成ISO文件  
 For CD-ROM image files in non-ISO format like BIN/CUE, MDF/MDS, etc., try to use `iat` command under Linux to convert them into ISO file.
 
+### 减少CPU占用 Reduce CPU Usage
+
+**如何在使用模拟器运行DOS、Windows 3.x、Windows 9x时减少CPU占用：**  
+**How to reduce CPU usage when running DOS, Windows 3.x, Windows 9x with emulators:**
+
+MS-DOS 6.22自带`POWER.EXE`，在`CONFIG.SYS`里添加以下配置即可：  
+MS-DOS 6.22 already has `POWER.EXE` installed, you can add the following configuration into `CONFIG.SYS`:
+
+	DEVICEHIGH=C:\DOS\POWER.EXE ADV:MAX
+
+其它版本的MS-DOS需要将`IDLE.COM`复制到`C:\`，然后从`AUTOEXEC.BAT`运行该命令。  
+For other versions of MS-DOS, copy `IDLE.COM` to `C:\`, then run it from `AUTOEXEC.BAT`。
+
+* `IDLE.COM`可以在*Microsoft Virtual PC 2007*中找到。  
+`IDLE.COM` can be found from *Microsoft Virtual PC 2007*.
+
+Windows 3.x需要将`WQGHLT.386`复制到`C:\WINDOWS\SYSTEM\`，然后打开`C:\WINDOWS\SYSTEM.INI`并在`[386enh]`小节中添加以下配置：  
+For Windows 3.x, copy `WQGHLT.386` to `C:\WINDOWS\SYSTEM\`, then open `C:\WINDOWS\SYSTEM.INI` and add the following configuration into `[386enh]` section:
+
+	device=wqghlt.386
+
+Windows 9x需要安装*AmnHLT*或*Amn Refrigerator*。  
+Windows 9x requires installing *AmnHLT* or *Amn Refrigerator*.
+
+### DOS下启用UMB Activate UMB for DOS
+
+在`CONFIG.SYS`中找到内容为`DEVICE=C:\DOS\EMM386.EXE`的行，然后在其后面加上`NOEMS`参数。  
+Open `CONFIG.SYS` and find the line with `DEVICE=C:\DOS\EMM386.EXE`, then append `NOEMS` parameter to it.
+
+### DOS下添加CD-ROM支持 Add CD-ROM support for MS-DOS
+
+将`OAKCDROM.SYS`复制到`C:\`（`OAKCDROM.SYS`可在Windows 9x的安装光盘中找到）。  
+Copy `OAKCDROM.SYS` to `C:\` (`OAKCDROM.SYS` can be found from Windows 9x installation CD-ROMs).
+
+如果MSCDEX没有安装，需要将`MSCDEX.EXE`复制到`C:\`。  
+Copy `MSCDEX.EXE` to `C:\` if MSCDEX is not installed.
+
+在`CONFIG.SYS`中添加以下配置：  
+Add the following configuration into `CONFIG.SYS`:
+
+	DEVICEHIGH=C:\OAKCDROM.SYS /D:CD1
+	LASTDRIVE=Z
+
+在`AUTOEXEC.BAT`中添加以下命令：  
+Add the following command into `AUTOEXEC.BAT`:
+
+	LH MSCDEX.EXE /D:CD1 /L:Z
+
+`/L:Z`用来指定CD-ROM对应的盘符。  
+`/L:Z` specifies the drive letter for CD-ROM.
+
 ### 如何在Windows 3.x下安装S3显卡驱动 How to install S3 video driver for Windows 3.x
 
 安装Windows 3.x时使用标准VGA显示驱动，安装完成后在“Windows 设置程序”中更改显卡驱动。  
