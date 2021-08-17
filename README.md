@@ -81,6 +81,9 @@ Some programs require UCDOS's special display utility `TX.COM` and outline fonts
 UCDOS特显程序256色列表 256-Color Table of UCDOS Special Display Tool  
 ![Color Table](http://frank-deng.github.io/retro-works/screenshots/TX.png)
 
+UCDOS特显程序可用字体 Fonts available for UCDOS Special Display Tool  
+![Fonts](http://frank-deng.github.io/retro-works/screenshots/TX_Fonts.png)
+
 PPP服务器和Telnet服务器
 ----------------------
 
