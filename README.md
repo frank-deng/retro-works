@@ -176,6 +176,9 @@ Find out the IP address after `default via` from the output of the step above, t
 设置新的PPP连接时需要将电话号码设置成`12345`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
 When setting up new PPP connection, set phone number with `12345`, set IP address with `192.168.7.2`, leave username and password blank.
 
+如果您有多部虚拟机连接相同的PPP服务器，则需要在每部虚拟机内的系统中分别配置不同的IP地址。比如配置Windows 3.2的IP地址为`192.168.7.2`，Windows 95的IP地址为`192.168.7.3`。  
+If you have multiple virtual machines connecting to the same PPP server, then you have to set different IP addresses for each virtual machine. For example, set Windows 3.2's IP address as `192.168.7.2`, and set Windows 95's IP addresss as `192.168.7.3`.
+
 检查“使用远程网上的默认网关”选项是否被选中，否则将无法连接目标服务器。  
 Check whether "Use default gateway on remote network" box is checked, or you'll be unable to connect to the target server.
 
