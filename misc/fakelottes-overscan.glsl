@@ -18,21 +18,8 @@
 ////////////////////////////////////////////////////////////////////
 
 ///////////////////////  Runtime Parameters  ///////////////////////
-#pragma parameter shadowMask "shadowMask" 1.0 0.0 4.0 1.0
-#pragma parameter SCANLINE_SINE_COMP_B "Scanline Intensity" 0.40 0.0 1.0 0.05
 #pragma parameter warpX "warpX" 0.031 0.0 0.125 0.01
 #pragma parameter warpY "warpY" 0.041 0.0 0.125 0.01
-#pragma parameter maskDark "maskDark" 0.5 0.0 2.0 0.1
-#pragma parameter maskLight "maskLight" 1.5 0.0 2.0 0.1
-#pragma parameter crt_gamma "CRT Gamma" 2.5 1.0 4.0 0.05
-#pragma parameter monitor_gamma "Monitor Gamma" 2.2 1.0 4.0 0.05
-#pragma parameter SCANLINE_SINE_COMP_A "Scanline Sine Comp A" 0.0 0.0 0.10 0.01
-#pragma parameter SCANLINE_BASE_BRIGHTNESS "Scanline Base Brightness" 0.95 0.0 1.0 0.01
-
-// prevent stupid behavior
-#if defined ROTATE_SCANLINES && !defined SCANLINES
-	#define SCANLINES
-#endif
 
 #if defined(VERTEX)
 
@@ -210,29 +197,27 @@ void main()
 	vec2 pos = v_texCoord.xy;
 #endif
 
-	vec4 res = BL_TEXTURE(Source, pos);
-  FragColor=res;
+	FragColor = BL_TEXTURE(Source, pos);
 
 //Remove garbled display around
 #if defined CURVATURE
-  float left=Warp(vec2(1, posNorm.y)).x-1;
-  float right=Warp(vec2(0, posNorm.y)).x+0.999;
-  float top=Warp(vec2(posNorm.x,1)).y-1;
-  float bottom=Warp(vec2(posNorm.x,0)).y+0.999;
-  float alpha=max(max(
-	smoothstep(-CURVATURE_SMOOTH,0,left-posNorm.x),
-	smoothstep(0,CURVATURE_SMOOTH,posNorm.x-right)
-  ),max(
-	smoothstep(-CURVATURE_SMOOTH,0,top-posNorm.y),
-	smoothstep(0,CURVATURE_SMOOTH,posNorm.y-bottom)
-  ));
-  res=mix(res,vec4(0,0,0,1),alpha);
-  FragColor=res;
+	float left=Warp(vec2(1, posNorm.y)).x-1;
+	float right=Warp(vec2(0, posNorm.y)).x+0.999;
+	float top=Warp(vec2(posNorm.x,1)).y-1;
+	float bottom=Warp(vec2(posNorm.x,0)).y+0.999;
+	float alpha=max(max(
+		smoothstep(-CURVATURE_SMOOTH,0,left-posNorm.x),
+		smoothstep(0,CURVATURE_SMOOTH,posNorm.x-right)
+	),max(
+		smoothstep(-CURVATURE_SMOOTH,0,top-posNorm.y),
+		smoothstep(0,CURVATURE_SMOOTH,posNorm.y-bottom)
+	));
+	FragColor=mix(FragColor,vec4(0,0,0,1),alpha);
 #else
-  if(v_texCoord.x <= 0 || v_texCoord.x >= (rubyInputSize.x/rubyTextureSize.x)
-    || v_texCoord.y <= 0 || v_texCoord.y >= (rubyInputSize.y/rubyTextureSize.y)){
-    FragColor = vec4(0.0,0,0,1.0);
-  }
+	if(v_texCoord.x <= 0 || v_texCoord.x >= (rubyInputSize.x/rubyTextureSize.x)
+		|| v_texCoord.y <= 0 || v_texCoord.y >= (rubyInputSize.y/rubyTextureSize.y)){
+		FragColor = vec4(0.0,0,0,1.0);
+	}
 #endif
 }
 #endif
