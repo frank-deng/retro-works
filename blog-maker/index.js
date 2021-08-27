@@ -22,9 +22,7 @@ const parseFile=require('./util').parseFile;
 
 async function processPost(name,idx){
   //Read content
-  let [content,localConfig]=parseFile(await new Promise((resolve,reject)=>{
-    fs.readFile(`${__dirname}/${config.sourceDir}/${name}.md`,config.sourceEncoding,(e,data)=>(e?reject(e):resolve(data)));
-  }));
+  let [content,localConfig]=parseFile(await fs.promises.readFile(`${__dirname}/${config.sourceDir}/${name}.md`,config.sourceEncoding));
 
   //Get template
   let template=(localConfig.layout || config.layout);
@@ -67,12 +65,8 @@ async function processPost(name,idx){
   //Write to the target
   let target=config.target;
   await Promise.all([
-    new Promise((resolve,reject)=>{
-      fs.writeFile(target+'/'+fileName,result.html,'binary',(e)=>(e?reject(e):resolve(e)));
-    }),
-    ...result.image.map(item=>new Promise((resolve,reject)=>{
-      fs.writeFile(target+'/'+item.path,item.data,'binary',(e)=>(e?reject(e):resolve(e)));
-    }))
+    fs.promises.writeFile(target+'/'+fileName,result.html,'binary'),
+    ...result.image.map(item=>fs.promises.writeFile(target+'/'+item.path,item.data,'binary'))
   ]);
 
   //Output title
@@ -91,15 +85,11 @@ async function main(){
     rimraf(target,r);
   });
   await Promise.all([
-    new Promise((resolve,reject)=>{
-      fs.mkdir(target+'/'+config.imageDir,{
-        recursive:true
-      },(e)=>(e?reject(e):resolve(e)));
+    fs.promises.mkdir(target+'/'+config.imageDir,{
+      recursive:true
     }),
-    new Promise((resolve,reject)=>{
-      fs.mkdir(target+'/'+config.equationDir,{
-        recursive:true
-      },(e)=>(e?reject(e):resolve(e)));
+    fs.promises.mkdir(target+'/'+config.equationDir,{
+      recursive:true
     }),
     new Promise((resolve,reject)=>{
       ncp(__dirname+'/'+config.staticDir, target+'/'+config.staticDir, (e)=>(e?reject(e):resolve(e)));
@@ -107,19 +97,12 @@ async function main(){
   ]);
 
   //Get all the posts
-  let posts = await new Promise((resolve,reject)=>{
-    fs.readdir(__dirname+'/'+config.sourceDir,(err,files)=>{
-      if(err){
-        reject(err);
-      }
-      let fileList=files.filter(file=>'md'==file.split('.').pop()).map(file=>{
-        let fileSplit=file.split('.');
-        return fileSplit.slice(0,fileSplit.length-1).join('.');
-      });
-      fileList.reverse();
-      resolve(fileList);
-    });
+  let posts=await fs.promises.readdir(__dirname+'/'+config.sourceDir);
+  posts=posts.filter(file=>'md'==file.split('.').pop()).map(file=>{
+    let fileSplit=file.split('.');
+    return fileSplit.slice(0,fileSplit.length-1).join('.');
   });
+  posts.reverse();
 
   //Process all the posts
   let postList=await Promise.all(posts.map((postName,idx)=>processPost(postName,idx)));
@@ -135,11 +118,7 @@ async function main(){
   if(config.targetEncoding){
     indexPage=iconv.encode(indexPage,config.targetEncoding);
   }
-  await new Promise((resolve,reject)=>{
-    fs.writeFile(target+`/index.htm`,
-      indexPage,
-      'binary',(e)=>(e?reject(e):resolve(e)));
-  });
+  await fs.promises.writeFile(target+`/index.htm`, indexPage, 'binary');
 }
 
 try{
