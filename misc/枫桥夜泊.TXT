@@ -2,7 +2,7 @@
 M10CU1,0KB1,0CL0
 
 .SLIDE
-请使用本仓库内的PPT.BAS打开本文件
+请使用本仓库内的PPT.BAS打开本文件，黑白插图文件名为POEM_BW.PCX，使用256色PCX格式图片文件。
 .CONTENT
 CO9B0,0,640,480CO0B0,0,640,200
 {%1(15}
