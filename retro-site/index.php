@@ -1,9 +1,14 @@
 <?php require('common.php');
+$loadNews=new FetchNews();
+$loadNcov=new FetchNcov();
+$loadWeather=new FetchWeather();
+fetchMultiWait($loadNews,$loadNcov,$loadWeather);
+
 $weatherStr='没有天气信息';
-$news=apcu_fetch('news_data');
-$ncov=apcu_fetch('ncov_data');
+$news=$loadNews->fetch();
+$ncov=$loadNcov->fetch();
 try{
-  $weather=apcu_fetch('weather_data');
+  $weather=$loadWeather->fetch();
   if($weather){
     $weatherStr=$weather['basic']['city'].'&nbsp;'
       .$weather['now']['cond']['txt'].'&nbsp;'
@@ -12,17 +17,14 @@ try{
     $weatherStr=$weatherStr.'&nbsp;AQI：'.$weather['aqi']['city']['aqi'].'&nbsp;'.$weather['aqi']['city']['qlty'];
   }
 }catch(Exception $e){
-  error_log('Error while processing weather data at index',$e);
+  error_log('Error while processing weather data',$e);
 }
-
-$weekStr=array('星期日','星期一','星期二','星期三','星期四','星期五','星期六');
-$dateStr=date('Y年n月j日').' '.$weekStr[date('w')];
 ?><html>
 	<head>
-		<meta charset='GB2312'/>
-    <title>首页 - <?=$dateStr?></title>
+	    <meta charset='GB2312'/>
+        <title>首页 - <?=$dateStr?></title>
 	</head>
-	<body topmargin='0' leftmargin='0' rightmargin='0' bottommargin='0' bgcolor='#ffffff' background='static/GRAY.JPG'>
+	<body topmargin='0' leftmargin='0' rightmargin='0' bottommargin='0' background='static/GRAY.JPG'>
     <table width='100%' cellspacing='0'>
       <!--页头和天气模块-->
       <tr>

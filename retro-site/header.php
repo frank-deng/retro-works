@@ -13,4 +13,4 @@
   <td bgcolor='#ffff33' align='right' width='50%' nowrap><a href='index.php'><font size='2'>回首页</font></a></td>
   <td bgcolor='#ffff33' width='10px' rowspan='10px'></td>
 </tr>
-<tr><td colspan='2'><table cellpadding='8'><tr><td>
+<tr><td colspan='2'><table cellpadding='8' width='100%'><tr><td>
