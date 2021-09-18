@@ -1,5 +1,5 @@
 <?php
-$data=apcu_fetch('ncov_data');
+$data=$ncov;
 if($data){
     $desc=$data['desc'];
 function display_incr($val){
