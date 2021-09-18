@@ -1,21 +1,36 @@
 <?php require('common.php');
 $loadNews=new FetchNews();
 $loadNcov=new FetchNcov();
-$loadWeather=new FetchWeather();
+$loadWeather=null;
+$weatherStr='没有天气信息';
+try{
+    $location=$_COOKIE['location'];
+    if($location){
+        $location=explode(';',$location);
+        $loadWeather=new FetchWeather($location[0],$location[1]);
+    }else{
+        $weatherStr.=' <font size=2><a href=\'selectCity.php\'>选择城市</a></font>&nbsp;';
+    }
+}catch(Exception $e){
+    error_log($e);
+}
 fetchMultiWait($loadNews,$loadNcov,$loadWeather);
 
-$weatherStr='没有天气信息';
 $news=$loadNews->fetch();
 $ncov=$loadNcov->fetch();
 try{
-  $weather=$loadWeather->fetch();
-  if($weather){
-    $weatherStr=$weather['basic']['city'].'&nbsp;'
-      .$weather['now']['cond']['txt'].'&nbsp;'
-      .$weather['daily_forecast'][0]['tmp']['min'].'℃/'
-      .$weather['daily_forecast'][0]['tmp']['max'].'℃';
-    $weatherStr=$weatherStr.'&nbsp;AQI：'.$weather['aqi']['city']['aqi'].'&nbsp;'.$weather['aqi']['city']['qlty'];
-  }
+    $weather=null;
+    if($loadWeather){
+        $weather=$loadWeather->fetch();
+    }
+    if($weather){
+        $weatherStr=$loadWeather->getLocationName().'&nbsp;'
+            .$weather['now']['text'].'&nbsp;'
+            .$weather['now']['temp'].'℃';
+        if($weather['air']){
+            $weatherStr.='&nbsp;AQI：'.$weather['air']['aqi'].'&nbsp;'.$weather['air']['category'];
+        }
+    }
 }catch(Exception $e){
   error_log('Error while processing weather data',$e);
 }
@@ -30,15 +45,13 @@ try{
     <tr>
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
         <td bgcolor='#ffff33' bordercolor='#ff0000' rowspan='2' width='50%' height='40px' nowrap>
-            <img src='/static/CONTBULL.GIF'/><font size='5' color='#000080'><b>欢迎光临我的信息港</b>&nbsp;</font><img src='static/CONTBULL.GIF'/></td>
+            <img src='/static/CONTBULL.GIF'/><font size='5' face='黑体' color='#000080'><b>欢迎光临我的信息港</b>&nbsp;</font><img src='static/CONTBULL.GIF'/></td>
         <td bgcolor='#ffff33' bordercolor='#ff0000' nowrap align='right' width='50%'><?=$weatherStr?></td>
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
     </tr>
     <tr>
         <td bgcolor='#ffff33' align='right' height='16px'>
-            <font size='2'>｜<?php
-                foreach($_CONFIG['LINKS'] as $item){ ?><a href='<?=$item["link"]?>'><?=$item['title']?></a>｜<?php }
-                ?><a href='weather.php'>天气预报</a>｜</font></td>
+            <font size='2'>｜<?php foreach($_CONFIG['LINKS'] as $item){ ?><a href='<?=$item["link"]?>'><?=$item['title']?></a>｜<?php } ?></font></td>
     </tr>
 </table><p></p>
 <!--News Module-->

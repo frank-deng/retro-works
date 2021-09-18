@@ -1,6 +1,5 @@
 <?php
 $_CONFIG=array(
-  'HEWEATHER_CITY'=>"南京",
   'HEWEATHER_KEY'=>"123456",
   'TIANAPI_KEY'=>"123456",
   'REQUEST_TIMEOUT'=>7,
@@ -8,6 +7,10 @@ $_CONFIG=array(
     array(
         'title'=>'我的博客',
         'link'=>'/blog/'
+    ),
+    array(
+        'title'=>'天气预报',
+        'link'=>'weather.php'
     )
   )
 );

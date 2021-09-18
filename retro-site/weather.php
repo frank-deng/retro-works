@@ -1,16 +1,31 @@
 <?php
 require('common.php');
 
-/*
-$location=$_COOKIE['location'];
-if($_GET['location']){
-		$location=$_GET['location'];
+$_QUERY=array();
+foreach(explode('&',$_SERVER['QUERY_STRING']) as $item){
+    $kv=explode('=',$item);
+    $key=$kv[0]; $value=$kv[1];
+    switch($key){
+        case 'location':
+            $value=iconv('GB2312','UTF-8',rawurldecode($value));
+        break;
+    }
+    $_QUERY[$key]=$value;
+}
+
+$location=iconv('GB2312','UTF-8',rawurldecode($_COOKIE['location']));
+if($_QUERY['location']){
+		$location=$_QUERY['location'];
 		setcookie("location",$location,time()+3600*24*666);
 }else if(!$location){
 		header('Location: selectCity.php');
 		exit();
 }
- */
+
+$location=explode(';',$location);
+$location_id=$location[0];
+$location_name=$location[1];
+
 try{
 	$suggestion_text=array(
 		'air'=>'空气污染指数：',
@@ -35,7 +50,8 @@ try{
 }
 
 require('header.php');
-?><a href='selectCity.php'>选择城市</a>
+?>
+<p></p>
 <table>
 	<tr>
 		<th align='left'>天气</th>

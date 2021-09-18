@@ -33,7 +33,6 @@ if($city){
     curl_setopt($ch, CURLOPT_POST, 0);
     curl_setopt($ch, CURLOPT_URL, 'https://geoapi.qweather.com/v2/city/lookup?'.http_build_query([
         'key'=>$_CONFIG['HEWEATHER_KEY'],
-        'range'=>20,
         'location'=>$city
     ]));
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -41,8 +40,10 @@ if($city){
     curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     try{
-        $cityData=json_decode(curl_exec($ch),true)['location'];
+        $data=curl_exec($ch);
+        $cityData=json_decode($data,true)['location'];
     }catch(Exception $e){
+        error_log($e);
     }
     curl_close($ch);
 }
@@ -52,13 +53,18 @@ require('header.php');
 请输入城市：<input type='text' name='city' value='<?=$city?>'><input type='submit' value='搜索'><hr>
 </form>
 <?php if($cityData){ ?>
-<div>请选择城市</div>
+<h3>请选择城市</h3>
 <ul>
-    <?php foreach($cityData as $item){ ?>
-    <li><a href='weather.php?location=<?=$item['id']?>'><?=$item['adm1']?>-<?=$item['adm2']?><?=$item['name']==$item['adm2'] ? '' : '-'.$item['name']?></a></li>
-    <?php } ?>
-</ul>
+<?php foreach($cityData as $item){ 
+    $name=$item['adm1'].'-'.$item['adm2'];
+    if($item['name']!=$item['adm2']){
+        $name.='-'.$item['name'];
+    }
+    $value=$item['id'].';'.$name;
+?>
+    <li><a href='weather.php?location=<?=$value?>'><?=$name?></a></li>
 <?php } ?>
-<?php
+</ul>
+<?php }
 require('footer.php');
 
