@@ -25,7 +25,7 @@ function display_paragraph($text){
 }
 require('header.php');
 include('ncovtable.php');
-?><hr><h3>最新消息</h3><table width='100%'><?php
+?><h3>最新消息</h3><table width='100%'><?php
 foreach($news as $idx=>$item){
 ?><?php
   if($idx){

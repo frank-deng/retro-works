@@ -1,6 +1,7 @@
 <?php
 require('common.php');
 
+/*
 $location=$_COOKIE['location'];
 if($_GET['location']){
 		$location=$_GET['location'];
@@ -9,6 +10,7 @@ if($_GET['location']){
 		header('Location: selectCity.php');
 		exit();
 }
+ */
 try{
 	$suggestion_text=array(
 		'air'=>'空气污染指数：',
@@ -100,5 +102,6 @@ require('header.php');
 		<div><?=$sugg['txt']?></div>
 	</li>
 <?php } ?>
-</ul><?php
+</ul>
+<div align='center'><img src='/static/ELEGLINE.GIF'/><br>&nbsp;</div><?php
 require('footer.php');
