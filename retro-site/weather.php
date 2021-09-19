@@ -41,7 +41,7 @@ if(!$weather){
     require('footer.php');
     exit();
 }
-?><p></p>
+?><p><b>当前城市：</b><?=$loadWeather->getLocationName()?> <font size='2'>[<a href='selectCity.php'>选择城市</a>]</font></p>
 <table>
 	<tr>
 		<th align='left'>天气</th>
@@ -51,16 +51,16 @@ if(!$weather){
 		<th align='left'>温度</th>
 		<td rowspan='3' width='10px'></td>
 		<td><?=$weather['now']['temp']?>℃</td>
-		<td rowspan='3' width='20px'></td>
+		<td rowspan='2' width='20px'></td>
 		<th align='left'>空气污染指数</th>
-		<td rowspan='3' width='10px'></td>
+		<td rowspan='2' width='10px'></td>
 		<td><?=$weather['air']['aqi']?></td>
 	</tr>
 	<tr>
 		<th align='left'>湿度</th>
 		<td><?=$weather['now']['humidity']?>%</td>
 		<th align='left'>能见度</th>
-		<td><?=$weather['now']['vis']?> km</td>
+		<td><?=$weather['now']['vis']?>km</td>
 		<th align='left'>空气质量等级</th>
 		<td><?=$weather['air']['category']?></td>
 	</tr>
@@ -68,10 +68,10 @@ if(!$weather){
 		<th align='left'>风向</th>
 		<td><?=$weather['now']['windDir']?></td>
 		<th align='left'>风速</th>
-		<td><?=$weather['now']['windScale']?>级</td>
+		<td colspan=5><?=$weather['now']['windScale']?>级（<?=$weather['now']['windSpeed']?>km/h）</td>
 	</tr>
 </table>
-<div align='center'><img src='/static/ELEGLINE.GIF'/></div>
+<p align='center'><img src='/static/ELEGLINE.GIF'/></p>
 <h3>明后天天气预报</h3>
 <table width='100%'>
 	<tr>
@@ -79,8 +79,6 @@ if(!$weather){
 		<th align='left'>天气</th>
 		<th align='left'>温度</th>
 		<th align='left'>湿度</th>
-		<th align='left'>紫外线指数</th>
-		<th align='left'>能见度</th>
 		<th align='left'>风向</th>
 		<th align='left'>风速</th>
 	</tr>
@@ -90,20 +88,18 @@ if(!$weather){
 		<td><?=$forecast['textDay'].'/'.$forecast['textNight']?></td>
 		<td><?=$forecast['tempMin']?>℃/<?=$forecast['tempMax']?>℃</td>
 		<td><?=$forecast['humidity']?>%</td>
-		<td><?=$forecast['uvIndex']?></td>
-		<td><?=$forecast['vis']?> km</td>
 		<td><?=$forecast['windDirDay']?>/<?=$forecast['windDirNight']?></td>
 		<td><?=$forecast['windScaleDay']?>级/<?=$forecast['windScaleNight']?>级</td>
 	</tr>
 <?php }} ?>
 </table>
-<div align='center'><img src='/static/ELEGLINE.GIF'/></div>
+<p align='center'><img src='/static/ELEGLINE.GIF'/></p>
 <h3>气象指数</h3>
 <ul>
-<?php foreach ($weather['suggestion'] as $key=>$sugg){ ?>
+<?php foreach ($weather['indices'] as $sugg){ ?>
 	<li>
-		<b><?=$suggestion_text[$key]?></b><?=$sugg['brf']?>
-		<div><?=$sugg['txt']?></div>
+		<b><?=$sugg['name']?></b>：<?=$sugg['category']?>
+		<div><?=$sugg['text']?></div>
 	</li>
 <?php } ?>
 </ul>

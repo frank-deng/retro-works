@@ -250,8 +250,12 @@ class FetchWeather extends DataManager{
             error_log($e);
         }
     }
-    public function getLocationName(){
-        return $this->location_name;
+    public function getLocationName($simple=false){
+        if(!$simple){
+            return $this->location_name;
+        }
+        $arr=explode('-',$this->location_name);
+        return $arr[count($arr)-1];
     }
 }
 

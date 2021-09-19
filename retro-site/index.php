@@ -24,7 +24,7 @@ try{
         $weather=$loadWeather->fetch();
     }
     if($weather){
-        $weatherStr=$loadWeather->getLocationName().'&nbsp;'
+        $weatherStr=$loadWeather->getLocationName(true).'&nbsp;'
             .$weather['now']['text'].'&nbsp;'
             .$weather['now']['temp'].'℃';
         if($weather['air']){

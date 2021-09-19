@@ -33,6 +33,7 @@ if($city){
     curl_setopt($ch, CURLOPT_POST, 0);
     curl_setopt($ch, CURLOPT_URL, 'https://geoapi.qweather.com/v2/city/lookup?'.http_build_query([
         'key'=>$_CONFIG['HEWEATHER_KEY'],
+        'range'=>'cn',
         'location'=>$city
     ]));
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
