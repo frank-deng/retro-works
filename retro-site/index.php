@@ -1,4 +1,5 @@
-<?php require('common.php');
+<?php
+require('common.php');
 $loadNews=new FetchNews();
 $loadNcov=new FetchNcov();
 $loadWeather=null;
@@ -6,20 +7,20 @@ $weatherStr='没有天气信息';
 try{
     $location=$_COOKIE['location'];
     if($location){
-        $location=explode(';',$location);
+        $location=explode(',',$location);
         $loadWeather=new FetchWeather($location[0],$location[1]);
     }else{
-        $weatherStr.=' <font size=2><a href=\'selectCity.php\'>选择城市</a></font>&nbsp;';
+        $weatherStr.=' <font size=2>[<a href=\'selectCity.php\'>选择城市</a>]</font>&nbsp;';
     }
+    fetchMultiWait($loadNews,$loadNcov,$loadWeather);
 }catch(Exception $e){
     error_log($e);
 }
-fetchMultiWait($loadNews,$loadNcov,$loadWeather);
 
 $news=$loadNews->fetch();
 $ncov=$loadNcov->fetch();
+$weather=null;
 try{
-    $weather=null;
     if($loadWeather){
         $weather=$loadWeather->fetch();
     }

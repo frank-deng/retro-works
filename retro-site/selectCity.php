@@ -13,7 +13,7 @@ header('content-type: text/html; charset=GB2312');
 apcu_delete('weather_data');
 
 $_QUERY=array();
-foreach(explode('&',file_get_contents("php://input")) as $item){
+foreach(explode('&',$_SERVER['QUERY_STRING']) as $item){
     $kv=explode('=',$item);
     $key=$kv[0]; $value=$kv[1];
     switch($key){
@@ -25,6 +25,12 @@ foreach(explode('&',file_get_contents("php://input")) as $item){
 }
 
 $city=$_QUERY['city'];
+if(!$city){
+    $location=$_COOKIE['location'];
+    if($location){
+        $city=end(explode('-',end(explode(',',$location))));
+    }
+}
 $cityData=null;
 if($city){
     $ch=curl_init();
@@ -50,7 +56,7 @@ if($city){
 }
 
 require('header.php');
-?><form method='post'>
+?><form action='selectCity.php' method='get'>
 请输入城市：<input type='text' name='city' value='<?=$city?>'><input type='submit' value='搜索'><hr>
 </form>
 <?php if($cityData){ ?>
@@ -61,9 +67,11 @@ require('header.php');
     if($item['name']!=$item['adm2']){
         $name.='-'.$item['name'];
     }
-    $value=$item['id'].';'.$name;
+    $query=http_build_query([
+        'location'=>$item['id'].','.$name
+    ]);
 ?>
-    <li><a href='weather.php?location=<?=$value?>'><?=$name?></a></li>
+    <li><a href='weather.php?<?=$query?>'><?=$name?></a></li>
 <?php } ?>
 </ul>
 <?php }

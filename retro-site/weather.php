@@ -1,37 +1,24 @@
 <?php
 require('common.php');
 
-$_QUERY=array();
-foreach(explode('&',$_SERVER['QUERY_STRING']) as $item){
-    $kv=explode('=',$item);
-    $key=$kv[0]; $value=$kv[1];
-    switch($key){
-        case 'location':
-            $value=iconv('GB2312','UTF-8',rawurldecode($value));
-        break;
-    }
-    $_QUERY[$key]=$value;
-}
-
 $location=null;
-if($_QUERY['location']){
-	$location=$_QUERY['location'];
-	setcookie("location",$location,time()+3600*24*666);
-}else if($_COOKIE['location']){
+try{
     $location=$_COOKIE['location'];
+    if($_GET['location']){
+        $location=$_GET['location'];
+        header('Set-Cookie: location='.urlencode($location).'; expires=Tue, 31-Dec-2030 23:59:59 GMT; path=/');
+    }
+}catch(Exception $e){
+    error_log($e);
 }
 if(!$location){
     header('Location: selectCity.php');
     exit();
 }
 
-$loadWeather=null;
-if($location){
-    $location=explode(';',$location);
-    $loadWeather=new FetchWeather($location[0],$location[1]);
-    fetchMultiWait($loadWeather);
-}
-
+$location=explode(',',$location);
+$loadWeather=new FetchWeather($location[0],$location[1]);
+fetchMultiWait($loadWeather);
 $weather=$loadWeather->fetch();
 
 $_TITLE=$_HEADER='天气预报';

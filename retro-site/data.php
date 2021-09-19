@@ -202,11 +202,11 @@ class FetchWeather extends DataManager{
         $this->ch=[];
         foreach(self::$urlList as $url){
             $ch=curl_init();
-            $query=array(
+            $query=[
                 'location'=>$this->location_id,
                 'key'=>$_CONFIG['HEWEATHER_KEY']
-            );
-            if($url['query']){
+            ];
+            if(isset($url['query'])){
                 $query=array_merge($url['query'],$query);
             }
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
