@@ -52,7 +52,19 @@ try{
         <td bgcolor='#ffff33' align='right' height='16px'>
             <font size='2'>｜<?php foreach($_CONFIG['LINKS'] as $item){ ?><a href='<?=$item["link"]?>'><?=$item['title']?></a>｜<?php } ?></font></td>
     </tr>
-</table><p></p>
+</table><p>
+<!--Weather warning-->
+<?php if($weather && count($weather['warning'])){
+$warningColorTable=[
+    '蓝色'=>'#0000ff',
+    '黄色'=>'#808000',
+    '橙色'=>'#ff8000',
+    '红色'=>'#ff0000',
+];
+foreach($weather['warning'] as $item){ ?>
+<div><font color='<?=$warningColorTable[$item['level']]?>'><?=$item['text']?></font></div>
+<?php }} ?>
+</p>
 <!--News Module-->
 <?php if($news){ ?>
 <table width='100%'>

@@ -27,9 +27,23 @@ if(!$weather){
 
 $_TITLE='天气预报 - '.$loadWeather->getLocationName();
 $_HEADER='天气预报';
+$warningColorTable=[
+    '蓝色'=>'#0000ff',
+    '黄色'=>'#808000',
+    '橙色'=>'#ff8000',
+    '红色'=>'#ff0000',
+];
 require('header.php');
-?><p><b>当前城市：</b><?=$loadWeather->getLocationName()?> <font size='2'>[<a href='selectCity.php'>选择城市</a>]</font></p>
-<table>
+?><p><b>当前城市：</b><?=$loadWeather->getLocationName()?> <font size='2'>[<a href='selectCity.php'>选择城市</a>]</font></p><?php
+if(count($weather['warning'])){
+?><p>
+<?php foreach($weather['warning'] as $item){
+?>
+<div><font color='<?=$warningColorTable[$item['level']]?>'><?=$item['text']?></font></div>
+<?php } ?>
+</p><?php
+}
+?><table>
 	<tr>
 		<th align='left'>天气</th>
 		<td rowspan='3' width='10px'></td>
