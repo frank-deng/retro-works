@@ -14,8 +14,8 @@
   <td bgcolor='#ffff33' width='10px'></td>
 </tr>
 <tr>
-    <td rowspan=2></td>
+    <td rowspan=3></td>
     <td height='16px' colspan=2></td>
-    <td rowspan=2></td>
+    <td rowspan=3></td>
 </tr>
 <tr><td colspan='2'>

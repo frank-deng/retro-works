@@ -39,6 +39,24 @@ try{
         <title>首页 - <?=$dateStr?></title>
 	</head>
 	<body topmargin='0' leftmargin='0' rightmargin='0' bottommargin='0' background='static/GRAY.JPG'>
+<!--Weather warning-->
+<?php if($weather && count($weather['warning'])){
+$warningColorTable=[
+    '蓝色'=>'#0000ff',
+    '黄色'=>'#a0a000',
+    '橙色'=>'#ff8000',
+    '红色'=>'#ff0000',
+]; ?>
+<?php foreach($weather['warning'] as $item){ ?>
+<font color='<?=$warningColorTable[$item['level']]?>'>
+    <marquee
+        bgcolor='#ffffff'
+        scrolldelay=400 scrollamount=8>
+        <?=$item['text']?>
+    </marquee>
+</font>
+<?php } ?>
+<?php } ?>
 <!--页头和天气模块-->
 <table width='100%' cellspacing='0' cellpadding='0'>
     <tr>
@@ -58,20 +76,6 @@ try{
         <td rowspan=200></td>
     </tr>
     <tr><td colspan=2>
-<!--Weather warning-->
-<?php if($weather && count($weather['warning'])){
-$warningColorTable=[
-    '蓝色'=>'#0000ff',
-    '黄色'=>'#808000',
-    '橙色'=>'#ff8000',
-    '红色'=>'#ff0000',
-]; ?>
-<table width='100%' cellspacing='0'>
-<?php foreach($weather['warning'] as $item){ ?>
-<tr><td bgcolor='#ffffff'><font color='<?=$warningColorTable[$item['level']]?>'><?=$item['text']?></font></td></tr>
-<?php } ?>
-</table><p></p>
-<?php } ?>
 <!--News Module-->
 <?php if($news){ ?>
 <table width='100%'>

@@ -29,7 +29,7 @@ $_TITLE='天气预报 - '.$loadWeather->getLocationName();
 $_HEADER='天气预报';
 $warningColorTable=[
     '蓝色'=>'#0000ff',
-    '黄色'=>'#808000',
+    '黄色'=>'#a0a000',
     '橙色'=>'#ff8000',
     '红色'=>'#ff0000',
 ];
