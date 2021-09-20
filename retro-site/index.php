@@ -40,19 +40,24 @@ try{
 	</head>
 	<body topmargin='0' leftmargin='0' rightmargin='0' bottommargin='0' background='static/GRAY.JPG'>
 <!--页头和天气模块-->
-<table width='100%' cellspacing='0'>
+<table width='100%' cellspacing='0' cellpadding='0'>
     <tr>
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
-        <td bgcolor='#ffff33' bordercolor='#ff0000' rowspan='2' width='50%' height='40px' nowrap>
+        <td bgcolor='#ffff33' bordercolor='#ff0000' rowspan='2' height='40px' nowrap>
             <img src='/static/CONTBULL.GIF'/><font size='5' face='黑体' color='#000080'><b>欢迎光临我的信息港</b>&nbsp;</font><img src='static/CONTBULL.GIF'/></td>
-        <td bgcolor='#ffff33' bordercolor='#ff0000' nowrap align='right' width='50%'><?=$weatherStr?></td>
+        <td bgcolor='#ffff33' bordercolor='#ff0000' nowrap align='right'><?=$weatherStr?></td>
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
     </tr>
     <tr>
         <td bgcolor='#ffff33' align='right' height='16px'>
             <font size='2'>｜<?php foreach($_CONFIG['LINKS'] as $item){ ?><a href='<?=$item["link"]?>'><?=$item['title']?></a>｜<?php } ?></font></td>
     </tr>
-</table><p>
+    <tr>
+        <td rowspan=200></td>
+        <td height='8px' colspan=2></td>
+        <td rowspan=200></td>
+    </tr>
+    <tr><td colspan=2>
 <!--Weather warning-->
 <?php if($weather && count($weather['warning'])){
 $warningColorTable=[
@@ -60,21 +65,21 @@ $warningColorTable=[
     '黄色'=>'#808000',
     '橙色'=>'#ff8000',
     '红色'=>'#ff0000',
-];
-foreach($weather['warning'] as $item){ ?>
-<div><font color='<?=$warningColorTable[$item['level']]?>'><?=$item['text']?></font></div>
-<?php }} ?>
-</p>
+]; ?>
+<table width='100%' cellspacing='0'>
+<?php foreach($weather['warning'] as $item){ ?>
+<tr><td bgcolor='#ffffff'><font color='<?=$warningColorTable[$item['level']]?>'><?=$item['text']?></font></td></tr>
+<?php } ?>
+</table><p></p>
+<?php } ?>
 <!--News Module-->
 <?php if($news){ ?>
 <table width='100%'>
     <tr>
-        <td width='8px' rowspan='100'></td>
         <td colspan=2 height='24px' valign='middle'>
             <img src='/static/BULL1A.GIF'/>
             <b>今日热点</b>　<a href='news.php'><font size='2'>查看详情&gt;&gt;</font></a>
         </td>
-        <td width='8px' rowspan='100'></td>
     </tr>
     <tr><td colspan=2 height='6px'></td></tr>
     <?php foreach($news as $item){ ?>
@@ -88,12 +93,10 @@ foreach($weather['warning'] as $item){ ?>
 <?php if($ncov){ ?>
 <table width='100%'>
     <tr>
-        <td width='8px' rowspan='100'></td>
         <td colspan='2' height='24px' valign='middle'>
             <img src='/static/BULL1A.GIF'/>
             <b>抗击疫情</b>　<a href='ncov.php'><font size='2'>查看详情&gt;&gt;</font></a>
         </td>
-        <td width='8px' rowspan='100'></td>
     </tr>
     <tr><td colspan='2' height='6px'></td></tr>
     <?php foreach($ncov['news'] as $item){ ?>
@@ -104,7 +107,9 @@ foreach($weather['warning'] as $item){ ?>
     <?php } ?>
     <tr><td colspan='2' height='5px'></td></tr>
     <tr><td colspan='2'><?php include('ncovtable.php'); ?><p></p></td></tr>
-</table><p align='center'><img src='/static/CONTLINE.GIF'><br>&nbsp;</p>
+</table><p align='center'><img src='/static/CONTLINE.GIF'></p>
 <?php } ?>
-</body></html>
+</td></tr>
+<tr><td height='10px'></td></tr>
+</table></body></html>
 
