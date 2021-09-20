@@ -104,5 +104,5 @@ if(count($weather['warning'])){
 	</li>
 <?php } ?>
 </ul>
-<div align='center'><img src='/static/ELEGLINE.GIF'/><br>&nbsp;</div><?php
+<p align='center'><img src='/static/ELEGLINE.GIF'/></p><?php
 require('footer.php');

@@ -43,5 +43,5 @@ if($highriskarea){
 ?><hr><h3>中风险地区（<?=count($midriskarea,COUNT_NORMAL)?>个）</h3><?php
 if($midriskarea){
 ?><ul><?php foreach($midriskarea as $item){?><li><?=$item?></li><?php } ?></ul><?php
-} 
+}
 require('footer.php');
