@@ -3,14 +3,12 @@ require('common.php');
 $loadNews=new FetchNews();
 $loadNcov=new FetchNcov();
 $loadWeather=null;
-$weatherStr='没有天气信息';
+$weatherStr='没有天气信息 <font size=2>[<a href=\'selectCity.php\'>选择城市</a>]</font>&nbsp;';
 try{
     $location=$_COOKIE['location'];
     if($location){
         $location=explode(',',$location);
         $loadWeather=new FetchWeather($location[0],$location[1]);
-    }else{
-        $weatherStr.=' <font size=2>[<a href=\'selectCity.php\'>选择城市</a>]</font>&nbsp;';
     }
     fetchMultiWait($loadNews,$loadNcov,$loadWeather);
 }catch(Exception $e){
@@ -33,7 +31,7 @@ try{
         }
     }
 }catch(Exception $e){
-  error_log('Error while processing weather data',$e);
+    error_log('Error while processing weather data',$e);
 }
 ?><html>
 	<head>

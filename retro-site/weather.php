@@ -6,7 +6,7 @@ try{
     $location=$_COOKIE['location'];
     if($_GET['location']){
         $location=$_GET['location'];
-        header('Set-Cookie: location='.urlencode($location).'; expires=Tue, 31-Dec-2030 23:59:59 GMT; path=/');
+        header('Set-Cookie: location='.urlencode($location).'; expires=Mon, 17-Jan-2038 23:59:59 GMT; path=/');
     }
 }catch(Exception $e){
     error_log($e);
@@ -20,14 +20,14 @@ $location=explode(',',$location);
 $loadWeather=new FetchWeather($location[0],$location[1]);
 fetchMultiWait($loadWeather);
 $weather=$loadWeather->fetch();
-
-$_TITLE=$_HEADER='天气预报';
-require('header.php');
 if(!$weather){
-    echo '<h3>没有天气信息</h3>';
-    require('footer.php');
+    header('Location: selectCity.php');
     exit();
 }
+
+$_TITLE='天气预报 - '.$loadWeather->getLocationName();
+$_HEADER='天气预报';
+require('header.php');
 ?><p><b>当前城市：</b><?=$loadWeather->getLocationName()?> <font size='2'>[<a href='selectCity.php'>选择城市</a>]</font></p>
 <table>
 	<tr>

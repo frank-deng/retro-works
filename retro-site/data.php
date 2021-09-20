@@ -190,6 +190,9 @@ class FetchWeather extends DataManager{
             'query'=>['type'=>0]
         ]
     ];
+    public static function clearCache(){
+        apcu_delete('weather_data');
+    }
     public function __construct($location_id=null, $location_name=null){
         global $_CONFIG;
         parent::__construct('weather',10);
@@ -254,8 +257,7 @@ class FetchWeather extends DataManager{
         if(!$simple){
             return $this->location_name;
         }
-        $arr=explode('-',$this->location_name);
-        return $arr[count($arr)-1];
+        return end(explode('-',$this->location_name));
     }
 }
 

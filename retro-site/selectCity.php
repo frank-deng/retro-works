@@ -1,16 +1,9 @@
 <?php
-require('config.php');
+require('common.php');
 
 $_TITLE=$_HEADER='天气预报';
 
-mb_internal_encoding('UTF-8');
-mb_http_output('GB2312');
-mb_language('uni');
-mb_regex_encoding('UTF-8');
-ob_start('mb_output_handler');
-header('content-type: text/html; charset=GB2312');
-
-apcu_delete('weather_data');
+FetchWeather::clearCache();
 
 $_QUERY=array();
 foreach(explode('&',$_SERVER['QUERY_STRING']) as $item){
@@ -40,6 +33,7 @@ if($city){
     curl_setopt($ch, CURLOPT_URL, 'https://geoapi.qweather.com/v2/city/lookup?'.http_build_query([
         'key'=>$_CONFIG['HEWEATHER_KEY'],
         'range'=>'cn',
+        'number'=>20,
         'location'=>$city
     ]));
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
