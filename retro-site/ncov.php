@@ -17,8 +17,9 @@ function display_paragraph($text){
     $p_arr=explode("\n",$text);
     $result='';
     foreach($p_arr as $p){
+        $p=preg_replace('/^[　\s\t\r\n]+|[　\s\t\r\n]+$/','',trim($p));
         if($p){
-          $result=$result.'<div>　　'.$p.'</div>';
+          $result.='<div>　　'.$p.'</div>';
         }
     }
     return $result;
