@@ -1,9 +1,10 @@
 <?php require('common.php');
 try{
-  $data=apcu_fetch('ncov_data');
-  if(!$data){
-    die('Failed to load ncov data.');
-  }
+    $loadNcov=new FetchNcov();
+    $ncov=$data=$loadNcov->fetch();
+    if(!$data){
+        die('Failed to load ncov data.');
+    }
 
   $news=$data['news'];
   $highriskarea=$data['riskarea']['high'];
@@ -26,7 +27,8 @@ function display_paragraph($text){
 }
 require('header.php');
 include('ncovtable.php');
-?><h3>最新消息</h3><table width='100%'><?php
+?><p><hr></p>
+<h3>最新消息</h3><table width='100%'><?php
 foreach($news as $idx=>$item){
 ?><?php
   if($idx){
