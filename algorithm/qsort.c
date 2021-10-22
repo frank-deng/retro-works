@@ -16,25 +16,29 @@ int arr_init(arr_t *arr, size_t itemSize, size_t size){
 }
 void arr_close(arr_t *arr){
 	free(arr->data);
+	arr->data=NULL;
 	arr->length=arr->size=arr->itemSize=0;
 }
 int arr_expand(arr_t *arr){
-	size_t sizeNew=arr->size+((arr->size)>>1);
-	void *dataNew=(void*)realloc(arr->data,(arr->itemSize)*sizeNew);
+	size_t sizeNew;
+	void* dataNew;
+	if(arr->length < arr->size){
+		return 1;
+	}
+	sizeNew=arr->size+((arr->size)>>1);
+	dataNew=(void*)realloc(arr->data,(arr->itemSize)*sizeNew);
 	if(!dataNew){
 		return 0;
 	}
 	arr->data=dataNew;
 	arr->size=sizeNew;
-	return 1;
+	return 2;
 }
 
 typedef int item_t;
 int arr_push(arr_t *arr, item_t *item){
-	if(arr->length >= arr->size){
-		if(!arr_expand(arr)){
-			return 0;
-		}
+	if(!arr_expand(arr)){
+		return 0;
 	}
 	((item_t*)(arr->data))[arr->length]=*item;
 	arr->length++;
@@ -85,7 +89,7 @@ static void __qsort(item_t *arr, size_t start, size_t end){
 void qsort(item_t *arr, size_t length){
 	__qsort(arr,0,length);
 }
-int main(){
+int main(size_t argc, char* argv[]){
 	arr_t arr;
 	unsigned long i;
 	item_t input, *arrData;
@@ -102,4 +106,3 @@ int main(){
 	arr_close(&arr);
 	return 0;
 }
-

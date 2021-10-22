@@ -49,7 +49,7 @@ int heap_push(heap_t *heap, item_t value){
 	heapData[heap->length]=value;
 	heap->length++;
 	while(pos){
-		parentPos=(pos-1)/2;
+		parentPos=(pos-1)>>1;
 		if((MIN_HEAP==heap->type && heapData[parentPos]<=heapData[pos])
 			|| (MAX_HEAP==heap->type && heapData[parentPos]>=heapData[pos])){
 			break;
@@ -60,9 +60,6 @@ int heap_push(heap_t *heap, item_t value){
 		pos=parentPos;
 	}
 	return 1;
-}
-item_t heap_top(heap_t *heap){
-	return ((item_t*)(heap->data))[0];
 }
 item_t heap_pop(heap_t *heap){
 	item_t *arrData=(item_t*)(heap->data), heapTopOrig,
@@ -113,56 +110,36 @@ item_t heap_pop(heap_t *heap){
 	}
 	return heapTopOrig;
 }
-void print_data(item_t *src, size_t length){
-	size_t i;
-	for(i=0; i<length; i++){
-		printf("%8d",src[i]);
-	}
-	putchar('\n');
-}
 int main(){
-	heap_t heapL, heapR;
-	item_t input, topL, topR;
-	heap_init(&heapL, MAX_HEAP, sizeof(item_t), 128);
-	heap_init(&heapR, MIN_HEAP, sizeof(item_t), 128);
+	int maxn=0,i;
+	size_t count;
+	heap_t heap;
+	item_t heapTop, input, *sorted;
+
+	scanf("%d%u",&maxn,&count);
+	heap_init(&heap, maxn?MIN_HEAP:MAX_HEAP, sizeof(item_t), count+1);
+	sorted=(item_t*)malloc(sizeof(item_t)*count);
+
 	while(EOF!=scanf("%d",&input)){
-		if(!heapL.length && !heapR.length){
-			heap_push(&heapL,input);
+		if(heap.length<count){
+			heap_push(&heap, input);
 			continue;
 		}
-		topL=heap_top(&heapL);
-		if(!heapR.length){
-			if(input>=topL){
-				heap_push(&heapR,input);
-			}else{
-				heap_push(&heapR,heap_pop(&heapL));
-				heap_push(&heapL,input);
-			}
-			continue;
-		}
-		topR=heap_top(&heapR);
-		if(input<=topL){
-			heap_push(&heapL,input);
-			if((heapL.length-heapR.length) > 1){
-				heap_push(&heapR,heap_pop(&heapL));
-			}
-		}else if(input>=topR){
-			heap_push(&heapR,input);
-			if(heapR.length!=heapL.length){
-				heap_push(&heapL,heap_pop(&heapR));
-			}
-		}else if(heapL.length != heapR.length){
-			heap_push(&heapR,input);
-		}else{
-			heap_push(&heapL,input);
+		heapTop=((item_t*)(heap.data))[0];
+		if((maxn && input>heapTop) || (!maxn && input<heapTop)){
+			heap_push(&heap,input);
+			heap_pop(&heap);
 		}
 	}
-	if(heapL.length==heapR.length){
-		printf("%d %d\n",heap_top(&heapL), heap_top(&heapR));
-	}else{
-		printf("%d\n",heap_top(&heapL));
+	i=0;
+	while(heap.length){
+		sorted[i]=heap_pop(&heap);
+		i++;
 	}
-	heap_close(&heapL);
-	heap_close(&heapR);
+	while(i--){
+		printf("%d\n",sorted[i]);
+	}
+	free(sorted);
+	heap_close(&heap);
 	return 0;
 }

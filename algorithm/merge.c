@@ -43,4 +43,3 @@ int main(size_t argc, char *argv[]){
 	fclose(fp1);
 	return 0;
 }
-
