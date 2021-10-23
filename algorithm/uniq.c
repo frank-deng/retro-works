@@ -6,10 +6,6 @@ typedef enum __rbtree_color_t{
 	RBTREE_BLACK,
 	RBTREE_RED
 }rbtree_color_t;
-typedef enum __rbtree_insert_pos_t{
-	INSERT_LEFT,
-	INSERT_RIGHT
-}rbtree_insert_pos_t;
 typedef struct __rbtree_leaf_t{
 	struct __rbtree_leaf_t *parent;
 	struct __rbtree_leaf_t *left;
@@ -75,10 +71,8 @@ static rbtree_leaf_t *__get_neighbour(rbtree_leaf_t *leaf){
 	return leaf==parent->left ? parent->right : parent->left;
 }
 int rbtree_push(rbtree_t *tree, value_t value){
-	unsigned int counter=0x7fff;
 	leaf_t *p=tree->root, *insert=NULL,
 		*parent=NULL, *gParent=NULL, *uParent=NULL, *ggParent=NULL;
-	rbtree_insert_pos_t insertPos;
 	//Create root node
 	if(!p){
 		tree->root=__create_leaf(NULL,value);
@@ -111,10 +105,7 @@ int rbtree_push(rbtree_t *tree, value_t value){
 	}
 
 	//Start adjusting rbtree
-	while(counter--){
-		if(!insert){
-			break;
-		}
+	while(insert){
 		parent=insert->parent;
 		if(!parent){
 			insert->color=RBTREE_BLACK;
@@ -199,13 +190,6 @@ int rbtree_push(rbtree_t *tree, value_t value){
 			continue;
 		}
 	}
-	/*
-	if(!counter){
-		puts("Dead loop");
-		exit(1);
-	}
-	*/
-
 	return 1;
 }
 void __rbtree_leaf_dump(rbtree_leaf_t *leaf, int level){
@@ -230,6 +214,20 @@ void rbtree_dump(rbtree_t *tree){
 		return;
 	}
 	__rbtree_leaf_dump(tree->root, 0);
+}
+int main(){
+	rbtree_t tree;
+	value_t input;
+	rbtree_init(&tree);
+	while(EOF!=scanf("%d",&input)){
+		if(rbtree_push(&tree,input)){
+			printf("%d\n",input);
+		}
+	}
+	//rbtree_dump(&tree);
+	rbtree_close(&tree);
+	return 0;
+}ump(tree->root, 0);
 }
 int main(){
 	rbtree_t tree;
