@@ -71,9 +71,61 @@ static rbtree_leaf_t *__get_neighbour(rbtree_leaf_t *leaf){
 	parent=leaf->parent;
 	return leaf==parent->left ? parent->right : parent->left;
 }
+static void __rbtree_update_parent(
+	rbtree_t *tree, rbtree_leaf_t *oldLeaf, rbtree_leaf_t *newLeaf){
+	rbtree_leaf_t *parent=NULL;
+	if(!oldLeaf){
+		return;
+	}
+	parent=oldLeaf->parent;
+	if(newLeaf){
+		newLeaf->parent=parent;
+	}
+	if(!parent){
+		tree->root=newLeaf;
+	}else if(oldLeaf==parent->left){
+		parent->left=newLeaf;
+	}else if(oldLeaf==parent->right){
+		parent->right=newLeaf;
+	}
+}
+static void __rbtree_right_rotate(rbtree_t *tree, rbtree_leaf_t *leaf){
+	rbtree_leaf_t *leafLeft;
+	if(!leaf){
+		return;
+	}
+	leafLeft=leaf->left;
+	if(!leafLeft){
+		return;
+	}
+	__rbtree_update_parent(tree,leaf,leafLeft);
+	leaf->left=leafLeft->right;
+	if(leaf->left){
+		leaf->left->parent=leaf;
+	}
+	leafLeft->right=leaf;
+	leaf->parent=leafLeft;
+}
+static void __rbtree_left_rotate(rbtree_t *tree, rbtree_leaf_t *leaf){
+	rbtree_leaf_t *leafRight;
+	if(!leaf){
+		return;
+	}
+	leafRight=leaf->right;
+	if(!leafRight){
+		return;
+	}
+	__rbtree_update_parent(tree,leaf,leafRight);
+	leaf->right=leafRight->left;
+	if(leaf->right){
+		leaf->right->parent=leaf;
+	}
+	leafRight->left=leaf;
+	leaf->parent=leafRight;
+}
 int rbtree_push(rbtree_t *tree, value_t value){
 	leaf_t *p=tree->root, *insert=NULL,
-		*parent=NULL, *gParent=NULL, *uParent=NULL, *ggParent=NULL;
+		*parent=NULL, *gParent=NULL, *uParent=NULL;
 	//Create root node
 	if(!p){
 		tree->root=__create_leaf(NULL,value);
@@ -126,67 +178,23 @@ int rbtree_push(rbtree_t *tree, value_t value){
 		if(insert==parent->left && parent==gParent->left){
 			parent->color=RBTREE_BLACK;
 			gParent->color=RBTREE_RED;
-			ggParent=gParent->parent;
-
-			gParent->left=parent->right;
-			if(gParent->left){
-				gParent->left->parent=gParent;
-			}
-			parent->right=gParent;
-			gParent->parent=parent;
-			parent->parent=ggParent;
-			if(!ggParent){
-				tree->root=parent;
-			}else if(ggParent->left==gParent){
-				ggParent->left=parent;
-			}else if(ggParent->right==gParent){
-				ggParent->right=parent;
-			}
+			__rbtree_right_rotate(tree,gParent);
 			break;
 		}
 		//Change color and left rotate
 		if(insert==parent->right && parent==gParent->right){
 			parent->color=RBTREE_BLACK;
 			gParent->color=RBTREE_RED;
-			ggParent=gParent->parent;
-
-			gParent->right=parent->left;
-			if(gParent->right){
-				gParent->right->parent=gParent;
-			}
-			parent->left=gParent;
-			gParent->parent=parent;
-			parent->parent=ggParent;
-			if(!ggParent){
-				tree->root=parent;
-			}else if(ggParent->left==gParent){
-				ggParent->left=parent;
-			}else if(ggParent->right==gParent){
-				ggParent->right=parent;
-			}
+			__rbtree_left_rotate(tree,gParent);
 			break;
 		}
 		if(insert==parent->left && gParent->right==parent){
-			parent->left=insert->right;
-			if(parent->left){
-				parent->left->parent=parent;
-			}
-			parent->parent=insert;
-			insert->right=parent;
-			insert->parent=gParent;
-			gParent->right=insert;
+			__rbtree_right_rotate(tree,parent);
 			insert=parent;
 			continue;
 		}
 		if(insert==parent->right && gParent->left==parent){
-			parent->right=insert->left;
-			if(parent->right){
-				parent->right->parent=parent;
-			}
-			parent->parent=insert;
-			insert->left=parent;
-			insert->parent=gParent;
-			gParent->left=insert;
+			__rbtree_right_rotate(tree,parent);
 			insert=parent;
 			continue;
 		}
@@ -194,11 +202,11 @@ int rbtree_push(rbtree_t *tree, value_t value){
 	return 1;
 }
 static void __rbtree_delete_adjust(rbtree_t *tree, rbtree_leaf_t *leaf){
-	rbtree_leaf_t *parent=NULL, *leafS=NULL, *leafSL=NULL, *leafSR=NULL, *leafGP=NULL;
+	rbtree_leaf_t *parent=NULL, *leafS=NULL, *leafSL=NULL, *leafSR=NULL;
 	rbtree_color_t color;
 	while(leaf && leaf->parent){
 		parent=leaf->parent;
-		leafS=leafSL=leafSR=leafGP=NULL;
+		leafS=leafSL=leafSR=NULL;
 		if(leaf==parent->left){
 			leafS=parent->right;
 		}else{
@@ -231,47 +239,43 @@ static void __rbtree_delete_adjust(rbtree_t *tree, rbtree_leaf_t *leaf){
 			leafS->color=parent->color;
 			parent->color=RBTREE_BLACK;
 			leafSR->color=RBTREE_BLACK;
-			leafGP=parent->parent;
-			leafS->left=parent;
-			parent->parent=leafS;
-			parent->right=leafSL;
-			if(leafSL){
-				leafSL->parent=parent;
-			}
-			if(!leafGP){
-				tree->root=leafS;
-			}else if(parent==leafGP->left){
-				leafGP->left=leafS;
-			}else if(parent==leafGP->right){
-				leafGP->right=leafS;
-			}
+			__rbtree_left_rotate(tree,parent);
 			return;
 		}else if((leafS && leafS==parent->left && RBTREE_BLACK==leafS->color)
 			&& (leafSL && RBTREE_RED==leafSL->color)){
 			leafS->color=parent->color;
 			parent->color=RBTREE_BLACK;
 			leafSL->color=RBTREE_BLACK;
-			leafGP=parent->parent;
-			leafS->right=parent;
-			parent->parent=leafS;
-			parent->left=leafSR;
-			if(leafSR){
-				leafSR->parent=parent;
-			}
-			if(!leafGP){
-				tree->root=leafS;
-			}else if(parent==leafGP->left){
-				leafGP->left=leafS;
-			}else if(parent==leafGP->right){
-				leafGP->right=leafS;
-			}
+			__rbtree_right_rotate(tree,parent);
 			return;
+		}else if(leafS && leafS==parent->right && RBTREE_BLACK==leafS->color
+			&& (!leafSR || RBTREE_BLACK==leafSR->color)
+			&& leafSL && RBTREE_RED==leafSL->color){
+			leafS->color=RBTREE_RED;
+			leafSL->color=RBTREE_BLACK;
+			__rbtree_right_rotate(tree,leafS);
+			continue;
+		}else if(leafS && leafS==parent->left && RBTREE_BLACK==leafS->color
+			&& (!leafSL || RBTREE_BLACK==leafSL->color)
+			&& leafSR && RBTREE_RED==leafSR->color){
+			leafS->color=RBTREE_RED;
+			leafSR->color=RBTREE_BLACK;
+			__rbtree_left_rotate(tree,leafS);
+			continue;
+		}else if(leafS && RBTREE_RED==leafS->color){
+			parent->color=RBTREE_RED;
+			leafS->color=RBTREE_BLACK;
+			if(leafS==parent->right){
+				__rbtree_left_rotate(tree,parent);
+			}else{
+				__rbtree_right_rotate(tree,parent);
+			}
 		}
 		return;
 	}
 }
 void rbtree_delete(rbtree_t* tree, rbtree_leaf_t *leaf){
-	rbtree_leaf_t *leafTemp=NULL, *leafP=NULL;
+	rbtree_leaf_t *leafTemp=NULL;
 	if(!leaf){
 		return;
 	}
@@ -288,30 +292,17 @@ void rbtree_delete(rbtree_t* tree, rbtree_leaf_t *leaf){
 	//Start adjusting tree
 	if(leaf->parent && RBTREE_BLACK==leaf->color){
 		__rbtree_delete_adjust(tree,leaf);
-		return;
 	}
 
+	//Deleting not to be tested yet
+	//leaf->value=-12345;
+	//return;
+
 	//Deleting node
-	leafP=leaf->parent;
-	leafTemp=NULL;
 	if(leaf->right){
-		leafTemp=leaf->right;
-		leafTemp->left=leaf->left;
-		if(leafTemp->left){
-			leafTemp->left->parent=leafTemp;
-		}
-	}else if(leaf->left){
-		leafTemp=leaf->left;
-	}
-	if(leafTemp){
-		leafTemp->parent=leafP;
-	}
-	if(!leafP){
-		tree->root=leafTemp;
-	}else if(leaf==leafP->left){
-		leafP->left=leafTemp;
-	}else if(leaf==leafP->right){
-		leafP->right=leafTemp;
+		__rbtree_update_parent(tree,leaf,leaf->right);
+	}else{
+		__rbtree_update_parent(tree,leaf,leaf->left);
 	}
 	free(leaf);leaf=NULL;
 }
@@ -334,7 +325,6 @@ void __rbtree_leaf_dump(rbtree_leaf_t *leaf, int level){
 	}
 	printf("%c,%d\n",leaf->color ? 'r' : 'B',leaf->value);
 	if(NULL!=leaf->left || NULL!=leaf->right){
-		_|| NULL!=leaf->right){
 		__rbtree_leaf_dump(leaf->left,level+1);
 	}
 }

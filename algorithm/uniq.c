@@ -227,18 +227,4 @@ int main(){
 	//rbtree_dump(&tree);
 	rbtree_close(&tree);
 	return 0;
-}ump(tree->root, 0);
-}
-int main(){
-	rbtree_t tree;
-	value_t input;
-	rbtree_init(&tree);
-	while(EOF!=scanf("%d",&input)){
-		if(rbtree_push(&tree,input)){
-			printf("%d\n",input);
-		}
-	}
-	//rbtree_dump(&tree);
-	rbtree_close(&tree);
-	return 0;
 }

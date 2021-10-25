@@ -49,7 +49,7 @@ int heap_push(heap_t *heap, item_t value){
 	heapData[heap->length]=value;
 	heap->length++;
 	while(pos){
-		parentPos=(pos-1)/2;
+		parentPos=(pos-1)>>1;
 		if((MIN_HEAP==heap->type && heapData[parentPos]<=heapData[pos])
 			|| (MAX_HEAP==heap->type && heapData[parentPos]>=heapData[pos])){
 			break;
@@ -166,4 +166,3 @@ int main(){
 	heap_close(&heapR);
 	return 0;
 }
-
