@@ -334,6 +334,7 @@ void __rbtree_leaf_dump(rbtree_leaf_t *leaf, int level){
 	}
 	printf("%c,%d\n",leaf->color ? 'r' : 'B',leaf->value);
 	if(NULL!=leaf->left || NULL!=leaf->right){
+		_|| NULL!=leaf->right){
 		__rbtree_leaf_dump(leaf->left,level+1);
 	}
 }
@@ -347,14 +348,17 @@ void rbtree_dump(rbtree_t *tree){
 int main(){
 	rbtree_t tree;
 	value_t input=0;
+	FILE *fp=NULL;
 	rbtree_init(&tree);
-	while(EOF!=scanf("%d",&input) && input>=0){
+	fp=fopen("3.txt","r");
+	while(EOF!=fscanf(fp,"%d",&input) && input>=0){
 		rbtree_push(&tree,input);
 		//rbtree_dump(&tree);
 	}
 	rbtree_dump(&tree);
-	rbtree_delete(&tree,tree.root);
+	rbtree_delete(&tree,rbtree_find(&tree,6));
 	rbtree_dump(&tree);
 	rbtree_close(&tree);
+	fclose(fp);
 	return 0;
 }
