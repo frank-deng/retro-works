@@ -63,14 +63,6 @@ rbtree_leaf_t* rbtree_find(rbtree_t *tree, value_t value){
 	}
 	return NULL;
 }
-static rbtree_leaf_t *__get_neighbour(rbtree_leaf_t *leaf){
-	rbtree_leaf_t *parent=NULL;
-	if(!leaf || !(leaf->parent)){
-		return NULL;
-	}
-	parent=leaf->parent;
-	return leaf==parent->left ? parent->right : parent->left;
-}
 static void __rbtree_update_parent(
 	rbtree_t *tree, rbtree_leaf_t *oldLeaf, rbtree_leaf_t *newLeaf){
 	rbtree_leaf_t *parent=NULL;
@@ -293,10 +285,6 @@ void rbtree_delete(rbtree_t* tree, rbtree_leaf_t *leaf){
 	if(leaf->parent && RBTREE_BLACK==leaf->color){
 		__rbtree_delete_adjust(tree,leaf);
 	}
-
-	//Deleting not to be tested yet
-	//leaf->value=-12345;
-	//return;
 
 	//Deleting node
 	if(leaf->right){
