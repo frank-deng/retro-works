@@ -21,6 +21,8 @@ char *numConv[]={
 #define DISP_1000 "Çª"
 #define DISP_10000 "Íò"
 #define DISP_1E8 "ÒÚ"
+#define DISP_1E16 "¾©"
+#define DISP_1E24 "ïö"
 
 bool conv1000(char* src, int8_t len){
 	char *p=src; int8_t digit, i; bool allZero=1, outZero=0;
@@ -79,8 +81,8 @@ bool conv10000(char *src, int8_t len){
 	hasNum0=conv1000(src,len-4);
 	if(hasNum0){
 		printf(DISP_10000);
-		src+=(len-4);
 	}
+	src+=(len-4);
 	hasNum1=conv1000(src,4);
 	return hasNum0 || hasNum1;
 }
@@ -95,10 +97,18 @@ void conv(char *src){
 		return;
 	}
 	src+=firstLen;
-	while(len){
+	while(len>0){
 		if(nonZero){
-			for(i=(len>>3); i>0; i--){
-				printf(DISP_1E8);
+			switch(len>>3){
+				case 3:
+					printf(DISP_1E24);
+				break;
+				case 2:
+					printf(DISP_1E16);
+				break;
+				case 1:
+					printf(DISP_1E8);
+				break;
 			}
 		}
 		nonZero=conv10000(src,8);
@@ -107,13 +117,24 @@ void conv(char *src){
 	}
 }
 int main(int argc, char* argv[]){
-	char *num;
+	char *num=NULL, *p=NULL;
+	size_t len=0;
 
 	if(argc<2){
-		fputs(stderr, "Usage: cnum number\n");
+		fputs("Usage: cnum number\n",stderr);
 		return 1;
 	}
 	num=argv[1];
+	for(p=num,len=0; *p; p++,len++){
+		if(*p<'0' || *p>'9'){
+			fputs("Invalid number\n",stderr);
+			return 1;
+		}
+		if(len>=32){
+			fputs("Number too large\n",stderr);
+			return 1;
+		}
+	}
 	conv(num);
 	putchar('\n');
 	return 0;
