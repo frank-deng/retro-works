@@ -27,8 +27,7 @@ char *numConv[]={
 bool conv1000(char* src, int8_t len){
 	char *p=src; int8_t digit, i; bool allZero=1, outZero=0;
 	for(i=len, p=src; i>0 && '\0'!=*p; i--,p++){
-		digit=*p-'0';
-		if(digit){
+		if(*p>='0' && *p<='9'){
 			allZero=0;
 			break;
 		}
@@ -60,18 +59,6 @@ bool conv1000(char* src, int8_t len){
 		}
 	}
 	return 1;
-}
-bool padZero(char *src, int8_t len){
-	char *p=src; bool foundZero=0;
-	while(*p && len){
-		if('0'==*p){
-			foundZero=1;
-		}else if(*p>='1' && *p<='9'){
-			return foundZero;
-		}
-		p++; len--;
-	}
-	return 0;
 }
 bool conv10000(char *src, int8_t len){
 	bool hasNum0=0, hasNum1=0;
