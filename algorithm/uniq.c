@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <string.h>
 
-typedef int value_t;
+typedef char* value_t;
 typedef enum __rbtree_color_t{
 	RBTREE_BLACK,
 	RBTREE_RED
@@ -24,10 +25,14 @@ void rbtree_init(rbtree_t *tree){
 static void __rbtree_free_leaf(rbtree_leaf_t *leaf){
 	if(leaf->left){
 		__rbtree_free_leaf(leaf->left);
+		leaf->left=NULL;
 	}
 	if(leaf->right){
 		__rbtree_free_leaf(leaf->right);
+		leaf->right=NULL;
 	}
+	free(leaf->value);
+	leaf->value=NULL;
 	free(leaf);
 }
 void rbtree_close(rbtree_t *tree){
@@ -45,22 +50,9 @@ static rbtree_leaf_t* __create_leaf(rbtree_leaf_t *parent, value_t value){
 	result->left=NULL;
 	result->right=NULL;
 	result->color=RBTREE_RED;
-	result->value=value; //Modify here with correspond data type
+	result->value=(char*)malloc(sizeof(char)*(strlen(value)+1));
+	strcpy(result->value,value);
 	return result;
-}
-rbtree_leaf_t* rbtree_find(rbtree_t *tree, value_t value){
-	rbtree_leaf_t* p=tree->root;
-	while(p){
-		if(value == p->value){
-			return p;
-		}
-		if(value < p->value){
-			p=p->left;
-		}else{
-			p=p->right;
-		}
-	}
-	return NULL;
 }
 static rbtree_leaf_t *__get_neighbour(rbtree_leaf_t *leaf){
 	rbtree_leaf_t *parent=NULL;
@@ -70,9 +62,62 @@ static rbtree_leaf_t *__get_neighbour(rbtree_leaf_t *leaf){
 	parent=leaf->parent;
 	return leaf==parent->left ? parent->right : parent->left;
 }
+static void __rbtree_update_parent(
+	rbtree_t *tree, rbtree_leaf_t *oldLeaf, rbtree_leaf_t *newLeaf){
+	rbtree_leaf_t *parent=NULL;
+	if(!oldLeaf){
+		return;
+	}
+	parent=oldLeaf->parent;
+	if(newLeaf){
+		newLeaf->parent=parent;
+	}
+	if(!parent){
+		tree->root=newLeaf;
+	}else if(oldLeaf==parent->left){
+		parent->left=newLeaf;
+	}else if(oldLeaf==parent->right){
+		parent->right=newLeaf;
+	}
+}
+static void __rbtree_right_rotate(rbtree_t *tree, rbtree_leaf_t *leaf){
+	rbtree_leaf_t *leafLeft;
+	if(!leaf){
+		return;
+	}
+	leafLeft=leaf->left;
+	if(!leafLeft){
+		return;
+	}
+	__rbtree_update_parent(tree,leaf,leafLeft);
+	leaf->left=leafLeft->right;
+	if(leaf->left){
+		leaf->left->parent=leaf;
+	}
+	leafLeft->right=leaf;
+	leaf->parent=leafLeft;
+}
+static void __rbtree_left_rotate(rbtree_t *tree, rbtree_leaf_t *leaf){
+	rbtree_leaf_t *leafRight;
+	if(!leaf){
+		return;
+	}
+	leafRight=leaf->right;
+	if(!leafRight){
+		return;
+	}
+	__rbtree_update_parent(tree,leaf,leafRight);
+	leaf->right=leafRight->left;
+	if(leaf->right){
+		leaf->right->parent=leaf;
+	}
+	leafRight->left=leaf;
+	leaf->parent=leafRight;
+}
 int rbtree_push(rbtree_t *tree, value_t value){
 	leaf_t *p=tree->root, *insert=NULL,
-		*parent=NULL, *gParent=NULL, *uParent=NULL, *ggParent=NULL;
+		*parent=NULL, *gParent=NULL, *uParent=NULL;
+	int comp=0;
 	//Create root node
 	if(!p){
 		tree->root=__create_leaf(NULL,value);
@@ -81,10 +126,11 @@ int rbtree_push(rbtree_t *tree, value_t value){
 	}
 	//Find the correct insert position and insert the data
 	while(p){
-		if(value == p->value){  //Modify here with corresponding comparison method
+		comp=strcmp(value,p->value);
+		if(!comp){
 			return 0;
 		}
-		if(value < p->value){  //Modify here with corresponding comparison method
+		if(comp>0){
 			if(p->left){
 				p=p->left;
 				continue;
@@ -125,67 +171,23 @@ int rbtree_push(rbtree_t *tree, value_t value){
 		if(insert==parent->left && parent==gParent->left){
 			parent->color=RBTREE_BLACK;
 			gParent->color=RBTREE_RED;
-			ggParent=gParent->parent;
-
-			gParent->left=parent->right;
-			if(gParent->left){
-				gParent->left->parent=gParent;
-			}
-			parent->right=gParent;
-			gParent->parent=parent;
-			parent->parent=ggParent;
-			if(!ggParent){
-				tree->root=parent;
-			}else if(ggParent->left==gParent){
-				ggParent->left=parent;
-			}else if(ggParent->right==gParent){
-				ggParent->right=parent;
-			}
+			__rbtree_right_rotate(tree,gParent);
 			break;
 		}
 		//Change color and left rotate
 		if(insert==parent->right && parent==gParent->right){
 			parent->color=RBTREE_BLACK;
 			gParent->color=RBTREE_RED;
-			ggParent=gParent->parent;
-
-			gParent->right=parent->left;
-			if(gParent->right){
-				gParent->right->parent=gParent;
-			}
-			parent->left=gParent;
-			gParent->parent=parent;
-			parent->parent=ggParent;
-			if(!ggParent){
-				tree->root=parent;
-			}else if(ggParent->left==gParent){
-				ggParent->left=parent;
-			}else if(ggParent->right==gParent){
-				ggParent->right=parent;
-			}
+			__rbtree_left_rotate(tree,gParent);
 			break;
 		}
 		if(insert==parent->left && gParent->right==parent){
-			parent->left=insert->right;
-			if(parent->left){
-				parent->left->parent=parent;
-			}
-			parent->parent=insert;
-			insert->right=parent;
-			insert->parent=gParent;
-			gParent->right=insert;
+			__rbtree_right_rotate(tree,parent);
 			insert=parent;
 			continue;
 		}
 		if(insert==parent->right && gParent->left==parent){
-			parent->right=insert->left;
-			if(parent->right){
-				parent->right->parent=parent;
-			}
-			parent->parent=insert;
-			insert->left=parent;
-			insert->parent=gParent;
-			gParent->left=insert;
+			__rbtree_left_rotate(tree,parent);
 			insert=parent;
 			continue;
 		}
@@ -217,11 +219,11 @@ void rbtree_dump(rbtree_t *tree){
 }
 int main(){
 	rbtree_t tree;
-	value_t input;
+	char input[2048]="";
 	rbtree_init(&tree);
-	while(EOF!=scanf("%d",&input)){
+	while(NULL!=gets(input)){
 		if(rbtree_push(&tree,input)){
-			printf("%d\n",input);
+			puts(input);
 		}
 	}
 	//rbtree_dump(&tree);
