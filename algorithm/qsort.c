@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
-typedef struct __arr_t{
+typedef struct{
 	size_t length;
 	size_t size;
 	size_t itemSize;
@@ -89,7 +89,7 @@ static void __qsort(item_t *arr, size_t start, size_t end){
 void qsort(item_t *arr, size_t length){
 	__qsort(arr,0,length);
 }
-int main(size_t argc, char* argv[]){
+int main(){
 	arr_t arr;
 	unsigned long i;
 	item_t input, *arrData;

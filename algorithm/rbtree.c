@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <malloc.h>
-#include <assert.h>
 
 typedef int value_t;
 typedef enum __rbtree_color_t{
@@ -293,10 +292,6 @@ void rbtree_delete(rbtree_t* tree, rbtree_leaf_t *leaf){
 	if(leaf->parent && RBTREE_BLACK==leaf->color){
 		__rbtree_delete_adjust(tree,leaf);
 	}
-
-	//Deleting not to be tested yet
-	//leaf->value=-12345;
-	//return;
 
 	//Deleting node
 	if(leaf->right){

@@ -1,21 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
 typedef char int8_t;
 typedef unsigned char bool;
 
-char *numConv[]={
-	"Áã",
-	"Ò¼",
-	"·¡",
-	"Èþ",
-	"ËÁ",
-	"Îé",
-	"Â½",
-	"Æâ",
-	"°Æ",
-	"¾Á"
-};
+char *numConv[]={"Áã","Ò¼","·¡","Èþ","ËÁ","Îé","Â½","Æâ","°Æ","¾Á"};
 #define DISP_10 "Ê°"
 #define DISP_100 "°Û"
 #define DISP_1000 "Çª"
@@ -73,8 +61,8 @@ bool conv10000(char *src, int8_t len){
 	hasNum1=conv1000(src,4);
 	return hasNum0 || hasNum1;
 }
-void conv(char *src){
-	int8_t len=strlen(src), firstLen=len&(0x7), nonZero=1, i;
+void conv(char *src,int8_t len){
+	int8_t firstLen=len&(0x7), nonZero=1, i;
 	if(!firstLen){
 		firstLen=8;
 	}
@@ -122,7 +110,7 @@ int main(int argc, char* argv[]){
 			return 1;
 		}
 	}
-	conv(num);
+	conv(num,len);
 	putchar('\n');
 	return 0;
 }

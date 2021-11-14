@@ -3,7 +3,7 @@
 #include <string.h>
 
 typedef char* value_t;
-typedef enum __rbtree_color_t{
+typedef enum{
 	RBTREE_BLACK,
 	RBTREE_RED
 }rbtree_color_t;
@@ -15,7 +15,7 @@ typedef struct __rbtree_leaf_t{
 	value_t value;
 }rbtree_leaf_t;
 typedef rbtree_leaf_t leaf_t;
-typedef struct __rbtree_t{
+typedef struct{
 	rbtree_leaf_t *root;
 }rbtree_t;
 

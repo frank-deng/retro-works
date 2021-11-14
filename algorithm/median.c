@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <malloc.h>
 
-typedef enum __heap_type_t{
+typedef enum{
 	MIN_HEAP,
 	MAX_HEAP
 }heap_type_t;
-typedef struct __heap_t{
+typedef struct{
 	heap_type_t type;
 	size_t length;
 	size_t itemSize;
