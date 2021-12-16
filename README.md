@@ -236,9 +236,9 @@ After that, run `npm start` to generate the blog site, generated files can be fo
 
 配置 Configuration
 
-* CPU 80486DX 66MHz
+* CPU 80486DX2 66MHz
 * 8M RAM
-* 256M HDD
+* 512M HDD
 * S3 864 Graphics Adapter with 384k VRAM, capable of handling 640x480 256-color video mode.
 * CD-ROM
 * Sound Blaster 16
