@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 	heap_init(&heap, maxn?MIN_HEAP:MAX_HEAP, sizeof(item_t), count+1);
 	sorted=(item_t*)malloc(sizeof(item_t)*count);
 
-	while(EOF!=scanf("%d",&input)){
+	while(EOF!=scanf("%ld",&input)){
 		if(heap.length<count){
 			heap_push(&heap, input);
 			continue;
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 		i++;
 	}
 	while(i--){
-		printf("%u\n",sorted[i]);
+		printf("%ld\n",sorted[i]);
 	}
 	free(sorted);
 	heap_close(&heap);
