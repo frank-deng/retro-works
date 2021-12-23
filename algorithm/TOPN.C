@@ -12,7 +12,8 @@ typedef struct{
 	size_t size;
 	void* data;
 }heap_t;
-int heap_init(heap_t* heap,	heap_type_t type,	size_t itemSize, size_t size){
+int heap_init(heap_t* heap,	heap_type_t type, size_t itemSize, size_t size)
+{
 	heap->type=type;
 	heap->length=0;
 	heap->size=size;
@@ -20,18 +21,24 @@ int heap_init(heap_t* heap,	heap_type_t type,	size_t itemSize, size_t size){
 	heap->data=(void*)malloc(itemSize*size);
 	return heap->data ? 1 : 0;
 }
-void heap_close(heap_t *heap){
+void heap_close(heap_t *heap)
+{
 	free(heap->data);
 	heap->length=heap->size=heap->itemSize=0;
 	heap->data=NULL;
 }
+#define __swap(type, arr, p0, p1) do{\
+	type temp = (arr)[(p0)];\
+	(arr)[(p0)] = (arr)[(p1)];\
+	(arr)[(p1)] = (temp);\
+}while(0)
 
-typedef int item_t;
+typedef long item_t;
 int heap_push(heap_t *heap, item_t value){
 	size_t sizeNew;
 	void* dataNew;
 	size_t pos=heap->length, parentPos;
-	item_t *heapData, temp;
+	item_t *heapData;
 
 	/* Heap space memory expansion */
 	if(heap->length >= heap->size){
@@ -54,24 +61,23 @@ int heap_push(heap_t *heap, item_t value){
 			|| (MAX_HEAP==heap->type && heapData[parentPos]>=heapData[pos])){
 			break;
 		}
-		temp=heapData[parentPos];
-		heapData[parentPos]=heapData[pos];
-		heapData[pos]=temp;
+		__swap(item_t, heapData, parentPos, pos);
 		pos=parentPos;
 	}
 	return 1;
 }
-item_t heap_pop(heap_t *heap){
+int heap_pop(heap_t *heap, item_t *item)
+{
 	item_t *arrData=(item_t*)(heap->data), heapTopOrig,
 		value, leftVal, rightVal, temp;
 	size_t pos=0, length, leftPos, rightPos;
 	if(!(heap->length)){
 		return 0;
 	}
-	heapTopOrig=arrData[0];
+	*item = arrData[0];
 	(heap->length)--;
 	if(!(heap->length)){
-		return heapTopOrig;
+		return 1;
 	}
 	arrData[0]=arrData[heap->length];
 	length=heap->length;
@@ -84,9 +90,7 @@ item_t heap_pop(heap_t *heap){
 			leftVal=arrData[leftPos];
 			if((MIN_HEAP==heap->type && leftVal<value)
 				||(MAX_HEAP==heap->type && leftVal>value)){
-				temp=arrData[leftPos];
-				arrData[leftPos]=arrData[pos];
-				arrData[pos]=temp;
+				__swap(item_t, arrData, leftPos, pos);
 			}
 			break;
 		}
@@ -97,26 +101,46 @@ item_t heap_pop(heap_t *heap){
 		}
 		if((MIN_HEAP==heap->type && leftVal<=rightVal)
 			||(MAX_HEAP==heap->type && leftVal>=rightVal)){
-			temp=arrData[leftPos];
-			arrData[leftPos]=arrData[pos];
-			arrData[pos]=temp;
+			__swap(item_t, arrData, leftPos, pos);
 			pos=leftPos;
 		}else{
-			temp=arrData[rightPos];
-			arrData[rightPos]=arrData[pos];
-			arrData[pos]=temp;
+			__swap(item_t, arrData, rightPos, pos);
 			pos=rightPos;
 		}
 	}
-	return heapTopOrig;
+	return 1;
 }
-int main(){
+void printHelp()
+{
+	fputs("Usage: topn.exe count\n", stderr);
+	fputs("    count parameter in negative value means smallest n numbers.", stderr);
+}
+int main(int argc, char *argv[])
+{
 	int maxn=0,i;
+	long inputCount = 0;
 	size_t count;
 	heap_t heap;
-	item_t heapTop, input, *sorted;
+	item_t heapTop, input, outval, *sorted;
 
-	scanf("%d%u",&maxn,&count);
+	if (argc <= 1) {
+		printHelp();
+		return 1;
+	}
+	inputCount = atol(argv[1]);
+	if (inputCount == 0) {
+		printHelp();
+		return 1;
+	}
+
+	if (inputCount < 0) {
+		maxn = 0;
+		count = -inputCount;
+	} else {
+		maxn = 1;
+		count = inputCount;
+	}
+
 	heap_init(&heap, maxn?MIN_HEAP:MAX_HEAP, sizeof(item_t), count+1);
 	sorted=(item_t*)malloc(sizeof(item_t)*count);
 
@@ -127,17 +151,17 @@ int main(){
 		}
 		heapTop=((item_t*)(heap.data))[0];
 		if((maxn && input>heapTop) || (!maxn && input<heapTop)){
-			heap_push(&heap,input);
-			heap_pop(&heap);
+			heap_push(&heap, input);
+			heap_pop(&heap, &outval);
 		}
 	}
 	i=0;
-	while(heap.length){
-		sorted[i]=heap_pop(&heap);
+	while(heap_pop(&heap, &outval)){
+		sorted[i]=outval;
 		i++;
 	}
 	while(i--){
-		printf("%d\n",sorted[i]);
+		printf("%u\n",sorted[i]);
 	}
 	free(sorted);
 	heap_close(&heap);
