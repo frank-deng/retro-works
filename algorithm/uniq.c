@@ -12,7 +12,6 @@ typedef struct __rbtree_leaf_t{
 	struct __rbtree_leaf_t *left;
 	struct __rbtree_leaf_t *right;
 	rbtree_color_t color;
-	value_t value;
 }rbtree_leaf_t;
 typedef rbtree_leaf_t leaf_t;
 typedef struct{
@@ -31,17 +30,18 @@ static void __rbtree_free_leaf(rbtree_leaf_t *leaf){
 		__rbtree_free_leaf(leaf->right);
 		leaf->right=NULL;
 	}
-	free(leaf->value);
-	leaf->value=NULL;
 	free(leaf);
 }
 void rbtree_close(rbtree_t *tree){
 	__rbtree_free_leaf(tree->root);
 	tree->root=NULL;
 }
-static rbtree_leaf_t* __create_leaf(rbtree_leaf_t *parent, value_t value){
+static rbtree_leaf_t* __create_leaf(rbtree_leaf_t *parent, char* value){
+	char *leafValue = NULL;
 	rbtree_leaf_t* result=NULL;
-	result=(rbtree_leaf_t*)malloc(sizeof(rbtree_leaf_t));
+	size_t valueLen = strlen(value);
+	result=(rbtree_leaf_t*)malloc(sizeof(rbtree_leaf_t) +
+		sizeof(char) * (valueLen + 1));
 	if(!result){
 		fprintf(stderr,"Memory allocation error.\n");
 		exit(1);
@@ -50,17 +50,9 @@ static rbtree_leaf_t* __create_leaf(rbtree_leaf_t *parent, value_t value){
 	result->left=NULL;
 	result->right=NULL;
 	result->color=RBTREE_RED;
-	result->value=(char*)malloc(sizeof(char)*(strlen(value)+1));
-	strcpy(result->value,value);
+	leafValue = (char*)result + sizeof(rbtree_leaf_t);
+	strcpy(leafValue,value);
 	return result;
-}
-static rbtree_leaf_t *__get_neighbour(rbtree_leaf_t *leaf){
-	rbtree_leaf_t *parent=NULL;
-	if(!leaf || !(leaf->parent)){
-		return NULL;
-	}
-	parent=leaf->parent;
-	return leaf==parent->left ? parent->right : parent->left;
 }
 static void __rbtree_update_parent(
 	rbtree_t *tree, rbtree_leaf_t *oldLeaf, rbtree_leaf_t *newLeaf){
@@ -126,7 +118,7 @@ int rbtree_push(rbtree_t *tree, value_t value){
 	}
 	//Find the correct insert position and insert the data
 	while(p){
-		comp=strcmp(value,p->value);
+		comp=strcmp(value, (char*)p + sizeof(rbtree_leaf_t));
 		if(!comp){
 			return 0;
 		}
@@ -204,7 +196,7 @@ void __rbtree_leaf_dump(rbtree_leaf_t *leaf, int level){
 		puts("NULL");
 		return;
 	}
-	printf("%c,%d\n",leaf->color ? 'r' : 'B',leaf->value);
+	printf("%c,%s\n",leaf->color ? 'r' : 'B', (char*)leaf + sizeof(rbtree_leaf_t));
 	if(NULL==leaf->left && NULL==leaf->right){
 		return;
 	}
