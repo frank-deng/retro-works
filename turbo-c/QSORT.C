@@ -15,8 +15,10 @@ int arr_init(arr_t *arr, size_t itemSize, size_t size){
 	return arr->data ? 1 : 0;
 }
 void arr_close(arr_t *arr){
-	free(arr->data);
-	arr->data=NULL;
+	if (heap->data != NULL) {
+		free(arr->data);
+		arr->data=NULL;
+	}
 	arr->length=arr->size=arr->itemSize=0;
 }
 int arr_expand(arr_t *arr){
@@ -35,15 +37,27 @@ int arr_expand(arr_t *arr){
 	return 2;
 }
 
-typedef int item_t;
-int arr_push(arr_t *arr, item_t *item){
+typedef long item_t;
+int arr_push(arr_t *arr, item_t item){
 	if(!arr_expand(arr)){
 		return 0;
 	}
-	((item_t*)(arr->data))[arr->length]=*item;
+	((item_t*)(arr->data))[arr->length] = item;
 	arr->length++;
 	return 1;
 }
+
+typedef struct {
+	item_t *start;
+	size_t length;
+} queue_item_t;
+typedef struct {
+	size_t size;
+	size_t start;
+	size_t end;
+	queue_item_t *data;
+} queue_t;
+
 static void __bubbleSort(item_t *arr, size_t start, size_t end){
 	size_t i,j; item_t temp;
 	for(i=start;i<end-1;i++){

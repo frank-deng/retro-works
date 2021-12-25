@@ -23,9 +23,11 @@ int heap_init(heap_t* heap,	heap_type_t type, size_t itemSize, size_t size)
 }
 void heap_close(heap_t *heap)
 {
-	free(heap->data);
+	if (heap->data != NULL) {
+		free(heap->data);
+		heap->data=NULL;
+	}
 	heap->length=heap->size=heap->itemSize=0;
-	heap->data=NULL;
 }
 #define __swap(type, arr, p0, p1) do{\
 	type temp = (arr)[(p0)];\

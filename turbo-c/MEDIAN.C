@@ -12,7 +12,7 @@ typedef struct{
 	size_t size;
 	void* data;
 }heap_t;
-int heap_init(heap_t* heap,	heap_type_t type,	size_t itemSize, size_t size){
+int heap_init(heap_t* heap,	heap_type_t type, size_t itemSize, size_t size){
 	heap->type=type;
 	heap->length=0;
 	heap->size=size;
@@ -25,8 +25,13 @@ void heap_close(heap_t *heap){
 	heap->length=heap->size=heap->itemSize=0;
 	heap->data=NULL;
 }
+#define __swap(type, arr, p0, p1) do{\
+	type temp = (arr)[(p0)];\
+	(arr)[(p0)] = (arr)[(p1)];\
+	(arr)[(p1)] = (temp);\
+}while(0)
 
-typedef int item_t;
+typedef long item_t;
 int heap_push(heap_t *heap, item_t value){
 	size_t sizeNew;
 	void* dataNew;
@@ -54,27 +59,29 @@ int heap_push(heap_t *heap, item_t value){
 			|| (MAX_HEAP==heap->type && heapData[parentPos]>=heapData[pos])){
 			break;
 		}
-		temp=heapData[parentPos];
-		heapData[parentPos]=heapData[pos];
-		heapData[pos]=temp;
+		__swap(item_t, heapData, pos, parentPos);
 		pos=parentPos;
 	}
 	return 1;
 }
-item_t heap_top(heap_t *heap){
-	return ((item_t*)(heap->data))[0];
+int heap_top(heap_t *heap, item_t *value){
+	if (!heap->length) {
+		return 0;
+	}
+	*value = ((item_t*)(heap->data))[0];
+	return 1;
 }
-item_t heap_pop(heap_t *heap){
-	item_t *arrData=(item_t*)(heap->data), heapTopOrig,
+int heap_pop(heap_t *heap, item_t *valueOut){
+	item_t *arrData=(item_t*)(heap->data),
 		value, leftVal, rightVal, temp;
 	size_t pos=0, length, leftPos, rightPos;
 	if(!(heap->length)){
 		return 0;
 	}
-	heapTopOrig=arrData[0];
+	*valueOut = arrData[0];
 	(heap->length)--;
 	if(!(heap->length)){
-		return heapTopOrig;
+		return 1;
 	}
 	arrData[0]=arrData[heap->length];
 	length=heap->length;
@@ -86,10 +93,8 @@ item_t heap_pop(heap_t *heap){
 			}
 			leftVal=arrData[leftPos];
 			if((MIN_HEAP==heap->type && leftVal<value)
-				||(MAX_HEAP==heap->type && leftVal>value)){
-				temp=arrData[leftPos];
-				arrData[leftPos]=arrData[pos];
-				arrData[pos]=temp;
+				||(MAX_HEAP==heap->type && leftVal>value)){	
+				__swap(item_t, arrData, pos, leftPos);
 			}
 			break;
 		}
@@ -100,18 +105,14 @@ item_t heap_pop(heap_t *heap){
 		}
 		if((MIN_HEAP==heap->type && leftVal<=rightVal)
 			||(MAX_HEAP==heap->type && leftVal>=rightVal)){
-			temp=arrData[leftPos];
-			arrData[leftPos]=arrData[pos];
-			arrData[pos]=temp;
+			__swap(item_t, arrData, pos, leftPos);
 			pos=leftPos;
 		}else{
-			temp=arrData[rightPos];
-			arrData[rightPos]=arrData[pos];
-			arrData[pos]=temp;
+			__swap(item_t, arrData, pos, rightPos);
 			pos=rightPos;
 		}
 	}
-	return heapTopOrig;
+	return 1;
 }
 void print_data(item_t *src, size_t length){
 	size_t i;
@@ -122,34 +123,37 @@ void print_data(item_t *src, size_t length){
 }
 int main(){
 	heap_t heapL, heapR;
-	item_t input, topL, topR;
+	item_t input, topL, topR, val;
 	heap_init(&heapL, MAX_HEAP, sizeof(item_t), 128);
 	heap_init(&heapR, MIN_HEAP, sizeof(item_t), 128);
-	while(EOF!=scanf("%d",&input)){
+	while(EOF!=scanf("%ld", &input)){
 		if(!heapL.length && !heapR.length){
-			heap_push(&heapL,input);
+			heap_push(&heapL, input);
 			continue;
 		}
-		topL=heap_top(&heapL);
+		heap_top(&heapL, &topL);
 		if(!heapR.length){
 			if(input>=topL){
-				heap_push(&heapR,input);
+				heap_push(&heapR, input);
 			}else{
-				heap_push(&heapR,heap_pop(&heapL));
-				heap_push(&heapL,input);
+				heap_pop(&heapL, &val);
+				heap_push(&heapR, val);
+				heap_push(&heapL, input);
 			}
 			continue;
 		}
-		topR=heap_top(&heapR);
+		heap_top(&heapR, &topR);
 		if(input<=topL){
 			heap_push(&heapL,input);
 			if((heapL.length-heapR.length) > 1){
-				heap_push(&heapR,heap_pop(&heapL));
+				heap_pop(&heapL, &val);
+				heap_push(&heapR, val);
 			}
 		}else if(input>=topR){
 			heap_push(&heapR,input);
 			if(heapR.length!=heapL.length){
-				heap_push(&heapL,heap_pop(&heapR));
+				heap_pop(&heapR, &val);
+				heap_push(&heapL, val);
 			}
 		}else if(heapL.length != heapR.length){
 			heap_push(&heapR,input);
@@ -157,10 +161,15 @@ int main(){
 			heap_push(&heapL,input);
 		}
 	}
-	if(heapL.length==heapR.length){
-		printf("%d %d\n",heap_top(&heapL), heap_top(&heapR));
-	}else{
-		printf("%d\n",heap_top(&heapL));
+
+	if (heapL.length) {
+		heap_top(&heapL, &topL);
+		if(heapL.length==heapR.length){
+			heap_top(&heapR, &topR);
+			printf("%d %d\n", topL, topR);
+		}else{
+			printf("%d\n", topL);
+		}
 	}
 	heap_close(&heapL);
 	heap_close(&heapR);
