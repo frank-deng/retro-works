@@ -166,9 +166,9 @@ int main(){
 		heap_top(&heapL, &topL);
 		if(heapL.length==heapR.length){
 			heap_top(&heapR, &topR);
-			printf("%d %d\n", topL, topR);
+			printf("%ld %ld\n", topL, topR);
 		}else{
-			printf("%d\n", topL);
+			printf("%ld\n", topL);
 		}
 	}
 	heap_close(&heapL);
