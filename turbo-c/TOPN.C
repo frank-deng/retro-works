@@ -119,9 +119,9 @@ void printHelp()
 }
 int main(int argc, char *argv[])
 {
-	int maxn=0,i;
+	int maxn=0;
 	long inputCount = 0;
-	size_t count;
+	size_t count, resultCount = 0, i;
 	heap_t heap;
 	item_t heapTop, input, outval, *sorted;
 
@@ -157,13 +157,19 @@ int main(int argc, char *argv[])
 			heap_pop(&heap, &outval);
 		}
 	}
-	i=0;
+	resultCount = 0;
 	while(heap_pop(&heap, &outval)){
-		sorted[i]=outval;
-		i++;
+		sorted[resultCount]=outval;
+		resultCount++;
 	}
-	while(i--){
-		printf("%ld\n",sorted[i]);
+	if (maxn) {
+		for(i = resultCount; i > 0; i--) {
+			printf("%ld\n", sorted[i - 1]);
+		}
+	} else {
+		for (i = 0; i < resultCount; i++) {
+			printf("%ld\n", sorted[i]);
+		}
 	}
 	free(sorted);
 	heap_close(&heap);

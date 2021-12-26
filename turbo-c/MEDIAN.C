@@ -114,13 +114,6 @@ int heap_pop(heap_t *heap, item_t *valueOut){
 	}
 	return 1;
 }
-void print_data(item_t *src, size_t length){
-	size_t i;
-	for(i=0; i<length; i++){
-		printf("%8d",src[i]);
-	}
-	putchar('\n');
-}
 int main(){
 	heap_t heapL, heapR;
 	item_t input, topL, topR, val;
