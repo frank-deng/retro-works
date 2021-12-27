@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
 	randomize();
 	while(count--){
-		long result = rand() * rand() & 0x7fffffff;
+		long result = ((long)rand() * (long)rand()) & 0x7fffffff;
 		result = (result % (max - min)) + min;
 		printf("%ld\n", result);
 	}
