@@ -66,7 +66,7 @@ int queueInit(queue_t *queue, size_t size){
 		return 0;
 	}
 	queue->data = (queue_item_t*)malloc(sizeof(queue_item_t) * size);
-	return (queue->data == NULL);
+	return (queue->data != NULL);
 }
 void queueClose(queue_t *queue){
 	if(queue->data == NULL){
@@ -119,7 +119,9 @@ void _qsort(item_t *arr0, size_t length)
 
 	queueItem.start = arr0;
 	queueItem.length = length;
-	queueInit(&queue, length + 1);
+	if (!queueInit(&queue, (length >> 3) + 1)){
+		return;
+	}
 	queueIn(&queue, &queueItem);
 	while(queueOut(&queue, &queueItem)){
 		item_t *arr = queueItem.start, *left, *right;
@@ -182,7 +184,10 @@ int main(size_t argc, char *argv[]){
 
 	arr_init(&arr,sizeof(item_t),128);
 	while(EOF!=scanf("%ld",&input)){
-		arr_push(&arr, input);
+		if (!arr_push(&arr, input)) {
+			fputs("Out of memory.", stderr);
+			return 1;
+		}
 	}
 	arrData=(item_t*)(arr.data);
 	_qsort(arrData, arr.length);
