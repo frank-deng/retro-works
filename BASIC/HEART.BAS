@@ -1,11 +1,11 @@
 10 DEFINT A-Z: DEFDBL P,T
 20 KEY OFF: SCREEN 1: COLOR 0, 1: CLS : PI = 3.141592654#
 30 LINE (160, 0)-(160, 199), 3,,&H3333: LINE (0, 30)-(319, 30), 3,,&H3333
-40 FOR I = 0 TO 360
-50 T = I * 2 * PI / 360
-60 X = INT(40 * (2 * SIN(T) - SIN(2 * T)) + 160)
-70 Y = INT(- 40 * (2 * COS(T) - COS(2 * T)) + 70)
-80 IF I > 0 THEN LINE (X0, Y0)-(X, Y), 2
+40 X0 = 160: Y0 = 30: FOR I = 1 TO 360
+50 T = I * PI / 180
+60 X = INT(40 * (2 * SIN(T) - SIN(2 * T)) + 0.5) + 160
+70 Y = INT(- 40 * (2 * COS(T) - COS(2 * T)) + 0.5) + 70
+80 LINE (X0, Y0)-(X, Y), 2
 90 X0 = X: Y0 = Y
 100 NEXT I
 110 WHILE INPUT$(1) = "": WEND
