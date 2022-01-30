@@ -1,0 +1,14 @@
+10 DEFINT A-Z: DEFDBL P, T: W = 50: H = 130: Y0 = 50
+20 KEY OFF: SCREEN 1: COLOR 0, 2: CLS : PI = 3.141592654#
+30 CIRCLE (160 - W, Y0), W, 2, PI * 2, PI, .7
+40 CIRCLE (160 + W, Y0), W, 2, PI * 2, PI, .7
+50 X0 = W * 2: FOR Y = 1 TO H
+60 X = INT(W * 2 * COS(Y * PI / 2 / H) + .5)
+70 LINE (X0 + 160, Y - 1 + Y0)-(X + 160, Y + Y0), 2
+80 LINE (-X0 + 160, Y - 1 + Y0)-(-X + 160, Y + Y0), 2
+90 X0 = X
+100 NEXT Y
+110 PAINT (160, 100), 2
+120 WHILE INPUT$(1) = "": WEND
+130 SCREEN 0: WIDTH 80: CLS : END
+
