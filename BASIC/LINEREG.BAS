@@ -1,45 +1,27 @@
-DEFDBL A-Z : DEFINT I
-COMMON LENGTH
-PRINT ""
-PRINT "*** Linear Regression Demo ***"
-PRINT ""
+10 DEFDBL A-Z : DEFINT I,L: DIM X(2048), Y(2048)
+20 PRINT "*** Linear Regression Demo ***": PRINT ""
+30 INPUT "CSV Filename: ", F$
+40 OPEN F$ FOR INPUT AS #1: WHILE NOT EOF(1)
+50 INPUT #1,X(I),Y(I): LENGTH = LENGTH+1
+60 WEND: CLOSE #1
+90 T0 = 0 : T1 = 0 : J0 = 1 : J1 = 1
+100 WHILE ABS(J0)>0.0001 OR ABS(J1)>0.0001
+110 A = 1 : B = 0 : D = 0 : J0 = 0 : J1 = 0
+120 FOR I = 0 TO LENGTH-1
+130 B = B + X(I)
+140 D = D + X(I) * X(I)
+150 H = T0 + T1 * X(I)
+160 J0 = J0 + (H - Y(I))
+170 J1 = J1 + (H - Y(I)) * X(I)
+180 NEXT I
+190 B = B / LENGTH : C = B : D = D / LENGTH
+200 J0 = J0 / LENGTH : J1 = J1 / LENGTH
+210 DET = 1 / (A*D-B*C)
+220 A1 = DET * D : B1 = DET * (-B)
+230 C1 = DET * (-C) : D1 = DET * A
+240 T0 = T0 - (A1 * J0 + B1 * J1)
+250 T1 = T1 - (C1 * J0 + D1 * J1)
+260 WEND
+270 PRINT "": PRINT "y = ";T0;"+ (";T1;") * x": PRINT ""
+280 END
 
-REM Read data
-INPUT "CSV Filename: ", F$
-LENGTH = 0
-OPEN F$ FOR INPUT AS #1
-WHILE NOT EOF(1)
-  INPUT #1,A#,B#
-  LENGTH = LENGTH+1
-WEND
-CLOSE #1
-REDIM SHARED X(LENGTH) AS DOUBLE
-REDIM SHARED Y(LENGTH) AS DOUBLE
-OPEN F$ FOR INPUT AS #1
-FOR I=0 TO LENGTH-1
-  INPUT #1,X(I),Y(I)
-NEXT I
-CLOSE #1
-
-REM Start Calculation
-T0 = 0 : T1 = 0 : J0 = 1 : J1 = 1
-WHILE ABS(J0)>0.0001 OR ABS(J1)>0.0001
-  A = 1 : B = 0 : D = 0 : J0 = 0 : J1 = 0
-  FOR I = 0 TO LENGTH-1
-    B = B + X(I)
-    D = D + X(I) * X(I)
-    H = T0 + T1 * X(I)
-    J0 = J0 + (H - Y(I))
-    J1 = J1 + (H - Y(I)) * X(I)
-  NEXT I
-  B = B / LENGTH : C = B : D = D / LENGTH
-  J0 = J0 / LENGTH : J1 = J1 / LENGTH
-
-  DET = 1 / (A*D-B*C)
-  A1 = DET * D : B1 = DET * (-B)
-  C1 = DET * (-C) : D1 = DET * A
-  T0 = T0 - (A1 * J0 + B1 * J1)
-  T1 = T1 - (C1 * J0 + D1 * J1)
-WEND
-PRINT "y = ";T0;"+ (";T1;") * x"
-END
