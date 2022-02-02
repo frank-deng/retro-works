@@ -186,14 +186,53 @@ int processChar(unsigned short x, unsigned short y, unsigned char qu, unsigned c
     fprintf(g_output, "\r\n");
     return 1;
 }
-int processStr(textdata_t *textdata)
+int processCharAscii(unsigned short x, unsigned short y, unsigned char qu, unsigned char wei)
+{
+    int i, j;
+    unsigned char buf[32], value;
+    unsigned short evenRow, oddRow, mask;
+    if (!readFont(buf, qu, wei)) {
+        return 0;
+    }
+    fprintf(g_output, "%d DATA %d,%d\r\n", g_lineNum, x, y);
+    g_lineNum += g_lineNumStep;
+    for (i = 0; i < 32; i += 4) {
+        evenRow = (((unsigned short)buf[i]) << 8) | buf[i+1];
+        oddRow = (((unsigned short)buf[i+2]) << 8) | buf[i+3];
+        fprintf(g_output, "%d DATA ", g_lineNum);
+        g_lineNum += g_lineNumStep;
+        for (j = 0; j < 15; j++) {
+            mask = 1 << (15 - j);
+            if (j) {
+                fprintf(g_output, ",");
+            }
+            value = 0;
+            if (mask & evenRow) {
+                value |= 1;
+            }
+            if (mask & oddRow) {
+                value |= 2;
+            }
+            fprintf(g_output, "%d", value);
+        }
+        fprintf(g_output, "\r\n");
+    }
+    return 1;
+}
+int processStr(textdata_t *textdata, int asciiMode)
 {
     unsigned int x = textdata->x;
     int i;
     unsigned char *p = textdata->data;
     for (i = 0; i < textdata->length; i++) {
-        if (!processChar(x, textdata->y, *p, *(p + 1))) {
-            continue;
+        if (asciiMode){
+            if (!processCharAscii(x, textdata->y, *p, *(p + 1))) {
+                continue;
+            }
+        } else {
+            if (!processChar(x, textdata->y, *p, *(p + 1))) {
+                continue;
+            }
         }
         p += 2;
         x += 16;
@@ -232,11 +271,11 @@ int main(int argc, char *argv[])
     for (i = 0; i < opt.text_data_count; i++) {
         charCount += opt.text_data[i].length;
     }
-		fprintf(g_output, "%u DATA %u\r\n", g_lineNum, charCount);
-		g_lineNum += g_lineNumStep;
+	fprintf(g_output, "%u DATA %u\r\n", g_lineNum, charCount);
+	g_lineNum += g_lineNumStep;
 
     for (i = 0; i < opt.text_data_count; i++) {
-        processStr(opt.text_data + i);
+        processStr(opt.text_data + i, opt.ascii_mode);
     }
 
     fclose(g_font);
