@@ -40,10 +40,10 @@ Usage: hanzi.exe [/a] [/f|/font FONT_FILE] [/o|/out OUTPUT_FILE]\n\
 static getopt_table_t g_getoptTable[] = {
     { "/a", "/ascii", 0,  SET_MODE_ASCII },
     { "/f", "/font", 1,  SET_FONT_FILE },
-    { "/o", "/out", 1,  SET_OUTPUT_FILE },
-    { "/l", "/line", 1,  SET_START_LINE },
-    { "/h", "/help", 0,  DISPLAY_HELP },
-    { NULL, NULL, 0, DEFAULT}
+		{ "/o", "/out", 1,  SET_OUTPUT_FILE },
+		{ "/l", "/line", 1,  SET_START_LINE },
+		{ "/h", "/help", 0,  DISPLAY_HELP },
+		{ NULL, NULL, 0, DEFAULT}
 };
 static unsigned short g_lineNum = 100;
 static unsigned short g_lineNumStep = 10;
@@ -51,88 +51,88 @@ static FILE* g_font = NULL;
 static FILE* g_output = NULL;
 static int processOptind(char *arg, textdata_t *target)
 {
-    char buf[256];
-    char *px = buf;
-    char *py = NULL;
-    char *text = NULL;
-    char *p = NULL;
-    char *pTarget = NULL;
+		char buf[256];
+		char *px = buf;
+		char *py = NULL;
+		char *text = NULL;
+		char *p = NULL;
+		char *pTarget = NULL;
 
-    strcpy(buf, arg);
-    strtok(buf, ":");
-    text = strtok(NULL, ":");
-    if (NULL == text) {
-        return 0;
-    }
-    px = strtok(buf, ",");
-    py = strtok(NULL, ",");
-    if (NULL == py) {
-        return 0;
-    }
-    target->x = atoi(px);
-    target->y = atoi(py);
+		strcpy(buf, arg);
+		strtok(buf, ":");
+		text = strtok(NULL, ":");
+		if (NULL == text) {
+				return 0;
+		}
+		px = strtok(buf, ",");
+		py = strtok(NULL, ",");
+		if (NULL == py) {
+				return 0;
+		}
+		target->x = atoi(px);
+		target->y = atoi(py);
 
-    p = text; pTarget = (char*)(target->data);
-    target->length = 0;
-    while (*p) {
-        if ('\0' == *p) {
-            break;
-        }
-        if ('\0' == *(p+1)) {
-            break;
-        }
-        if ((unsigned char)*p < 0xa1) {
-            p++;
-            continue;
-        }
-        *pTarget = *p;
-        *(pTarget + 1) = *(p + 1);
-        p += 2;
-        pTarget += 2;
-        (target->length)++;
-    }
-    *pTarget = '\0';
-    return 1;
+		p = text; pTarget = (char*)(target->data);
+		target->length = 0;
+		while (*p) {
+				if ('\0' == *p) {
+						break;
+				}
+				if ('\0' == *(p+1)) {
+						break;
+				}
+				if ((unsigned char)*p < 0xa1) {
+						p++;
+						continue;
+				}
+				*pTarget = *p;
+				*(pTarget + 1) = *(p + 1);
+				p += 2;
+				pTarget += 2;
+				(target->length)++;
+		}
+		*pTarget = '\0';
+		return 1;
 }
 static int getopt(getopt_t *dest, int argc, char *argv[])
 {
-    getopt_table_t *item = NULL;
-    char *paramStr = NULL;
-    int i, j;
-    dest->font_file = "HZK16.FON";
-    dest->output_file = NULL;
-    dest->ascii_mode = 0;
-    dest->start_line = 100;
-    dest->line_step = 10;
-    dest->text_data_count = 0;
-    for (i = 1; i < argc; i++) {
-        for (item = g_getoptTable; item->arg != NULL; item++) {
-            if (!strcmp(argv[i], item->arg) || !strcmp(argv[i], item->arg2)) {
-                break;
-            }
-        }
+		getopt_table_t *item = NULL;
+		char *paramStr = NULL;
+		int i, j;
+		dest->font_file = "HZK16.FON";
+		dest->output_file = NULL;
+		dest->ascii_mode = 0;
+		dest->start_line = 100;
+		dest->line_step = 10;
+		dest->text_data_count = 0;
+		for (i = 1; i < argc; i++) {
+				for (item = g_getoptTable; item->arg != NULL; item++) {
+						if (!strcmp(argv[i], item->arg) || !strcmp(argv[i], item->arg2)) {
+								break;
+						}
+				}
 
-        if (NULL == item->arg) {
-            if (processOptind(argv[i], dest->text_data + dest->text_data_count)) {
-                (dest->text_data_count)++;
-            }
-            continue;
-        }
-        
-        paramStr = NULL;
-        if (item->param) {
-            if (i + 1 >= argc) {
-                return 0;
-            }
-            i++;
-            paramStr = argv[i];
-        }
-        
-        switch (item->action) {
-            case DISPLAY_HELP:
-                return 0;
-            break;
-            case SET_MODE_ASCII:
+				if (NULL == item->arg) {
+						if (processOptind(argv[i], dest->text_data + dest->text_data_count)) {
+								(dest->text_data_count)++;
+						}
+						continue;
+				}
+
+				paramStr = NULL;
+				if (item->param) {
+						if (i + 1 >= argc) {
+								return 0;
+						}
+						i++;
+						paramStr = argv[i];
+				}
+
+				switch (item->action) {
+						case DISPLAY_HELP:
+								return 0;
+						break;
+						case SET_MODE_ASCII:
                 dest->ascii_mode = 1;
             break;
             case SET_FONT_FILE:
@@ -141,7 +141,7 @@ static int getopt(getopt_t *dest, int argc, char *argv[])
             case SET_OUTPUT_FILE:
                 dest->output_file = paramStr;
             break;
-            case SET_START_LINE:
+						case SET_START_LINE:
                 dest->start_line = atoi(paramStr);
                 if (!dest->start_line) {
                     return 0;
@@ -161,7 +161,7 @@ int readFont(unsigned char *buf, unsigned char qu, unsigned char wei)
         return 0;
     }
     offset = qu - 0xa1;
-    offset *= 94;
+		offset *= 94;
     offset += wei - 0xa1;
     offset *= 32;
     if (fseek(g_font, offset, SEEK_SET)) {
@@ -181,43 +181,43 @@ int processChar(unsigned short x, unsigned short y, unsigned char qu, unsigned c
     fprintf(g_output, "%d DATA %d,%d", g_lineNum, x, y);
     g_lineNum += g_lineNumStep;
     for (i = 0; i < 32; i += 2) {
-        fprintf(g_output, ",&H%x", (((unsigned short)buf[i]) << 8) | buf[i+1]);
-    }
-    fprintf(g_output, "\r\n");
-    return 1;
+				fprintf(g_output, ",&H%x", (((unsigned short)buf[i]) << 8) | buf[i+1]);
+		}
+		fprintf(g_output, "\r\n");
+		return 1;
 }
 int processCharAscii(unsigned short x, unsigned short y, unsigned char qu, unsigned char wei)
 {
-    int i, j;
-    unsigned char buf[32], value;
-    unsigned short evenRow, oddRow, mask;
-    if (!readFont(buf, qu, wei)) {
-        return 0;
-    }
-    fprintf(g_output, "%d DATA %d,%d\r\n", g_lineNum, x, y);
-    g_lineNum += g_lineNumStep;
-    for (i = 0; i < 32; i += 4) {
-        evenRow = (((unsigned short)buf[i]) << 8) | buf[i+1];
-        oddRow = (((unsigned short)buf[i+2]) << 8) | buf[i+3];
-        fprintf(g_output, "%d DATA ", g_lineNum);
-        g_lineNum += g_lineNumStep;
-        for (j = 0; j < 15; j++) {
-            mask = 1 << (15 - j);
-            if (j) {
-                fprintf(g_output, ",");
-            }
-            value = 0;
-            if (mask & evenRow) {
-                value |= 1;
-            }
-            if (mask & oddRow) {
-                value |= 2;
-            }
-            fprintf(g_output, "%d", value);
-        }
-        fprintf(g_output, "\r\n");
-    }
-    return 1;
+		int i, j;
+		unsigned char buf[32], value;
+		unsigned short evenRow, oddRow, mask;
+		if (!readFont(buf, qu, wei)) {
+				return 0;
+		}
+		fprintf(g_output, "%d DATA %d,%d\r\n", g_lineNum, x, y);
+		g_lineNum += g_lineNumStep;
+		for (i = 0; i < 32; i += 4) {
+				evenRow = (((unsigned short)buf[i]) << 8) | buf[i+1];
+				oddRow = (((unsigned short)buf[i+2]) << 8) | buf[i+3];
+				fprintf(g_output, "%d DATA ", g_lineNum);
+				g_lineNum += g_lineNumStep;
+				for (j = 0; j < 16; j++) {
+						mask = 1 << (15 - j);
+						if (j) {
+								fprintf(g_output, ",");
+						}
+						value = 0;
+						if (mask & evenRow) {
+								value |= 1;
+						}
+						if (mask & oddRow) {
+								value |= 2;
+						}
+						fprintf(g_output, "%d", value);
+				}
+				fprintf(g_output, "\r\n");
+		}
+		return 1;
 }
 int processStr(textdata_t *textdata, int asciiMode)
 {
