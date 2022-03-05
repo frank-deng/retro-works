@@ -59,16 +59,18 @@ static int processOptind(char *arg, textdata_t *target)
 		char *pTarget = NULL;
 
 		strcpy(buf, arg);
-		strtok(buf, ":");
-		text = strtok(NULL, ":");
+		text = strchr(buf, ':');
 		if (NULL == text) {
-				return 0;
+			return 0;
 		}
-		px = strtok(buf, ",");
-		py = strtok(NULL, ",");
+		*text = '\0';
+		text++;
+		py = strchr(buf, ',');
 		if (NULL == py) {
-				return 0;
+			return 0;
 		}
+		*py = '\0';
+		py++;
 		target->x = atoi(px);
 		target->y = atoi(py);
 
@@ -258,7 +260,7 @@ int main(int argc, char *argv[])
 
     g_output = stdout;
     if (opt.output_file) {
-        g_output = fopen(opt.font_file, "w");
+				g_output = fopen(opt.output_file, "w");
         if (NULL == g_output) {
             fputs("Failed to open output file.\n", stderr);
             fclose(g_font);
