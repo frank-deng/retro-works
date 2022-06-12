@@ -43,4 +43,8 @@ LWin & Delete::WinClose
 LWin::F13
 LAlt::F14
 LControl::F15
+Esc::F16
+RControl::F17
+RAlt::F18
+MButton::F19
 #If
