@@ -10,6 +10,4 @@ CO7B0,0,640,480{=0%1@88,88}
 {-12|196(5)}{¡«Ä¸Ç×½Ú¿ìÀÖ¡«}
 .ACTION
 ANYKEY:EXT$PPT.TXT
-MUSIC
-CDEFGAB
-
+
