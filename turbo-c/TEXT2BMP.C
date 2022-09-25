@@ -59,7 +59,7 @@ int checkEnv()
     regs.h.ah = 0;
     regs.h.al = 0x1;
     int86(0x79,&regs,&regs);
-    if (0 == regs.x.flags & 0x40) {
+    if (0 == (regs.x.flags & 0x40)) {
         fputs("Please run RDNFT.COM first.\n", stderr);
         return 1;
     }
@@ -142,12 +142,18 @@ void writeBMP(FILE *fp, charData_t *charData[], short charspc)
 
     // Calculate width and height
     for (pChar = charData; *pChar != NULL; pChar++) {
+        unsigned short charWidth = (*pChar)->width;
         if (imgHeight < (*pChar)->height) {
             imgHeight = (*pChar)->height;
         }
-        imgWidth += (*pChar)->width;
-        if (pChar != charData) {
-            imgWidth += charspc;
+        imgWidth += charWidth;
+        if (*(pChar + 1) == NULL) {
+            continue;
+        }
+        if (charspc < 0 && -charspc >= charWidth) {
+           imgWidth -= charWidth;
+        } else {
+           imgWidth += charspc;
         }
     }
 
@@ -160,13 +166,19 @@ void writeBMP(FILE *fp, charData_t *charData[], short charspc)
     }
     x = 0;
     for (pChar = charData; *pChar != NULL; pChar++) {
+        unsigned short charWidth = (*pChar)->width;
         for (y = 0; y < (*pChar)->height; y++) {
             drawPixels(bmpData + y * rowBytes, x,
                 (*pChar)->data + y * (*pChar)->rowSize, (*pChar)->rowSize);
         }
-        x += (*pChar)->width;
-        if (pChar != charData) {
-            x += charspc;
+        x += charWidth;
+        if (*(pChar + 1) == NULL) {
+            continue;
+        }
+        if (charspc < 0 && -charspc >= charWidth) {
+           x -= charWidth;
+        } else {
+           x += charspc;
         }
     }
 
