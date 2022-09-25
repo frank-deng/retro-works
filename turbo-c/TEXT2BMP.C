@@ -194,8 +194,7 @@ void writeBMP(FILE *fp, charData_t *charData[], short charspc)
 }
 int main(int argc, char *argv[])
 {
-    unsigned char ascfont, hzkfont;
-    unsigned short width, height;
+    unsigned short ascfont, hzkfont, width, height;
     short charspc;
     charData_t *charData[512];
     size_t charDataLen = 0;
@@ -219,7 +218,6 @@ int main(int argc, char *argv[])
         fputs("Failed to open target file.\n", stderr);
         return 4;
     }
-    printf("%s %u %u %u %u %d\n", argv[1], ascfont, hzkfont, width, height, charspc);
 
     // Get bitmap for each character
     for (p = argv[2]; *p != '\0'; p++) {
@@ -234,6 +232,11 @@ int main(int argc, char *argv[])
     }
     charData[charDataLen] = NULL;
     writeBMP(target, charData, charspc);
+
+    // Clean up
+    for (i = 0; i < charDataLen; i++) {
+        free(charData[i]);
+    }
     fclose(target);
     return 0;
 }
