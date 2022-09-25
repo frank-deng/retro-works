@@ -63,11 +63,11 @@ int parseArgs(int argc, char *argv[], unsigned char *color, char **src, char **d
     *color = 0;
 
     // Parse color setting
-    if (0 == strcmp("/color1", argv[1])) {
+    if (0 == strcmp("/COLOR1", argv[1])) {
         *color = 1;
-    } else if (0 == strcmp("/color2", argv[1])) {
+    } else if (0 == strcmp("/COLOR2", argv[1])) {
         *color = 2;
-    } else if (0 == strcmp("/color3", argv[1])) {
+    } else if (0 == strcmp("/COLOR3", argv[1])) {
         *color = 3;
     }
 
@@ -81,7 +81,7 @@ int parseArgs(int argc, char *argv[], unsigned char *color, char **src, char **d
     *dest = argv[optind + 1];
     return 0;
 Failed:
-    fputs("Usage: bmp2cga.exe BMP_FILE OUTPUT_FILE\n", stderr);
+    fputs("Usage: BMP2CGA.EXE [/COLOR1|/COLOR2|/COLOR3] BMP_FILE OUTPUT_FILE\n", stderr);
     return 1;
 }
 int main(int argc, char *argv[])
