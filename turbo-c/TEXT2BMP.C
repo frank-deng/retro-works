@@ -26,7 +26,8 @@ typedef struct {
 typedef struct {
     unsigned short magicNum;
     unsigned long size;
-    unsigned long res;
+    unsigned short res;
+    unsigned short res2;
     unsigned long dataOffset;
     unsigned long headerSize;
     long width;
@@ -41,17 +42,27 @@ typedef struct {
     unsigned long res4;
 } bmpHeader_t;
 
+#define BMP_PALETTE_SIZE (8)
+#define BMP_HEADER_SIZE (40)
+
 static uint8_t bitmapBuf[32768];
 
 int checkEnv()
 {
     union REGS regs;
+    regs.x.ax = 0xdb00;
+    int86(0x2f,&regs,&regs);
+    if (regs.x.bx != 0x5450) {
+        fputs("Please run UCDOS first.\n", stderr);
+        return 1;
+    }
     regs.h.ah = 0;
-	regs.h.al = 0x1;
-	int86(0x79,&regs,&regs);
-	if (0 == regs.x.flags & 0x40) {
-		return 1;
-	}
+    regs.h.al = 0x1;
+    int86(0x79,&regs,&regs);
+    if (0 == regs.x.flags & 0x40) {
+        fputs("Please run RDNFT.COM first.\n", stderr);
+        return 1;
+    }
     return 0;
 }
 charData_t* getCharBitmap(unsigned short ch, unsigned char fontAsc, unsigned char fontHzk,
@@ -73,7 +84,7 @@ charData_t* getCharBitmap(unsigned short ch, unsigned char fontAsc, unsigned cha
     } param;
     param.ch = ch;
     param.font = ch <= 0xff ? fontAsc : fontHzk,
-    param.width = width;
+    param.width = ch <= 0xff ? (width >> 1) : width;
     param.height = height;
     param.top = 0;
     param.bottom = height - 1;
@@ -121,36 +132,65 @@ void drawPixels(unsigned char *dest, unsigned short pos,
     }
     *pDest |= (*pSrc << (8 - bias));
 }
-void writeBMP(FILE *fp, charData_t *charData, short charspc)
+void writeBMP(FILE *fp, charData_t *charData[], short charspc)
 {
-    charData_t *pChar = NULL;
+    charData_t **pChar = NULL;
     unsigned short imgWidth = 0, imgHeight = 0, x, y;
     size_t rowBytes = 0;
     unsigned char *bmpData = NULL, *pBmp = NULL;
     bmpHeader_t header;
-    for (pChar = charData; pChar != NULL; pChar++) {
-        if (imgHeight < pChar->height) {
-            imgHeight = pChar->height;
+
+    // Calculate width and height
+    for (pChar = charData; *pChar != NULL; pChar++) {
+        if (imgHeight < (*pChar)->height) {
+            imgHeight = (*pChar)->height;
         }
-        imgWidth += width;
+        imgWidth += (*pChar)->width;
         if (pChar != charData) {
             imgWidth += charspc;
         }
     }
+
+    // Prepare bitmap data for BMP
     rowBytes = ((imgWidth + 0x1f) >> 5) << 2;
     bmpData = (unsigned char *)calloc(rowBytes, imgHeight);
-    printf("%d %d\n", imgWidth, imgHeight);
+    if (NULL == bmpData) {
+        fputs("Failed to allocate mem for BMP.\n", stderr);
+        return;
+    }
     x = 0;
-    for (pChar = charData; pChar != NULL; pChar++) {
-        for (y = 0; y < pChar->height; y++) {
+    for (pChar = charData; *pChar != NULL; pChar++) {
+        for (y = 0; y < (*pChar)->height; y++) {
             drawPixels(bmpData + y * rowBytes, x,
-                pChar->data + y * pChar->rowSize, pChar->rowSize);
+                (*pChar)->data + y * (*pChar)->rowSize, (*pChar)->rowSize);
         }
-        x += width;
+        x += (*pChar)->width;
         if (pChar != charData) {
             x += charspc;
         }
     }
+
+    // Write to bmp
+    header.magicNum = 0x4d42;
+    header.size = sizeof(bmpHeader_t) + BMP_PALETTE_SIZE +
+        (unsigned long)rowBytes * (unsigned long)imgHeight;
+    header.res = header.res2 = 0;
+    header.dataOffset = sizeof(bmpHeader_t) + BMP_PALETTE_SIZE;
+    header.headerSize = BMP_HEADER_SIZE;
+    header.width = imgWidth;
+    header.height = imgHeight;
+    header.planes = 1;
+    header.bpp = 1;
+    header.compression = 0;
+    header.imageSize = (unsigned long)rowBytes * (unsigned long)imgHeight;
+    header.xres = header.yres = 72;
+    header.res3 = header.res4 = 0;
+    fwrite(&header, sizeof(header), 1, fp);
+    fwrite("\0\0\0\0\xff\xff\xff\xff", BMP_PALETTE_SIZE, 1, fp);
+    for (y = imgHeight; y > 0; y--) {
+        fwrite(bmpData + (y - 1) * rowBytes, rowBytes, 1, fp);
+    }
+    free(bmpData);
 }
 int main(int argc, char *argv[])
 {
@@ -168,7 +208,6 @@ int main(int argc, char *argv[])
         return 1;
     }
     if (checkEnv() != 0) {
-        fputs("Please run RDNFT.COM first.\n", stderr);
         return 2;
     }
     if (5 != sscanf(argv[1], "%u,%u,%u,%u,%d", &ascfont, &hzkfont, &width, &height, &charspc)) {
@@ -180,6 +219,7 @@ int main(int argc, char *argv[])
         fputs("Failed to open target file.\n", stderr);
         return 4;
     }
+    printf("%s %u %u %u %u %d\n", argv[1], ascfont, hzkfont, width, height, charspc);
 
     // Get bitmap for each character
     for (p = argv[2]; *p != '\0'; p++) {
@@ -193,7 +233,7 @@ int main(int argc, char *argv[])
          charDataLen++;
     }
     charData[charDataLen] = NULL;
-    writeBMP(fp, charData, charspc);
+    writeBMP(target, charData, charspc);
     fclose(target);
     return 0;
 }
