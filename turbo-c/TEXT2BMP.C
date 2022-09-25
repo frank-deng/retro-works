@@ -206,7 +206,7 @@ void writeBMP(FILE *fp, charData_t *charData[], short charspc)
 }
 int main(int argc, char *argv[])
 {
-    unsigned short ascfont, hzkfont, width, height;
+    unsigned short ascfont, hzkfont, width, height, attr;
     short charspc;
     charData_t *charData[512];
     size_t charDataLen = 0;
@@ -215,32 +215,42 @@ int main(int argc, char *argv[])
     FILE *target = NULL;
 
     if (argc < 4) {
-        fputs("Usage: TEXT2BMP.EXE ascfont,hzkfont,width,height,space text bmpfile.bmp\n", stderr);
+        fputs("Usage:\nTEXT2PIC.EXE out.bmp \
+ascfont,hzkfont,w,h,space,attr text1 text2 ...\n", stderr);
         return 1;
     }
     if (checkEnv() != 0) {
         return 2;
     }
-    if (5 != sscanf(argv[1], "%u,%u,%u,%u,%d", &ascfont, &hzkfont, &width, &height, &charspc)) {
+    if (6 != sscanf(argv[2], "%u,%u,%u,%u,%d,%u",
+        &ascfont, &hzkfont, &width, &height, &charspc, &attr)) {
         fputs("Failed to specify font format.\n", stderr);
         return 3;
     }
-    target = fopen(argv[3], "wb");
+    target = fopen(argv[1], "wb");
     if (NULL == target) {
         fputs("Failed to open target file.\n", stderr);
         return 4;
     }
 
     // Get bitmap for each character
-    for (p = argv[2]; *p != '\0'; p++) {
-         unsigned short chData = *p;
-         if (chData > 0x7f) {
-             chData <<= 8;
-             p++;
-             chData |= *p;
+    for (i = 3; i < argc; i++) {
+        if (i != 3) {
+            charData[charDataLen] = getCharBitmap(' ', ascfont, hzkfont,
+                 width, height, attr);
+            charDataLen++;
+        }
+        for (p = argv[i]; *p != '\0'; p++) {
+             unsigned short chData = *p;
+             if (chData > 0x7f) {
+                 chData <<= 8;
+                 p++;
+                 chData |= *p;
+             }
+             charData[charDataLen] = getCharBitmap(chData, ascfont, hzkfont,
+                 width, height, attr);
+             charDataLen++;
          }
-         charData[charDataLen] = getCharBitmap(chData, ascfont, hzkfont, width, height, 1);
-         charDataLen++;
     }
     charData[charDataLen] = NULL;
     writeBMP(target, charData, charspc);
