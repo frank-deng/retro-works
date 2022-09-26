@@ -13,17 +13,6 @@ typedef struct {
     unsigned char *data;
 } charData_t;
 typedef struct {
-    unsigned short lineHeight;
-    unsigned short indent;
-    unsigned char ascFont;
-    unsigned char hzkFont;
-    unsigned short fontWidth;
-    unsigned short fontHeight;
-    unsigned short fontAttr;
-    short charSpace;
-    charData_t *data;
-} rowData_t;
-typedef struct {
     unsigned short magicNum;
     unsigned long size;
     unsigned short res;
