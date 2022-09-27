@@ -33,8 +33,12 @@ typedef struct {
 
 #define BMP_PALETTE_SIZE (8)
 #define BMP_HEADER_SIZE (40)
+#define HELP_TEXT "\
+Usage: TEXT2BMP.EXE [/f fontasc,fonthzk] [/s width,height] [/c charspace] [/a attr] [/i]\n\
+                    /o output.bmp text1 text2 ...\n\
+"
 
-static uint8_t bitmapBuf[32768];
+static unsigned char bitmapBuf[32768];
 
 int checkEnv()
 {
@@ -121,14 +125,20 @@ void drawPixels(unsigned char *dest, unsigned short pos,
     }
     *pDest |= (*pSrc << (8 - bias));
 }
-void writeBMP(FILE *fp, charData_t *charData[], short charspc)
+void inverseLine(unsigned char *buf, size_t len)
+{
+    size_t count = (len >> 1), i;
+    for (i = 0; i < count; i++) {
+        ((uint16_t*)buf)[i] = ~(((uint16_t*)buf)[i]);
+    }
+    if (len & 1) {
+        buf[len - 1] = ~(buf[len - 1]);
+    }
+}
+void getImageSize(charData_t *charData[], short charspc, unsigned short *width, unsigned short *height)
 {
     charData_t **pChar = NULL;
     unsigned short imgWidth = 0, imgHeight = 0, x, y;
-    size_t rowBytes = 0;
-    unsigned char *bmpData = NULL, *pBmp = NULL;
-    bmpHeader_t header;
-
     // Calculate width and height
     for (pChar = charData; *pChar != NULL; pChar++) {
         unsigned short charWidth = (*pChar)->width;
@@ -145,33 +155,19 @@ void writeBMP(FILE *fp, charData_t *charData[], short charspc)
            imgWidth += charspc;
         }
     }
-
-    // Prepare bitmap data for BMP
-    rowBytes = ((imgWidth + 0x1f) >> 5) << 2;
-    bmpData = (unsigned char *)calloc(rowBytes, imgHeight);
-    if (NULL == bmpData) {
-        fputs("Failed to allocate mem for BMP.\n", stderr);
-        return;
-    }
-    x = 0;
-    for (pChar = charData; *pChar != NULL; pChar++) {
-        unsigned short charWidth = (*pChar)->width;
-        for (y = 0; y < (*pChar)->height; y++) {
-            drawPixels(bmpData + y * rowBytes, x,
-                (*pChar)->data + y * (*pChar)->rowSize, (*pChar)->rowSize);
-        }
-        x += charWidth;
-        if (*(pChar + 1) == NULL) {
-            continue;
-        }
-        if (charspc < 0 && -charspc >= charWidth) {
-           x -= charWidth;
-        } else {
-           x += charspc;
-        }
-    }
+    *width = imgWidth;
+    *height = imgHeight;
+}
+void writeBMP(FILE *fp, charData_t *charData[], short charspc, unsigned short color)
+{
+    charData_t **pChar = NULL;
+    unsigned short imgWidth = 0, imgHeight = 0, x, y;
+    size_t rowBytes = 0;
+    bmpHeader_t header;
+    getImageSize(charData, charspc, &imgWidth, &imgHeight);
 
     // Write to bmp
+    rowBytes = ((imgWidth + 0x1f) >> 5) << 2;
     header.magicNum = 0x4d42;
     header.size = sizeof(bmpHeader_t) + BMP_PALETTE_SIZE +
         (unsigned long)rowBytes * (unsigned long)imgHeight;
@@ -189,60 +185,170 @@ void writeBMP(FILE *fp, charData_t *charData[], short charspc)
     fwrite(&header, sizeof(header), 1, fp);
     fwrite("\0\0\0\0\xff\xff\xff\xff", BMP_PALETTE_SIZE, 1, fp);
     for (y = imgHeight; y > 0; y--) {
-        fwrite(bmpData + (y - 1) * rowBytes, rowBytes, 1, fp);
+        memset(bitmapBuf, 0, rowBytes);
+        x = 0;
+        for (pChar = charData; *pChar != NULL; pChar++) {
+            unsigned short charWidth = (*pChar)->width, charHeight = (*pChar)->height;
+            if ((y - 1) < charHeight) {
+                drawPixels(bitmapBuf, x, (*pChar)->data + (y - 1) * (*pChar)->rowSize, (*pChar)->rowSize);
+            }
+            x += charWidth;
+            if (*(pChar + 1) == NULL) {
+                continue;
+            }
+            if (charspc < 0 && -charspc >= charWidth) {
+               x -= charWidth;
+            } else {
+               x += charspc;
+		    }
+		}
+        if (color & 1) {
+            inverseLine(bitmapBuf, rowBytes);
+        }
+        fwrite(bitmapBuf, rowBytes, 1, fp);
     }
-    free(bmpData);
+}
+
+typedef enum {
+    DEFAULT,
+    DISPLAY_HELP,
+    SET_FONT,
+    SET_SIZE,
+    SET_SPACE,
+    SET_ATTR,
+    SET_INVERSE,
+    SET_OUTPUT_FILE
+} getopt_action_t;
+typedef struct {
+    const char *arg;
+    const char *arg2;
+    unsigned char param;
+    getopt_action_t action;
+} getopt_table_t;
+typedef struct {
+    char *outFile;
+    unsigned short ascfont;
+    unsigned short hzkfont;
+    unsigned short width;
+    unsigned short height;
+    unsigned short attr;
+    unsigned short space;
+    unsigned short color;
+} getopt_t;
+static getopt_table_t g_getoptTable[] = {
+    { "/o", "/O", 1,  SET_OUTPUT_FILE },
+    { "/f", "/F", 1,  SET_FONT },
+    { "/s", "/S", 1,  SET_SIZE },
+    { "/c", "/C", 1,  SET_SPACE },
+    { "/a", "/A", 1,  SET_ATTR },
+    { "/i", "/I", 1,  SET_INVERSE },
+    { "/h", "/H", 0,  DISPLAY_HELP },
+    { NULL, NULL, 0, DEFAULT}
+};
+int processArgs(int argc, char *argv[], getopt_t *opts, int *optind)
+{
+    getopt_table_t *item = NULL;
+    char *paramStr = NULL;
+    int i, j;
+    opts->outFile = NULL;
+    opts->ascfont = opts->hzkfont = 0;
+    opts->width = opts->height = 16;
+    opts->attr = 1;
+    opts->space = 0;
+    opts->color = 0;
+    for (i = 1; i < argc; i++) {
+        for (item = g_getoptTable; item->arg != NULL; item++) {
+            if (!strcmp(argv[i], item->arg) || !strcmp(argv[i], item->arg2)) {
+                break;
+            }
+        }
+        if (NULL == item->arg) {
+            break;
+        }
+        paramStr = NULL;
+        if (item->param) {
+            if (i + 1 >= argc) {
+                return 0;
+            }
+            i++;
+            paramStr = argv[i];
+        }
+        switch (item->action) {
+            case DISPLAY_HELP:
+                return 0;
+            break;
+            case SET_INVERSE:
+                opts->color = 1;
+            break;
+            case SET_OUTPUT_FILE:
+                opts->outFile = paramStr;
+            break;
+            case SET_FONT:
+                puts(paramStr);
+                sscanf(paramStr, "%u,%u", &(opts->ascfont), &(opts->ascfont));
+            break;
+            case SET_SIZE:
+                puts(paramStr);
+                sscanf(paramStr, "%u,%u", &(opts->width), &(opts->height));
+            break;
+            case SET_SPACE:
+                opts->space = atoi(paramStr);
+            break;
+            case SET_ATTR:
+                opts->attr = atoi(paramStr);
+            break;
+        }
+    }
+    if (i >= argc || NULL == opts->outFile) {
+        return 0;
+    }
+    *optind = i;
+    return 1;
 }
 int main(int argc, char *argv[])
 {
-    unsigned short ascfont, hzkfont, width, height, attr;
-    short charspc;
+    getopt_t opts;
+    int optind = 1;
     charData_t *charData[512];
     size_t charDataLen = 0;
     int i;
     char *p;
     FILE *target = NULL;
 
-    if (argc < 4) {
-        fputs("Usage:\nTEXT2PIC.EXE out.bmp \
-ascfont,hzkfont,w,h,space,attr text1 text2 ...\n", stderr);
+    if (!processArgs(argc, argv, &opts, &optind)) {
+        fputs(HELP_TEXT, stderr);
         return 1;
     }
     if (checkEnv() != 0) {
         return 2;
     }
-    if (6 != sscanf(argv[2], "%u,%u,%u,%u,%d,%u",
-        &ascfont, &hzkfont, &width, &height, &charspc, &attr)) {
-        fputs("Failed to specify font format.\n", stderr);
-        return 3;
-    }
-    target = fopen(argv[1], "wb");
+    target = fopen(opts.outFile, "wb");
     if (NULL == target) {
         fputs("Failed to open target file.\n", stderr);
-        return 4;
+        return 3;
     }
 
     // Get bitmap for each character
-    for (i = 3; i < argc; i++) {
-        if (i != 3) {
-            charData[charDataLen] = getCharBitmap(' ', ascfont, hzkfont,
-                 width, height, attr);
+    for (i = optind; i < argc; i++) {
+        if (i != optind) {
+            charData[charDataLen] = getCharBitmap(' ', opts.ascfont, opts.hzkfont,
+                 opts.width, opts.height, opts.attr);
             charDataLen++;
         }
         for (p = argv[i]; *p != '\0'; p++) {
              unsigned short chData = *p;
-             if (chData > 0x7f) {
+             if (chData > 0x7f && *(p + 1) != '\0') {
                  chData <<= 8;
                  p++;
                  chData |= *p;
              }
-             charData[charDataLen] = getCharBitmap(chData, ascfont, hzkfont,
-                 width, height, attr);
+             charData[charDataLen] = getCharBitmap(chData, opts.ascfont, opts.hzkfont,
+                 opts.width, opts.height, opts.attr);
              charDataLen++;
          }
     }
     charData[charDataLen] = NULL;
-    writeBMP(target, charData, charspc);
+    writeBMP(target, charData, opts.space, opts.color);
 
     // Clean up
     for (i = 0; i < charDataLen; i++) {
