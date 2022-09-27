@@ -34,8 +34,8 @@ typedef struct {
 #define BMP_PALETTE_SIZE (8)
 #define BMP_HEADER_SIZE (40)
 #define HELP_TEXT "\
-Usage: TEXT2BMP.EXE [/f fontasc,fonthzk] [/s width,height] [/c charspace] [/a attr] [/i]\n\
-                    /o output.bmp text1 text2 ...\n\
+Usage: TEXT2BMP.EXE [/f fontasc,fonthzk] [/s width,height] [/c charspace]\n\
+                    [/a attr] [/i] /o output.bmp text1 text2 ...\n\
 "
 
 static unsigned char bitmapBuf[32768];
@@ -241,7 +241,7 @@ static getopt_table_t g_getoptTable[] = {
     { "/s", "/S", 1,  SET_SIZE },
     { "/c", "/C", 1,  SET_SPACE },
     { "/a", "/A", 1,  SET_ATTR },
-    { "/i", "/I", 1,  SET_INVERSE },
+    { "/i", "/I", 0,  SET_INVERSE },
     { "/h", "/H", 0,  DISPLAY_HELP },
     { NULL, NULL, 0, DEFAULT}
 };
@@ -284,11 +284,9 @@ int processArgs(int argc, char *argv[], getopt_t *opts, int *optind)
                 opts->outFile = paramStr;
             break;
             case SET_FONT:
-                puts(paramStr);
-                sscanf(paramStr, "%u,%u", &(opts->ascfont), &(opts->ascfont));
+                sscanf(paramStr, "%u,%u", &(opts->ascfont), &(opts->hzkfont));
             break;
             case SET_SIZE:
-                puts(paramStr);
                 sscanf(paramStr, "%u,%u", &(opts->width), &(opts->height));
             break;
             case SET_SPACE:
