@@ -1,4 +1,4 @@
-let csvParse=require('csv-parse/lib/sync');
+let csvParse=require('csv-parse/sync').parse;
 module.exports={
   parseFile(content){
     let lines=content.split('\n');
