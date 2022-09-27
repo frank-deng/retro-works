@@ -54,34 +54,44 @@ void processLine(char *buf, size_t size, unsigned char color)
         ((unsigned short *)buf)[i - 1] = val;
     }
 }
+typedef struct {
+    char *arg;
+    unsigned char value;
+} argMatch_t;
+static argMatch_t g_argMatch[] = {
+    { "/COLOR1", 1 },
+    { "/color1", 1 },
+    { "/COLOR2", 2 },
+    { "/color2", 2 },
+    { "/COLOR3", 3 },
+    { "/color3", 3 },
+    { NULL, 0 },
+};
 int parseArgs(int argc, char *argv[], unsigned char *color, char **src, char **dest)
 {
     int optind = 1;
+    argMatch_t *match = NULL;
     if (argc < 2) {
-        goto Failed;
+        return 0;
     }
     *color = 0;
 
     // Parse color setting
-    if (0 == strcmp("/COLOR1", argv[1])) {
-        *color = 1;
-    } else if (0 == strcmp("/COLOR2", argv[1])) {
-        *color = 2;
-    } else if (0 == strcmp("/COLOR3", argv[1])) {
-        *color = 3;
+    for (match = g_argMatch; match->arg != NULL; match++) {
+        if (0 == strcmp(match->arg, argv[1])) {
+            *color = match->value;
+            break;
+        }
     }
 
     if (*color != 0) {
         optind = 2;
     }
     if (optind + 1 >= argc) {
-        goto Failed;
+        return 0;
     }
     *src = argv[optind];
     *dest = argv[optind + 1];
-    return 0;
-Failed:
-    fputs("Usage: BMP2CGA.EXE [/COLOR1|/COLOR2|/COLOR3] BMP_FILE OUTPUT_FILE\n", stderr);
     return 1;
 }
 int main(int argc, char *argv[])
@@ -96,7 +106,8 @@ int main(int argc, char *argv[])
     unsigned short y, u16val;
     unsigned short rowBytesBmp, rowBytesSrc, rowBytesTarget;
 
-    if (parseArgs(argc, argv, &color, &srcPath, &destPath)) {
+    if (!parseArgs(argc, argv, &color, &srcPath, &destPath)) {
+        fputs("Usage: BMP2CGA.EXE [/COLOR1|/COLOR2|/COLOR3] BMP_FILE OUTPUT_FILE\n", stderr);
         return 1;
     }
     initMapColor();
