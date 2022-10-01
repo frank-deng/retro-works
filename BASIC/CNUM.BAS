@@ -1,62 +1,21 @@
-DECLARE FUNCTION CNUM1E8% (S$)
-DECLARE FUNCTION CNUM10000% (S$)
-DECLARE FUNCTION CNUM1000% (S$)
-DEFINT A-Z: DIM SHARED N$(15): FOR I = 0 TO 14: READ N$(I): NEXT I
-DATA "Áã","Ò¼","·¡","Èþ","ËÁ","Îé","Â½","Æâ","°Æ","¾Á","Ê°","°Û","Çª","Íò","ÒÚ"
-INPUT "Input Number: ", IN$
-IF LEN(IN$) > 16 THEN PRINT "Input too long.": END
-R = CNUM1E8%(IN$)
-PRINT ""
-END
-
-FUNCTION CNUM1000 (S$)
-    IF VAL(S$) = 0 THEN
-        CNUM1000 = 0
-        EXIT FUNCTION
-    END IF
-    OUTZERO = 0
-    L = LEN(S$)
-    FOR I = L TO 1 STEP -1
-        DIGIT = VAL(MID$(S$, L + 1 - I, 1))
-        IF DIGIT <> 0 THEN
-            IF OUTZERO <> 0 THEN PRINT N$(0); : OUTZERO = 0
-            PRINT N$(DIGIT);
-            SELECT CASE I
-                CASE 2
-                    PRINT N$(10);
-                CASE 3
-                    PRINT N$(11);
-                CASE 4
-                    PRINT N$(12);
-            END SELECT
-        ELSE
-           OUTZERO = 1
-        END IF
-    NEXT I
-    CNUM1000% = 1
-END FUNCTION
-
-FUNCTION CNUM10000% (S$)
-    L = LEN(S$)
-    IF L <= 4 THEN
-        CNUM10000% = CNUM1000%(S$)
-        EXIT FUNCTION
-    END IF
-    A1 = CNUM1000%(MID$(S$, 1, L - 4))
-    IF A1 <> 0 THEN PRINT N$(13);
-    A2 = CNUM1000%(MID$(S$, L - 4 + 1, 4))
-    CNUM10000% = A1 OR A2
-END FUNCTION
-
-FUNCTION CNUM1E8% (S$)
-    L = LEN(S$)
-    IF L <= 8 THEN
-        CNUM1E8% = CNUM10000%(S$)
-        EXIT FUNCTION
-    END IF
-    A1 = CNUM10000%(MID$(S$, 1, L - 8))
-    IF A1 <> 0 THEN PRINT N$(14);
-    A2 = CNUM10000%(MID$(S$, L - 8 + 1, 8))
-    CNUM1E8% = A1 OR A2
-END FUNCTION
-
+10 DEFINT A-Z: DIM N$(15): FOR I = 0 TO 14: READ N$(I): NEXT I: R1=0: R2=0
+20 DATA "Áã","Ò¼","·¡","Èþ","ËÁ","Îé","Â½","Æâ","°Æ","¾Á","Ê°","°Û","Çª","Íò","ÒÚ"
+30 INPUT "Input Number: ",IN$: L=LEN(IN$)
+40 IF IN$="" THEN GOTO 30 ELSE IF L > 16 THEN PRINT "Input too long.": END
+50 IF L < 8 THEN S1$=IN$: GOSUB 200: END
+60 S1$=MID$(IN$,1,L-8): GOSUB 200: IF R1<>0 THEN PRINT N$(14);
+70 S1$=MID$(IN$,L-8+1,8): GOSUB 200
+80 END
+100 IF VAL(S2$)=0 THEN R2=0: RETURN
+110 R2=1: OZ=0: L2=LEN(S2$): FOR I=L2 TO 1 STEP -1
+120 D=VAL(MID$(S2$, L2+1-I, 1))
+130 IF D=0 THEN OZ=1: GOTO 170
+140 IF OZ<>0 THEN PRINT N$(0);: OZ=0
+150 PRINT N$(D);
+160 IF I=2 THEN PRINT N$(10); ELSE IF I=3 THEN PRINT N$(11); ELSE IF I=4 THEN PRINT N$(12);
+170 NEXT I: RETURN
+200 L1=LEN(S1$): IF L1<=4 THEN S2$=S1$: GOSUB 100: R1=R2: RETURN
+210 R1=0: S2$=MID$(S1$,1,L1-4): GOSUB 100: R1=R2
+220 IF R2<>0 THEN PRINT N$(13);
+230 S2$=MID$(S1$,L1-4+1,4): GOSUB 100: R1=R1 OR R2
+240 RETURN

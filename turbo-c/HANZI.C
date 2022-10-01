@@ -34,7 +34,7 @@ typedef struct {
 
 #define HELP_TEXT "\
 Usage: hanzi.exe [/a] [/f|/font FONT_FILE] [/o|/out OUTPUT_FILE]\n\
-                 [/l|/line START_LINE_NUM] text1 text2 ...\n\
+                 [/l|/line START_LINE_NUM] x1,y1:text1 x2,y2:text2 ...\n\
 "
 
 static getopt_table_t g_getoptTable[] = {
