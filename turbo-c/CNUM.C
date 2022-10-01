@@ -14,8 +14,8 @@ char *numConv[]={"Áã","Ò¼","·¡","Èþ","ËÁ","Îé","Â½","Æâ","°Æ","¾Á"};
 
 bool conv1000(char* src, int8_t len){
 	char *p=src; int8_t digit, i; bool allZero=1, outZero=0;
-	for(i=len, p=src; i>0 && '\0'!=*p; i--,p++){
-		if(*p>='0' && *p<='9'){
+	for(p=src, i=0; '\0'!=*p && i<len; p++,i++){
+		if(*p>'0' && *p<='9'){
 			allZero=0;
 			break;
 		}
