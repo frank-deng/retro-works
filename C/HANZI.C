@@ -20,7 +20,7 @@ typedef struct {
     unsigned short x;
     unsigned short y;
     unsigned short length;
-    unsigned char data[256];
+    unsigned char data[64];
 } textdata_t;
 typedef struct {
     char *font_file;
@@ -29,7 +29,7 @@ typedef struct {
     unsigned short start_line;
     unsigned short line_step;
     unsigned short text_data_count;
-    textdata_t text_data[64];
+    textdata_t text_data[32];
 } getopt_t;
 
 #define HELP_TEXT "\
@@ -76,7 +76,7 @@ static int processOptind(char *arg, textdata_t *target)
     *pTarget = '\0';
     return 1;
 }
-static int getopt(getopt_t *dest, int argc, char *argv[])
+static int processArgs(getopt_t *dest, int argc, char *argv[])
 {
     getopt_table_t *item = NULL;
     char *paramStr = NULL;
@@ -163,7 +163,11 @@ int processChar(unsigned short x, unsigned short y, unsigned char qu, unsigned c
     fprintf(g_output, "%d DATA %d,%d", g_lineNum, x, y);
     g_lineNum += g_lineNumStep;
     for (i = 0; i < 32; i += 2) {
-        fprintf(g_output, ",&H%x", (((unsigned short)buf[i]) << 8) | buf[i+1]);
+        if (buf[i] || buf[i+1]) {
+            fprintf(g_output, ",&H%x", (((unsigned short)buf[i]) << 8) | buf[i+1]);
+        } else {
+            fprintf(g_output, ",0");
+        }
     }
     fprintf(g_output, "\r\n");
     return 1;
@@ -219,11 +223,11 @@ int processStr(textdata_t *textdata, int asciiMode)
 }
 int main(int argc, char *argv[])
 {
-    getopt_t opt;
+    static getopt_t opt;
     short charCount = 0;
     int i;
 
-    if (!getopt(&opt, argc, argv)) {
+    if (!processArgs(&opt, argc, argv)) {
         fputs(HELP_TEXT, stderr);
         return 1;
     }
