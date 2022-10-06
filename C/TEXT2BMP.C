@@ -42,16 +42,16 @@ static unsigned char bitmapBuf[32768];
 
 int checkEnv()
 {
-    union REGS regs;
+    union REGPACK regs;
     regs.x.ax = 0xdb00;
-    int86(0x2f,&regs,&regs);
+    intr(0x2f,&regs);
     if (regs.x.bx != 0x5450) {
         fputs("Please run UCDOS first.\n", stderr);
         return 1;
     }
     regs.h.ah = 0;
     regs.h.al = 0x1;
-    int86(0x79,&regs,&regs);
+    intr(0x79,&regs);
     if (0 == (regs.x.flags & 0x40)) {
         fputs("Please run RDNFT.COM first.\n", stderr);
         return 1;
