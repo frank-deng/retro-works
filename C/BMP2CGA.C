@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_IMAGE_WIDTH (640)
 #define MAX_IMAGE_WIDTH_COLOR (320)
