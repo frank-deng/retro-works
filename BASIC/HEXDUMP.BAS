@@ -1,0 +1,9 @@
+10 DEFINT A-Z: INPUT "Input file: ",FI$: INPUT "Output file: ",FO$
+20 OPEN "R",#1,FI$,1: FIELD #1,1 AS C$
+30 OPEN FO$ FOR OUTPUT AS #2
+40 N=0: WHILE NOT EOF(1): GET #1
+50 IF N>0 THEN PRINT#2,",";
+60 PRINT#2,"&H";HEX$(ASC(C$));: N=N+1
+70 WEND
+80 CLOSE: PRINT "Total length:";N
+90 END

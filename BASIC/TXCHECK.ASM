@@ -1,4 +1,4 @@
-;-a
+-a
 org 100h
 push ax
 push bx
@@ -29,3 +29,12 @@ org 11f
 jnz 126
 ^c
 -d 100
+-n txcheck.bin
+-rcx
+2a
+-w
+
+-a
+org 100h
+push ax
+push bx
