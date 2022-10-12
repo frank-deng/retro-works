@@ -1,3 +1,6 @@
+以下汇编代码可直接用debug程序的汇编功能汇编到org 100h，然后保存成二进制文件并用HEXDUMP.BAS转换成QBasic可使用的DATA数据。
+
+检查特显程序是否运行：
 -a
 org 100h
 push ax
@@ -9,19 +12,18 @@ mov word ptr [si],0
 mov ax,db00
 int 2fh
 cmp al,ff
-jnz 100 ;(后面再改)
+jnz 100
 cmp bx,5450
-jnz 100 ;(后面再改)
+jnz 100
 mov ax,11
 int 79h
-jnz 100 ;(后面再改)
+jnz 100
 cs:
 mov word ptr [si],1
-pop si ;(jnz 100对应的地址改为此处地址)
+pop si
 pop bx
 pop ax
 retf
-
 org 112
 jnz 126
 org 118
@@ -34,6 +36,7 @@ jnz 126
 2a
 -w
 
+检查打印字库模块是否安装：
 -a
 org 100h
 push ax
@@ -45,12 +48,12 @@ mov word ptr [si],0
 mov ax,db00
 int 2fh
 cmp al,ff
-jnz 100 ;(后面再改)
+jnz 100
 cmp bx,5450
-jnz 100 ;(后面再改)
+jnz 100
 mov ax,1
 int 79h
-jnz 100 ;(后面再改)
+jnz 100
 mov ax,ff0b
 int 16h
 cs:
@@ -71,6 +74,7 @@ jnz 12b
 2f
 -w
 
+获取打印字库点阵：
 -a
 org 100h
 push ds
