@@ -28,7 +28,7 @@ org 118
 jnz 126
 org 11f
 jnz 126
-^c
+
 -n txcheck.bin
 -rcx
 2a
@@ -59,14 +59,13 @@ pop si
 pop bx
 pop ax
 retf
-
 org 112
 jnz 12b
 org 118
 jnz 12b
 org 11f
 jnz 12b
-^C
+
 -n chk.bin
 -rcx
 2f
@@ -94,9 +93,8 @@ pop si
 pop es
 pop ds
 retf
-^C
+
 -n hz.bin
 -rcx
 1f
 -w
-
