@@ -35,10 +35,10 @@ TYPE BMPHeaderT
 END TYPE
 
 CALL InitEnv
-LOCATE 1, 1, 0: SCREEN 1: CLS
+LOCATE 1, 1, 0: SCREEN 2: CLS
 
-CALL DrawStr("∑„«≈“π≤¥",4,0,3,24,24,4,3)
-CALL DrawStr("’≈ºÃ",40,28,0,12,12,12,3)
+CALL DrawStr("∑„«≈“π≤¥",8,0,3,24,24,8,3)
+CALL DrawStr("’≈ºÃ",80,28,0,12,12,24,3)
 CALL DrawStr("‘¬¬‰Œ⁄Ã‰À™¬˙ÃÏ£¨",0,55,0,16,16,0,3)
 CALL DrawStr("Ω≠∑„”Êª∂‘≥Ó√ﬂ°£",0,78,0,16,16,0,3)
 CALL DrawStr("π√À’≥«Õ‚∫Æ…ΩÀ¬£¨",0,101,0,16,16,0,3)
@@ -80,7 +80,7 @@ SUB DrawStr(STR AS STRING, X1 AS INTEGER, Y1 AS INTEGER, FONT AS INTEGER, W0 AS 
             I=I+1: CH$=CH$+MID$(STR,I+1,1)
         END IF
         WA=W0: CALL DrawChar(CH$,XA,Y1,FONT,WA,H,C)
-        XA=XA+WA+SP0: I=I+1
+        XA=XA+WA*2+SP0: I=I+1
     WEND
 END SUB
 
@@ -112,7 +112,7 @@ SUB DrawChar(STR AS STRING, X0 AS INTEGER, Y0 AS INTEGER, FONT AS INTEGER, W AS 
     W=Param.W
     DEF SEG=VARSEG(BITMAP(0)): ROWBYTES=(W+7)\8: PX=VARPTR(BITMAP(0)): P=PEEK(PX)
     FOR Y=0 TO (H-1): FOR X=0 TO (W-1)
-        IF P AND BITMASK(X AND 7) THEN PSET (X0+X,Y0+Y),C
+        IF P AND BITMASK(X AND 7) THEN PSET (X0+X*2,Y0+Y),C: PSET (X0+X*2+1,Y0+Y),C
         IF (X AND 7)=7 OR X=(W-1) THEN PX=PX+1: P=PEEK(PX)
     NEXT X: NEXT Y: DEF SEG
 END SUB
