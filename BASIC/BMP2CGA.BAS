@@ -1,4 +1,14 @@
+'BSAVE File Format
+'
+'Bytes Description
+'1     ID Flag, always 0xfd
+'2     Segment address, little endian, cab be ignored by BLOAD
+'2     Offset address, little endian, cab be ignored by BLOAD
+'2     Data length, little endian
+'n     Data, n=Data length
+'1     Tailer flag, always 0x1a
 DEFINT A-Z
+
 TYPE BMPHeaderT
     id AS STRING * 2
     size AS LONG
