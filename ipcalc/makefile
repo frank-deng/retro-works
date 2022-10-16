@@ -1,8 +1,8 @@
 TARGET=ipcalc.com test.com
 OBJS=ipv4.obj
-HEADERS=ipv4.h
+HEADERS=ipv4.h util.h
 CFLAGS=-ms -0 -q -d0 -os
-LDFLAGS=-mt -0 -q -d0 -os
+LDFLAGS=-mt -0 -q -d0 -os -zl -zld -lr
 
 .NOCHECK
 compilework: $(TARGET)

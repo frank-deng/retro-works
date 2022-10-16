@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdlib.h>
 #include "ipv4.h"
 
@@ -159,7 +158,7 @@ char *ipv4_ntop(uint32_t input, char *buf)
             *p = '.';
             p++;
         }
-        utoa(((input >> (8 * (3 - i))) & 0xff), p, 10);
+        u8tostr(((input >> (8 * (3 - i))) & 0xff), p);
         while (*p != '\0') {
             p++;
         }
