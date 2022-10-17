@@ -19,5 +19,5 @@ char *ipv6_ntop(ipv6addr_t, char *);
 }
 #endif
 
-
 #endif
+

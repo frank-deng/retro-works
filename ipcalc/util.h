@@ -3,92 +3,10 @@
 
 #include <stdint.h>
 
-typedef struct {
-    uint16_t d[8];
-} uint128_t;
-
-inline void u128and(uint128_t *a, uint128_t *b)
-{
-    uint8_t i;
-    for (i = 0; i < 8; i++) {
-        a->d[i] &= b->d[i];
-    }
-}
-inline void u128or(uint128_t *a, uint128_t *b)
-{
-    uint8_t i;
-    for (i = 0; i < 8; i++) {
-        a->d[i] |= b->d[i];
-    }
-}
-inline void u128not(uint128_t *a)
-{
-    uint8_t i;
-    for (i = 0; i < 8; i++) {
-        a->d[i] = ~(a->d[i]);
-    }
-}
-inline void u128xor(uint128_t *a, uint128_t *b)
-{
-    uint8_t i;
-    for (i = 0; i < 8; i++) {
-        a->d[i] ^= b->d[i];
-    }
-}
-inline void u128add(uint128_t *a, uint128_t *b)
-{
-    uint8_t i;
-    uint32_t tmp, inc = 0;
-    for (i = 0; i < 8; i++) {
-        tmp = a->d[i];
-        tmp += b->d[i];
-        tmp += inc;
-        a->d[i] = tmp & 0xffff;
-        inc = tmp >> 16;
-    }
-}
-inline void u128sub(uint128_t *a, uint128_t *b)
-{
-    uint8_t i;
-    int32_t tmp, dec = 0;
-    for (i = 0; i < 8; i++) {
-        tmp = a->d[i];
-        tmp -= b->d[i];
-        tmp += dec;
-        a->d[i] = tmp & 0xffff;
-        dec = tmp >> 16;
-    }
-}
-inline uint16_t u128shr(uint128_t *v, uint8_t n)
-{
-    uint8_t i;
-    uint16_t res = 1;
-    n &= 0xf;
-    res <<= n;
-    res -= 1;
-    res &= v->d[0];
-    for (i = 0; i < 7; i++) {
-        v->d[i] >>= n;
-        v->d[i] |= (v->d[i+1]) << (15-n);
-    }
-    v->d[i] >>= n;
-    return res;
-}
-inline uint16_t u128mulu8(uint128_t *v, uint8_t n)
-{
-    uint8_t i;
-    uint128_t tmp;
-    for (i = 0; i < 7; i++) {
-        tmp.d[i] = 0;
-    }
-    return 0;
-}
-inline char *u128tostr(uint128_t *v, char *buf)
-{
-    return buf;
-}
-
 #define isdigit(c) ((c)>='0' && (c)<='9')
+#define ishexdigit(c) (((c)>='0' && (c)<='9') || ((c)>='A' && (c)<='F') || ((c)>='a' && (c)<='f'))
+#define num2hexu(n) ((n)>9 ? ((n)-10+'A') : ((n)+'0'))
+#define num2hexl(n) ((n)>9 ? ((n)-10+'a') : ((n)+'0'))
 
 inline char *utostr(uint32_t v, char *buf)
 {
@@ -107,6 +25,18 @@ inline char *utostr(uint32_t v, char *buf)
             *p = *t;
             p++;
         }
+    }
+    *p = '\0';
+    return buf;
+}
+inline char *u16tohex(uint16_t v, char *buf, bool upper)
+{
+    uint8_t i, d;
+    char *p = buf;
+    for (i = 0; i < 4; i++) {
+        d = (v >> ((3 - i) << 2)) & 0xf;
+        *p = (upper ? num2hexh(d) : num2hexl(d));
+        p++;
     }
     *p = '\0';
     return buf;
