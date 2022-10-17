@@ -48,17 +48,17 @@ int main(int argc, char *argv[])
     print("Wildcard: ");
     print(ipv4_ntop(wildcard, strbuf));
     print(" = ");
-    print(u8tostr(32 - data.netmask, strbuf));
+    print(utostr(32 - data.netmask, strbuf));
     print("\r\n");
 
     print("Netmask: ");
     print(ipv4_ntop(~wildcard, strbuf));
     print(" = ");
-    print(u8tostr(data.netmask, strbuf));
+    print(utostr(data.netmask, strbuf));
     print("\r\n");
 
     print("Available hosts: ");
-    print(u32tostr(wildcard < 1 ? 0 : wildcard - 1, strbuf));
+    print(utostr(wildcard < 1 ? 0 : wildcard - 1, strbuf));
     print("\r\n");
 
     print("Network IP: ");
@@ -70,9 +70,9 @@ int main(int argc, char *argv[])
     print("\r\n");
 
     if (data.netmask <= 30) {
-        print("First IP: ");
+        print("IP Range: ");
         print(ipv4_ntop((data.ipaddr & (~wildcard)) + 1, strbuf));
-        print("\r\nLast IP: ");
+        print(" - ");
         print(ipv4_ntop((data.ipaddr | wildcard) - 1, strbuf));
         print("\r\n");
     }

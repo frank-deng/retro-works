@@ -2,7 +2,7 @@
 #define ipv6_h_
 
 #include <stdbool.h>
-#include <stdint.h>
+#include "util.h"
 
 typedef struct {
     uint16_t d[8];
@@ -12,9 +12,8 @@ typedef struct {
 extern "C" {
 #endif
 
-bool ipv4_pton(const char *, uint32_t *);
-int8_t ipv4_ptonm(char *);
-char *ipv4_ntop(uint32_t, char *);
+bool ipv6_pton(const char *, ipv6addr_t *);
+char *ipv6_ntop(ipv6addr_t, char *);
 
 #ifdef __cplusplus
 }

@@ -158,7 +158,7 @@ char *ipv4_ntop(uint32_t input, char *buf)
             *p = '.';
             p++;
         }
-        u8tostr(((input >> (8 * (3 - i))) & 0xff), p);
+        utostr(((input >> (8 * (3 - i))) & 0xff), p);
         while (*p != '\0') {
             p++;
         }
