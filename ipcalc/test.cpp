@@ -1,9 +1,11 @@
 #include "test.hpp"
 #include "ipv4.h"
+#include "ipv6.h"
 
 void Test::run(){
     uint32_t ipv4AddrBin = 0;
-    char ipbuf[16];
+    ipv6addr_t addr6={0,0,0,0,0,0,0,0}, addr6a={0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff};
+    char ipbuf[46];
     puts("IP conversion:");
     EXP_TRUE(ipv4_pton("192.168.1.1", &ipv4AddrBin));
     EXP_EQ(0xc0a80101, ipv4AddrBin);
@@ -62,6 +64,24 @@ void Test::run(){
     EXP_STREQ("0.0.0.1", ipv4_ntop(0x1, ipbuf));
     EXP_STREQ("255.255.255.255", ipv4_ntop(0xffffffff, ipbuf));
     EXP_STREQ("255.255.0.0", ipv4_ntop(0xffff0000, ipbuf));
+
+    puts("IPv6 conversion");
+    EXP_STREQ("0000:0000:0000:0000:0000:0000:0000:0000", ipv6_ntop(&addr6, ipbuf, IPV6_FORMAT_FULL));
+    EXP_TRUE(ipv6_pton(ipbuf, &addr6a));
+    EXP_MEMEQ(sizeof(addr6), &addr6, &addr6a);
+
+    memset(&addr6, 0xff, sizeof(addr6));
+    EXP_TRUE(ipv6_pton("2001:DB8:85a3::8a2e:370:7334", &addr6));
+    addr6a.d[0] = 0x2001;
+    addr6a.d[1] = 0xdb8;
+    addr6a.d[2] = 0x85a3;
+    addr6a.d[3] = 0;
+    addr6a.d[4] = 0;
+    addr6a.d[5] = 0x8a2e;
+    addr6a.d[6] = 0x370;
+    addr6a.d[7] = 0x7334;
+    EXP_MEMEQ(sizeof(addr6), &addr6, &addr6a);
+    EXP_STREQ("2001:0db8:85a3:0000:0000:8a2e:0370:7334", ipv6_ntop(&addr6a, ipbuf, IPV6_FORMAT_FULL));
 }
 
 int main(int argc, char *argv[])

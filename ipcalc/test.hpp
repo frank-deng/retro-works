@@ -73,4 +73,19 @@ public:
     } \
 } while (0)
 
+#define EXP_MEMEQ(len, val, expr) do { \
+    void *exprRes = (expr); \
+    void *valRes = (val); \
+    if (NULL == exprRes) { \
+        printf("Failed: %s is NULL\n", #expr); \
+        this->failedCount++; \
+    } \
+    if (0 == memcmp(exprRes, valRes, (len))) { \
+        printf("Succeed: %s memeq %s\n", #expr, #val); \
+    } else { \
+        printf("Failed: %s memeq %s\n", #expr, #val); \
+        this->failedCount++; \
+    } \
+} while (0)
+
 #endif

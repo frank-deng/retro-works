@@ -1,5 +1,6 @@
 #include <string.h>
 #include "ipv4.h"
+#include "ipv6.h"
 
 #define HELP_TEXT ("\
 Usage: ipcalc ipaddr/netmask\r\n\
@@ -32,7 +33,7 @@ static inline bool parseArgs(ArgData_t *data, int argc, char *argv[])
     }
     return true;
 ParseFailed:
-    print(HELP_TEXT);
+    fputs(HELP_TEXT, stderr);
     return false;
 }
 int main(int argc, char *argv[])
@@ -45,36 +46,14 @@ int main(int argc, char *argv[])
     }
     wildcard = (1UL << (32 - data.netmask)) - 1;
 
-    print("Wildcard: ");
-    print(ipv4_ntop(wildcard, strbuf));
-    print(" = ");
-    print(utostr(32 - data.netmask, strbuf));
-    print("\r\n");
-
-    print("Netmask: ");
-    print(ipv4_ntop(~wildcard, strbuf));
-    print(" = ");
-    print(utostr(data.netmask, strbuf));
-    print("\r\n");
-
-    print("Available hosts: ");
-    print(utostr(wildcard < 1 ? 0 : wildcard - 1, strbuf));
-    print("\r\n");
-
-    print("Network IP: ");
-    print(ipv4_ntop((data.ipaddr & (~wildcard)), strbuf));
-    print("\r\n");
-
-    print("Broadcast IP: ");
-    print(ipv4_ntop((data.ipaddr | wildcard), strbuf));
-    print("\r\n");
-
+    printf("Wildcard: %s = %u\n", ipv4_ntop(wildcard, strbuf), 32 - data.netmask);
+    printf("Netmask: %s = %u\n", ipv4_ntop(~wildcard, strbuf), data.netmask);
+    printf("Available hosts: %lu\n", wildcard < 1 ? 0 : wildcard - 1);
+    printf("Network IP: %s\n", ipv4_ntop((data.ipaddr & (~wildcard)), strbuf));
     if (data.netmask <= 30) {
-        print("IP Range: ");
-        print(ipv4_ntop((data.ipaddr & (~wildcard)) + 1, strbuf));
-        print(" - ");
-        print(ipv4_ntop((data.ipaddr | wildcard) - 1, strbuf));
-        print("\r\n");
+        printf("IP Range: %s - ", ipv4_ntop((data.ipaddr & (~wildcard)) + 1, strbuf));
+        puts(ipv4_ntop((data.ipaddr | wildcard) - 1, strbuf));
     }
+    printf("Broadcast IP: %s\n", ipv4_ntop((data.ipaddr | wildcard), strbuf));
     return 0;
 }

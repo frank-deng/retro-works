@@ -2,6 +2,7 @@
 #define ipv4_h_
 
 #include <stdbool.h>
+#include <stdio.h>
 #include "util.h"
 
 #ifdef __cplusplus

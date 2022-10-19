@@ -1,7 +1,9 @@
 #include <stdlib.h>
+#include <ctype.h>
 #include "ipv4.h"
 
 typedef struct {
+    bool status;
     char lastChar;
     uint8_t segments;
     uint16_t numval;
@@ -42,7 +44,7 @@ static inline bool processEnd(ipv4_pton_data_t *data)
 bool ipv4_pton(const char *str, uint32_t *target)
 {
     char *p = NULL;
-    ipv4_pton_data_t ipv4PtonData = {'\0', 0, 0, 0};
+    ipv4_pton_data_t ipv4PtonData = {true, '\0', 0, 0, 0};
     for (p = (char*)str; *p != '\0'; p++) {
         if (isdigit(*p)) {
             if (!processDigit(&ipv4PtonData, *p)) {
@@ -151,17 +153,18 @@ int8_t ipv4_ptonm(char *input)
 }
 char *ipv4_ntop(uint32_t input, char *buf)
 {
-    uint8_t i;
     char *p = buf;
+    uint8_t i;
     for (i = 0; i < 4; i++) {
-        if (i != 0) {
+        if(i != 0){
             *p = '.';
             p++;
         }
-        utostr(((input >> (8 * (3 - i))) & 0xff), p);
-        while (*p != '\0') {
+        utoa((input>>((3-i)<<3)) & 0xff, p, 10);
+        while(*p != '\0'){
             p++;
         }
     }
+    *p = '\0';
     return buf;
 }
