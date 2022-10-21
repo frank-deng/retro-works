@@ -32,10 +32,6 @@ typedef enum {
 inline token_type_t getTokenType(char_type_t type, size_t length, char *buf)
 {
     int8_t i;
-    for (i = 0; i < length; i++) {
-        putchar(buf[i]);
-    }
-    putchar('\n');
     if (CHAR_TYPE_DIGIT == type) {
         return TOKEN_NUM;
     } else if (CHAR_TYPE_SEP4 == type) {
@@ -48,21 +44,24 @@ inline token_type_t getTokenType(char_type_t type, size_t length, char *buf)
 
 typedef struct {
     token_type_t lastTokenType;
-    size_t tokenLength;
-    char tokenData[4];
+    char lastTokenData[5];
     bool ralign;
     uint16_t leftData[8];
     uint16_t rightData[8];
     uint8_t leftSize;
     uint8_t rightSize;
+    int8_t sep4Count;
 } ipv6_pton_data_t;
-inline void writeNum(ipv6_pton_data_t *data)
+inline bool writeNum(ipv6_pton_data_t *data)
 {
-    uint8_t i;
+    char *p = NULL;
     uint16_t val = 0;
-    for (i = 0; i < data->tokenLength; i++) {
-        val <<= 10;
-        val |= hexdigit2num(data->tokenData[i]);
+    if ((data->leftSize + data->rightSize) >= 8) {
+        return false;
+    }
+    for (p = data->lastTokenData; '\0' != *p; p++) {
+        val <<= 4;
+        val |= hexdigit2num(*p);
     }
     if (data->ralign) {
         data->rightData[data->rightSize] = val;
@@ -71,61 +70,99 @@ inline void writeNum(ipv6_pton_data_t *data)
         data->leftData[data->leftSize] = val;
         (data->leftSize)++;
     }
+    return true;
 }
-inline bool processNum(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+inline bool processNum(ipv6_pton_data_t *data, size_t length, char *buf)
 {
     uint8_t i;
-    if (data->lastTokenType == TOKEN_NUM) {
+    if (TOKEN_NUM == data->lastTokenType) {
         return false;
     }
-    data->lastTokenType = type;
-    data->tokenLength = length;
     for (i = 0; i < length; i++) {
-        data->tokenData[i] = buf[i];
+        data->lastTokenData[i] = buf[i];
     }
+    data->lastTokenData[length] = '\0';
     return true;
 }
-inline bool processSep(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+inline bool processSep(ipv6_pton_data_t *data)
 {
-    if (data->lastTokenType != TOKEN_NUM) {
+    if (data->lastTokenType != TOKEN_NUM || 
+        data->sep4Count >= 0) {
         return false;
     }
-    writeNum(data);
-    return true;
+    return writeNum(data);
 }
-inline bool processRAlign(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+inline bool processRAlign(ipv6_pton_data_t *data)
 {
-    if (TOKEN_SEP == data->lastTokenType || TOKEN_SEP4 == data->lastTokenType) {
+    bool status;
+    if (TOKEN_SEP == data->lastTokenType ||
+        TOKEN_SEP4 == data->lastTokenType || 
+        data->sep4Count >= 0) {
         return false;
     }
-    writeNum(data);
+    status = writeNum(data);
     data->ralign = true;
-    return true;
+    return status;
+}
+inline bool processSep4(ipv6_pton_data_t *data)
+{
+    char *p = data->lastTokenData;
+    uint16_t val = 0;
+    if (data->lastTokenType != TOKEN_NUM || data->sep4Count >= 3) {
+        return false;
+    }
+    // Number with leading 0 is not allowed by IPv4
+    if ('0' == *p && '\0' != *(p + 1)) {
+        return false;
+    }
+    // Check whether all characters are dec digits and value is lower than 255
+    while ('\0' != *p) {
+        if (!isdigit(*p)) {
+            return false;
+        }
+        val *= 10;
+        val += (*p - '0');
+        if (val > 0xff) {
+            return false;
+        }
+        p++;
+    }
+    (data->sep4Count)++;
+    return writeNum(data);
 }
 inline bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
 {
-    token_type_t tokenType = getTokenType(type, length, buf);
     bool status;
-
+    token_type_t tokenType = getTokenType(type, length, buf);
     if (TOKEN_INVALID == tokenType) {
         return false;
     }
     switch (tokenType) {
         case TOKEN_NUM:
-            status = processNum(data, type, length, buf);
+            status = processNum(data, length, buf);
         break;
         case TOKEN_SEP:
-            status = processSep(data, type, length, buf);
+            status = processSep(data);
         break;
         case TOKEN_SEP4:
-            //status = processSep4(data, type, length, buf);
+            status = processSep4(data);
         break;
         case TOKEN_RALIGN:
-            status = processRAlign(data, type, length, buf);
+            status = processRAlign(data);
         break;
     }
-    data->lastTokenType = type;
+    data->lastTokenType = tokenType;
     return status;
+}
+inline bool processEnd(ipv6_pton_data_t *data)
+{
+    if (TOKEN_RALIGN == data->lastTokenType) {
+        return true;
+    }
+    if (TOKEN_NUM != data->lastTokenType || (data->sep4Count >= 0 && data->sep4Count != 3)) {
+        return false;
+    }
+    return writeNum(data);
 }
 static uint8_t g_charTypeLenMax[CHAR_TYPE_MAX] = { 4, 2, 1, 0 };
 bool ipv6_pton(const char *input, ipv6addr_t *addr)
@@ -136,14 +173,9 @@ bool ipv6_pton(const char *input, ipv6addr_t *addr)
     char_type_t lastCharType;
     char buf[4], *pBuf = buf;
     data.lastTokenType = TOKEN_START;
-    data.tokenLength = 0;
     data.ralign = false;
     data.leftSize = data.rightSize = 0;
-
-    // Empty string not allowed
-    if ('\0' == *input) {
-        return false;
-    }
+    data.sep4Count = -1;
     for (p = (char*)input; *p != '\0'; p++) {
         char_type_t charType = getCharType(*p);
         if (CHAR_TYPE_OTHER == charType) {
@@ -164,7 +196,12 @@ bool ipv6_pton(const char *input, ipv6addr_t *addr)
         *pBuf = *p;
         pBuf++;
     }
-    if (!processToken(&data, lastCharType, pBuf - buf, buf)) {
+    // Process last token
+    if ((pBuf > buf) && !processToken(&data, lastCharType, pBuf - buf, buf)) {
+        return false;
+    }
+    // Process end
+    if (!processEnd(&data)) {
         return false;
     }
 

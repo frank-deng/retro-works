@@ -82,7 +82,10 @@ void Test::run(){
     addr6a.d[6] = 0x370;
     addr6a.d[7] = 0x7334;
     EXP_MEMEQ(sizeof(addr6), &addr6, &addr6a);
-    EXP_STREQ("2001:0db8:85a3:0000:0000:8a2e:0370:7334", ipv6_ntop(&addr6a, ipbuf, IPV6_FORMAT_FULL));
+    EXP_STREQ("2001:0db8:85a3:0000:0000:8a2e:0370:7334", ipv6_ntop(&addr6, ipbuf, IPV6_FORMAT_FULL));
+    
+    EXP_TRUE(ipv6_pton("::192.168.1.1", &addr6));
+    memset(&addr6a, 0, sizeof(addr6));
 }
 
 int main(int argc, char *argv[])
