@@ -3,7 +3,6 @@
 #include "ipv4.h"
 
 typedef struct {
-    bool status;
     char lastChar;
     uint8_t segments;
     uint16_t numval;

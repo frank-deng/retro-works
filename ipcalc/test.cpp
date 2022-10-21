@@ -39,6 +39,7 @@ void Test::run(){
     EXP_FALSE(ipv4_pton("1234.168.1.1", &ipv4AddrBin));
     EXP_FALSE(ipv4_pton("1234.168.1", &ipv4AddrBin));
     EXP_FALSE(ipv4_pton("192.168..1", &ipv4AddrBin));
+    EXP_FALSE(ipv4_pton("", &ipv4AddrBin));
     
     puts("Netmask conversion:");
     EXP_EQ(0, ipv4_ptonm("0.0.0.0"));

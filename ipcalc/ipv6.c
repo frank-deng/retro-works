@@ -1,92 +1,98 @@
+#include <ctype.h>
 #include <stdio.h>
 #include "ipv6.h"
 
+typedef enum {
+    CHAR_TYPE_DIGIT,
+    CHAR_TYPE_SEP,
+    CHAR_TYPE_SEP4,
+    CHAR_TYPE_OTHER,
+    CHAR_TYPE_MAX
+} char_type_t;
+inline char_type_t getCharType(char ch)
+{
+    if (isxdigit(ch)) {
+        return MATCH_DIGIT;
+    } else if (':' == ch) {
+        return CHAR_TYPE_SEP;
+    } else if ('.' == ch) {
+        return CHAR_TYPE_SEP4;
+    }
+    return CHAR_TYPE_OTHER;
+}
+
+typedef enum {
+    TOKEN_START,
+    TOKEN_NUM,
+    TOKEN_SEP,
+    TOKEN_RALIGN,
+    TOKEN_SEP4,
+    TOKEN_INVALID
+} token_type_t;
+inline token_type_t getTokenType(char_type_t type, size_t length, char *buf)
+{
+    if (CHAR_TYPE_DIGIT == type) {
+        return TOKEN_NUM;
+    } else if (CHAR_TYPE_SEP4 == type) {
+        return TOKEN_SEP4;
+    } else if (CHAR_TYPE_SEP == type) {
+        return length > 1 ? TOKEN_RALIGN : TOKEN_SEP;
+    }
+    return TOKEN_INVALID;
+}
 typedef struct {
-    char lastChar;
-    uint8_t digits;
-    uint16_t numval;
+    token_type_t lastTokenType;
+    size_t tokenLength;
+    char tokenData[4];
     bool ralign;
     uint16_t leftData[8];
     uint16_t rightData[8];
     uint8_t leftSize;
     uint8_t rightSize;
-} ipv6_pton_data_t;
-static inline bool processDigit(ipv6_pton_data_t *data, char ch)
+} ipv6_data_t;
+bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
 {
-    if (!ishexdigit(ch) || data->digits >= 4) {
+    token_type_t tokenType = getTokenType(type, length, buf);
+    if (TOKEN_INVALID == tokenType) {
         return false;
     }
-    data->numval <<= 4;
-    data->numval |= hexdigit2num(ch);
-    (data->digits)++;
-    return true;
 }
-static inline bool processSep(ipv6_pton_data_t *data)
-{
-    if (':' == data->lastChar) {
-        if (data->ralign) {
-            return false;
-        }
-        data->ralign = true;
-        return true;
-    }
-    if (data->digits <= 0 || (data->leftSize + data->rightSize) > 8) {
-        return false;
-    }
-    if (data->ralign) {
-        data->rightData[data->rightSize] = data->numval;
-        (data->rightSize)++;
-    } else {
-        data->leftData[data->leftSize] = data->numval;
-        (data->leftSize)++;
-    }
-    data->digits = 0;
-    data->numval = 0;
-    return true;
-}
-static inline bool processEnd(ipv6_pton_data_t *data)
-{
-    if (data->digits <= 0) {
-        return true;
-    }
-    if ((data->leftSize + data->rightSize) >= 8) {
-        return false;
-    }
-    if (data->ralign) {
-        data->rightData[data->rightSize] = data->numval;
-        (data->rightSize)++;
-    } else {
-        data->leftData[data->leftSize] = data->numval;
-        (data->leftSize)++;
-    }
-    return true;
-}
+static uint8_t g_charTypeLenMax[CHAR_TYPE_MAX] = { 4, 2, 1, 0 };
 bool ipv6_pton(const char *input, ipv6addr_t *addr)
 {
     ipv6_pton_data_t data;
     char *p = NULL;
     uint8_t i;
-    data.lastChar='\0';
-    data.digits=0;
-    data.numval=0;
-    data.ralign=false;
-    data.leftSize=0;
-    data.rightSize=0;
+    char_type_t lastCharType;
+    char buf[4], *pBuf = buf;
+    data.lastTokenType = TOKEN_START;
+    data.tokenLength = 0;
+    data.ralign = false;
+    data.leftSize = data.rightSize = 0;
     for (p = (char*)input; *p != '\0'; p++) {
-        if (ishexdigit(*p)) {
-            if (!processDigit(&data, *p)) {
+        char_type_t charType = getCharType(*p);
+        if (CHAR_TYPE_INVALID == charType) {
+             return false;
+        }
+        if (pBuf > buf && lastCharType != charType) {
+            // Process token
+            if (!processToken(&data, lastCharType, pBuf - buf, buf)) {
                 return false;
             }
-        } else if (':' == *p) {
-            if (!processSep(&data)) {
-                return false;
-            }
-        } else {
+            pBuf = buf;
+        }
+        // Process character
+        if ((pBuf - buf) >= g_charTypeLenMax[charType]) {
             return false;
         }
-        data.lastChar = *p;
+        lastCharType = charType;
+        *pBuf = *p;
+        pBuf++;
     }
-    if (!processEnd(&data)) {
+    if (lastCharType == CHAR_EMPTY) {
+        return false;
+    }
+    if (!processToken(&data, buf, pBuf - buf)) {
         return false;
     }
     for (i=0; i<8; i++) {
