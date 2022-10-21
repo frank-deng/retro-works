@@ -43,7 +43,7 @@ static inline bool processEnd(ipv4_pton_data_t *data)
 bool ipv4_pton(const char *str, uint32_t *target)
 {
     char *p = NULL;
-    ipv4_pton_data_t ipv4PtonData = {true, '\0', 0, 0, 0};
+    ipv4_pton_data_t ipv4PtonData = {true, '\0', 0, 0};
     for (p = (char*)str; *p != '\0'; p++) {
         if (isdigit(*p)) {
             if (!processDigit(&ipv4PtonData, *p)) {

@@ -22,6 +22,6 @@ ipv6.obj: ipv6.c $(HEADERS)
 
 .NOCHECK
 clean:
-	-del *.obj
-	-del *.err
-	-del $(TARGET)
+	-deltree *.obj
+	-deltree *.err
+	-deltree $(TARGET)

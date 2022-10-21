@@ -12,7 +12,7 @@ typedef enum {
 inline char_type_t getCharType(char ch)
 {
     if (isxdigit(ch)) {
-        return MATCH_DIGIT;
+        return CHAR_TYPE_DIGIT;
     } else if (':' == ch) {
         return CHAR_TYPE_SEP;
     } else if ('.' == ch) {
@@ -31,6 +31,11 @@ typedef enum {
 } token_type_t;
 inline token_type_t getTokenType(char_type_t type, size_t length, char *buf)
 {
+    int8_t i;
+    for (i = 0; i < length; i++) {
+        putchar(buf[i]);
+    }
+    putchar('\n');
     if (CHAR_TYPE_DIGIT == type) {
         return TOKEN_NUM;
     } else if (CHAR_TYPE_SEP4 == type) {
@@ -40,6 +45,7 @@ inline token_type_t getTokenType(char_type_t type, size_t length, char *buf)
     }
     return TOKEN_INVALID;
 }
+
 typedef struct {
     token_type_t lastTokenType;
     size_t tokenLength;
@@ -49,13 +55,77 @@ typedef struct {
     uint16_t rightData[8];
     uint8_t leftSize;
     uint8_t rightSize;
-} ipv6_data_t;
-bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+} ipv6_pton_data_t;
+inline void writeNum(ipv6_pton_data_t *data)
+{
+    uint8_t i;
+    uint16_t val = 0;
+    for (i = 0; i < data->tokenLength; i++) {
+        val <<= 10;
+        val |= hexdigit2num(data->tokenData[i]);
+    }
+    if (data->ralign) {
+        data->rightData[data->rightSize] = val;
+        (data->rightSize)++;
+    } else {
+        data->leftData[data->leftSize] = val;
+        (data->leftSize)++;
+    }
+}
+inline bool processNum(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+{
+    uint8_t i;
+    if (data->lastTokenType == TOKEN_NUM) {
+        return false;
+    }
+    data->lastTokenType = type;
+    data->tokenLength = length;
+    for (i = 0; i < length; i++) {
+        data->tokenData[i] = buf[i];
+    }
+    return true;
+}
+inline bool processSep(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+{
+    if (data->lastTokenType != TOKEN_NUM) {
+        return false;
+    }
+    writeNum(data);
+    return true;
+}
+inline bool processRAlign(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+{
+    if (TOKEN_SEP == data->lastTokenType || TOKEN_SEP4 == data->lastTokenType) {
+        return false;
+    }
+    writeNum(data);
+    data->ralign = true;
+    return true;
+}
+inline bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
 {
     token_type_t tokenType = getTokenType(type, length, buf);
+    bool status;
+
     if (TOKEN_INVALID == tokenType) {
         return false;
     }
+    switch (tokenType) {
+        case TOKEN_NUM:
+            status = processNum(data, type, length, buf);
+        break;
+        case TOKEN_SEP:
+            status = processSep(data, type, length, buf);
+        break;
+        case TOKEN_SEP4:
+            //status = processSep4(data, type, length, buf);
+        break;
+        case TOKEN_RALIGN:
+            status = processRAlign(data, type, length, buf);
+        break;
+    }
+    data->lastTokenType = type;
+    return status;
 }
 static uint8_t g_charTypeLenMax[CHAR_TYPE_MAX] = { 4, 2, 1, 0 };
 bool ipv6_pton(const char *input, ipv6addr_t *addr)
@@ -69,9 +139,14 @@ bool ipv6_pton(const char *input, ipv6addr_t *addr)
     data.tokenLength = 0;
     data.ralign = false;
     data.leftSize = data.rightSize = 0;
+
+    // Empty string not allowed
+    if ('\0' == *input) {
+        return false;
+    }
     for (p = (char*)input; *p != '\0'; p++) {
         char_type_t charType = getCharType(*p);
-        if (CHAR_TYPE_INVALID == charType) {
+        if (CHAR_TYPE_OTHER == charType) {
              return false;
         }
         if (pBuf > buf && lastCharType != charType) {
@@ -89,12 +164,11 @@ bool ipv6_pton(const char *input, ipv6addr_t *addr)
         *pBuf = *p;
         pBuf++;
     }
-    if (lastCharType == CHAR_EMPTY) {
+    if (!processToken(&data, lastCharType, pBuf - buf, buf)) {
         return false;
     }
-    if (!processToken(&data, buf, pBuf - buf)) {
-        return false;
-    }
+
+    // Write ipv6 bin to target
     for (i=0; i<8; i++) {
         if (i < data.leftSize) {
             addr->d[i] = data.leftData[i];
