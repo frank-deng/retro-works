@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 bool ipv4_pton(const char *, uint32_t *);
-int8_t ipv4_ptonm(char *);
+uint8_t ipv4_ptonm(char *);
 char *ipv4_ntop(uint32_t, char *);
 
 #ifdef __cplusplus

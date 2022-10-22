@@ -1,0 +1,26 @@
+TARGET=ipcalc test
+OBJS=ipv4.o ipv6.o
+HEADERS=ipv4.h ipv6.h util.h
+CFLAGS=
+LDFLAGS=
+
+.PHONY:compilework
+compilework: $(TARGET)
+
+ipcalc: $(OBJS) main.obj
+	gcc $(LDFLAGS) -o $@ $<
+test: $(OBJS) test.obj
+	g++ $(LDFLAGS) -o $@ $<
+main.obj: main.c $(HEADERS)
+	gcc $(CFLAGS) -o $@ $^
+test.obj: test.cpp test.hpp $(HEADERS)
+	g++ $(CFLAGS) -o $@ $^
+ipv4.obj: ipv4.c $(HEADERS)
+	gcc $(CFLAGS) -o $@ $^
+ipv6.obj: ipv6.c $(HEADERS)
+	gcc $(CFLAGS) -o $@ $^
+
+.PHONY:clean
+clean:
+	-rm *.obj $(TARGET)
+

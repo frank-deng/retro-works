@@ -3,7 +3,21 @@
 
 #include <stdint.h>
 
+#define INVALID_NETMASK (0xff)
+
 #define hexdigit2num(c) ((c)>='a' ? (c)-'a'+10 : (c)>='A' ? (c)-'A'+10 : (c)-'0')
+
+inline bool isipv6addr(char *str)
+{
+    char *p = str;
+    while ('\0' != *p) {
+        if (':' == *p) {
+            return true;
+        }
+        p++;
+    }
+    return false;
+}
 
 inline char *u16tohex(uint16_t v, char *buf, bool upper)
 {

@@ -107,22 +107,14 @@ static inline uint8_t count_leading_zero(uint32_t input)
     }
     return result;
 }
-int8_t ipv4_get_netmask(uint32_t input)
-{
-    uint32_t n = ~input;
-    if ((n & (n + 1)) != 0) {
-        return -1;
-    }
-    return (int8_t)count_leading_zero(n);
-}
-int8_t ipv4_ptonm(char *input)
+uint8_t ipv4_ptonm(char *input)
 {
     bool parseAsNumberSucc = true;
     uint32_t n = 0;
     char *p = NULL;
-    // Empty string not allowed
-    if ('\0' == *input) {
-        return -1;
+    // Empty string and string with leading zero not allowed
+    if ('\0' == *input || ('0' == *input && '\0' != *(input+1))) {
+        return INVALID_NETMASK;
     }
     // First try to parse input as dec number
     for (p = input; *p != '\0'; p++) {
@@ -138,17 +130,17 @@ int8_t ipv4_ptonm(char *input)
          }
     }
     if (parseAsNumberSucc) {
-        return (int8_t)n;
+        return (uint8_t)n;
     }
     // Try to parse input as ip
     if (!ipv4_pton(input, &n)) {
-         return -1;
+         return INVALID_NETMASK;
     }
     n = ~n;
     if ((n & (n + 1)) != 0) {
-        return -1;
+        return INVALID_NETMASK;
     }
-    return (int8_t)count_leading_zero(n);
+    return count_leading_zero(n);
 }
 char *ipv4_ntop(uint32_t input, char *buf)
 {

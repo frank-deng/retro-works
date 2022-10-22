@@ -18,6 +18,7 @@ extern "C" {
 #endif
 
 bool ipv6_pton(const char*, ipv6addr_t*);
+uint8_t ipv6_ptonm(char *);
 char *ipv6_ntop(ipv6addr_t*, char*, ipv6_output_format_t);
 
 #ifdef __cplusplus

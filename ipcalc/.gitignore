@@ -1,0 +1,15 @@
+*.o
+*.COM
+*.com
+*.so
+*.obj
+*.OBJ
+*.com
+*.COM
+*.exe
+*.EXE
+*.err
+*.ERR
+ipcalc
+test
+

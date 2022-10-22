@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "ipv4.h"
 #include "ipv6.h"
 
 typedef enum {
@@ -284,15 +285,111 @@ static char *ipv6_ntop_full(ipv6addr_t *addr, char *buf) {
 }
 char *ipv6_ntop(ipv6addr_t *addr, char *buf, ipv6_output_format_t format)
 {
-    
+    int8_t zeroStart = -1, zeroLen = 0;
+    uint8_t i;
+    uint32_t ipv4data;
+    char *p = buf;
     switch(format){
         case IPV6_FORMAT_FULL:
-            return ipv6_ntop_full(addr, buf);
-            
+            return ipv6_ntop_full(addr, buf);        
         break;
         case IPV6_FORMAT_UNCOMP:
             return ipv6_ntop_uncomp(addr, buf);
         break;
     }
+
+    // Check zero segment range
+    for (i = 0; i < 8; i++) {
+        if (zeroStart < 0) {
+            if (addr->d[i] == 0) {
+                zeroStart = i;
+                zeroLen = 1;
+            }
+        } else {
+            if (addr->d[i] != 0) {
+                break;
+            }
+            zeroLen++;
+        }
+    }
+
+    // Print as ::
+    if (zeroStart == 0 && zeroLen == 8) {
+        buf[0] = buf[1] = ':';
+        buf[2] = '\0';
+        return buf;
+    }
+    
+    // Print as ::1
+    if (zeroStart == 0 && zeroLen == 7 && 1 == addr->d[7]) {
+        buf[0] = buf[1] = ':';
+        buf[2] = '1';
+        buf[3] = '\0';
+        return buf;
+    }
+
+    // Print as ipv4 addr
+    if (zeroStart == 0 && zeroLen >= 6) {
+        buf[0] = buf[1] = ':';
+        ipv4_ntop(((uint32_t)(addr->d[6]) << 16) | addr->d[7], buf + 2);
+        return buf;
+    }
+
+    // Print as ipv6
+    for (i = 0; i < 8; i++) {
+        if (i > zeroStart && i < zeroStart + zeroLen) {
+            continue;
+        }
+        if (i > 0 || i == zeroStart) {
+            *p = ':';
+            p++;
+        }
+        if (zeroStart == i) {
+            continue;
+        }
+        utoa(addr->d[i], p, 16);
+        while(*p != '\0'){
+            p++;
+        }
+    }
+    *p = '\0';
+
     return buf;
+}
+uint8_t ipv6_ptonm(char *input)
+{
+    uint16_t n = 0;
+    char *p = NULL;
+    // Empty string and string with leading zero not allowed
+    if ('\0' == *input || ('0' == *input && '\0' != *(input+1))) {
+        return INVALID_NETMASK;
+    }
+    for (p = input; *p != '\0'; p++) {
+         if (!isdigit(*p)) {
+             return INVALID_NETMASK;
+         }
+         n *= 10;
+         n += *p - '0';
+         if (n > 128) {
+             return INVALID_NETMASK;
+         }
+    }
+    return (uint8_t)n;
+}
+void ipv6_apply_netmask(ipv6addr_t *addr, uint8_t netmask, bool nonzero)
+{
+    uint8_t procSegs = netmask >> 4, procBits = netmask & 0xf;
+    uint8_t i = 7;
+    while (procSegs) {
+        addr->d[i] = nonzero ? 0xffff : 0;
+        i--;
+        procSegs--;
+    }
+    if (procBits > 0) {
+        if (nonzero) {
+            addr->d[i] |= ((uint16_t)1 << procBits) - 1;
+        } else {
+            addr->d[i] &= ~(((uint16_t)1 << procBits) - 1);
+        }
+    }
 }

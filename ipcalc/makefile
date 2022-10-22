@@ -1,6 +1,6 @@
 TARGET=ipcalc.com test.com
 OBJS=ipv4.obj ipv6.obj
-HEADERS=ipv4.h util.h
+HEADERS=ipv4.h ipv6.h util.h
 CFLAGS=-ms -0 -q -d0 -os
 LDFLAGS=-mt -0 -q -d0 -os -zl -zld -lr
 
