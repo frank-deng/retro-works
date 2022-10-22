@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "ipv6.h"
 
@@ -251,18 +252,46 @@ bool ipv6_pton(const char *input, ipv6addr_t *addr)
     }
     return true;
 }
+static char *ipv6_ntop_uncomp(ipv6addr_t *addr, char *buf) {
+    uint8_t i;
+    char *p = buf;
+    for (i = 0; i < 8; i++) {
+        if(i != 0){
+            *p = ':';
+            p++;
+        }
+        utoa(addr->d[i], p, 16);
+        while(*p != '\0'){
+            p++;
+        }
+    }
+    return buf;
+}
+static char *ipv6_ntop_full(ipv6addr_t *addr, char *buf) {
+    uint8_t i, j;
+    char *p = buf;
+    for (i = 0; i < 8; i++) {
+        if(i != 0){
+            *p = ':';
+            p++;
+        }
+        u16tohex(addr->d[i], p, false);
+        while(*p != '\0'){
+            p++;
+        }
+    }
+    return buf;
+}
 char *ipv6_ntop(ipv6addr_t *addr, char *buf, ipv6_output_format_t format)
 {
+    
     switch(format){
         case IPV6_FORMAT_FULL:
-            sprintf(buf, "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
-                addr->d[0], addr->d[1], addr->d[2], addr->d[3],
-                addr->d[4], addr->d[5], addr->d[6], addr->d[7]);
+            return ipv6_ntop_full(addr, buf);
+            
         break;
         case IPV6_FORMAT_UNCOMP:
-            sprintf(buf, "%x:%x:%x:%x:%x:%x:%x:%x",
-                addr->d[0], addr->d[1], addr->d[2], addr->d[3],
-                addr->d[4], addr->d[5], addr->d[6], addr->d[7]);
+            return ipv6_ntop_uncomp(addr, buf);
         break;
     }
     return buf;
