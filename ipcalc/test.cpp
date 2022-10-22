@@ -84,8 +84,30 @@ void Test::run(){
     EXP_MEMEQ(sizeof(addr6), &addr6, &addr6a);
     EXP_STREQ("2001:0db8:85a3:0000:0000:8a2e:0370:7334", ipv6_ntop(&addr6, ipbuf, IPV6_FORMAT_FULL));
     
-    EXP_TRUE(ipv6_pton("::192.168.1.1", &addr6));
+    EXP_TRUE(ipv6_pton("::192.168.0.2", &addr6));
     memset(&addr6a, 0, sizeof(addr6));
+    addr6a.d[6] = 0xc0a8;
+    addr6a.d[7] = 0x0002;
+    EXP_MEMEQ(sizeof(addr6), &addr6, &addr6a);
+
+    EXP_TRUE(ipv6_pton("a:b::", &addr6));
+    memset(&addr6a, 0, sizeof(addr6));
+    addr6a.d[0] = 0xa;
+    addr6a.d[1] = 0xb;
+    EXP_MEMEQ(sizeof(addr6), &addr6, &addr6a);
+
+    EXP_FALSE(ipv6_pton(":a:b", &addr6));
+    EXP_FALSE(ipv6_pton("1:a:b", &addr6));
+    EXP_FALSE(ipv6_pton("1:2:3:4:5:6:7:8:9", &addr6));
+    EXP_FALSE(ipv6_pton("1:2:3:4:5:6:7:8::", &addr6));
+    EXP_FALSE(ipv6_pton("1:23333:3:4:5:6:7:8", &addr6));
+    EXP_FALSE(ipv6_pton("1:2:3:4:5::6:7:8:9", &addr6));
+    EXP_FALSE(ipv6_pton("::192.168.00.2", &addr6));
+    EXP_FALSE(ipv6_pton("::192.168.01.2", &addr6));
+    EXP_FALSE(ipv6_pton("::192.168.a.2", &addr6));
+    EXP_FALSE(ipv6_pton("::192.168.0.299", &addr6));
+    EXP_FALSE(ipv6_pton("::192.168..2", &addr6));
+    EXP_FALSE(ipv6_pton("::192.168.1.2:6", &addr6));
 }
 
 int main(int argc, char *argv[])

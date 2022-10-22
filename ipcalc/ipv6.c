@@ -50,14 +50,54 @@ typedef struct {
     uint16_t rightData[8];
     uint8_t leftSize;
     uint8_t rightSize;
-    int8_t sep4Count;
+    uint8_t ipv4NumCount;
 } ipv6_pton_data_t;
+inline bool writeNumIPv4(ipv6_pton_data_t *data)
+{
+    char *p = data->lastTokenData;
+    uint16_t val = 0;
+    // Number with leading 0 is not allowed by IPv4
+    if ('0' == *p && '\0' != *(p + 1)) {
+        return false;
+    }
+    // Check whether all characters are dec digits and value is lower than 255
+    while ('\0' != *p) {
+        if (!isdigit(*p)) {
+            return false;
+        }
+        val *= 10;
+        val += (*p - '0');
+        if (val > 0xff) {
+            return false;
+        }
+        p++;
+    }
+    if (data->ralign) {
+        if (data->ipv4NumCount & 1) {
+            data->rightData[data->rightSize] = val << 8;
+            (data->rightSize)++;
+        } else {
+            data->rightData[data->rightSize-1] |= val;
+        }
+    } else {
+        if (data->ipv4NumCount & 1) {
+            data->leftData[data->leftSize] = val << 8;
+            (data->leftSize)++;
+        } else {
+            data->leftData[data->leftSize-1] |= val;
+        }
+    }
+    return true;
+}
 inline bool writeNum(ipv6_pton_data_t *data)
 {
     char *p = NULL;
     uint16_t val = 0;
     if ((data->leftSize + data->rightSize) >= 8) {
         return false;
+    }
+    if (data->ipv4NumCount > 0) {
+        return writeNumIPv4(data);
     }
     for (p = data->lastTokenData; '\0' != *p; p++) {
         val <<= 4;
@@ -87,47 +127,31 @@ inline bool processNum(ipv6_pton_data_t *data, size_t length, char *buf)
 inline bool processSep(ipv6_pton_data_t *data)
 {
     if (data->lastTokenType != TOKEN_NUM || 
-        data->sep4Count >= 0) {
+        data->ipv4NumCount > 0) {
         return false;
     }
     return writeNum(data);
 }
 inline bool processRAlign(ipv6_pton_data_t *data)
 {
-    bool status;
+    bool status = true;
     if (TOKEN_SEP == data->lastTokenType ||
         TOKEN_SEP4 == data->lastTokenType || 
-        data->sep4Count >= 0) {
+        data->ipv4NumCount > 0) {
         return false;
     }
-    status = writeNum(data);
+    if (TOKEN_NUM == data->lastTokenType) {
+        status = writeNum(data);
+    }
     data->ralign = true;
     return status;
 }
 inline bool processSep4(ipv6_pton_data_t *data)
 {
-    char *p = data->lastTokenData;
-    uint16_t val = 0;
-    if (data->lastTokenType != TOKEN_NUM || data->sep4Count >= 3) {
+    if (data->lastTokenType != TOKEN_NUM || data->ipv4NumCount >= 4) {
         return false;
     }
-    // Number with leading 0 is not allowed by IPv4
-    if ('0' == *p && '\0' != *(p + 1)) {
-        return false;
-    }
-    // Check whether all characters are dec digits and value is lower than 255
-    while ('\0' != *p) {
-        if (!isdigit(*p)) {
-            return false;
-        }
-        val *= 10;
-        val += (*p - '0');
-        if (val > 0xff) {
-            return false;
-        }
-        p++;
-    }
-    (data->sep4Count)++;
+    (data->ipv4NumCount)++;
     return writeNum(data);
 }
 inline bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
@@ -157,12 +181,22 @@ inline bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length
 inline bool processEnd(ipv6_pton_data_t *data)
 {
     if (TOKEN_RALIGN == data->lastTokenType) {
-        return true;
+        
+        return (data->leftSize < 8);
     }
-    if (TOKEN_NUM != data->lastTokenType || (data->sep4Count >= 0 && data->sep4Count != 3)) {
+    if (TOKEN_NUM != data->lastTokenType || (data->ipv4NumCount > 0 && data->ipv4NumCount != 3)) {
         return false;
     }
-    return writeNum(data);
+    if (data->ipv4NumCount > 0) {
+        (data->ipv4NumCount)++;
+    }
+    if (!writeNum(data)) {
+        return false;
+    }
+    if ((!data->ralign && data->leftSize != 8) || (data->leftSize + data->rightSize > 8)) {
+        return false;
+    }
+    return true;
 }
 static uint8_t g_charTypeLenMax[CHAR_TYPE_MAX] = { 4, 2, 1, 0 };
 bool ipv6_pton(const char *input, ipv6addr_t *addr)
@@ -175,7 +209,7 @@ bool ipv6_pton(const char *input, ipv6addr_t *addr)
     data.lastTokenType = TOKEN_START;
     data.ralign = false;
     data.leftSize = data.rightSize = 0;
-    data.sep4Count = -1;
+    data.ipv4NumCount = 0;
     for (p = (char*)input; *p != '\0'; p++) {
         char_type_t charType = getCharType(*p);
         if (CHAR_TYPE_OTHER == charType) {
