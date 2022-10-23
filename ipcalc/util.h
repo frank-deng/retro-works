@@ -1,11 +1,43 @@
 #ifndef util_h_
 #define util_h_
 
+#include <limits.h>
+#include <ctype.h>
 #include <stdint.h>
 
 #define INVALID_NETMASK (0xff)
 
 #define hexdigit2num(c) ((c)>='a' ? (c)-'a'+10 : (c)>='A' ? (c)-'A'+10 : (c)-'0')
+
+static inline unsigned int atouint(char *input, unsigned int max, bool *status)
+{
+    unsigned int n = 0;
+    char *p = NULL;
+    // Empty string and string with leading zero not allowed
+    if ('\0' == *input || ('0' == *input && '\0' != *(input+1))) {
+        goto ErrorHandler;
+    }
+    // First try to parse input as dec number
+    for (p = input; *p != '\0'; p++) {
+        if (!isdigit(*p)) {
+            goto ErrorHandler;
+        }
+        n *= 10;
+        n += *p - '0';
+        if (n > max) {
+            goto ErrorHandler;
+        }
+    }
+    if (NULL != status) {
+        *status = true;
+    }
+    return n;
+ErrorHandler:
+    if (NULL != status) {
+        *status = false;
+    }
+    return 0;
+}
 
 static inline bool isipv6addr(char *str)
 {

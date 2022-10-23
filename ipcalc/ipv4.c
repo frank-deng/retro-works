@@ -110,25 +110,8 @@ static inline uint8_t count_leading_zero(uint32_t input)
 uint8_t ipv4_ptonm(char *input)
 {
     bool parseAsNumberSucc = true;
-    uint32_t n = 0;
-    char *p = NULL;
-    // Empty string and string with leading zero not allowed
-    if ('\0' == *input || ('0' == *input && '\0' != *(input+1))) {
-        return INVALID_NETMASK;
-    }
-    // First try to parse input as dec number
-    for (p = input; *p != '\0'; p++) {
-         if (!isdigit(*p)) {
-             parseAsNumberSucc = false;
-             break;
-         }
-         n *= 10;
-         n += *p - '0';
-         if (n > 32) {
-             parseAsNumberSucc = false;
-             break;
-         }
-    }
+    // Try to parse input as number
+    uint32_t n = atouint(input, 32, &parseAsNumberSucc);
     if (parseAsNumberSucc) {
         return (uint8_t)n;
     }

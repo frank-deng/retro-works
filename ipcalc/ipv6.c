@@ -253,7 +253,7 @@ bool ipv6_pton(const char *input, ipv6addr_t *addr)
     }
     return true;
 }
-static char *ipv6_ntop_uncomp(ipv6addr_t *addr, char *buf) {
+static char *ipv6_ntop_uncomp(ipv6addr_t *addr, char *buf, bool full) {
     uint8_t i;
     char *p = buf;
     for (i = 0; i < 8; i++) {
@@ -261,19 +261,7 @@ static char *ipv6_ntop_uncomp(ipv6addr_t *addr, char *buf) {
             *p = ':';
             p++;
         }
-        p += utohex(addr->d[i], p, 0, false);
-    }
-    return buf;
-}
-static char *ipv6_ntop_full(ipv6addr_t *addr, char *buf) {
-    uint8_t i, j;
-    char *p = buf;
-    for (i = 0; i < 8; i++) {
-        if(i != 0){
-            *p = ':';
-            p++;
-        }
-        p += utohex(addr->d[i], p, 4, false);
+        p += utohex(addr->d[i], p, (full ? 4 : 0), false);
     }
     return buf;
 }
@@ -285,10 +273,10 @@ char *ipv6_ntop(ipv6addr_t *addr, char *buf, ipv6_output_format_t format)
     char *p = buf;
     switch(format){
         case IPV6_FORMAT_FULL:
-            return ipv6_ntop_full(addr, buf);        
+            return ipv6_ntop_uncomp(addr, buf, true);
         break;
         case IPV6_FORMAT_UNCOMP:
-            return ipv6_ntop_uncomp(addr, buf);
+            return ipv6_ntop_uncomp(addr, buf, false);
         break;
     }
 
@@ -346,23 +334,9 @@ char *ipv6_ntop(ipv6addr_t *addr, char *buf, ipv6_output_format_t format)
 }
 uint8_t ipv6_ptonm(char *input)
 {
-    uint16_t n = 0;
-    char *p = NULL;
-    // Empty string and string with leading zero not allowed
-    if ('\0' == *input || ('0' == *input && '\0' != *(input+1))) {
-        return INVALID_NETMASK;
-    }
-    for (p = input; *p != '\0'; p++) {
-         if (!isdigit(*p)) {
-             return INVALID_NETMASK;
-         }
-         n *= 10;
-         n += *p - '0';
-         if (n > 128) {
-             return INVALID_NETMASK;
-         }
-    }
-    return (uint8_t)n;
+    bool succeed = true;
+    unsigned int n = atouint(input, 128, &succeed);
+    return succeed ? (uint8_t)n : INVALID_NETMASK;
 }
 void ipv6_apply_netmask(ipv6addr_t *addr, uint8_t netmask, bool nonzero)
 {

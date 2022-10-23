@@ -59,8 +59,8 @@ public:
 } while (0)
 
 #define EXP_STREQ(val, expr) do { \
-    char *exprRes = (expr); \
-    char *valRes = (val); \
+    char *exprRes = (char*)(expr); \
+    char *valRes = (char*)(val); \
     if (NULL == exprRes) { \
         printf("Failed: %s is NULL\n", #expr); \
         this->failedCount++; \
@@ -74,8 +74,8 @@ public:
 } while (0)
 
 #define EXP_MEMEQ(len, val, expr) do { \
-    void *exprRes = (expr); \
-    void *valRes = (val); \
+    void *exprRes = (void*)(expr); \
+    void *valRes = (void*)(val); \
     if (NULL == exprRes) { \
         printf("Failed: %s is NULL\n", #expr); \
         this->failedCount++; \
