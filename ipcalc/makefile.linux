@@ -11,7 +11,7 @@ ipcalc: $(OBJS) main.o
 	gcc $(LDFLAGS) -o $@ $^
 test: $(OBJS) test.o
 	g++ $(LDFLAGS) -o $@ $^
-main.o: main.c $(HEADERS)
+main.o: main.c $(HEADERS) langpack.h
 	gcc $(CFLAGS) -c -o $@ $<
 test.o: test.cpp test.hpp $(HEADERS)
 	g++ $(CFLAGS) -c -o $@ $<

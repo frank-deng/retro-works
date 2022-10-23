@@ -11,7 +11,7 @@ ipcalc.com: $(OBJS) main.obj
 	wcl $(LDFLAGS) -fe=$@ $<
 test.com: $(OBJS) test.obj
 	wcl $(LDFLAGS) -fe=$@ $<
-main.obj: main.c $(HEADERS)
+main.obj: main.c $(HEADERS) langpack.h
 	wcc $(CFLAGS) -fo=$@ $[.
 test.obj: test.cpp test.hpp $(HEADERS)
 	wpp $(CFLAGS) -fo=$@ $[.
