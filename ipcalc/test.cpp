@@ -55,7 +55,7 @@ void Test::run(){
     EXP_EQ(29, ipv4_ptonm("255.255.255.248"));
     EXP_EQ(30, ipv4_ptonm("255.255.255.252"));
     EXP_EQ(31, ipv4_ptonm("255.255.255.254"));
-    EXP_EQ(-1, ipv4_ptonm("255.223.0.0"));
+    EXP_EQ(INVALID_NETMASK, ipv4_ptonm("255.223.0.0"));
     
     puts("Convert binary ipv4 addr to str:");
     EXP_NE(NULL, ipv4_ntop(0xc0a80101, ipbuf));

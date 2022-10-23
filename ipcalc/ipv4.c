@@ -151,11 +151,7 @@ char *ipv4_ntop(uint32_t input, char *buf)
             *p = '.';
             p++;
         }
-        utoa((input>>((3-i)<<3)) & 0xff, p, 10);
-        while(*p != '\0'){
-            p++;
-        }
+        p += utodec((input>>((3-i)<<3)) & 0xff, p);
     }
-    *p = '\0';
     return buf;
 }

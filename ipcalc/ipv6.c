@@ -11,7 +11,7 @@ typedef enum {
     CHAR_TYPE_OTHER,
     CHAR_TYPE_MAX
 } char_type_t;
-inline char_type_t getCharType(char ch)
+static inline char_type_t getCharType(char ch)
 {
     if (isxdigit(ch)) {
         return CHAR_TYPE_DIGIT;
@@ -31,7 +31,7 @@ typedef enum {
     TOKEN_SEP4,
     TOKEN_INVALID
 } token_type_t;
-inline token_type_t getTokenType(char_type_t type, size_t length, char *buf)
+static inline token_type_t getTokenType(char_type_t type, size_t length, char *buf)
 {
     int8_t i;
     if (CHAR_TYPE_DIGIT == type) {
@@ -54,7 +54,7 @@ typedef struct {
     uint8_t rightSize;
     uint8_t ipv4NumCount;
 } ipv6_pton_data_t;
-inline bool writeNumIPv4(ipv6_pton_data_t *data)
+static inline bool writeNumIPv4(ipv6_pton_data_t *data)
 {
     char *p = data->lastTokenData;
     uint16_t val = 0;
@@ -91,7 +91,7 @@ inline bool writeNumIPv4(ipv6_pton_data_t *data)
     }
     return true;
 }
-inline bool writeNum(ipv6_pton_data_t *data)
+static inline bool writeNum(ipv6_pton_data_t *data)
 {
     char *p = NULL;
     uint16_t val = 0;
@@ -114,7 +114,7 @@ inline bool writeNum(ipv6_pton_data_t *data)
     }
     return true;
 }
-inline bool processNum(ipv6_pton_data_t *data, size_t length, char *buf)
+static inline bool processNum(ipv6_pton_data_t *data, size_t length, char *buf)
 {
     uint8_t i;
     if (TOKEN_NUM == data->lastTokenType) {
@@ -126,7 +126,7 @@ inline bool processNum(ipv6_pton_data_t *data, size_t length, char *buf)
     data->lastTokenData[length] = '\0';
     return true;
 }
-inline bool processSep(ipv6_pton_data_t *data)
+static inline bool processSep(ipv6_pton_data_t *data)
 {
     if (data->lastTokenType != TOKEN_NUM || 
         data->ipv4NumCount > 0) {
@@ -134,7 +134,7 @@ inline bool processSep(ipv6_pton_data_t *data)
     }
     return writeNum(data);
 }
-inline bool processRAlign(ipv6_pton_data_t *data)
+static inline bool processRAlign(ipv6_pton_data_t *data)
 {
     bool status = true;
     if (TOKEN_SEP == data->lastTokenType ||
@@ -148,7 +148,7 @@ inline bool processRAlign(ipv6_pton_data_t *data)
     data->ralign = true;
     return status;
 }
-inline bool processSep4(ipv6_pton_data_t *data)
+static inline bool processSep4(ipv6_pton_data_t *data)
 {
     if (data->lastTokenType != TOKEN_NUM || data->ipv4NumCount >= 4) {
         return false;
@@ -156,7 +156,7 @@ inline bool processSep4(ipv6_pton_data_t *data)
     (data->ipv4NumCount)++;
     return writeNum(data);
 }
-inline bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
+static inline bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length, char *buf)
 {
     bool status;
     token_type_t tokenType = getTokenType(type, length, buf);
@@ -180,7 +180,7 @@ inline bool processToken(ipv6_pton_data_t *data, char_type_t type, size_t length
     data->lastTokenType = tokenType;
     return status;
 }
-inline bool processEnd(ipv6_pton_data_t *data)
+static inline bool processEnd(ipv6_pton_data_t *data)
 {
     if (TOKEN_RALIGN == data->lastTokenType) {
         
@@ -261,10 +261,7 @@ static char *ipv6_ntop_uncomp(ipv6addr_t *addr, char *buf) {
             *p = ':';
             p++;
         }
-        utoa(addr->d[i], p, 16);
-        while(*p != '\0'){
-            p++;
-        }
+        p += utohex(addr->d[i], p, 0, false);
     }
     return buf;
 }
@@ -276,10 +273,7 @@ static char *ipv6_ntop_full(ipv6addr_t *addr, char *buf) {
             *p = ':';
             p++;
         }
-        u16tohex(addr->d[i], p, false);
-        while(*p != '\0'){
-            p++;
-        }
+        p += utohex(addr->d[i], p, 4, false);
     }
     return buf;
 }
@@ -313,25 +307,22 @@ char *ipv6_ntop(ipv6addr_t *addr, char *buf, ipv6_output_format_t format)
         }
     }
 
-    // Print as ::
-    if (zeroStart == 0 && zeroLen == 8) {
-        buf[0] = buf[1] = ':';
-        buf[2] = '\0';
-        return buf;
-    }
-    
-    // Print as ::1
-    if (zeroStart == 0 && zeroLen == 7 && 1 == addr->d[7]) {
-        buf[0] = buf[1] = ':';
-        buf[2] = '1';
-        buf[3] = '\0';
-        return buf;
-    }
-
-    // Print as ipv4 addr
+    // Print as ::, ::1, ::a.b.c.d
     if (zeroStart == 0 && zeroLen >= 6) {
-        buf[0] = buf[1] = ':';
-        ipv4_ntop(((uint32_t)(addr->d[6]) << 16) | addr->d[7], buf + 2);
+        *p = ':';
+        p++;
+        *p = ':';
+        p++;
+        if (zeroLen == 8) {
+           *p = '\0';
+           return buf;
+        } else if (zeroLen == 7 && 1 == addr->d[7]) {
+           *p = '1';
+           p++;
+           *p = '\0';
+           return buf;
+        }
+        ipv4_ntop(((uint32_t)(addr->d[6]) << 16) | addr->d[7], p);
         return buf;
     }
 
@@ -347,10 +338,7 @@ char *ipv6_ntop(ipv6addr_t *addr, char *buf, ipv6_output_format_t format)
         if (zeroStart == i) {
             continue;
         }
-        utoa(addr->d[i], p, 16);
-        while(*p != '\0'){
-            p++;
-        }
+        p += utohex(addr->d[i], p, 0, false);
     }
     *p = '\0';
 

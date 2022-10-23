@@ -7,20 +7,19 @@ LDFLAGS=
 .PHONY:compilework
 compilework: $(TARGET)
 
-ipcalc: $(OBJS) main.obj
-	gcc $(LDFLAGS) -o $@ $<
-test: $(OBJS) test.obj
-	g++ $(LDFLAGS) -o $@ $<
-main.obj: main.c $(HEADERS)
-	gcc $(CFLAGS) -o $@ $^
-test.obj: test.cpp test.hpp $(HEADERS)
-	g++ $(CFLAGS) -o $@ $^
-ipv4.obj: ipv4.c $(HEADERS)
-	gcc $(CFLAGS) -o $@ $^
-ipv6.obj: ipv6.c $(HEADERS)
-	gcc $(CFLAGS) -o $@ $^
+ipcalc: $(OBJS) main.o
+	gcc $(LDFLAGS) -o $@ $^
+test: $(OBJS) test.o
+	g++ $(LDFLAGS) -o $@ $^
+main.o: main.c $(HEADERS)
+	gcc $(CFLAGS) -c -o $@ $<
+test.o: test.cpp test.hpp $(HEADERS)
+	g++ $(CFLAGS) -c -o $@ $<
+ipv4.o: ipv4.c $(HEADERS)
+	gcc $(CFLAGS) -c -o $@ $<
+ipv6.o: ipv6.c $(HEADERS)
+	gcc $(CFLAGS) -c -o $@ $<
 
 .PHONY:clean
 clean:
-	-rm *.obj $(TARGET)
-
+	-rm *.o $(TARGET)
