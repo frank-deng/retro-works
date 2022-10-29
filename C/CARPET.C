@@ -70,10 +70,10 @@ void drawCarpet(uint16_t size, FILE *fp)
     size_t rowBytes = ((size + 0x1f) >> 5) << 2;
     bmpHeader_t header;
 
-    header.size = sizeof(bmpHeader_t) + BMP_PALETTE_SIZE +
+    header.size = 2 + sizeof(bmpHeader_t) + BMP_PALETTE_SIZE +
         (uint32_t)rowBytes * (uint32_t)size;
     header.res = 0;
-    header.dataOffset = sizeof(bmpHeader_t) + BMP_PALETTE_SIZE;
+    header.dataOffset = 2 + sizeof(bmpHeader_t) + BMP_PALETTE_SIZE;
     header.headerSize = BMP_HEADER_SIZE;
     header.width = size;
     header.height = size;

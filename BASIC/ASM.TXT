@@ -1,6 +1,6 @@
 以下汇编代码可直接用debug程序的汇编功能汇编到org 100h，然后保存成二进制文件并用HEXDUMP.BAS转换成QBasic可使用的DATA数据。
 
-检查特显程序是否运行：
+检查UCDOS特显程序是否运行：
 -a
 org 100h
 push ax
@@ -36,7 +36,7 @@ jnz 126
 2a
 -w
 
-检查打印字库模块是否安装：
+检查UCDOS打印字库模块是否安装：
 -a
 org 100h
 push ax
@@ -74,7 +74,7 @@ jnz 12b
 2f
 -w
 
-获取打印字库点阵：
+获取UCDOS打印字库点阵：
 -a
 org 100h
 push ds
