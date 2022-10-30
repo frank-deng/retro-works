@@ -217,7 +217,7 @@ After that, run `npm start` to generate the blog site, generated files can be fo
 
 配置 Configuration
 
-* V30 (80186 Compatible) CPU
+* V20 (80186 Compatible) CPU
 * 640k RAM
 * 5.25" 1.2M High Density Floppy Drive
 * 5.25" 360k Double Side Floppy Drive
@@ -239,7 +239,7 @@ After that, run `npm start` to generate the blog site, generated files can be fo
 * CPU 80486DX2 66MHz
 * 8M RAM
 * 512M HDD
-* S3 864 Graphics Adapter with 384k VRAM, capable of handling 640x480 256-color video mode.
+* S3 864 Graphics Adapter with 512k VRAM
 * CD-ROM
 * Sound Blaster 16
 * Mouse
