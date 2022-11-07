@@ -354,6 +354,11 @@ Use the basic VGA driver for the initial install, then change the video driver u
 安装显卡驱动时如果提示插入S3 Trio 64V Flat Mode Driver软盘，则此时需要将路径填写成`C:\WINDOWS\SYSTEM\`以完成显卡驱动的安装。  
 When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk, redirect the installer to `C:\WINDOWS\SYSTEM\` to complete the graphics driver install.
 
+### Windows 3.x下使用DOSBox-x的打印机 Use DOSBox-x's printer under Windows 3.x
+
+选择“Epson LQ1600K”作为打印机驱动程序，之后可以从Windows 3.x的应用程序中打印到PNG图片。
+Select "Epson LQ1600K" as the printer driver, then you can print document into PNG files from Windows 3.x applications.
+
 ### Linux下安装字体
 
 1. 将字体文件复制到`/usr/share/fonts`中，并将字体文件的权限改为`644`。  
@@ -388,4 +393,3 @@ Permanently enable serial console on `/dev/ttyS0`:
 Check whether serial console is enabled on `/dev/ttyS0`:
 
     systemctl status serial-getty@ttyS0.service
-
