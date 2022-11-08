@@ -1,3 +1,3 @@
 @echo off
-nmake
+wmake
 pause

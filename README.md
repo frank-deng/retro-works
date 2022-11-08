@@ -356,10 +356,10 @@ When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk
 
 ### Windows 3.x下使用DOSBox-x的打印机 Use DOSBox-x's printer under Windows 3.x
 
-选择“Epson LQ1600K”作为打印机驱动程序，之后可以从Windows 3.x的应用程序中打印到PNG图片。
-Select "Epson LQ1600K" as the printer driver, then you can print document into PNG files from Windows 3.x applications.
+选择`Epson LQ1600K`作为打印机驱动程序，之后可以从Windows 3.x的应用程序中使用DOSBox-x的虚拟打印机打印到PNG图片。  
+Select `Epson LQ1600K` as the printer driver, then you can print document into PNG files from Windows 3.x applications via DOSBox-x's virtual printer.
 
-### Linux下安装字体
+### Linux下安装字体 Install Fonts Under Linux
 
 1. 将字体文件复制到`/usr/share/fonts`中，并将字体文件的权限改为`644`。  
 Copy font files to `/usr/share/fonts` and change the permission of the font files into `644`.
