@@ -169,6 +169,17 @@ Convert video into VCD
 	ffmpeg -i input.mp4 -target pal-vcd|ntsc-vcd output.mpg
 	vcdimager -t vcd2 -l "Movie Title" -c output.cue -b output.bin output.mpg
 
+使用ffmpeg制作VCD并将源视频分成多长碟片（每张碟片最长1小时）  
+Convert video into VCD and split the source video into multiple discs (Maximum 1 hour for each disc)
+
+	ffmpeg -ss 00:00:00 -t 00:60:00 -i input.mp4 -target pal-vcd|ntsc-vcd output1.mpg
+	vcdimager -t vcd2 -l "Part 1" -c output1.cue -b output1.bin output1.mpg
+	ffmpeg -ss 00:60:00 -t 00:30:00 -i input.mp4 -target pal-vcd|ntsc-vcd output2.mpg
+	vcdimager -t vcd2 -l "Part 2" -c output2.cue -b output2.bin output2.mpg
+
+Windows 3.2和Windows 95使用**金山影霸II**播放PAL制式VCD，使用XingMPEG Player播放NTSC制式VCD。  
+Under Windows 3.2 and Windows 95, use SoftVCD II (JinShanYinBa II) to play PAL VCD, use XingMPEG Player to play NTSC VCD.
+
 DOSBox使用的Autoexec命令，用于挂载原始硬盘镜像和软盘镜像  
 DOSBox autoexec command for mounting raw harddisk image and floppy image
 
