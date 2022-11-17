@@ -163,6 +163,12 @@ Convert video into format accepted by Windows 3.1
 		-vf "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2"\
 		-r 12 -ac 1 -ar 22050 -y output.avi
 
+使用ffmpeg制作VCD  
+Convert video into VCD
+
+	ffmpeg -i input.mp4 -target pal-vcd|ntsc-vcd output.mpg
+	vcdimager -t vcd2 -l "Movie Title" -c output.cue -b output.bin output.mpg
+
 DOSBox使用的Autoexec命令，用于挂载原始硬盘镜像和软盘镜像  
 DOSBox autoexec command for mounting raw harddisk image and floppy image
 
