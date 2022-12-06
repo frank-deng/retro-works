@@ -1,0 +1,9 @@
+defflow off
+deflogin on
+cjkwidth on
+vbell off
+term ansi.sys
+shell /bin/bash
+encoding UTF-8 GBK
+setenv RUN_SCREEN yes
+
