@@ -14,26 +14,12 @@ abstract class DataManager{
         $this->timeout=$timeout;
 
         //Load data from cache
-        $data=apcu_fetch($this->cache_key_data);
-        if(!$data){
-            $this->cache_expired=true;
-        }else{
-            $this->data=$data;
-            //Check if cache expired
-            $timestamp=apcu_fetch($this->cache_key_timestamp);
-            if($this->timeout && (!$timestamp || ((time()-$timestamp) > $this->timeout))){
-                $this->cache_expired=true;
-            }
-        }
+        $this->cache_expired=true;
     }
     protected function cacheExpired(){
         return $this->cache_expired;
     }
     protected function writeCache($data){
-        apcu_add($this->cache_key_data,null);
-        apcu_store($this->cache_key_data,$data);
-        apcu_add($this->cache_key_timestamp,null);
-        apcu_store($this->cache_key_timestamp,time());
     }
     public function getHandle(){
         return $this->ch;
@@ -191,7 +177,6 @@ class FetchWeather extends DataManager{
         ]
     ];
     public static function clearCache(){
-        apcu_delete('weather_data');
     }
     public function __construct($location_id=null, $location_name=null){
         global $_CONFIG;

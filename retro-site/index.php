@@ -94,25 +94,6 @@ $warningColorTable=[
     <?php } ?>
 </table><p align='center'><img src='/static/CONTLINE.GIF'></p>
 <?php } ?>
-<?php if($ncov){ ?>
-<table width='100%'>
-    <tr>
-        <td colspan='2' height='24px' valign='middle'>
-            <img src='/static/BULL1A.GIF'/>
-            <b>抗击疫情</b>　<a href='ncov.php'><font size='2'>查看详情&gt;&gt;</font></a>
-        </td>
-    </tr>
-    <tr><td colspan='2' height='6px'></td></tr>
-    <?php foreach($ncov['news'] as $item){ ?>
-    <tr>
-        <td width='10px'></td>
-        <td><img src='/static/BULLET3.GIF'/> <?=$item['title']?></td>
-    </tr>
-    <?php } ?>
-    <tr><td colspan='2' height='5px'></td></tr>
-    <tr><td colspan='2'><?php include('ncovtable.php'); ?><p></p></td></tr>
-</table><p align='center'><img src='/static/CONTLINE.GIF'></p>
-<?php } ?>
 </td></tr>
 <tr><td height='10px'></td></tr>
 </table></body></html>
