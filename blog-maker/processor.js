@@ -30,40 +30,19 @@ require('mathjax-full/js/util/entities/all.js');
 
 function svg2gif(svgData){
   return new Promise((resolve,reject)=>{
-    if ('win32' == process.platform) {
-      let convert=spawn('convert',['-','+dither','+antialias','-colors','16','GIF:-']);
-      let result=Buffer.alloc(0,0,'binary');
-      convert.stdout.on('data',(data)=>{
-        result=Buffer.concat([result,data]);
-      });
-      convert.stderr.on('data',(data)=>{
-        console.error('convert:',data.toString());
-      });
-      convert.stdin.write(svgData);
-      convert.stdin.end();
-      convert.on('close',()=>{
-        resolve(result);
-      });
-    } else {
-      let rsvgConvert=spawn('rsvg-convert',['-b','#ffffff','-f','png']),
-        convert=spawn('convert',['-','+dither','+antialias','-colors','16','GIF:-']),
-        result=Buffer.alloc(0,0,'binary');
-      rsvgConvert.stderr.on('data',(data)=>{
-        console.error('rsvg:',data.toString());
-      });
-      convert.stderr.on('data',(data)=>{
-        console.error('convert:',data.toString());
-      });
-      rsvgConvert.stdout.pipe(convert.stdin);
-      convert.stdout.on('data',(data)=>{
-        result=Buffer.concat([result,data]);
-      });
-      convert.on('close',()=>{
-        resolve(result);
-      });
-      rsvgConvert.stdin.write(svgData);
-      rsvgConvert.stdin.end();
-    }
+    let convert=spawn('magick',['convert','-','+dither','+antialias','-colors','16','GIF:-']);
+    let result=Buffer.alloc(0,0,'binary');
+    convert.stdout.on('data',(data)=>{
+      result=Buffer.concat([result,data]);
+    });
+    convert.stderr.on('data',(data)=>{
+      console.error('convert:',data.toString());
+    });
+    convert.stdin.write(svgData);
+    convert.stdin.end();
+    convert.on('close',()=>{
+      resolve(result);
+    });
   });
 }
 function applyFont(document,text,fontTable={}){
