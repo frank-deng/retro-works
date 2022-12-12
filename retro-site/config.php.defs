@@ -3,6 +3,8 @@ $_CONFIG=array(
   'HEWEATHER_KEY'=>"123456",
   'TIANAPI_KEY'=>"123456",
   'REQUEST_TIMEOUT'=>7,
+  'BLOGS_DATA'=>'../blog-maker/dist/postlist.json',
+  'BLOGS_COUNT'=>10,
   'LINKS'=>array(
     array(
         'title'=>'我的博客',

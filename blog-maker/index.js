@@ -118,7 +118,10 @@ async function main(){
   if(config.targetEncoding){
     indexPage=iconv.encode(indexPage,config.targetEncoding);
   }
-  await fs.promises.writeFile(target+`/index.htm`, indexPage, 'binary');
+  await Promise.all([
+    fs.promises.writeFile(target+'/index.htm', indexPage, 'binary'),
+    fs.promises.writeFile(target+'/postlist.json', JSON.stringify(postList, null, 2), 'UTF-8'),
+  ]);
 }
 
 try{

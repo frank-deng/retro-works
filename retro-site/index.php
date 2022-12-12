@@ -1,7 +1,7 @@
 <?php
 require('common.php');
 $loadNews=new FetchNews();
-$loadNcov=new FetchNcov();
+$loadBlogs=new FetchBlogs();
 $loadWeather=null;
 $weatherStr='没有天气信息 <font size=2>[<a href=\'selectCity.php\'>选择城市</a>]</font>&nbsp;';
 try{
@@ -10,13 +10,13 @@ try{
         $location=explode(',',$location);
         $loadWeather=new FetchWeather($location[0],$location[1]);
     }
-    fetchMultiWait($loadNews,$loadNcov,$loadWeather);
+    fetchMultiWait($loadNews,$loadBlogs,$loadWeather);
 }catch(Exception $e){
     error_log($e);
 }
 
 $news=$loadNews->fetch();
-$ncov=$loadNcov->fetch();
+$blogs=$loadBlogs->fetch();
 $weather=null;
 try{
     if($loadWeather){
@@ -90,6 +90,23 @@ $warningColorTable=[
     <tr>
         <td width='10px'></td>
         <td><img src='/static/BULLET3.GIF'/> <?=$item['title']?></td>
+    </tr>
+    <?php } ?>
+</table><p align='center'><img src='/static/CONTLINE.GIF'></p>
+<?php } ?>
+<?php if($blogs){ ?>
+<table width='100%'>
+    <tr>
+        <td colspan=2 height='24px' valign='middle'>
+            <img src='/static/BULL1A.GIF'/>
+            <b>我的博客</b>　<a href='blog/index.htm'><font size='2'>更多&gt;&gt;</font></a>
+        </td>
+    </tr>
+    <tr><td colspan=2 height='6px'></td></tr>
+    <?php foreach($blogs as $item){ ?>
+    <tr>
+        <td width='10px'></td>
+        <td><img src='/static/BULLET3.GIF'/> <a href='blog/<?=$item['link']?>'><?=$item['title']?></a></td>
     </tr>
     <?php } ?>
 </table><p align='center'><img src='/static/CONTLINE.GIF'></p>

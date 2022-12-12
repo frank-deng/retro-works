@@ -25,7 +25,9 @@ abstract class DataManager{
         return $this->ch;
     }
     public function onFinish(){
-        $this->data=curl_multi_getcontent($this->ch);
+        if ($this->ch) {
+            $this->data=curl_multi_getcontent($this->ch);
+        }
     }
     public function fetch(){
         return $this->data;
@@ -51,6 +53,9 @@ function fetchMultiWait(...$arr){
     try{
         foreach($taskList as $object){
             $handle=$object->getHandle();
+            if (!$handle) {
+                continue;
+            }
             if(!is_array($handle)){
                 curl_multi_add_handle($task,$handle);
                 continue;
@@ -74,6 +79,9 @@ function fetchMultiWait(...$arr){
     }finally{
         foreach($taskList as $object){
             $handle=$object->getHandle();
+            if (!$handle) {
+                continue;
+            }
             if(!is_array($handle)){
                 curl_multi_remove_handle($task,$handle);
                 continue;
@@ -115,31 +123,20 @@ class FetchNews extends DataManager{
         }
     }
 }
-class FetchNcov extends DataManager{
+class FetchBlogs extends DataManager{
     public function __construct(){
         global $_CONFIG;
-        parent::__construct('ncov', 60*10);
-        if($this->cacheExpired()){
-            $ch=curl_init();
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-            curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
-            curl_setopt($ch, CURLOPT_URL, 'http://api.tianapi.com/txapi/ncov/index');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-              'key'=>$_CONFIG['TIANAPI_KEY']
-            )));
-            $this->ch=$ch;
-        }
-    }
-    public function onFinish(){
         try{
-            $data=curl_multi_getcontent($this->ch);
-            if($data){
-                $this->data=json_decode($data,true)['newslist'][0];
-                $this->writeCache($this->data);
+            parent::__construct('blogs', 60*10);
+            if (!$_CONFIG['BLOGS_DATA']) {
+                return;
             }
+            $blogsData = file_get_contents($_CONFIG['BLOGS_DATA']);
+            if (!$blogsData) {
+                return;
+            }
+            $this->data = array_slice(json_decode($blogsData, true), 0, $_CONFIG['BLOGS_COUNT']);
+            $this->writeCache($this->data);
         }catch(Exception $e){
             error_log($e);
         }
