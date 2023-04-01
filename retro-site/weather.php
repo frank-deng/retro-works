@@ -35,7 +35,7 @@ $warningColorTable=[
 ];
 require('header.php');
 ?><p><b>当前城市：</b><?=$loadWeather->getLocationName()?> <font size='2'>[<a href='selectCity.php'>选择城市</a>]</font></p><?php
-if(count($weather['warning'])){
+if($weather['warning'] && count($weather['warning'])){
 ?><p>
 <?php foreach($weather['warning'] as $item){
 ?>

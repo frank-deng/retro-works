@@ -40,7 +40,7 @@ try{
 	</head>
 	<body topmargin='0' leftmargin='0' rightmargin='0' bottommargin='0' background='static/GRAY.JPG'>
 <!--Weather warning-->
-<?php if($weather && count($weather['warning'])){
+<?php if($weather && is_array($weather['warning']) && count($weather['warning'])){
 $warningColorTable=[
     '蓝色'=>'#0000ff',
     '黄色'=>'#a0a000',
@@ -86,7 +86,7 @@ $warningColorTable=[
         </td>
     </tr>
     <tr><td colspan=2 height='6px'></td></tr>
-    <?php foreach($news as $item){ ?>
+    <?php $news10 = array_slice($news, 0, 10); foreach($news10 as $item){ ?>
     <tr>
         <td width='10px'></td>
         <td><img src='/static/BULLET3.GIF'/> <?=$item['title']?></td>
