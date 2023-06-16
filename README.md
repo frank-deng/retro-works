@@ -73,6 +73,25 @@ Some retro programming works for vintage platforms. For entertainment use only.
 新年快乐 Happy New Year  
 ![Happy New Year](http://frank-deng.github.io/retro-works/screenshots/New_Year.png)
 
+诸事皆顺 Everything Goes Well  
+![Everything Goes Well](http://frank-deng.github.io/retro-works/screenshots/Well.png)
+
+月亮河 *Moon River*  
+![Moon River](http://frank-deng.github.io/retro-works/screenshots/Moon_River.png)
+
+图案 Patterns  
+![Pattern 1](http://frank-deng.github.io/retro-works/screenshots/Pattern_1.png)  
+  
+![Pattern 2](http://frank-deng.github.io/retro-works/screenshots/Pattern_2.png)  
+  
+![Pattern 3](http://frank-deng.github.io/retro-works/screenshots/Pattern_3.png)
+
+中文数字 Chinese Number  
+![Chinese Number 1](http://frank-deng.github.io/retro-works/screenshots/Chinese_Number_1.png)  
+  
+![Chinese Number 2](http://frank-deng.github.io/retro-works/screenshots/Chinese_Number_2.png)
+
+
 1997's PC
 ---------
 
