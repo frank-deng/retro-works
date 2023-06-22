@@ -149,6 +149,9 @@ UCDOS特显程序256色列表 256-Color Table of UCDOS Special Display Tool
 UCDOS特显程序可用字体 Fonts available for UCDOS Special Display Tool  
 ![Fonts](http://frank-deng.github.io/retro-works/screenshots/TX_Fonts.png)
 
+UCDOS可用英文字体 English fonts available for UCDOS  
+![English Fonts](http://frank-deng.github.io/retro-works/screenshots/TX_Fonts2.png)
+
 #### PPP服务器 PPP Server
 
 天气预报 Weather Forecast  

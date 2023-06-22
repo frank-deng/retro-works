@@ -102,3 +102,24 @@ retf
 -rcx
 1f
 -w
+
+画点：
+-a
+org 100h
+push ax
+push cx
+push dx
+mov al,0
+mov cx,0
+mov dx,0
+mov ah,0c
+int 10h
+pop dx
+pop cx
+pop ax
+retf
+
+-n draw.bin
+-rcx
+13
+-w
