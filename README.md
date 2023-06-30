@@ -87,9 +87,7 @@ Some retro programming works for vintage platforms. For entertainment use only.
 ![Pattern 3](http://frank-deng.github.io/retro-works/screenshots/Pattern_3.png)
 
 中文数字 Chinese Number  
-![Chinese Number 1](http://frank-deng.github.io/retro-works/screenshots/Chinese_Number_1.png)  
-  
-![Chinese Number 2](http://frank-deng.github.io/retro-works/screenshots/Chinese_Number_2.png)
+![Chinese Number](http://frank-deng.github.io/retro-works/screenshots/Chinese_Number.png)
 
 罗马数字 Roman Number  
 ![Roman Number](http://frank-deng.github.io/retro-works/screenshots/Roman_Number.png)
@@ -151,6 +149,9 @@ UCDOS特显程序可用字体 Fonts available for UCDOS Special Display Tool
 
 UCDOS可用英文字体 English fonts available for UCDOS  
 ![English Fonts](http://frank-deng.github.io/retro-works/screenshots/TX_Fonts2.png)
+
+中文数字 Chinese Number  
+![Chinese Number for UCDOS](http://frank-deng.github.io/retro-works/screenshots/Chinese_Number_UCDOS.png)
 
 #### PPP服务器 PPP Server
 
