@@ -109,6 +109,8 @@ void Test::run(){
     EXP_FALSE(ipv6_pton("::192.168.0.299", &addr6));
     EXP_FALSE(ipv6_pton("::192.168..2", &addr6));
     EXP_FALSE(ipv6_pton("::192.168.1.2:6", &addr6));
+    EXP_FALSE(ipv6_pton("1::192::168:1:2:6", &addr6));
+    EXP_FALSE(ipv6_pton("1::192::168.1.2:6", &addr6));
 }
 
 int main(int argc, char *argv[])

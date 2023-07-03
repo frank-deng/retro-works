@@ -139,7 +139,8 @@ static inline bool processRAlign(ipv6_pton_data_t *data)
     bool status = true;
     if (TOKEN_SEP == data->lastTokenType ||
         TOKEN_SEP4 == data->lastTokenType || 
-        data->ipv4NumCount > 0) {
+        data->ipv4NumCount > 0 ||
+	true == data->ralign) {
         return false;
     }
     if (TOKEN_NUM == data->lastTokenType) {
