@@ -153,6 +153,12 @@ UCDOS可用英文字体 English fonts available for UCDOS
 中文数字 Chinese Number  
 ![Chinese Number for UCDOS](http://frank-deng.github.io/retro-works/screenshots/Chinese_Number_UCDOS.png)
 
+IP地址计算器 IP Address Calculator  
+![IP Calculator](http://frank-deng.github.io/retro-works/screenshots/IPCalc.png)
+
+UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS  
+![IP Calculator](http://frank-deng.github.io/retro-works/screenshots/IPCalc_UCDOS.png)
+
 #### PPP服务器 PPP Server
 
 天气预报 Weather Forecast  
