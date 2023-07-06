@@ -22,6 +22,7 @@ Some retro programming works for vintage platforms. For entertainment use only.
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
 * 黑白棋游戏 Reversi Game
+* 英文打字练习 English Input Training
 * 五笔打字练习 Wubi Input Training
 
 ### 截图欣赏 Screenshots
