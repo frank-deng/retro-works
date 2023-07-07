@@ -4,7 +4,9 @@
 #include <malloc.h>
 
 #define MAGIC_NUM ("MGC")
-#define UNSUPPORTED_FILE_TYPE ("Unsupported file type.")
+#define HELP_TEXT ("Usage: %s input.crd [output.txt]\n")
+#define INVALID_FILE ("Unable to open file")
+#define UNSUPPORTED_FILE_TYPE ("Unsupported file type")
 
 struct headerLine_s {
 	char reserved[6];
@@ -20,6 +22,9 @@ struct cardHeader_s {
 char *checkFile(FILE *fp)
 {
 	char buf[sizeof(MAGIC_NUM)];
+	if (NULL == fp) {
+		return INVALID_FILE;
+	}
 	fseek(fp, 0, SEEK_SET);
 	fread(buf, sizeof(MAGIC_NUM) - 1, 1, fp);
 	if (memcmp(MAGIC_NUM, buf, sizeof(MAGIC_NUM) - 1) != 0) {
@@ -78,22 +83,32 @@ int parseFile(FILE *dst, FILE *fp)
 }
 int main(int argc, char *argv[])
 {
-	FILE *fp = NULL;
 	char *err = NULL;
 	char *fpath = NULL;
+	char *dpath = NULL;
+	FILE *fp = NULL;
+	FILE *out = stdout;
 
+	if (argc < 2) {
+		fprintf(stderr, HELP_TEXT, argv[0]);
+		return 1;
+	}
 	fpath = argv[1];
 	fp = fopen(fpath, "rb");
-	if (NULL == fp) {
-		fprintf(stderr, "Unable to open file: %s\n", fpath);
-		return 1;
-	}
 	err = checkFile(fp);
 	if (NULL != err) {
-		fprintf(stderr, "%s\n", err);
+		fprintf(stderr, "%s: %s\n", err, fpath);
 		return 1;
 	}
-	parseFile(stdout, fp);
+	if (argc >= 3) {
+		dpath = argv[2];
+		out = fopen(dpath, "w");
+		if (NULL == out) {
+			fprintf(stderr, "Unable to open file: %s\n", dpath);
+			return 1;
+		}
+	}
+	parseFile(out, fp);
 	return 0;
 }
 
