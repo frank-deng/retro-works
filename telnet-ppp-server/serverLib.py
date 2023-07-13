@@ -21,23 +21,29 @@ class SocketServer:
         instance = self.__instances[str(conn.fileno())];
         datar = None
         dataw = None
-        if (mask & selectors.EVENT_READ):
-            datar = conn.recv(1024);
-            if datar:
-                instance.read(datar);
-        if (mask & selectors.EVENT_WRITE):
-            dataw = instance.write();
-            if dataw:
-                conn.sendall(dataw);
-        if (not datar) and (not dataw):
-            time.sleep(0.001);
+        try:
+            if (mask & selectors.EVENT_READ):
+                datar = conn.recv(1024);
+                if datar:
+                    instance.read(datar);
+            if (mask & selectors.EVENT_WRITE):
+                dataw = instance.write();
+                if dataw:
+                    conn.sendall(dataw);
+            if (not datar) and (not dataw):
+                time.sleep(0.001);
+        except Exception as e:
+            print(e);
+            instance.close();
+            del self.__instances[str(conn.fileno())];
+            self.__sel.unregister(conn);
 
     def close(self):
         for key, instance in self.__instances.items():
             try:
                 instance.close();
             except Exception as e:
-                pass;
+                print(e);
         self.__sel.close();
 
     def run(self):
