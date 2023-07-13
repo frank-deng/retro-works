@@ -19,14 +19,18 @@ class SocketServer:
 
     def __connHandler(self, conn, mask):
         instance = self.__instances[str(conn.fileno())];
+        datar = None
+        dataw = None
         if (mask & selectors.EVENT_READ):
-            data = conn.recv(1024);
-            if data:
-                instance.read(data);
+            datar = conn.recv(1024);
+            if datar:
+                instance.read(datar);
         if (mask & selectors.EVENT_WRITE):
-            data = instance.write();
-            if data:
-                conn.sendall(data);
+            dataw = instance.write();
+            if dataw:
+                conn.sendall(dataw);
+        if (not datar) and (not dataw):
+            time.sleep(0.001);
 
     def close(self):
         for key, instance in self.__instances.items():
