@@ -3,7 +3,6 @@ import traceback;
 
 class SocketServer:
     __addr=('0,0,0,0',8080);
-    __running=True;
     __instances={};
     def __init__(self,host,port,handler,args=()):
         self.__addr=(host,port);
@@ -21,14 +20,15 @@ class SocketServer:
     def __connHandler(self, conn, mask):
         instance = self.__instances[str(conn.fileno())];
         if (mask & selectors.EVENT_READ):
-            instance.read(conn.recv(1024));
+            data = conn.recv(1024);
+            if data:
+                instance.read(data);
         if (mask & selectors.EVENT_WRITE):
             data = instance.write();
             if data:
                 conn.sendall(data);
 
     def close(self):
-        self.__running=False;
         for key, instance in self.__instances.items():
             try:
                 instance.close();
