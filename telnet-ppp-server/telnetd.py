@@ -50,49 +50,9 @@ class Readline:
                 if(self.__echo):
                     self.__display+=val.to_bytes(1,'little');
 
-import socket,select;
-class ProxyApp:
-    __socket=None;
-    def __init__(self,host,port):
-        self.__socket=socket.socket();
-        self.__socket.settimeout(3);
-        self.__socket.connect((host,port));
-        self.__socket.setblocking(0);
-        self.__socket.settimeout(3);
-
-    def read(self,content):
-        if not self.__socket:
-            return None;
-        try:
-            self.__socket.send(content);
-        except Exception as e:
-            return None;
-        return True;
-
-    def write(self):
-        if not self.__socket:
-            return None;
-        try:
-            ready = select.select([self.__socket], [], [], 0.1);
-            if not ready[0]:
-                return b'';
-            content=self.__socket.recv(1024);
-            if len(content)<=0:
-                return None;
-            return content;
-        except Exception as e:
-            return None;
-        return b'';
-
-    def close(self):
-        if self.__socket:
-            self.__socket.close();
-            self.__socket=None;
-
 import subprocess,pty,fcntl,os,io,codecs;
 class ProcessApp:
     __process=None;
-    __rawMode=True;
     def __init__(self,args,cwd,environ={}):
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
@@ -142,6 +102,60 @@ class ProcessApp:
             sys.stderr.write(format_exc(e)+"\n");
             return None;
 
+class BGProcessApp:
+    __process=None;
+    def __init__(self,args,cwd,environ={}):
+        self.__master, self.__slave = pty.openpty();
+        fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
+        fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK);
+        env=os.environ.copy();
+        env.update(environ);
+        ptyPath="/proc/%d/fd/%d"%(os.getpid(),self.__slave);
+        argsProc=[]
+        for i in range(len(args)):
+            if ('%I'==args[i]):
+                argsProc.append(ptyPath)
+            else:
+                argsProc.append(args[i])
+        self.__process=subprocess.Popen(
+            argsProc,
+            bufsize=0,
+            start_new_session=True,
+            stdin=self.__slave,
+            stdout=self.__slave,
+            stderr=self.__slave,
+            cwd=cwd,
+            env=env
+        );
+
+    def close(self):
+        if self.__process is None:
+            return;
+        os.close(self.__slave);
+        os.close(self.__master);
+        self.__process=None;
+
+    def read(self, data):
+        if self.__process is None:
+            return None;
+        try:
+            os.write(self.__master, data);
+            return True;
+        except Exception as e:
+            sys.stderr.write(format_exc(e)+"\n");
+            return None;
+
+    def write(self):
+        if self.__process is None:
+            return None;
+        try:
+            return os.read(self.__master, 65536);
+        except BlockingIOError:
+            return b'';
+        except Exception as e:
+            sys.stderr.write(format_exc(e)+"\n");
+            return None;
+
 import json;
 class LoginHandler:
     __loginInfo={};
@@ -164,9 +178,6 @@ class LoginHandler:
         if (loginInfo is None) or password!=loginInfo['password']:
             return b'Invalid Login.\r\n';
         try:
-            if 'ProxyApp'==loginInfo['module']:
-                self.__app=ProxyApp(loginInfo['host'],loginInfo['port']);
-                return b'Success.'+b'\r\n';
             if 'ProcessApp'==loginInfo['module']:
                 self.__app=ProcessApp(
                     loginInfo['command'],
@@ -174,6 +185,15 @@ class LoginHandler:
                     loginInfo.get('environ',{})
                 );
                 return b'Success.'+b'\r\n';
+            elif 'BGProcessApp'==loginInfo['module']:
+                self.__app=BGProcessApp(
+                    loginInfo['command'],
+                    loginInfo.get('cwd',os.environ['HOME']),
+                    loginInfo.get('environ',{})
+                );
+                return b'Success.'+b'\r\n';
+            else:
+                return b'Invalid app.'+b'\r\n';
         except Exception as e:
             sys.stderr.write('Error during creating application: '+str(e)+"\n");
             return b'Invalid Login.\r\n';
