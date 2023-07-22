@@ -2,7 +2,10 @@
 
 from serverLib import SocketServer;
 from traceback import format_exc;
-import hashlib,sys;
+import hashlib,sys,time,socket,selectors;
+import traceback;
+import subprocess,pty,fcntl,os,io,codecs;
+import json;
 
 class Readline:
     __maxLength=60;
@@ -50,10 +53,9 @@ class Readline:
                 if(self.__echo):
                     self.__display+=val.to_bytes(1,'little');
 
-import subprocess,pty,fcntl,os,io,codecs;
 class ProcessApp:
     __process=None;
-    def __init__(self,args,cwd,environ={}):
+    def __init__(self,args,cwd,environ={},user=None,group=None):
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
         fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK);
@@ -67,7 +69,9 @@ class ProcessApp:
             stdout=self.__slave,
             stderr=self.__slave,
             cwd=cwd,
-            env=env
+            env=env,
+            user=user,
+            group=group
         );
 
     def close(self):
@@ -104,7 +108,7 @@ class ProcessApp:
 
 class BGProcessApp:
     __process=None;
-    def __init__(self,args,cwd,environ={}):
+    def __init__(self,args,cwd,environ={},user=None,group=None):
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
         fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK);
@@ -125,7 +129,9 @@ class BGProcessApp:
             stdout=self.__slave,
             stderr=self.__slave,
             cwd=cwd,
-            env=env
+            env=env,
+            user=user,
+            group=group
         );
 
     def close(self):
@@ -156,7 +162,6 @@ class BGProcessApp:
             sys.stderr.write(format_exc(e)+"\n");
             return None;
 
-import json;
 class LoginHandler:
     __loginInfo={};
     __running=True;
@@ -182,14 +187,18 @@ class LoginHandler:
                 self.__app=ProcessApp(
                     loginInfo['command'],
                     loginInfo.get('cwd',os.environ['HOME']),
-                    loginInfo.get('environ',{})
+                    loginInfo.get('environ',{}),
+                    user=loginInfo.get('user',None),
+                    group=loginInfo.get('group',None)
                 );
                 return b'Success.'+b'\r\n';
             elif 'BGProcessApp'==loginInfo['module']:
                 self.__app=BGProcessApp(
                     loginInfo['command'],
                     loginInfo.get('cwd',os.environ['HOME']),
-                    loginInfo.get('environ',{})
+                    loginInfo.get('environ',{}),
+                    user=loginInfo.get('user',None),
+                    group=loginInfo.get('group',None)
                 );
                 return b'Success.'+b'\r\n';
             else:
@@ -276,6 +285,63 @@ class LoginHandler:
         if self.__app:
             self.__closeApp();
         self.__running=False;
+
+class SocketServer:
+    __addr=('0,0,0,0',8080);
+    __instances={};
+    def __init__(self,host,port,handler,args=()):
+        self.__addr=(host,port);
+        self.__handler=handler;
+        self.__handlerArgs=args;
+    
+    def __accept(self, sock, mask):
+        conn, addr = sock.accept();
+        conn.setblocking(0);
+        instance = self.__handler(*self.__handlerArgs);
+        self.__instances[str(conn.fileno())] = instance;
+        conn.sendall(instance.write());
+        self.__sel.register(conn, selectors.EVENT_READ|selectors.EVENT_WRITE, self.__connHandler);
+
+    def __connHandler(self, conn, mask):
+        instance = self.__instances[str(conn.fileno())];
+        datar = None
+        dataw = None
+        try:
+            if (mask & selectors.EVENT_READ):
+                datar = conn.recv(1024);
+                if datar:
+                    instance.read(datar);
+            if (mask & selectors.EVENT_WRITE):
+                dataw = instance.write();
+                if dataw:
+                    conn.sendall(dataw);
+            if (not datar) and (not dataw):
+                time.sleep(0.001);
+        except Exception as e:
+            print(e);
+            instance.close();
+            del self.__instances[str(conn.fileno())];
+            self.__sel.unregister(conn);
+
+    def close(self):
+        for key, instance in self.__instances.items():
+            try:
+                instance.close();
+            except Exception as e:
+                print(e);
+        self.__sel.close();
+
+    def run(self):
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+        server.setblocking(0);
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1);
+        server.bind(self.__addr);
+        server.listen(1000);
+        self.__sel = selectors.DefaultSelector();
+        self.__sel.register(server, selectors.EVENT_READ, self.__accept);
+        while True:
+            for key, mask in self.__sel.select():
+                key.data(key.fileobj, mask);
 
 if '__main__'==__name__:
     import argparse;

@@ -25,7 +25,6 @@ Execute the following commands to install softwares required:
 在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
-	@reboot root /usr/local/bin/pppd.py -P 2333 multilink enable-session defaultroute ipcp-accept-remote mtu 576 10.0.2.15: noauth
 	@reboot user /usr/local/bin/telnetd.py -P 2345 -c path/to/telnetd.conf
 
 其中`10.0.2.15`是主机或目标站点的IP。  
