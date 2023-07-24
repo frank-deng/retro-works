@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from serverLib import SocketServer;
 from traceback import format_exc;
 import hashlib,sys,time,socket,selectors;
 import traceback;
@@ -59,7 +58,7 @@ class ProcessApp:
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
         fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK);
-        env=os.environ.copy();
+        env={};
         env.update(environ);
         self.__process=subprocess.Popen(
             args,
@@ -112,7 +111,7 @@ class BGProcessApp:
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
         fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK);
-        env=os.environ.copy();
+        env={};
         env.update(environ);
         ptyPath="/proc/%d/fd/%d"%(os.getpid(),self.__slave);
         argsProc=[]
