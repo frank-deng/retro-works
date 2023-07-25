@@ -26,6 +26,7 @@ Execute the following commands to install softwares required:
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
 	@reboot user /usr/local/bin/telnetd.py -P 2345 -c path/to/telnetd.conf
+	@reboot root /usr/local/bin/telnetd.py -P 2333 -c path/to/ppp.conf
 
 其中`10.0.2.15`是主机或目标站点的IP。  
 `10.0.2.15` is the IP address of the host machine or the target site.
@@ -86,7 +87,7 @@ Find out the IP address after `default via` from the output of the step above, t
 
 ### Windows 3.x客户端使用方法 Windows 3.x Client Usage
 
-设置新的PPP连接时需要将电话号码设置成`12345`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
+设置新的PPP连接时需要将电话号码设置成`12333`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
 When setting up new PPP connection, set phone number with `12345`, set IP address with `192.168.7.2`, leave username and password blank.
 
 如果您有多部虚拟机连接相同的PPP服务器，则需要在每部虚拟机内的系统中分别配置不同的IP地址。比如配置Windows 3.2的IP地址为`192.168.7.2`，Windows 95的IP地址为`192.168.7.3`。  
@@ -94,6 +95,9 @@ If you have multiple virtual machines connecting to the same PPP server, then yo
 
 检查“使用远程网上的默认网关”选项是否被选中，否则将无法连接目标服务器。  
 Check whether "Use default gateway on remote network" box is checked, or you'll be unable to connect to the target server.
+
+检查“拨号后出现终端窗口”选项是否被选中，否则将无法登录。  
+Check whether "Bring up terminal window after dialing" box is checked, or you'll be unable to login.
 
 当连接成功时，打开浏览器，使用URL`http://目标站点IP`访问目标站点。  
 When connection established, open browser and use URL `http://Target IP` to access the target site.
