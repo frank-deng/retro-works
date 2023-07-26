@@ -77,8 +77,8 @@ class LoginHandler(BaseLogin):
                 loginInfo.get('port',22),
                 loginInfo.get('user',username),
                 password,
-                term=loginInfo.get('term',None)
-                width=loginInfo.get('cols',None)
+                term=loginInfo.get('term',None),
+                width=loginInfo.get('cols',None),
                 height=loginInfo.get('lines',None)
             )
             return b'Success.\r\n';
