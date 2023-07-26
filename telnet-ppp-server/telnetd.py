@@ -178,6 +178,7 @@ class LoginHandler(BaseLogin):
         return super().read(content)
 
     def write(self):
+        output=b'';
         if self.__app:
             try:
                 content=self.__app.write();
@@ -186,7 +187,9 @@ class LoginHandler(BaseLogin):
             except Exception as e:
                 print('app-write',e,file=sys.stderr);
             self.__closeApp();
-        return b'\r\n'+super().write()
+            output+=b'\r\n'
+        output+=super().write()
+        return output
 
     def close(self):
         self.__closeApp();
