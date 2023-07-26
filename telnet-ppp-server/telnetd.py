@@ -7,52 +7,6 @@ import subprocess,pty,fcntl,os,io,codecs;
 import json;
 from utils import SocketServer,BaseLogin
 
-class Readline:
-    __maxLength=60;
-    __echo=True;
-    __display=b'';
-    __inputContent=b'';
-    __finished=False;
-    def setEcho(self,value):
-        self.__echo=bool(value);
-
-    def setMaxLength(self,value):
-        self.__maxLength=value;
-
-    def getDisplay(self):
-        content=self.__display;
-        self.__display=b'';
-        return content;
-
-    def get(self):
-        if not self.__finished:
-            return None;
-        content=self.__inputContent;
-        self.__inputContent=b'';
-        self.__display=b'';
-        self.__finished=False;
-        return content;
-
-    def reset(self):
-        self.__inputContent=b'';
-        self.__display=b'';
-        self.__finished=False;
-
-    def write(self,content):
-        if self.__finished:
-            return;
-        for val in content:
-            if 0x08==val and len(self.__inputContent)>0: #Backspace
-                if(self.__echo):
-                    self.__display+=b'\x08 \x08';
-                self.__inputContent=self.__inputContent[0:-1];
-            elif 0x0d==val or 0x0a==val: #Continue
-                self.__finished=True;
-            elif val>=0x20 and val<=0x7e and len(self.__inputContent)<self.__maxLength:
-                self.__inputContent+=val.to_bytes(1,'little');
-                if(self.__echo):
-                    self.__display+=val.to_bytes(1,'little');
-
 class ProcessApp:
     __process=None;
     def __init__(self,args,cwd,environ={},user=None,group=None):
@@ -224,7 +178,6 @@ class LoginHandler(BaseLogin):
         return super().read(content)
 
     def write(self):
-        output=b'';
         if self.__app:
             try:
                 content=self.__app.write();
@@ -233,9 +186,7 @@ class LoginHandler(BaseLogin):
             except Exception as e:
                 print('app-write',e,file=sys.stderr);
             self.__closeApp();
-            output+=b'\r\n'
-        output+=super().write()
-        return output
+        return b'\r\n'+super().write()
 
     def close(self):
         self.__closeApp();

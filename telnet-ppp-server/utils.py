@@ -1,4 +1,5 @@
 import time,socket,selectors;
+from traceback import print_exc;
 
 class Readline:
     __maxLength=60;
@@ -78,7 +79,8 @@ class SocketServer:
             if (not datar) and (not dataw):
                 time.sleep(0.001);
         except Exception as e:
-            print(e);
+            print(e)
+            print_exc()
             instance.close();
             del self.__instances[str(conn.fileno())];
             self.__sel.unregister(conn);
@@ -88,7 +90,8 @@ class SocketServer:
             try:
                 instance.close();
             except Exception as e:
-                print(e);
+                print(e)
+                print_exc()
         self.__sel.close();
 
     def run(self):
@@ -108,7 +111,6 @@ class BaseLogin:
     __action='showLogin';
     __username=b'';
     __password=b'';
-    __app=None;
     def __init__(self):
         self.__readLine=Readline();
 
@@ -116,14 +118,6 @@ class BaseLogin:
         pass;
 
     def read(self,content):
-        if self.__app:
-            try:
-                if self.__app.read(content) is not None:
-                    return True;
-            except Exceptio as e:
-                print('app-read',e,file=sys.stderr);
-            self.__closeApp();
-
         if not len(content):
             return True;
 
@@ -148,16 +142,6 @@ class BaseLogin:
 
     def write(self):
         output=b'';
-        if self.__app:
-            try:
-                content=self.__app.write();
-                if conten is not None:
-                    return content;
-            except Exception as e:
-                print('app-write',e,file=sys.stderr);
-            self.__closeApp();
-            output+=b'\r\n';
-            
         output+=self.__readLine.getDisplay();
         action=self.__action;
         if 'showLogin'==action:
