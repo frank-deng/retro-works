@@ -5,6 +5,7 @@ import hashlib,sys,time,socket,selectors;
 import traceback;
 import subprocess,pty,fcntl,os,io,codecs;
 import json;
+from utils import SocketServer,BaseLogin
 
 class Readline:
     __maxLength=60;
@@ -161,23 +162,17 @@ class BGProcessApp:
             sys.stderr.write(format_exc(e)+"\n");
             return None;
 
-class LoginHandler:
+class LoginHandler(BaseLogin):
     __loginInfo={};
-    __running=True;
-    __action='showLogin';
-    __username=b'';
-    __password=b'';
     __app=None;
     def __init__(self,configFile):
-        self.__readLine=Readline();
+        super().__init__();
         with open(configFile, 'r') as f:
             self.__loginInfo=json.load(f);
 
-    def __processLogin(self,username,password):
-        username=self.__username.decode('UTF-8');
-        password=hashlib.sha256(self.__password).hexdigest();
-        self.__username=b'';
-        self.__password=b'';
+    def onLogin(self,_username,_password):
+        username=_username.decode('UTF-8');
+        password=hashlib.sha256(_password).hexdigest();
         loginInfo=self.__loginInfo.get(username);
         if (loginInfo is None) or password!=loginInfo['password']:
             return b'Invalid Login.\r\n';
@@ -217,11 +212,8 @@ class LoginHandler:
             except Exception as e:
                 sys.stderr.write(format_exc(e)+"\n");
             self.__app=None;
-        self.__action='showLogin';
     
     def read(self,content):
-        if not self.__running:
-            return None;
         if self.__app:
             try:
                 if self.__app.read(content) is not None:
@@ -229,32 +221,9 @@ class LoginHandler:
             except Exception as e:
                 print('app-read',e,file=sys.stderr);
             self.__closeApp();
-
-        if not len(content):
-            return True;
-
-        self.__readLine.write(content);
-        inputContent=self.__readLine.get();
-        if inputContent is None:
-            return True;
-        if 'inputUserName'==self.__action:
-            self.__readLine.reset();
-            if not inputContent:
-                self.__username=b'';
-                self.__action='showLogin';
-            else:
-                self.__username=inputContent;
-                self.__action='showPassword';
-        elif 'inputPassword'==self.__action:
-            self.__readLine.reset();
-            self.__readLine.setEcho(True);
-            self.__password=inputContent;
-            self.__action='processLogin';
-        return True;
+        return super().read(content)
 
     def write(self):
-        if not self.__running:
-            return None;
         output=b'';
         if self.__app:
             try:
@@ -264,87 +233,12 @@ class LoginHandler:
             except Exception as e:
                 print('app-write',e,file=sys.stderr);
             self.__closeApp();
-            output+=b'\r\n';
-            
-        output+=self.__readLine.getDisplay();
-        action=self.__action;
-        if 'showLogin'==action:
-            self.__action='inputUserName';
-            self.__readLine.reset();
-            output+=b'\r\nLogin:';
-        elif 'showPassword'==action:
-            self.__action='inputPassword';
-            output+=b'\r\nPassword:';
-            self.__readLine.reset();
-            self.__readLine.setEcho(False);
-        elif 'processLogin'==action:
-            self.__action='showLogin';
-            output+=b'\r\n'+self.__processLogin(self.__username,self.__password);
-        return output;
+            output+=b'\r\n'
+        output+=super().write()
+        return output
 
     def close(self):
-        if not self.__running:
-            return;
-        if self.__app:
-            self.__closeApp();
-        self.__running=False;
-
-class SocketServer:
-    __addr=('0,0,0,0',8080);
-    __instances={};
-    def __init__(self,host,port,handler,args=()):
-        self.__addr=(host,port);
-        self.__handler=handler;
-        self.__handlerArgs=args;
-    
-    def __accept(self, sock, mask):
-        conn, addr = sock.accept();
-        conn.setblocking(0);
-        instance = self.__handler(*self.__handlerArgs);
-        self.__instances[str(conn.fileno())] = instance;
-        conn.sendall(instance.write());
-        self.__sel.register(conn, selectors.EVENT_READ|selectors.EVENT_WRITE, self.__connHandler);
-
-    def __connHandler(self, conn, mask):
-        instance = self.__instances[str(conn.fileno())];
-        datar = None
-        dataw = None
-        try:
-            if (mask & selectors.EVENT_READ):
-                datar = conn.recv(1024);
-                if datar:
-                    instance.read(datar);
-            if (mask & selectors.EVENT_WRITE):
-                dataw = instance.write();
-                if dataw:
-                    conn.sendall(dataw);
-            if (not datar) and (not dataw):
-                time.sleep(0.001);
-        except Exception as e:
-            print(e);
-            instance.close();
-            del self.__instances[str(conn.fileno())];
-            self.__sel.unregister(conn);
-
-    def close(self):
-        for key, instance in self.__instances.items():
-            try:
-                instance.close();
-            except Exception as e:
-                print(e);
-        self.__sel.close();
-
-    def run(self):
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-        server.setblocking(0);
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1);
-        server.bind(self.__addr);
-        server.listen(1000);
-        self.__sel = selectors.DefaultSelector();
-        self.__sel.register(server, selectors.EVENT_READ, self.__accept);
-        while True:
-            for key, mask in self.__sel.select():
-                key.data(key.fileobj, mask);
+        self.__closeApp();
 
 if '__main__'==__name__:
     import argparse;
@@ -382,3 +276,4 @@ if '__main__'==__name__:
     finally:
         socketServer.close();
     exit(0);
+

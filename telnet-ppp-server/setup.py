@@ -16,5 +16,5 @@ setup(
     url = '',
     description = 'PPP server and Telnet server for old platforms like Windows 3.x, Windows 95.',
     python_requires = '>=3.5.0',
-    scripts=['telnetd.py']
+    scripts=['utils.py', 'telnetd.py']
 );
