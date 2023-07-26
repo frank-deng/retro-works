@@ -183,10 +183,14 @@ class LoginHandler:
             return b'Invalid Login.\r\n';
         try:
             if 'ProcessApp'==loginInfo['module']:
+                env={}
+                if loginInfo.get('os_environ',False):
+                    env=os.environ.copy();
+                env.update(loginInfo.get('environ',{}));
                 self.__app=ProcessApp(
                     loginInfo['command'],
                     loginInfo.get('cwd',os.environ['HOME']),
-                    loginInfo.get('environ',{}),
+                    env,
                     user=loginInfo.get('user',None),
                     group=loginInfo.get('group',None)
                 );
