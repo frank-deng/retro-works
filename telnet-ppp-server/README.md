@@ -18,18 +18,14 @@ PPP server, Telnet server and static blog site generator require running under L
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
 
-	sudo apt-get install python3 ppp nginx-light php-fpm php-mbstring php-apcu
-	cd telnet-ppp-server
-	sudo python3 setup.py install
+	sudo apt-get install python3 ppp nginx-light
+	sudo pip3 install paramiko
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
-	@reboot user /usr/local/bin/telnetd.py -P 2345 -c path/to/telnetd.conf
-	@reboot root /usr/local/bin/telnetd.py -P 2333 -c path/to/ppp.conf
-
-其中`10.0.2.15`是主机或目标站点的IP。  
-`10.0.2.15` is the IP address of the host machine or the target site.
+	@reboot user python3 /path/to/telnet-ssh-adapter.py -P 2345 -c path/to/ssh.conf
+	@reboot root python3 /path/to/telnetd.py -P 2333 -c path/to/ppp.conf
 
 对于VIM用户，需要在`/etc/vim/vimrc`中添加以下配置以保证全角双引号和制表符能在终端中正常显示：  
 For VIM users, it's necessary to add the following configuration to `/etc/vim/vimrc` for properly displaying fullwidth quote marks and line drawing characters in terminal:
@@ -41,8 +37,8 @@ For VIM users, it's necessary to add the following configuration to `/etc/vim/vi
 在`dosbox-x.conf`所在目录中添加`phonebook.txt`，内容如下：  
 Create `phonebook.txt` at the same directory of `dosbox-x.conf`:
 
-	12345 127.0.0.1:2333
-	16666 127.0.0.1:2345
+	12333 127.0.0.1:2333
+	12345 127.0.0.1:2345
 
 将DOSBox配置中`[serial]`小节下的配置项做如下修改：  
 Change DOSBox configuration under seciton `[serial]`:

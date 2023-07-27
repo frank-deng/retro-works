@@ -10,7 +10,7 @@ from utils import SocketServer,BaseLogin
 class SSHApp:
     __trans=None
     __channel=None
-    def __init__(self,addr,port,username,password,term='ansi',width=80,height=24):
+    def __init__(self,addr,port,username,password,term=None,width=None,height=None):
         trans=paramiko.Transport((addr,port,))
         trans.start_client()
         trans.auth_password(username, password)
@@ -73,13 +73,13 @@ class LoginHandler(BaseLogin):
             return b'Invalid Login.\r\n'
         try:
             self.__app=SSHApp(
-                loginInfo['addr'],
+                loginInfo.get('addr','127.0.0.1'),
                 loginInfo.get('port',22),
                 loginInfo.get('user',username),
                 password,
-                term=loginInfo.get('term',None),
-                width=loginInfo.get('cols',None),
-                height=loginInfo.get('lines',None)
+                term=loginInfo.get('term','ansi'),
+                width=loginInfo.get('cols',80),
+                height=loginInfo.get('lines',24)
             )
             return b'Success.\r\n';
         except Exception as e:
