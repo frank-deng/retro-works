@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
 from traceback import print_exc;
-import hashlib,sys,time,socket,selectors;
-import traceback;
-import subprocess,pty,fcntl,os,io,codecs;
-import paramiko,termios,tty,json;
+import paramiko,socket,json;
 from utils import SocketServer,BaseLogin
 
 class SSHApp:
