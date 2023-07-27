@@ -63,6 +63,13 @@ class SocketServer:
         conn.sendall(instance.write());
         self.__sel.register(conn, selectors.EVENT_READ|selectors.EVENT_WRITE, self.__connHandler);
 
+    def __closeConn(self,conn):
+        key=str(conn.fileno())
+        self.__instances[key].close()
+        del self.__instances[key]
+        self.__sel.unregister(conn)
+        conn.close()
+
     def __connHandler(self, conn, mask):
         instance = self.__instances[str(conn.fileno())];
         datar = None
@@ -71,18 +78,21 @@ class SocketServer:
             if (mask & selectors.EVENT_READ):
                 datar = conn.recv(1024);
                 if datar:
-                    instance.read(datar);
+                    if not instance.read(datar):
+                        self.__closeConn(conn)
+                        return
             if (mask & selectors.EVENT_WRITE):
                 dataw = instance.write();
                 if dataw:
                     conn.sendall(dataw);
+                elif dataw is None:
+                    self.__closeConn(conn)
+                    return
             if (not datar) and (not dataw):
                 time.sleep(0.001);
         except Exception as e:
             print_exc()
-            instance.close();
-            del self.__instances[str(conn.fileno())];
-            self.__sel.unregister(conn);
+            self.__closeConn(conn)
 
     def close(self):
         for key, instance in self.__instances.items():

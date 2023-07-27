@@ -1,34 +1,21 @@
 #!/usr/bin/env python3
 
-from traceback import print_exc;
-import hashlib,sys,time,socket,selectors;
-import traceback;
-import subprocess,pty,fcntl,os,io,codecs;
-import json;
+from traceback import print_exc
+import json,hashlib,subprocess,pty,fcntl,os,time
 from utils import SocketServer,BaseLogin
-
-class PPPManager:
-    __clients={}
-    def in(self,key,data):
-        if key in self.__clients:
 
 class PPPApp:
     __process=None;
-    def __init__(self,args,cwd,environ={},user=None,group=None):
+    def __init__(self,args):
         self.__master, self.__slave = pty.openpty();
         fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK);
         fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK);
-        env={};
-        env.update(environ);
         ptyPath="/proc/%d/fd/%d"%(os.getpid(),self.__slave);
-        argsProc=[]
-        for i in range(len(args)):
-            if ('%I'==args[i]):
-                argsProc.append(ptyPath)
-            else:
-                argsProc.append(args[i])
         self.__process=subprocess.Popen(
-            argsProc,
+            [
+               '/usr/sbin/pppd',
+               ptyPath,
+            ] + args,
             bufsize=0,
             start_new_session=True,
             stdin=self.__slave,
@@ -65,10 +52,12 @@ class PPPApp:
             return None;
 
 class LoginHandler(BaseLogin):
+    conn={}
     __loginInfo={};
     __app=None;
     def __init__(self,configFile):
         super().__init__();
+        self.__running=True
         with open(configFile, 'r') as f:
             self.__loginInfo=json.load(f);
 
@@ -79,53 +68,47 @@ class LoginHandler(BaseLogin):
         if (loginInfo is None) or password!=loginInfo['password']:
             return b'Invalid Login.\r\n';
         try:
-            if 'ProcessApp'==loginInfo['module']:
-                env={}
-                if loginInfo.get('os_environ',False):
-                    env=os.environ.copy();
-                env.update(loginInfo.get('environ',{}));
-                self.__app=ProcessApp(
-                    loginInfo['command'],
-                    loginInfo.get('cwd',os.environ['HOME']),
-                    env,
-                    user=loginInfo.get('user',None),
-                    group=loginInfo.get('group',None)
-                );
-                return b'Success.'+b'\r\n';
-            elif 'BGProcessApp'==loginInfo['module']:
-                self.__app=BGProcessApp(
-                    loginInfo['command'],
-                    loginInfo.get('cwd',os.environ['HOME']),
-                    loginInfo.get('environ',{}),
-                    user=loginInfo.get('user',None),
-                    group=loginInfo.get('group',None)
-                );
-                return b'Success.'+b'\r\n';
-            else:
-                return b'Invalid app.'+b'\r\n';
+            self.__username=username;
+            if username in LoginHandler.conn:
+                LoginHandler.conn[username].close()
+                time.sleep(1)
+            self.__app=PPPApp(
+                loginInfo['options'],
+            );
+            LoginHandler.conn[username]=self
+            return b'Success.'+b'\r\n';
         except Exception as e:
             print_exc()
             return b'Invalid Login.\r\n';
 
-    def __closeApp(self):
-        if self.__app:
-            try:
-                self.__app.close();
-            except Exception as e:
-                print_exc()
-            self.__app=None;
+    def close(self):
+        self.__running=False
+        if not self.__app:
+            return
+        try:
+            self.__app.close();
+            if self.__username in LoginHandler.conn:
+                del LoginHandler.conn[self.__username]
+        except Exception as e:
+            print_exc()
+        self.__app=None;
     
     def read(self,content):
+        if not self.__running:
+            return False
         if self.__app:
             try:
                 if self.__app.read(content) is not None:
                     return True;
             except Exception as e:
                 print_exc()
-            self.__closeApp();
+            self.close();
+            return False
         return super().read(content)
 
     def write(self):
+        if not self.__running:
+            return None
         output=b'';
         if self.__app:
             try:
@@ -134,13 +117,10 @@ class LoginHandler(BaseLogin):
                     return content;
             except Exception as e:
                 print_exc()
-            self.__closeApp();
-            output+=b'\r\n'
+            self.close();
+            return None
         output+=super().write()
         return output
-
-    def close(self):
-        self.__closeApp();
 
 if '__main__'==__name__:
     import argparse;
@@ -162,7 +142,7 @@ if '__main__'==__name__:
         '--config',
         '-c',
         help='Specify config file for the telnetd server.',
-        default='./telnetd.conf'
+        default='./ppp.conf'
     );
     args = parser.parse_args();
 

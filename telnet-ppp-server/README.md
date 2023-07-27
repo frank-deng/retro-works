@@ -19,13 +19,36 @@ PPP server, Telnet server and static blog site generator require running under L
 Execute the following commands to install softwares required:
 
 	sudo apt-get install python3 ppp nginx-light
-	sudo pip3 install psutil paramiko
+	sudo pip3 install paramiko
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
 	@reboot user python3 /path/to/telnet-ssh-adapter.py -P 2345 -c path/to/ssh.conf
-	@reboot root python3 /path/to/telnetd.py -P 2333 -c path/to/ppp.conf
+	@reboot root python3 /path/to/ppp-manager.py -P 2333 -c path/to/ppp.conf
+
+在`/etc/crontab`中加入以下配置：  
+Add the following configuration to `/etc/ppp/options`:
+
+	lock
+	nodetach
+	multilink
+	enable-session
+	defaultroute
+	mtu 576
+	noauth
+
+在`~/.screenrc`中加入以下配置：  
+Add the following configuration to `~/.screenrc`:
+
+	defflow off
+	deflogin on
+	cjkwidth on
+	vbell off
+	term ansi.sys
+	shell /bin/bash
+	encoding UTF-8 GBK
+	setenv RUN_SCREEN yes
 
 对于VIM用户，需要在`/etc/vim/vimrc`中添加以下配置以保证全角双引号和制表符能在终端中正常显示：  
 For VIM users, it's necessary to add the following configuration to `/etc/vim/vimrc` for properly displaying fullwidth quote marks and line drawing characters in terminal:

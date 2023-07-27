@@ -83,7 +83,7 @@ class LoginHandler(BaseLogin):
             print_exc()
             return b'Invalid Login.\r\n';
 
-    def __closeApp(self):
+    def close(self):
         if self.__app:
             self.__app.close();
             self.__app=None;
@@ -95,7 +95,7 @@ class LoginHandler(BaseLogin):
                     return True;
             except Exception as e:
                 print_exc()
-            self.__closeApp();
+            self.close();
         return super().read(content)
 
     def write(self):
@@ -107,13 +107,10 @@ class LoginHandler(BaseLogin):
                     return content;
             except Exception as e:
                 print_exc()
-            self.__closeApp();
+            self.close();
             output+=b'\r\n'
         output+=super().write()
         return output
-
-    def close(self):
-        self.__closeApp();
 
 if '__main__'==__name__:
     import argparse;
