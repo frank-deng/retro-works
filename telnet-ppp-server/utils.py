@@ -79,7 +79,6 @@ class SocketServer:
             if (not datar) and (not dataw):
                 time.sleep(0.001);
         except Exception as e:
-            print(e)
             print_exc()
             instance.close();
             del self.__instances[str(conn.fileno())];
@@ -90,7 +89,6 @@ class SocketServer:
             try:
                 instance.close();
             except Exception as e:
-                print(e)
                 print_exc()
         self.__sel.close();
 
@@ -120,7 +118,6 @@ class BaseLogin:
     def read(self,content):
         if not len(content):
             return True;
-
         self.__readLine.write(content);
         inputContent=self.__readLine.get();
         if inputContent is None:

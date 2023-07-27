@@ -83,7 +83,7 @@ class LoginHandler(BaseLogin):
             )
             return b'Success.\r\n';
         except Exception as e:
-            sys.stderr.write('Error during creating application: '+str(e)+"\n");
+            print_exc()
             return b'Invalid Login.\r\n';
 
     def __closeApp(self):
@@ -97,7 +97,7 @@ class LoginHandler(BaseLogin):
                 if self.__app.read(content) is not None:
                     return True;
             except Exception as e:
-                print('app-read',e,file=sys.stderr);
+                print_exc()
             self.__closeApp();
         return super().read(content)
 
