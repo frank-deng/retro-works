@@ -33,11 +33,7 @@ class PPPApp:
             start_new_session=True,
             stdin=self.__slave,
             stdout=self.__slave,
-            stderr=self.__slave,
-            cwd=cwd,
-            env=env,
-            user=user,
-            group=group
+            stderr=self.__slave
         );
 
     def close(self):

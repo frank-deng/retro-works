@@ -19,7 +19,7 @@ PPP server, Telnet server and static blog site generator require running under L
 Execute the following commands to install softwares required:
 
 	sudo apt-get install python3 ppp nginx-light
-	sudo pip3 install paramiko
+	sudo pip3 install psutil paramiko
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
