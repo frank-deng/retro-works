@@ -286,15 +286,6 @@ When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk
 选择`Epson LQ1600K`作为打印机驱动程序，之后可以从Windows 3.x的应用程序中使用DOSBox-x的虚拟打印机打印到PNG图片。  
 Select `Epson LQ1600K` as the printer driver, then you can print document into PNG files from Windows 3.x applications via DOSBox-x's virtual printer.
 
-### Linux下安装字体 Install Fonts Under Linux
-
-1. 将字体文件复制到`/usr/share/fonts`中，并将字体文件的权限改为`644`。  
-Copy font files to `/usr/share/fonts` and change the permission of the font files into `644`.
-2. 运行`sudo fc-cache -v`使得新添加的字体生效。  
-Run `sudo fc-cache -v` to activate newly added fonts.
-3. 运行`fc-list`查看新添加的字体是否生效。  
-Run `fc-list` to check whether the newly-added fonts are useable.
-
 ### X11禁止Ctrl+Alt+Fn键切换终端 Disable Switching TTY Via Ctrl+Alt+Fn Under X11
 
 将以下内容添加到`/etc/xorg.conf`：  
@@ -304,19 +295,3 @@ Add the following code to `/etc/xorg.conf`:
 	    Option "DontVTSwitch" "true"
 	EndSection
 
-### 启用Linux的串口终端 Enable serial console under Linux
-
-临时为`/dev/ttyS0`启用串口登录（重启后失效）：  
-Temporarily enable serial console on `/dev/ttyS0` (Disabled after reboot):
-
-    systemctl start getty@ttyS0.service
-
-永久为`/dev/ttyS0`启用串口登录：  
-Permanently enable serial console on `/dev/ttyS0`:
-
-    systemctl enable serial-getty@ttyS0.service
-
-查看`/dev/ttyS0`的串口登录功能是否启用：  
-Check whether serial console is enabled on `/dev/ttyS0`:
-
-    systemctl status serial-getty@ttyS0.service

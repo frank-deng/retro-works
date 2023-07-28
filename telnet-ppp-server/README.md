@@ -1,8 +1,8 @@
 PPP服务器和Telnet服务器
 ======================
 
-IE3浏览器可通过PPP协议访问部署在服务端的HTML站点，并配有类似Jekyll的静态博客网站生成器。  
-IE3 browser can access the HTML site deployed at server side via PPP protocol. A Jekyll-like static blog site generator is also available.
+IE3浏览器可通过PPP协议访问部署在服务端的HTML站点。  
+IE3 browser can access the HTML site deployed at server side via PPP protocol.
 
 Telnet服务器可使用类似Telix、HyperTerminal的终端仿真程序通过拨号方式连接。  
 Use terminal emulators like Telix, HyperTerminal to dial to the Telnet server.
@@ -27,7 +27,7 @@ Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 	@reboot user python3 /path/to/telnet-ssh-adapter.py -P 2345 -c path/to/ssh.conf
 	@reboot root python3 /path/to/ppp-manager.py -P 2333 -c path/to/ppp.conf
 
-在`/etc/crontab`中加入以下配置：  
+在`/etc/ppp/options`中加入以下配置：  
 Add the following configuration to `/etc/ppp/options`:
 
 	lock
@@ -121,16 +121,20 @@ Check whether "Bring up terminal window after dialing" box is checked, or you'll
 当连接成功时，打开浏览器，使用URL`http://目标站点IP`访问目标站点。  
 When connection established, open browser and use URL `http://Target IP` to access the target site.
 
-### 配置博客生成器 Configure Blog Maker
+### 启用Linux的串口终端（可选） Enable serial console under Linux (Optional)
 
-执行以下命令安装所需的软件：  
-Execute the following commands to install the softwares required:
+临时为`/dev/ttyS0`启用串口登录（重启后失效）：  
+Temporarily enable serial console on `/dev/ttyS0` (Inavailable after reboot):
 
-	sudo apt-get install nodejs imagemagick
+	systemctl start getty@ttyS0.service
 
-然后进入`blog-maker`目录运行`npm install`安装所需的NodeJS包。  
-Then enter `blog-maker` directory and run `npm install` to install NodeJS packages required.
+永久为`/dev/ttyS0`启用串口登录：  
+Permanently enable serial console on `/dev/ttyS0`:
 
-之后运行`npm start`即可生成博客站点内容，生成结果在`dist`目录中。  
-After that, run `npm start` to generate the blog site, generated files can be found at `dist` directory.
+	systemctl enable serial-getty@ttyS0.service
+
+查看`/dev/ttyS0`的串口登录功能是否启用：  
+Check whether serial console is enabled on `/dev/ttyS0`:
+
+	systemctl status serial-getty@ttyS0.service
 
