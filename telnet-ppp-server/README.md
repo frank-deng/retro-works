@@ -7,13 +7,13 @@ IE3 browser can access the HTML site deployed at server side via PPP protocol.
 Telnet服务器可使用类似Telix、HyperTerminal的终端仿真程序通过拨号方式连接。  
 Use terminal emulators like Telix, HyperTerminal to dial to the Telnet server.
 
-PPP服务器、Telnet服务器和静态博客网站生成器需要在Linux环境（如Debian、Ubuntu）中运行。  
-PPP server, Telnet server and static blog site generator require running under Linux environments like Debian, Ubuntu.
+PPP服务器、Telnet服务器需要在Linux环境（如Debian、Ubuntu）中运行。  
+PPP server, Telnet server require running under Linux environments like Debian, Ubuntu.
 
 **严禁将PPP服务器或Telnet服务器部署到生产环境或含有敏感数据的环境！！！**  
 **DO NOT deploy PPP server or Telnet server to production environment or environment with sensitive data!!!**
 
-### Linux PPP服务器和Telnet服务器配置 Linux PPP Server Configuration
+## Linux PPP服务器和Telnet服务器配置 Linux PPP Server Configuration
 
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
@@ -38,24 +38,7 @@ Add the following configuration to `/etc/ppp/options`:
 	mtu 576
 	noauth
 
-在`~/.screenrc`中加入以下配置：  
-Add the following configuration to `~/.screenrc`:
-
-	defflow off
-	deflogin on
-	cjkwidth on
-	vbell off
-	term ansi.sys
-	shell /bin/bash
-	encoding UTF-8 GBK
-	setenv RUN_SCREEN yes
-
-对于VIM用户，需要在`/etc/vim/vimrc`中添加以下配置以保证全角双引号和制表符能在终端中正常显示：  
-For VIM users, it's necessary to add the following configuration to `/etc/vim/vimrc` for properly displaying fullwidth quote marks and line drawing characters in terminal:
-
-	set ambiwidth=double
-
-### DOSBox串口配置 Configure DOSBox's Serial Interface
+## DOSBox串口配置 Configure DOSBox's Serial Interface
 
 在`dosbox-x.conf`所在目录中添加`phonebook.txt`，内容如下：  
 Create `phonebook.txt` at the same directory of `dosbox-x.conf`:
@@ -69,7 +52,7 @@ Change DOSBox configuration under seciton `[serial]`:
 	serial1 = modem
 	phonebookfile = phonebook.txt
 
-### VirtualBox NAT配置端口转发 Configure NAT Port Forwarding for VirtualBox
+## VirtualBox NAT配置端口转发 Configure NAT Port Forwarding for VirtualBox
 
 如果PPP服务器和Telnet服务器是部署在VirtualBox虚拟机里的Linux系统上，且虚拟机网卡连接的是NAT网络，则需要在虚拟机网卡的端口转发设置中为虚拟机里的PPP服务器和Telnet服务器分别添加2条端口转发规则，以使得主机上的DOSBox-X能访问虚拟机里的服务。  
 If PPP server and Telnet server are deployed on the VirtualBox Linux guest, and guest network adapter is attacted to NAT. Then you must add port forwarding rules for PPP server and Telnet server inside guest machine, so as to enable host DOSBox-x accessing them.
@@ -104,10 +87,39 @@ Execute command `ip route show` in the guest Linux terminal.
 2. 在上一步的命令输出中找到`default via`后面的IP地址，该地址即为客户机的虚拟路由器IP，VirtualBox客户机中一般为`10.0.2.2`。  
 Find out the IP address after `default via` from the output of the step above, this is the virtual router IP for the guest machine. For VirtualBox guests it's `10.0.2.2` in most cases.
 
-### Windows 3.x客户端使用方法 Windows 3.x Client Usage
+## GNU Screen
+
+[GNU Screen](https://www.gnu.org/software/screen/)可实现多终端窗口管理，以及将服务端UTF-8编码转换为古董电脑客户端使用的GBK、Shift-JIS编码的功能。
+[GNU Screen](https://www.gnu.org/software/screen/) is used for managing multiple terminal windows, as well as converting server-side's UTF-8 encoding into GBK, Shift-JIS encoding used by clients on vintage computers.
+
+### 推荐配置 Recommended Configuration
+
+在`~/.screenrc`中加入以下配置：  
+Add the following configuration to `~/.screenrc`:
+
+	defflow off
+	deflogin on
+	cjkwidth on
+	vbell off
+	term ansi.sys
+	shell /bin/bash
+	encoding UTF-8 GBK
+	setenv RUN_SCREEN yes
+
+对于VIM用户，需要在`/etc/vim/vimrc`中添加以下配置以保证全角双引号和制表符能在终端中正常显示：  
+For VIM users, it's necessary to add the following configuration to `/etc/vim/vimrc` for properly displaying fullwidth quote marks and line drawing characters in terminal:
+
+	set ambiwidth=double
+
+### 已知问题 Known Issues
+
+字符编码转换功能在重新连接已有GNU Screen会话后会失效。需要重启GNU Screen恢复字符编码转换功能。
+Encoding conversion won't work after reattaching to existing GNU Screen session. Restarting GNU Screen is needed to get encoding conversion work again.
+
+## Windows 3.x客户端使用方法 Windows 3.x Client Usage
 
 设置新的PPP连接时需要将电话号码设置成`12333`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
-When setting up new PPP connection, set phone number with `12345`, set IP address with `192.168.7.2`, leave username and password blank.
+When setting up new PPP connection, set phone number with `12333`, set IP address with `192.168.7.2`, leave username and password blank.
 
 如果您有多部虚拟机连接相同的PPP服务器，则需要在每部虚拟机内的系统中分别配置不同的IP地址。比如配置Windows 3.2的IP地址为`192.168.7.2`，Windows 95的IP地址为`192.168.7.3`。  
 If you have multiple virtual machines connecting to the same PPP server, then you have to set different IP addresses for each virtual machine. For example, set Windows 3.2's IP address as `192.168.7.2`, and set Windows 95's IP addresss as `192.168.7.3`.
@@ -121,7 +133,7 @@ Check whether "Bring up terminal window after dialing" box is checked, or you'll
 当连接成功时，打开浏览器，使用URL`http://目标站点IP`访问目标站点。  
 When connection established, open browser and use URL `http://Target IP` to access the target site.
 
-### 启用Linux的串口终端（可选） Enable serial console under Linux (Optional)
+## 启用Linux的串口终端（可选） Enable serial console under Linux (Optional)
 
 临时为`/dev/ttyS0`启用串口登录（重启后失效）：  
 Temporarily enable serial console on `/dev/ttyS0` (Inavailable after reboot):

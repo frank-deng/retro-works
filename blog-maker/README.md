@@ -4,6 +4,9 @@
 类似Jekyll的静态博客网站生成器，支持LaTeX数学公式。  
 A Jekyll-like static blog site generator, supports LaTeX mathematical equations.
 
+需要在Linux环境（如Debian、Ubuntu）中运行。  
+Require running under Linux environments like Debian, Ubuntu.
+
 安装 Installation
 -----------------
 
