@@ -3,6 +3,7 @@ $_CONFIG=array(
   'HEWEATHER_KEY'=>"123456",
   'TIANAPI_KEY'=>"123456",
   'TRANSLATION_KEY'=>array("123456","132456"),
+  'ERINE_KEY'=>array("123456","123456"),
   'REQUEST_TIMEOUT'=>7,
   'BLOGS_DATA'=>'../blog-maker/dist/postlist.json',
   'BLOGS_COUNT'=>10,
@@ -14,6 +15,10 @@ $_CONFIG=array(
     array(
         'title'=>'在线翻译',
         'link'=>'translation.php'
+    ),
+    array(
+        'title'=>'你问我答',
+        'link'=>'ask.php'
     ),
     array(
         'title'=>'天气预报',

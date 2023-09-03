@@ -17,49 +17,34 @@ foreach(explode('&',$_SERVER['QUERY_STRING']) as $item){
 }
 
 $word=$_QUERY['word'];
-if ($word) {
-    $ch=curl_init();
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_URL, 'https://aip.baidubce.com/oauth/2.0/token');
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-    curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-        'grant_type' => 'client_credentials',
-        'client_id' => $_CONFIG['TRANSLATION_KEY'][0],
-        'client_secret' => $_CONFIG['TRANSLATION_KEY'][1]
-    )));
-    $resp=curl_exec($ch);
-    curl_close($ch);
-    $token_data=json_decode($resp,true);
-
-    $dir=explode('-',$_QUERY['dir']);
-    $ch=curl_init();
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_URL, 'https://aip.baidubce.com/rpc/2.0/mt/texttrans/v1?access_token='.$token_data['access_token']);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-    curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json',
-        'Accept: application/json'
-    ));
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array(
-        'from' => $dir[0],
-        'to' => $dir[1],
-        'q' => $word,
-    )));
-    $resp=curl_exec($ch);
-    curl_close($ch);
-    $result=json_decode($resp,true);
-} else {
+if (!$word) {
     $_QUERY['dir']='en-zh';
+} else {
+    $access_token=GetAccessToken($_CONFIG['TRANSLATION_KEY'][0], $_CONFIG['TRANSLATION_KEY'][1]);
+    if ($access_token){
+        $dir=explode('-',$_QUERY['dir']);
+        $ch=curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'https://aip.baidubce.com/rpc/2.0/mt/texttrans/v1?access_token='.$access_token);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array(
+            'from' => $dir[0],
+            'to' => $dir[1],
+            'q' => $word,
+        )));
+        $resp=curl_exec($ch);
+        curl_close($ch);
+        $result=json_decode($resp,true);
+    }
 }
 
 require('header.php');
