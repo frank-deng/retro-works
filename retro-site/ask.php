@@ -1,5 +1,7 @@
 <?php
 require('common.php');
+require('Parsedown.php');
+$Parsedown = new Parsedown();
 
 $_TITLE=$_HEADER='你问我答';
 
@@ -53,14 +55,14 @@ require('header.php');
     <tr><td colspan=2 height='24px' valign='top'>请输入问题：</td></tr>
     <tr>
         <td valign='top'><textarea type='text' name='question' cols='60' rows='3'><?=$question?></textarea></td>
-        <td valign='top' width='50%'><input type='submit' value='提问'></td>
+        <td valign='top' width='100%'><input type='submit' value='提问'></td>
     </tr>
     <tr><td colspan=2><hr></td></tr>
 </table>
 </form>
 <?php if ($result) { ?>
 <h5>以下是相关回答：</h5>
-<p><?=$result['result']?></p>
+<p><?=$Parsedown->text($result['result'])?></p>
 <?php } ?>
 <?php
 require('footer.php');

@@ -18,14 +18,18 @@ PPP server, Telnet server require running under Linux environments like Debian, 
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
 
-	sudo apt-get install python3 ppp nginx-light
+	sudo apt-get install python3 ppp
 	sudo pip3 install paramiko
+
+开启IP转发：将`/etc/sysctl.conf`中的`net.ipv4.ip_forward`的值改为`1`。  
+Enable IP Forwarding: Modify `/etc/sysctl.conf` and change the value of `net.ipv4.ip_forward` into `1`.
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
 	@reboot user python3 /path/to/telnet-ssh-adapter.py -P 2345 -c path/to/ssh.conf
 	@reboot root python3 /path/to/ppp-manager.py -P 2333 -c path/to/ppp.conf
+	@reboot root iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
 
 在`/etc/ppp/options`中加入以下配置：  
 Add the following configuration to `/etc/ppp/options`:
@@ -37,6 +41,8 @@ Add the following configuration to `/etc/ppp/options`:
 	defaultroute
 	mtu 576
 	noauth
+
+
 
 ## DOSBox串口配置 Configure DOSBox's Serial Interface
 
