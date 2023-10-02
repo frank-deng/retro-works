@@ -13,10 +13,6 @@ $_CONFIG=array(
         'link'=>'/blog/'
     ),
     array(
-        'title'=>'在线翻译',
-        'link'=>'translation.php'
-    ),
-    array(
         'title'=>'你问我答',
         'link'=>'ask.php'
     ),

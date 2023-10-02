@@ -4,6 +4,8 @@ from traceback import print_exc
 import json,hashlib,subprocess,pty,fcntl,os,time
 from utils import SocketServer,BaseLogin
 
+pppdExec='/usr/sbin/pppd'
+
 class PPPApp:
     __process=None;
     def __init__(self,args):
@@ -13,7 +15,7 @@ class PPPApp:
         ptyPath="/proc/%d/fd/%d"%(os.getpid(),self.__slave);
         self.__process=subprocess.Popen(
             [
-               '/usr/sbin/pppd',
+               pppdExec,
                ptyPath,
             ] + args,
             bufsize=0,
@@ -144,7 +146,13 @@ if '__main__'==__name__:
         help='Specify config file for the telnetd server.',
         default='./ppp.conf'
     );
+    parser.add_argument(
+        '--pppd',
+        help='Specify the path of pppd.',
+        default='/usr/sbin/pppd'
+    );
     args = parser.parse_args();
+    pppdExec = args.pppd;
 
     #Test json format
     with open(args.config, 'r') as f:

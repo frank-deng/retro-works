@@ -13,12 +13,12 @@ PPP server, Telnet server require running under Linux environments like Debian, 
 **严禁将PPP服务器或Telnet服务器部署到生产环境或含有敏感数据的环境！！！**  
 **DO NOT deploy PPP server or Telnet server to production environment or environment with sensitive data!!!**
 
-## Linux PPP服务器和Telnet服务器配置 Linux PPP Server Configuration
+## Linux PPP服务器和Telnet服务器配置 Linux PPP Server and Telnet Server Configuration
 
 执行以下命令安装所需软件：  
 Execute the following commands to install softwares required:
 
-	sudo apt-get install python3 ppp
+	sudo apt-get install iptables python3 ppp
 	sudo pip3 install paramiko
 
 开启IP转发：将`/etc/sysctl.conf`中的`net.ipv4.ip_forward`的值改为`1`。  
@@ -42,21 +42,23 @@ Add the following configuration to `/etc/ppp/options`:
 	mtu 576
 	noauth
 
+## Tiny Core Linux PPP服务器配置 Tiny Core Linux PPP Server Configuration
 
+安装所需软件包 Install packages required
 
-## DOSBox串口配置 Configure DOSBox's Serial Interface
+	tce-load -wi pppd iptables python3.9
 
-在`dosbox-x.conf`所在目录中添加`phonebook.txt`，内容如下：  
-Create `phonebook.txt` at the same directory of `dosbox-x.conf`:
+在`/opt/bootlocal.sh`中添加以下命令：  
+Add the following command to `/opt/bootlocal.sh`:
 
-	12333 127.0.0.1:2333
-	12345 127.0.0.1:2345
+	sysctl -w net.ipv4.ip_forward=1
+	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
+	python3 /path/to/ppp-manager.py --port 2333 --config path/to/ppp.conf --pppd /path/to/pppd &
 
-将DOSBox配置中`[serial]`小节下的配置项做如下修改：  
-Change DOSBox configuration under seciton `[serial]`:
+执行以下命令保存修改：  
+Use the following command to save all the modifications:
 
-	serial1 = modem
-	phonebookfile = phonebook.txt
+	filetool.sh -b
 
 ## VirtualBox NAT配置端口转发 Configure NAT Port Forwarding for VirtualBox
 
@@ -92,6 +94,20 @@ Programs inside virtual machine can access host services via `Virtual Router IP`
 Execute command `ip route show` in the guest Linux terminal.
 2. 在上一步的命令输出中找到`default via`后面的IP地址，该地址即为客户机的虚拟路由器IP，VirtualBox客户机中一般为`10.0.2.2`。  
 Find out the IP address after `default via` from the output of the step above, this is the virtual router IP for the guest machine. For VirtualBox guests it's `10.0.2.2` in most cases.
+
+## DOSBox串口配置 Configure DOSBox's Serial Interface
+
+在`dosbox-x.conf`所在目录中添加`phonebook.txt`，内容如下：  
+Create `phonebook.txt` at the same directory of `dosbox-x.conf`:
+
+	12333 127.0.0.1:2333
+	12345 127.0.0.1:2345
+
+将DOSBox配置中`[serial]`小节下的配置项做如下修改：  
+Change DOSBox configuration under seciton `[serial]`:
+
+	serial1 = modem
+	phonebookfile = phonebook.txt
 
 ## GNU Screen
 
