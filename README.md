@@ -174,16 +174,6 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 实用命令 Useful Commands
 ------------------------
 
-将原始硬盘镜像转换成VDI格式硬盘镜像  
-Convert raw disk image into VDI format image
-
-	VBoxManage convertdd source.img destination.vdi --format VDI
-
-将VDI格式硬盘镜像转换成原始硬盘镜像  
-Convert VDI format HDD image into raw HDD image
-
-	VBoxManage clonehd source.vdi destination.img --format RAW
-
 Linux下挂载虚拟软盘（使用GB2312编码的文件名）  
 Mount floppy image under Linux (Use GB2312 for filename encoding)
 
@@ -295,3 +285,7 @@ Add the following code to `/etc/xorg.conf`:
 	    Option "DontVTSwitch" "true"
 	EndSection
 
+### 不同Linux环境安装编译环境的方式 How To Install Build Environment for Linux
+
+* Debian/Ubuntu: `sudo apt-get install build-essential`
+* Tiny Core: `tce-load -wi compiletc`
