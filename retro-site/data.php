@@ -94,19 +94,64 @@ function fetchMultiWait(...$arr){
 }
 
 class FetchNews extends DataManager{
-    public function __construct(){
+    private $enabled=true;
+    public function __construct($enabled=true){
         global $_CONFIG;
         parent::__construct('news', 60*3);
+        $this->enabled=$enabled;
+        if($this->enabled && $this->cacheExpired()){
+            $ch=curl_init();
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
+            curl_setopt($ch, CURLOPT_URL, 'https://apis.tianapi.com/guonei/index');
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
+              'key'=>$_CONFIG['TIANAPI_KEY'],
+              'num'=>50
+            )));
+            $this->ch=$ch;
+        }
+    }
+    public function onFinish(){
+        try{
+            if(!$this->enabled){
+                $this->data=null;
+                return;
+            }
+            $data=curl_multi_getcontent($this->ch);
+            if($data){
+                $this->data=json_decode($data,true)['result']['newslist'];
+                foreach($this->data as $idx=>$item){
+                    $this->data[$idx]['detail_key']=base64_encode($item['url']);
+                }
+                $this->writeCache($this->data);
+            }
+        }catch(Exception $e){
+            error_log($e);
+        }
+    }
+}
+class FetchNewsDetail extends DataManager{
+    public function __construct($url){
+        global $_CONFIG;
+        parent::__construct('news_detail', 60*3);
         if($this->cacheExpired()){
             $ch=curl_init();
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
             curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
-            curl_setopt($ch, CURLOPT_URL, 'http://api.tianapi.com/bulletin/index');
+            curl_setopt($ch, CURLOPT_URL, 'https://apis.tianapi.com/htmltext/index');
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-              'key'=>$_CONFIG['TIANAPI_KEY']
+              'key'=>$_CONFIG['TIANAPI_KEY'],
+              'url'=>$url
             )));
             $this->ch=$ch;
         }
@@ -115,7 +160,7 @@ class FetchNews extends DataManager{
         try{
             $data=curl_multi_getcontent($this->ch);
             if($data){
-                $this->data=json_decode($data,true)['newslist'];
+                $this->data=json_decode($data,true)['result'];
                 $this->writeCache($this->data);
             }
         }catch(Exception $e){

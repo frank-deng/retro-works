@@ -1,6 +1,6 @@
 <?php
 require('common.php');
-$loadNews=new FetchNews();
+$loadNews=new FetchNews($_GET['news']!=='0');
 $loadBlogs=new FetchBlogs();
 $loadWeather=null;
 $weatherStr='没有天气信息 <font size=2>[<a href=\'selectCity.php\'>选择城市</a>]</font>&nbsp;';
@@ -82,14 +82,14 @@ $warningColorTable=[
     <tr>
         <td colspan=2 height='24px' valign='middle'>
             <img src='/static/BULL1A.GIF'/>
-            <b>今日热点</b>　<a href='news.php'><font size='2'>查看详情&gt;&gt;</font></a>
+            <b>今日热点</b>　<a href='news.php'><font size='2'>更多&gt;&gt;</font></a>
         </td>
     </tr>
     <tr><td colspan=2 height='6px'></td></tr>
     <?php $news10 = array_slice($news, 0, 10); foreach($news10 as $item){ ?>
     <tr>
         <td width='10px'></td>
-        <td><img src='/static/BULLET3.GIF'/> <?=$item['title']?></td>
+        <td><img src='/static/BULLET3.GIF'/> <a href='newsDetail.php?key=<?=$item['detail_key']?>'><?=$item['title']?></a></td>
     </tr>
     <?php } ?>
 </table><p align='center'><img src='/static/CONTLINE.GIF'></p>

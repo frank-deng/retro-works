@@ -14,10 +14,8 @@ try{
 require('header.php');
 ?><table width='100%'>
 <?php foreach($news as $idx=>$item){ ?>
-    <tr><td align='center'><b><?=$item['title']?></b></td></tr>
-    <tr><td height='20px' align='center' valign='top'><font size='1' color='#0000ff'><?=$item['source'].' '.$item['mtime']?></font></td></tr>
-    <tr><td>　　<?=$item['digest']?></td></tr>
-    <tr><td height='20px' width='100%' align='center' valign='middle'><img src='/static/PROFLINE.GIF'/></td></tr>
+<tr><td><img src='/static/BULLET3.GIF'/> <a href='newsDetail.php?key=<?=$item['detail_key']?>'><?=$item['title']?></a></td></tr>
 <?php } ?>
+<tr><td height='20px' width='100%' align='center' valign='middle'><img src='/static/PROFLINE.GIF'/></td></tr>
 </table><?php 
 require('footer.php');
