@@ -168,6 +168,35 @@ class FetchNewsDetail extends DataManager{
         }
     }
 }
+class FetchImage extends DataManager{
+    public function __construct($url){
+        global $_CONFIG;
+        parent::__construct('news_detail', 60*3);
+        if($this->cacheExpired()){
+            $ch=curl_init();
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
+            curl_setopt($ch, CURLOPT_POST, 0);
+            curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $this->ch=$ch;
+        }
+    }
+    public function onFinish(){
+        try{
+            $data=curl_multi_getcontent($this->ch);
+            if($data){
+                $this->data=$data;
+                $this->writeCache($this->data);
+            }
+        }catch(Exception $e){
+            error_log($e);
+        }
+    }
+}
 class FetchBlogs extends DataManager{
     public function __construct(){
         global $_CONFIG;
