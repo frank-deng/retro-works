@@ -1,9 +1,7 @@
 <?php
 require('common.php');
-require('Parsedown.php');
-$Parsedown = new Parsedown();
 
-$_TITLE=$_HEADER='你问我答';
+$_TITLE=$_HEADER='在线翻译';
 
 $question=null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -11,22 +9,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $kv=explode('=',$item);
         $key=$kv[0]; $value=$kv[1];
         switch($key){
-            case 'question':
+            case 'text':
                 $value=iconv('GB2312','UTF-8',rawurldecode($value));
                 $value=str_replace('+',' ',$value);
             break;
         }
         $_POST[$key]=$value;
     }
-    $question=$_POST['question'];
-    if ($question) {
-        $access_token=GetAccessToken($_CONFIG['ERINE_KEY'][0], $_CONFIG['ERINE_KEY'][1]);
+    $text=$_POST['text'];
+    $from='en';
+    $to='zh';
+    if ($_POST['zh_to_en']){
+        $from='zh';
+        $to='en';
+    }
+
+    if ($text) {
+        $access_token=GetAccessToken($_CONFIG['TRANSLATION_KEY'][0], $_CONFIG['TRANSLATION_KEY'][1]);
         if ($access_token){
             $ch=curl_init();
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_URL, 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token='.$access_token);
+            curl_setopt($ch, CURLOPT_URL, 'https://aip.baidubce.com/rpc/2.0/mt/texttrans/v1?access_token='.$access_token);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
             curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
@@ -37,8 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 'messages'=>[
                     [
-                        'role'=>'user',
-                        'content'=>$question
+                        'from'=>$from,
+                        'to'=>$to,
+                        'q'=>$text
                     ]
                 ]
             ]));
@@ -50,18 +56,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 require('header.php');
-?><form action='ask.php' method='post' valign='top'>
+?><form action='translation.php' method='post' valign='top'>
 <table width='100%' cellspacing='0' cellpadding='0'>
-    <tr><td colspan=2 height='24px' valign='top'>请输入问题：</td></tr>
+    <tr><td colspan=2 height='24px' valign='top'>请输入内容：</td></tr>
     <tr>
         <td valign='top'><textarea type='text' name='question' cols='60' rows='3'><?=$question?></textarea></td>
-        <td valign='top' width='100%'><input type='submit' value='提问'></td>
+	<td valign='top' width='100%'>
+            <input type='submit' name='zh_to_en' value='中译英'></td>
+            <input type='submit' name='en_to_zh' value='英译中'></td>
     </tr>
     <tr><td colspan=2><hr></td></tr>
 </table>
 </form>
 <?php if ($result) { ?>
-<h5>以下是相关回答：</h5><?=$Parsedown->text($result['result'])?>
+<h5>以下是翻译结果：</h5>
+<p><?=$result['result']['trans_result']['dst']?></p>
 <?php } ?>
 <?php
 require('footer.php');
