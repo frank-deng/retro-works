@@ -2,6 +2,7 @@
 require('common.php');
 
 $_TITLE=$_HEADER='在线翻译';
+$result=$text=null;
 
 $question=null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,13 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'Content-Type: application/json'
             ));
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'messages'=>[
-                    [
-                        'from'=>$from,
-                        'to'=>$to,
-                        'q'=>$text
-                    ]
-                ]
+                'from'=>$from,
+                'to'=>$to,
+                'q'=>$text
             ]));
             $resp=curl_exec($ch);
             curl_close($ch);
@@ -60,9 +57,9 @@ require('header.php');
 <table width='100%' cellspacing='0' cellpadding='0'>
     <tr><td colspan=2 height='24px' valign='top'>请输入内容：</td></tr>
     <tr>
-        <td valign='top'><textarea type='text' name='question' cols='60' rows='3'><?=$question?></textarea></td>
+        <td valign='top'><textarea type='text' name='text' cols='60' rows='3'><?=$text?></textarea></td>
 	<td valign='top' width='100%'>
-            <input type='submit' name='zh_to_en' value='中译英'></td>
+            <input type='submit' name='zh_to_en' value='中译英'><br/>
             <input type='submit' name='en_to_zh' value='英译中'></td>
     </tr>
     <tr><td colspan=2><hr></td></tr>
@@ -70,7 +67,7 @@ require('header.php');
 </form>
 <?php if ($result) { ?>
 <h5>以下是翻译结果：</h5>
-<p><?=$result['result']['trans_result']['dst']?></p>
+<?php foreach($result['result']['trans_result'] as $item){ ?><p><?=$item['dst']?></p><?php } ?>
 <?php } ?>
 <?php
 require('footer.php');
