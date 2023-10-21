@@ -59,15 +59,15 @@ require('header.php');
     <tr>
         <td valign='top'><textarea type='text' name='text' cols='60' rows='3'><?=$text?></textarea></td>
 	<td valign='top' width='100%'>
-            <input type='submit' name='zh_to_en' value='中译英'><br/>
-            <input type='submit' name='en_to_zh' value='英译中'></td>
+            <input type='submit' name='zh_to_en' value='中翻英'><br/>
+            <input type='submit' name='en_to_zh' value='英翻中'></td>
     </tr>
     <tr><td colspan=2><hr></td></tr>
 </table>
 </form>
 <?php if ($result) { ?>
 <h5>以下是翻译结果：</h5>
-<?php foreach($result['result']['trans_result'] as $item){ ?><p><?=$item['dst']?></p><?php } ?>
+<font face="<?=($to=='zh' ? '宋体' : 'Times New Roman')?>"><?php foreach($result['result']['trans_result'] as $item){ ?><p><?=$item['dst']?></p></font><?php } ?>
 <?php } ?>
 <?php
 require('footer.php');
