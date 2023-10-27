@@ -55,10 +55,9 @@ Add the following command to `/opt/bootlocal.sh`:
 	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
 	python3 /path/to/ppp-manager.py --port 2333 --config path/to/ppp.conf --pppd /path/to/pppd &
 
-执行以下命令保存修改：  
-Use the following command to save all the modifications:
+执行`backup`命令保存修改。  
+Use `backup` command to save all the modifications.
 
-	filetool.sh -b
 
 ## VirtualBox NAT配置端口转发 Configure NAT Port Forwarding for VirtualBox
 
