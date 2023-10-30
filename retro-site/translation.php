@@ -57,7 +57,7 @@ require('header.php');
 <table width='100%' cellspacing='0' cellpadding='0'>
     <tr><td colspan=2 height='24px' valign='top'>请输入内容：</td></tr>
     <tr>
-        <td valign='top'><textarea type='text' name='text' cols='60' rows='3'><?=$text?></textarea></td>
+        <td valign='top'><textarea type='text' name='text' cols='58' rows='3'><?=$text?></textarea></td>
 	<td valign='top' width='100%'>
             <input type='submit' name='zh_to_en' value='中翻英'><br/>
             <input type='submit' name='en_to_zh' value='英翻中'></td>

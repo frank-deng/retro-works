@@ -54,7 +54,7 @@ require('header.php');
 <table width='100%' cellspacing='0' cellpadding='0'>
     <tr><td colspan=2 height='24px' valign='top'>请输入问题：</td></tr>
     <tr>
-        <td valign='top'><textarea type='text' name='question' cols='60' rows='3'><?=$question?></textarea></td>
+        <td valign='top'><textarea type='text' name='question' cols='58' rows='3'><?=$question?></textarea></td>
         <td valign='top' width='100%'><input type='submit' value='提问'></td>
     </tr>
     <tr><td colspan=2><hr></td></tr>
