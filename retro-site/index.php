@@ -51,7 +51,7 @@ $warningColorTable=[
 <font color='<?=$warningColorTable[$item['level']]?>'>
     <marquee
         bgcolor='#ffffff'
-        scrolldelay=400 scrollamount=8>
+        scrolldelay=100 scrollamount=8>
         <?=$item['text']?>
     </marquee>
 </font>

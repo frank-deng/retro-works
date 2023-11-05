@@ -48,20 +48,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-require('header.php');
-?><form action='ask.php' method='post' valign='top'>
+?><html>
+<head>
+  <meta charset='GB2312'/>
+  <title><?=$_TITLE?></title>
+</head>
+<body topmargin='10px' leftmargin='10px' rightmargin='10px' bottommargin='10px' bgcolor='#ffffff'>
+<h1 align='center'><img src='static/title.gif'></h1>
+<form action='ask.php' method='post' valign='top'>
 <table width='100%' cellspacing='0' cellpadding='0'>
-    <tr><td colspan=2 height='24px' valign='top'>请输入问题：</td></tr>
+    <tr><td colspan=2 height='24px' valign='top'><h5><font color='#00007f'>请输入问题：</font></h5></td></tr>
     <tr>
         <td valign='top'><textarea type='text' name='question' cols='58' rows='3'><?=$question?></textarea></td>
         <td valign='top' width='100%'><input type='submit' value='提问'></td>
     </tr>
-    <tr><td colspan=2><hr></td></tr>
+    <tr><td colspan=2 height='24px' valign='top'><hr></td></tr>
 </table>
 </form>
 <?php if ($result) { ?>
-<h5>以下是相关回答：</h5><?=$Parsedown->text($result['result'])?>
+<h5><font color='#00007f'>以下是相关回答：</font></h5><?=$Parsedown->text($result['result'])?>
+<p align='center'><hr></p>
 <?php } ?>
-<?php
-require('footer.php');
+</body></html>
