@@ -23,13 +23,11 @@ class Readline:
             return None;
         content=self.__inputContent;
         self.__inputContent=b'';
-        self.__display=b'';
         self.__finished=False;
         return content;
 
     def reset(self):
         self.__inputContent=b'';
-        self.__display=b'';
         self.__finished=False;
 
     def write(self,content):
@@ -42,6 +40,7 @@ class Readline:
                 self.__inputContent=self.__inputContent[0:-1];
             elif 0x0d==val or 0x0a==val: #Continue
                 self.__finished=True;
+                self.__display+=b'\r\n';
             elif val>=0x20 and val<=0x7e and len(self.__inputContent)<self.__maxLength:
                 self.__inputContent+=val.to_bytes(1,'little');
                 if(self.__echo):
@@ -157,12 +156,12 @@ class BaseLogin:
             output+=b'\r\nLogin:';
         elif 'showPassword'==action:
             self.__action='inputPassword';
-            output+=b'\r\nPassword:';
+            output+=b'Password:';
             self.__readLine.reset();
             self.__readLine.setEcho(False);
         elif 'processLogin'==action:
             self.__action='showLogin';
-            output+=b'\r\n'+self.onLogin(self.__username,self.__password);
+            output+=self.onLogin(self.__username,self.__password);
             self.__username=b'';
             self.__password=b'';
         return output;
