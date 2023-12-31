@@ -355,8 +355,8 @@ int main(int argc, char *argv[])
     uint32_t report_m[GUESS_CHANCES]={0,0,0,0,0,0,0,0,0,0,0,0};
     unsigned int interval=0, file_write_counter=0, i;
     time_t t0=time(NULL),t;
-    init();
     read_file(fname,report_s,report_m);
+    init();
     print_report(report_s,report_m);
     while(running){
         report_s[guess_s()-1]++;
