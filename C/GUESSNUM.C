@@ -229,7 +229,7 @@ static inline void goto_rowcol(uint8_t row, uint8_t col)
     printf("\033[%u;%uH",row+1,col+1);
 #endif
 }
-static inline void clrscr()
+static inline void _clrscr()
 {
 #if defined(__DOS__)
     union REGPACK regs;
@@ -276,19 +276,24 @@ void init()
 {
     srand(time(NULL));
     init_guess();
-    clrscr();
+    _clrscr();
     printf("Guesses %10s %10s\n", "Normal", "Mastermind");
 #if defined(__DOS__)
+    goto_rowcol(24,0);
+    cprintf("Press Esc to quit.");
 	OrigKeyboardVect=_dos_getvect(0x09);
     OrigTimerVect=_dos_getvect(0x08);
     _dos_setvect(0x09,KeyboardHandler);
     _dos_setvect(0x08,TimerHandler);
 #else
+    goto_rowcol(20,0);
+    printf("Press Ctrl-c to quit.");
 	signal(SIGINT,do_exit_signal);
 #endif
 }
 void before_exit()
 {
+    _clrscr();
 #if defined(__DOS__)
 	_dos_setvect(0x09,OrigKeyboardVect);
     _dos_setvect(0x08,OrigTimerVect);
@@ -313,23 +318,25 @@ void print_report(uint32_t report_s[GUESS_CHANCES], uint32_t report_m[GUESS_CHAN
     printf("Total: %lu\n", total_s);
 }
 
-void read_file(char *path, uint32_t report_s[GUESS_CHANCES], uint32_t report_m[GUESS_CHANCES])
+void read_file(char *path, uint32_t *report_s, uint32_t *report_m)
 {
     char buf[80];
-    uint8_t i,guesses,last_record=GUESS_CHANCES;
+    uint8_t i;
+    unsigned int guesses;
+    unsigned long count_s,count_m;
     FILE *fp=fopen(path, "r");
     if(NULL==fp){
         return;
     }
-    fgets(buf,sizeof(buf)-2,fp);
-    for(i=0; i<GUESS_CHANCES; i++){
-        if(3!=fscanf(fp,"%u,%lu,%lu\n",&guesses,&report_s[i],&report_m[i])){
-            break;
-        }
+    fgets(buf,sizeof(buf),fp);
+    for(i=0;i<GUESS_CHANCES && !feof(fp); i++){
+        fscanf(fp,"%u,%lu,%lu\n",&guesses,&count_s,&count_m);
+        report_s[i]=(uint32_t)count_s;
+        report_m[i]=(uint32_t)count_m;
     }
     fclose(fp);
 }
-void write_file(char *path, uint32_t report_s[GUESS_CHANCES], uint32_t report_m[GUESS_CHANCES])
+void write_file(char *path, uint32_t *report_s, uint32_t *report_m)
 {
     uint8_t i,last_record=GUESS_CHANCES;
     FILE *fp=fopen(path, "w");
