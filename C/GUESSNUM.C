@@ -18,53 +18,36 @@
 #define min(x, y) ((x) < (y) ? (x) : (y))
 #endif
 
-#define BCD_INVALID_NUM (0xffff)
-
-static inline uint16_t int2bcd_s(uint16_t n)
+static inline uint16_t int2bcd(uint16_t n, bool *digit_unique_out)
 {
     uint16_t digit=(n%10),result=digit,map=(1<<digit);
+    bool digit_unique=true;
     
     n/=10; digit=n%10;
     if ((map & (1<<digit)) != 0) {
-         return BCD_INVALID_NUM;
+         digit_unique=false;
     }
     map |= (1<<digit);
     result |= (digit<<4);
     
     n/=10; digit=n%10;
     if ((map & (1<<digit)) != 0) {
-         return BCD_INVALID_NUM;
+         digit_unique=false;
     }
     map |= (1<<digit);
     result |= (digit<<8);
     
     n/=10; digit=n%10;
     if ((map & (1<<digit)) != 0) {
-         return BCD_INVALID_NUM;
+         digit_unique=false;
     }
     result |= (digit<<12);
     
+    if(NULL!=digit_unique_out){
+        *digit_unique_out=digit_unique;
+    }
+    
     return result;
-}
-static inline uint16_t int2bcd_m(uint16_t n)
-{
-    uint16_t result=(n%10);
-    n/=10;
-    result |= ((n%10)<<4);
-    n/=10;
-    result |= ((n%10)<<8);
-    n/=10;
-    result |= ((n%10)<<12);
-    return result;
-}
-static inline uint16_t gen_answer(bool allow_dup_digit)
-{
-    uint16_t n,res;
-    do{
-        n=rand();
-        res=allow_dup_digit?int2bcd_m(n):int2bcd_s(n);
-    }while(BCD_INVALID_NUM==res);
-    return res;
 }
 static inline uint8_t check_s(uint16_t ans, uint16_t guess)
 {
@@ -113,36 +96,31 @@ static inline uint8_t check_m(uint16_t ans, uint16_t guess)
 }
 
 #define GUESS_CHANCES 16
-#define CANDIDATES_COUNT 5040
-#define BUF_SIZE 10080
-#define NUM_START 123
-#define NUM_END 9876
-#define MASTERMIND_MAX 10000
+#define NUM_UNIQUE_COUNT 5040
+#define NUM_TOTAL_COUNT 10000
 
-static uint16_t numbers_pool[BUF_SIZE];
-static uint16_t numbers_buf[BUF_SIZE];
+static uint16_t numbers_pool[NUM_TOTAL_COUNT];
+static uint16_t numbers_buf[NUM_TOTAL_COUNT];
 static void init_guess()
 {
-    uint16_t n,n2,*np;
-    for(n=NUM_START,np=numbers_pool; n<=NUM_END; n++){
-		n2=int2bcd_s(n);
-		if(n2==BCD_INVALID_NUM){
-	   	 continue;
+    uint16_t n, nbcd, *n_unique=numbers_pool, *n_dup=numbers_pool+NUM_UNIQUE_COUNT;
+    bool digit_unique=true;
+    for(n=0; n<NUM_TOTAL_COUNT; n++){
+		nbcd=int2bcd(n,&digit_unique);
+		if(digit_unique){
+	   	 *n_unique=nbcd;
+            n_unique++;
+		}else{
+		    *n_dup=nbcd;
+            n_dup++;
 		}
-		*np=n2; np++;
     }
 }
 static uint8_t guess_s(){
-    uint16_t ans=gen_answer(false), times=0, count=CANDIDATES_COUNT;
+    uint16_t ans=numbers_pool[rand()%NUM_UNIQUE_COUNT], times=0, count=NUM_UNIQUE_COUNT;
     uint16_t n,n2,*nums=numbers_pool,*np,*np2,*np_end;
     uint8_t cmp;
-
-    // Start guess
-    while (times < GUESS_CHANCES) {
-        if(0==count){
-            return 0;
-        }
-        
+    while (times < GUESS_CHANCES && count>0) {
 	    times++;
 	    n=nums[rand()%count];
 	    cmp=check_s(ans,n);
@@ -168,34 +146,16 @@ static uint8_t guess_s(){
         }
         count=np2-numbers_buf;
     }
+    if(times>=GUESS_CHANCES || 0==count){
+        return GUESS_CHANCES;
+    }
     return times;
 }
 static uint8_t guess_m(){
-    uint16_t ans=gen_answer(true), times=1, count=MASTERMIND_MAX;
-    uint16_t n,n2,nbcd,*nums=numbers_buf,*np,*np2,*np_end;
+    uint16_t ans=numbers_pool[rand()%NUM_TOTAL_COUNT], times=0, count=NUM_TOTAL_COUNT;
+    uint16_t n,n2,*nums=numbers_pool,*np,*np2,*np_end;
     uint8_t cmp;
-    
-    // First guess
-    n=int2bcd_m(rand()%MASTERMIND_MAX);
-    cmp=check_m(ans,n);
-	if(0x40==cmp){
-        return times;
-	}
-    for(n2=0,np=numbers_buf; n2<MASTERMIND_MAX; n2++){
-        nbcd=int2bcd_m(n2);
-        if(nbcd==n || check_m(n,nbcd)!=cmp){
-            continue;
-        }
-        *np=nbcd; np++;
-    }
-    count=np-numbers_buf;
-    
-    // Later guesses
-    while (times < GUESS_CHANCES) {
-        if(0==count){
-            return 0;
-        }
-        
+    while (times < GUESS_CHANCES && count>0) {
 	    times++;
 	    n=nums[rand()%count];
 	    cmp=check_m(ans,n);
@@ -203,7 +163,15 @@ static uint8_t guess_m(){
 		    break;
 	    }
         
-    	np=np2=numbers_buf; np_end=np+count;
+        if(nums!=numbers_buf){
+            // First guess
+            np=nums; np2=numbers_buf;
+            nums=numbers_buf;
+        }else{
+       	 np=np2=numbers_buf; 
+        }
+        
+        np_end=np+count;
         while(np<np_end){
         	n2=*np;
             if(n!=n2 && check_m(n2,n)==cmp){
@@ -212,6 +180,9 @@ static uint8_t guess_m(){
             np++;
         }
         count=np2-numbers_buf;
+    }
+    if(times>=GUESS_CHANCES || 0==count){
+        return GUESS_CHANCES;
     }
     return times;
 }
@@ -286,7 +257,7 @@ void init()
     _dos_setvect(0x09,KeyboardHandler);
     _dos_setvect(0x08,TimerHandler);
 #else
-    goto_rowcol(20,0);
+    goto_rowcol(19,0);
     printf("Press Ctrl-c to quit.");
 	signal(SIGINT,do_exit_signal);
 #endif
