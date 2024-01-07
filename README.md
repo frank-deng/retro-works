@@ -93,6 +93,9 @@ Some retro programming works for vintage platforms. For entertainment use only.
 罗马数字 Roman Number  
 ![Roman Number](http://frank-deng.github.io/retro-works/screenshots/Roman_Number.png)
 
+24点求解器 24 Game Solver  
+![Moon River](http://frank-deng.github.io/retro-works/screenshots/24_Game_Solver.png)
+
 
 1997's PC
 ---------
