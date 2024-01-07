@@ -1,110 +1,44 @@
-DEFINT I-K
-COMMON SHARED goal, FOUND
-DECLARE FUNCTION comp (A!, B!)
-DECLARE FUNCTION calc! (A!, B!, o$)
-DECLARE FUNCTION expr1! (A!, B!, C!, D!, O1$, O2$, O3$)
-DECLARE FUNCTION expr2! (A!, B!, C!, D!, O1$, O2$, O3$)
-DECLARE FUNCTION expr3! (A!, B!, C!, D!, O1$, O2$, O3$)
-DECLARE FUNCTION expr4! (A!, B!, C!, D!, O1$, O2$, O3$)
-DECLARE FUNCTION expr5! (A!, B!, C!, D!, O1$, O2$, O3$)
-
-DECLARE SUB enumoper (A!, B!, C!, D!)
-DECLARE SUB main ()
-
-CALL main
-
-FUNCTION calc! (A!, B!, o$)
-  SELECT CASE o$
-    CASE "+"
-      calc! = A! + B!
-    CASE "-"
-      calc! = A! - B!
-    CASE "*"
-      calc! = A! * B!
-    CASE "/"
-      IF B! = 0 THEN
-        calc! = 1000000
-      ELSE
-        calc! = A! / B!
-      END IF
-  END SELECT
-END FUNCTION
-
-FUNCTION comp (A!, B!)
-  IF ABS(A! - B!) < .0001 THEN
-    comp = 1
-  ELSE
-    comp = 0
-  END IF
-END FUNCTION
-
-SUB enumoper (A AS SINGLE, B AS SINGLE, C AS SINGLE, D AS SINGLE)
-  DIM o(4) AS STRING: o(0) = "+": o(1) = "-": o(2) = "*": o(3) = "/"
-  FOR i = 0 TO 3: FOR j = 0 TO 3: FOR k = 0 TO 3
-    IF comp(expr1(A, B, C, D, o(i), o(j), o(k)), goal) THEN
-      PRINT A; o(i); "("; B; o(j); "("; C; o(k); D; "))="; goal
-      FOUND = 1
-      EXIT SUB
-    ELSEIF comp(expr2(A, B, C, D, o(i), o(j), o(k)), goal) THEN
-      PRINT A; o(i); "(("; B; o(j); C; ")"; o(k); D; ")="; goal
-      FOUND = 1
-      EXIT SUB
-    ELSEIF comp(expr3(A, B, C, D, o(i), o(j), o(k)), goal) THEN
-      PRINT "("; A; o(i); "("; B; o(j); C; "))"; o(k); D; "="; goal
-      FOUND = 1
-      EXIT SUB
-    ELSEIF comp(expr4(A, B, C, D, o(i), o(j), o(k)), goal) THEN
-      PRINT "("; A; o(i); B; ")"; o(j); "("; C; o(k); D; ")="; goal
-      FOUND = 1
-      EXIT SUB
-    ELSEIF comp(expr5(A, B, C, D, o(i), o(j), o(k)), goal) THEN
-      PRINT "(("; A; o(i); B; ")"; o(j); C; ")"; o(k); D; "="; goal
-      FOUND = 1
-      EXIT SUB
-    END IF
-  NEXT k: NEXT j: NEXT i
-END SUB
-
-FUNCTION expr1! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM abcd### a#(b#(c#d))
-  expr1! = calc!(A!, calc!(B!, calc!(C!, D!, O3$), O2$), O1$)
-END FUNCTION
-
-FUNCTION expr2! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM abc#d## a#((b#c)#d)
-  expr2! = calc!(A!, calc!(calc!(B!, C!, O2$), D!, O3$), O1$)
-END FUNCTION
-
-FUNCTION expr3! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM abc##d# (a#(b#c))#d
-  expr3! = calc!(calc!(A!, calc!(B!, C!, O2$), O1$), D!, O3$)
-END FUNCTION
-
-FUNCTION expr4! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM ab#cd## (a#b)#(c#d)
-  expr4! = calc!(calc!(A!, B!, O1$), calc!(C!, D!, O3$), O2$)
-END FUNCTION
-
-FUNCTION expr5! (A!, B!, C!, D!, O1$, O2$, O3$)
-  REM ab#c#d# ((a#b)#c)#d
-  expr5! = calc!(calc!(calc!(A!, B!, O1$), C!, O2$), D!, O3$)
-END FUNCTION
-
-SUB main
-  DIM N(4) AS SINGLE: FOUND = 0
-  INPUT "Input 4 numbers:", N(0), N(1), N(2), N(3)
-  INPUT "Input goal number (24 by default):", goal$
-  IF ""=goal$ THEN goal=24 ELSE goal=VAL(goal$)
-  FOR i = 0 TO 3: FOR j = 0 TO 3
-    IF i <> j THEN
-      FOR k = 0 TO 3
-        IF i <> k AND j <> k THEN
-          CALL enumoper(N(i), N(j), N(k), N(6 - i - j - k))
-          IF FOUND > 0 THEN EXIT SUB
-        END IF
-      NEXT k
-    END IF
-  NEXT j: NEXT i
-  PRINT "No Answer"
-END SUB
-
+10 DEFINT E-W:DEFDBL A-D,X-Z
+11 F=0:DIM N(4):DIM OP$(4):OP$(0)="+":OP$(1)="-":OP$(2)="*":OP$(3)="/"
+20 INPUT "Input 4 numbers:",N(0),N(1),N(2),N(3)
+30 INPUT "Input goal number (24 by default):",GOAL$
+40 IF ""=GOAL$ THEN GOAL=24 ELSE GOAL=VAL(GOAL$)
+50 FOR I=0 TO 3:FOR J=0 TO 3:IF I=J THEN GOTO 181
+60 FOR K=0 TO 3:IF I=K OR J=K THEN GOTO 180
+70 FOR I0=0 TO 3:FOR J0=0 TO 3:FOR K0=0 TO 3
+80 A=N(I):B=N(J):C=N(K):D=N(6-I-J-K):O1$=OP$(I0):O2$=OP$(J0):O3$=OP$(K0)
+90 GOSUB 300: IF F=1 THEN GOTO 190
+100 GOSUB 400: IF F=1 THEN GOTO 190
+110 GOSUB 500: IF F=1 THEN GOTO 190
+120 GOSUB 600: IF F=1 THEN GOTO 190
+130 GOSUB 700: IF F=1 THEN GOTO 190
+170 NEXT K0:NEXT J0:NEXT I0
+180 NEXT K
+181 NEXT J:NEXT I
+189 PRINT "No Answer."
+190 END
+300 REM abcd### a#(b#(c#d))
+310 X=C:Y=D:O$=O3$:GOSUB 1000:X=B:Y=Z:O$=O2$:GOSUB 1000:X=A:Y=Z:O$=O1$:GOSUB 1000
+320 IF ABS(Z-GOAL)<0.000001 THEN F=1:PRINT A;O1$;" (";B;O2$;" (";C;O3$;D;"))=";GOAL
+330 RETURN
+400 REM abc#d## a#((b#c)#d)
+410 X=B:Y=C:O$=O2$:GOSUB 1000:X=Z:Y=D:O$=O3$:GOSUB 1000:X=A:Y=Z:O$=O1$:GOSUB 1000
+420 IF ABS(Z-GOAL)<0.000001 THEN F=1:PRINT A;O1$;" ((";B;O2$;C;") ";O3$;D;")=";GOAL
+430 RETURN
+500 REM abc##d# (a#(b#c))#d
+510 X=B:Y=C:O$=O2$:GOSUB 1000:X=A:Y=Z:O$=O1$:GOSUB 1000:X=Z:Y=D:O$=O3$:GOSUB 1000
+520 IF ABS(Z-GOAL)<0.000001 THEN F=1:PRINT "(";A;O1$;" (";B;O2$;C;")) ";O3$;D;"=";GOAL
+530 RETURN
+600 REM ab#cd## (a#b)#(c#d)
+610 X=A:Y=B:O$=O1$:GOSUB 1000:Z1=Z:X=C:Y=D:O$=O3$:GOSUB 1000:X=Z1:Y=Z:O$=O2$:GOSUB 1000
+620 IF ABS(Z-GOAL)<0.000001 THEN F=1:PRINT "(";A;O1$;B;") ";O2$;" (";C;O3$;D;")=";GOAL
+630 RETURN
+700 REM ab#c#d# ((a#b)#c)#d
+710 X=A:Y=B:O$=O1$:GOSUB 1000:X=Z:Y=C:O$=O2$:GOSUB 1000:X=Z:Y=D:O$=O3$:GOSUB 1000
+720 IF ABS(Z-GOAL)<0.000001 THEN F=1:PRINT "((";A;O1$;B;") ";O2$;C;") ";O3$;D;"=";GOAL
+730 RETURN
+1000 IF O$="+" THEN Z=X+Y:RETURN
+1010 IF O$="-" THEN Z=X-Y:RETURN
+1020 IF O$="*" THEN Z=X*Y:RETURN
+1030 IF O$="/" AND Y<>0 THEN Z=X/Y:RETURN
+1040 Z=10000000:RETURN
