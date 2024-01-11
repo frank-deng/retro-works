@@ -7,9 +7,12 @@
 #define HELP_TEXT "Usage: %s file\n"
 #define START_CALC "Calculating Sudoku..."
 #define END_CALC "Finished.\n"
+#define INVALID_GROUP_NUM_POS "Invalid group number at line %d, column %d.\n"
+#define GROUP_MALFORMED "Group #%u has %u cells, not 9, please check.\n"
 #define INVALID_NUM_POS "Invalid number at line %d, column %d.\n"
 #define DUP_NUM_POS "Duplicated number detected at line %d, column %d.\n"
 #define OPEN_FILE_FAILED "Failed to open Sudoku file.\n"
+#define OPEN_JIGSAW_FILE_FAILED "Failed to open Sudoku jigsaw map file.\n"
 #define NO_ANSWER_POS "No ansert at line %d, column %d.\n"
 #define NO_ANSWER "No answer.\n"
 
@@ -89,26 +92,58 @@ static inline uint8_t next_num(uint16_t map, uint8_t n)
     }
     return 0;
 }
-void printboard(){
+void printboard(bool jigsaw){
     uint8_t x, y;
     for (y = 0; y < 9; y++){
         for (x = 0; x < 9; x++){
             printf("%d ", board[y][x]);
-            if (2 == (x % 3)){
+            if (!jigsaw && (2 == (x % 3))){
                 printf(" ");
             }
         }
         puts("");
-        if (2 == (y % 3)){
+        if (!jigsaw && (2 == (y % 3))){
             puts("");
         }
     }
+}
+int read_jigsaw_map(char *filename)
+{
+    uint8_t x, y, grp_cells[9]={0,0,0,0,0,0,0,0,0}, i;
+    unsigned int n;
+    FILE *fp = fopen(filename, "r");
+    if (NULL==fp){
+        fprintf(stderr, OPEN_JIGSAW_FILE_FAILED);
+        return E_FAIL;
+    }
+    for (y = 0; y < 9; y++){
+        for (x = 0; x < 9; x++){
+            fscanf(fp, "%u", &n);
+            if (n > 9 || n < 1) {
+                fclose(fp);
+                fprintf(stderr, INVALID_GROUP_NUM_POS, y+1, x+1);
+                return E_INVAL;
+            }
+            i = n-1;
+            group[y][x]=i;
+            grp_cells[i]++;
+        }
+    }
+    fclose(fp);
+    for(i=0; i<9; i++){
+        if(grp_cells[i] != 9){
+            fprintf(stderr, GROUP_MALFORMED, i+1, grp_cells[i]);
+            return E_INVAL;
+        }
+    }
+    return E_OK;
 }
 int read_sudoku(char *filename){
     uint8_t x, y, grp;
     uint16_t nmap;
     stack_item_t *sp=stack;
     unsigned int n;
+    int ret=E_OK;
     FILE *fp = fopen(filename, "r");
     if (NULL==fp){
         fprintf(stderr, OPEN_FILE_FAILED);
@@ -119,7 +154,8 @@ int read_sudoku(char *filename){
             fscanf(fp, "%u", &n);
             if (n > 9) {
                 fprintf(stderr, INVALID_NUM_POS, y+1, x+1);
-                return E_INVAL;
+                ret=E_INVAL;
+                goto finally_exit;
             }
             board[y][x]=n;
             grp=group[y][x];
@@ -133,7 +169,8 @@ int read_sudoku(char *filename){
                 nmap = (((uint16_t)1)<<n);
                 if((mapx[x] & nmap)||(mapy[y] & nmap)||(mapgrp[grp] & nmap)){
                     fprintf(stderr, DUP_NUM_POS, y+1, x+1);
-                    return E_INVAL;
+                    ret=E_INVAL;
+                    goto finally_exit;
                 }
                 mapx[x] |= nmap;
                 mapy[y] |= nmap;
@@ -141,8 +178,9 @@ int read_sudoku(char *filename){
             }
         }
     }
+finally_exit:
     fclose(fp);
-    return E_OK;
+    return ret;
 }
 int calc_sudoku_step1(){
     uint8_t x, y, grp, n, i;
@@ -223,12 +261,21 @@ int calc_sudoku_step2(){
     return E_OK;
 }
 int main(int argc, char *argv[]){
-    int res;
+    int res; char *mapfile=NULL, *sudoku_file=NULL;
     if (argc < 2){
         fprintf(stderr, HELP_TEXT, argv[0]);
         exit(1);
     }
-    if (E_OK != read_sudoku(argv[1])){
+    if(argc > 2){
+        mapfile=argv[1];
+        sudoku_file=argv[2];
+    }else{
+        sudoku_file=argv[1];
+    }
+    if(mapfile!=NULL && E_OK!=read_jigsaw_map(mapfile)){
+        exit(1);
+    }
+    if (E_OK != read_sudoku(sudoku_file)){
         exit(1);
     }
     res = calc_sudoku_step1();
@@ -242,6 +289,6 @@ int main(int argc, char *argv[]){
     }else if (res != E_OK) {
         return 1;
     }
-    printboard();
+    printboard(mapfile!=NULL);
     return 0;
 }
