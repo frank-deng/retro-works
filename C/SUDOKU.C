@@ -1,232 +1,247 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 
 #define HELP_TEXT "Usage: %s file\n"
-
-#define CHECK_SUDOKU "Checking Sudoku... "
-#define CHECK_SUDOKU_PASSED "Finished.\nStart calculating...\n"
-#define CALC_FINISHED "Calculation finished.\n"
+#define START_CALC "Calculating Sudoku..."
+#define END_CALC "Finished.\n"
 #define INVALID_NUM_POS "Invalid number at line %d, column %d.\n"
+#define DUP_NUM_POS "Duplicated number detected at line %d, column %d.\n"
 #define OPEN_FILE_FAILED "Failed to open Sudoku file.\n"
-#define INCONSISTENT_NUM_ROW "Invalid number at line %d.\n"
-#define INCONSISTENT_NUM_COL "Invalid number at column %d.\n"
-#define INCONSISTENT_NUM_AREA "Invalid number at block %d.\n"
 #define NO_ANSWER_POS "No ansert at line %d, column %d.\n"
 #define NO_ANSWER "No answer.\n"
 
-static int candl, board[9][9] = {
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0},
-}, cand[81][3];
+enum{
+    E_OK,
+    E_AGAIN,
+    E_INVAL,
+    E_FAIL,
+};
 
-void read_sudoku(char *filename){
-	int x, y;
-	FILE *fp;
-	fp = fopen(filename, "r");
-	if (!fp){
-		printf(OPEN_FILE_FAILED);
-		exit(1);
-	}
-	for (y = 0; y < 9; y++){
-		for (x = 0; x < 9; x++){
-			fscanf(fp, "%u", &(board[y][x]));
-			if (board[y][x] > 9 || board[y][x] < 0) {
-				printf(INVALID_NUM_POS, y+1, x+1);
-				exit(1);
-			}
-		}
-	}
-	fclose(fp);
+typedef struct {
+    uint8_t x;
+    uint8_t y;
+    uint8_t grp;
+    uint16_t map;
+    uint8_t last_num;
+} stack_item_t;
+
+static uint8_t group[9][9] = {
+    {0,0,0,1,1,1,2,2,2},
+    {0,0,0,1,1,1,2,2,2},
+    {0,0,0,1,1,1,2,2,2},
+    {3,3,3,4,4,4,5,5,5},
+    {3,3,3,4,4,4,5,5,5},
+    {3,3,3,4,4,4,5,5,5},
+    {6,6,6,7,7,7,8,8,8},
+    {6,6,6,7,7,7,8,8,8},
+    {6,6,6,7,7,7,8,8,8},
+};
+static uint8_t board[9][9] = {
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0},
+};
+
+static uint16_t mapx[9],mapy[9],mapgrp[9];
+static stack_item_t stack[81];
+static uint8_t stack_len=0;
+
+static inline uint8_t trailing_zeros(uint16_t n)
+{
+    uint8_t res=0;
+    if(0==(n&0xff)){
+        res+=8;
+        n>>=8;
+    }
+    if(0==(n&0xf)){
+        res+=4;
+        n>>=4;
+    }
+    if(0==(n&0x3)){
+        res+=2;
+        n>>=2;
+    }
+    if(0==(n&0x1)){
+        res+=1;
+        n>>=1;
+    }
+    return res;
+}
+static inline uint8_t next_num(uint16_t map, uint8_t n)
+{
+    if(0==map){
+        return 0;
+    }
+    while(n<9){
+        n++;
+        if(map&(1<<n)){
+            return n;
+        }
+    }
+    return 0;
 }
 void printboard(){
-	int x, y;
-	for (y = 0; y < 9; y++){
-		for (x = 0; x < 9; x++){
-			printf("%d ", board[y][x]);
-			if (2 == (x % 3)){
-				printf(" ");
-			}
-		}
-		puts("");
-		if (2 == (y % 3)){
-			puts("");
-		}
-	}
+    uint8_t x, y;
+    for (y = 0; y < 9; y++){
+        for (x = 0; x < 9; x++){
+            printf("%d ", board[y][x]);
+            if (2 == (x % 3)){
+                printf(" ");
+            }
+        }
+        puts("");
+        if (2 == (y % 3)){
+            puts("");
+        }
+    }
 }
-void check_sudoku(){
-	int x, y, area, ax, ay, nums, n;
-	for (y = 0; y < 9; y++){
-		nums = 0;
-		for (x = 0; x < 9; x++){
-			n = board[y][x];
-			if (n) {
-				if (nums & (1 << n)){
-					printf(INCONSISTENT_NUM_ROW, y+1);
-					exit(1);
-				} else {
-					nums |= (1 << n);
-				}
-			}
-		}
-	}
-	
-	for (x = 0; x < 9; x++){
-		nums = 0;
-		for (y = 0; y < 9; y++){
-			n = board[y][x];
-			if (n) {
-				if (nums & (1 << n)){
-					printf(INCONSISTENT_NUM_COL, x+1);
-					exit(1);
-				} else {
-					nums |= (1 << n);
-				}
-			}
-		}
-	}
-	
-	for (area = 0; area < 9; area++) {
-		ax = (area % 3) * 3;
-		ay = (int)(area / 3) * 3;
-		nums = 0;
-		for (y = 0; y < 3; y++){
-			for (x = 0; x < 3; x++){
-				n = board[ay + y][ax + x];
-				if (n) {
-					if (nums & (1 << n)){
-						printf(INCONSISTENT_NUM_AREA, area+1);
-						exit(1);
-					} else {
-						nums |= (1 << n);
-					}
-				}
-			}
-		}
-	}
+int read_sudoku(char *filename){
+    uint8_t x, y, grp;
+    uint16_t nmap;
+    stack_item_t *sp=stack;
+    unsigned int n;
+    FILE *fp = fopen(filename, "r");
+    if (NULL==fp){
+        fprintf(stderr, OPEN_FILE_FAILED);
+        return E_FAIL;
+    }
+    for (y = 0; y < 9; y++){
+        for (x = 0; x < 9; x++){
+            fscanf(fp, "%u", &n);
+            if (n > 9) {
+                fprintf(stderr, INVALID_NUM_POS, y+1, x+1);
+                return E_INVAL;
+            }
+            board[y][x]=n;
+            grp=group[y][x];
+            if (0==n){
+                sp->x = x;
+                sp->y = y;
+                sp->grp = grp;
+                sp++;
+                stack_len++;
+            } else {
+                nmap = (((uint16_t)1)<<n);
+                if((mapx[x] & nmap)||(mapy[y] & nmap)||(mapgrp[grp] & nmap)){
+                    fprintf(stderr, DUP_NUM_POS, y+1, x+1);
+                    return E_INVAL;
+                }
+                mapx[x] |= nmap;
+                mapy[y] |= nmap;
+                mapgrp[grp] |= nmap;
+            }
+        }
+    }
+    fclose(fp);
+    return E_OK;
 }
-
-int getcand(int x, int y){
-	int nums = 0, ox, oy, i, j;
-	for (i = 0; i < 9; i++){
-		nums |= ((1 << board[y][i]) | (1 << board[i][x]));
-	}
-	ox = (int)(x / 3) * 3; oy = (int)(y / 3) * 3;
-	for (i = 0; i < 3; i++){
-		for (j = 0; j < 3; j++){
-			nums |= (1 << board[oy+i][ox+j]);
-		}
-	}
-	return (~nums) & 0x3fe;
+int calc_sudoku_step1(){
+    uint8_t x, y, grp, n, i;
+    uint16_t nmap;
+    bool running=true;
+    stack_item_t *sp=stack, *sp0=stack;
+    while(running){
+        running=false;
+        sp=sp0=stack;
+        for (i = 0; i < stack_len; i++, sp++) {
+            x = sp->x;
+            y = sp->y;
+            grp = sp->grp;
+            nmap = (~(mapx[x] | mapy[y] | mapgrp[grp])) & 0x3fe;
+            if(0==nmap){
+                fprintf(stderr, NO_ANSWER_POS, x+1, y+1);
+                return E_INVAL;
+            }else if(0 != (nmap&(nmap-1))){
+                sp0->x = x;
+                sp0->y = y;
+                sp0->grp = grp;
+                sp0++;
+            }else{
+                board[y][x] = trailing_zeros(nmap);
+                mapx[x] |= nmap;
+                mapy[y] |= nmap;
+                mapgrp[grp] |= nmap;
+                running=true;
+            }
+        }
+        stack_len = sp0-stack;
+    }
+    return ((stack_len==0) ? E_OK : E_AGAIN);
 }
-int getnextnum(int n, int c){
-	n++;
-	while (n <= 9) {
-		if (c & (1 << n)){
-			return n;
-		}
-		n++;
-	}
-	return 0;
+int calc_sudoku_step2(){
+    uint8_t x, y, grp, n, i;
+    uint16_t map;
+    stack_item_t *sp=stack, *stack_tail=stack+stack_len;
+    for (i = 0; i < stack_len; i++, sp++) {
+        x = sp->x;
+        y = sp->y;
+        grp = sp->grp;
+        sp->last_num = 0;
+        sp->map = (~(mapx[x] | mapy[y] | mapgrp[grp])) & 0x3fe;
+    }
+    memset(mapx, 0, sizeof(mapx));
+    memset(mapy, 0, sizeof(mapy));
+    memset(mapgrp, 0, sizeof(mapgrp));
+    
+    sp=stack;
+    while(sp<stack_tail){
+        x = sp->x;
+        y = sp->y;
+        grp = sp->grp;
+        n = sp->last_num;
+        if(n>0){
+            map = (~(1<<n));
+            mapx[x]&=map;
+            mapy[y]&=map;
+            mapgrp[grp]&=map;
+        }
+        map = sp->map & (~(mapx[x] | mapy[y] | mapgrp[grp])) & 0x3fe;
+        n = next_num(map, n);
+        sp->last_num = board[y][x] = n;
+        if(0==n){
+            if(sp==stack){
+                return E_INVAL;
+            }
+            sp--;
+        }else{
+            map = (1<<n);
+            mapx[x]|=map;
+            mapy[y]|=map;
+            mapgrp[grp]|=map;
+            sp++;
+        }
+    }
+    return E_OK;
 }
-int checknum(int x, int y, int n){
-	int i, x1, y1, ax = (int)(x / 3) * 3, ay = (int)(y / 3) * 3;
-	for (i = 0; i < 9; i++){
-		if (x != i && board[y][i] == n){
-			return 0;
-		} else if (y != i && board[i][x] == n){
-			return 0;
-		}
-	}
-	for (y1 = ay; y1 < ay + 3; y1++){
-		for (x1 = ax; x1 < ax + 3; x1++){
-			if (x1 != x && y1 != y && board[y1][x1] == n){
-				return 0;
-			}
-		}
-	}
-	return 1;
-}
-void updatecandl(){
-	int x, y, c;
-	candl = 0;
-	for (y = 0; y < 9; y++){
-		for (x = 0; x < 9; x++){
-			if (board[y][x] != 0){
-				continue;
-			}
-			c = getcand(x, y);
-			if (c == 0){
-				printf(NO_ANSWER_POS, y+1, x+1);
-				exit(1);
-			}
-			cand[candl][0] = x;
-			cand[candl][1] = y;
-			cand[candl][2] = c;
-			candl++;
-		}
-	}
-}
-int calc_step1(){
-	int i, x, y, cn, status = 0;
-	updatecandl();
-	while (!status && candl > 0){
-		status = 1;
-		for (i = 0; i < candl; i++){
-			cn = cand[i][2];
-			if (0 == (cn & (cn - 1))){
-				x = cand[i][0]; y = cand[i][1];
-				board[y][x] = getnextnum(0, cn);
-				status = 0;
-			}
-		}
-		if (!status) {
-			updatecandl();
-		}
-	}
-	return ((candl > 0) ? 0 : 1);
-}
-void calc_step2(){
-	int sl = 0, s[81], x, y;
-	s[0] = getnextnum(0, cand[0][2]);
-	while (sl < candl){
-		x = cand[sl][0]; y = cand[sl][1];
-		if (0 == s[sl]){
-			board[y][x] = 0; sl--;
-			s[sl] = getnextnum(s[sl], cand[sl][2]);
-		} else if(checknum(x, y, s[sl])){
-			board[y][x] = s[sl]; sl++;
-			if (sl < candl){
-				s[sl] = getnextnum(0, cand[sl][2]);
-			}
-		} else {
-			s[sl] = getnextnum(s[sl], cand[sl][2]);
-		}
-	}
-}
-
 int main(int argc, char *argv[]){
-	if (argc < 2){
-		printf(HELP_TEXT, argv[0]);
-		exit(1);
-	}
-	read_sudoku(argv[1]);
-	printf(CHECK_SUDOKU);
-	check_sudoku();
-	printf(CHECK_SUDOKU_PASSED);
-	if (calc_step1()) {
-		printf(CALC_FINISHED);
-		printboard();
-		return 0;
-	}
-	calc_step2();
-	printf(CALC_FINISHED);
-	printboard();
-	return 0;
+    int res;
+    if (argc < 2){
+        fprintf(stderr, HELP_TEXT, argv[0]);
+        exit(1);
+    }
+    if (E_OK != read_sudoku(argv[1])){
+        exit(1);
+    }
+    res = calc_sudoku_step1();
+    if (res == E_AGAIN){
+        fprintf(stderr, START_CALC);
+        if(calc_sudoku_step2()!=E_OK){
+            fprintf(stderr, NO_ANSWER);
+            return 1;
+        }
+        fprintf(stderr, END_CALC);
+    }else if (res != E_OK) {
+        return 1;
+    }
+    printboard();
+    return 0;
 }
