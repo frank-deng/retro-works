@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define HELP_TEXT "Usage: %s file\n"
+#define HELP_TEXT "Usage:\n\t%s file\n\t%s map_file file\n"
 #define START_CALC "Calculating Sudoku..."
 #define END_CALC "Finished.\n"
 #define INVALID_GROUP_NUM_POS "Invalid group number at line %d, column %d.\n"
@@ -260,10 +260,14 @@ int calc_sudoku_step2(){
     }
     return E_OK;
 }
+void print_help(const char *app_name)
+{
+        fprintf(stderr, HELP_TEXT, app_name, app_name);
+}
 int main(int argc, char *argv[]){
     int res; char *mapfile=NULL, *sudoku_file=NULL;
     if (argc < 2){
-        fprintf(stderr, HELP_TEXT, argv[0]);
+	print_help(argv[0]);
         exit(1);
     }
     if(argc > 2){
