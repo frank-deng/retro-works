@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define HELP_TEXT "Usage:\n\t%s file\n\t%s map_file file\n"
+#define HELP_TEXT "Usage:\n    %s file\n    %s map_file file\n"
 #define START_CALC "Calculating Sudoku..."
 #define END_CALC "Finished.\n"
 #define INVALID_GROUP_NUM_POS "Invalid group number at line %d, column %d.\n"
