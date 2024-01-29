@@ -87,8 +87,6 @@ class SocketServer:
                 elif dataw is None:
                     self.__closeConn(conn)
                     return
-            if (not datar) and (not dataw):
-                time.sleep(0.001);
         except Exception as e:
             print_exc()
             self.__closeConn(conn)
@@ -112,6 +110,7 @@ class SocketServer:
         while True:
             for key, mask in self.__sel.select():
                 key.data(key.fileobj, mask);
+            time.sleep(0.01);
                 
 class BaseLogin:
     __loginInfo={};
