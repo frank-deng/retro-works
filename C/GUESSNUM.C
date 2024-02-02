@@ -127,11 +127,11 @@ static inline uint8_t guess_s() {
     while (times < GUESS_CHANCES && count>0) {
         times++;
         n=nums[rand()%count];
-        cmp=check_s(ans,n);
-        if(0x40==cmp) {
+        if(n==ans) {
             break;
         }
-
+        cmp=check_s(ans,n);
+        
         if(nums!=numbers_buf) {
             // First guess
             np=nums;
@@ -164,10 +164,10 @@ static inline uint8_t guess_m() {
     while (times < GUESS_CHANCES && count>0) {
         times++;
         n=nums[rand()%count];
-        cmp=check_m(ans,n);
-        if(0x40==cmp) {
+        if(n==ans) {
             break;
         }
+        cmp=check_m(ans,n);
 
         if(nums!=numbers_buf) {
             // First guess
@@ -212,7 +212,7 @@ static inline void _clrscr()
 {
 #if defined(__DOS__)
     union REGPACK regs;
-    regs.x.ax = 0x0600;
+	regs.x.ax = 0x0600;
     regs.h.bh = 0x07;
     regs.x.cx = 0;
     regs.h.dh = 24;
