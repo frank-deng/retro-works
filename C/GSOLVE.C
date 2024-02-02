@@ -34,30 +34,7 @@ bool has_dup_digit(uint16_t num)
     }
     return false;
 }
-uint8_t check_s(uint16_t ans, uint16_t guess)
-{
-    uint8_t result = 0, i, valAns, valGuess;
-    uint16_t existAns = 0, existGuess = 0;
-    for (i = 0; i < 4; i++) {
-        valAns = ans & 0xf;
-        valGuess = guess & 0xf;
-        ans >>= 4;
-        guess >>= 4;
-        if (valAns == valGuess) {
-            result += 0x10;
-            continue;
-        }
-        existAns |= (1 << valAns);
-        existGuess |= (1 << valGuess);
-    }
-    existGuess &= existAns;
-    while (existGuess != 0) {
-        result++;
-        existGuess = existGuess & (existGuess - 1);
-    }
-    return result;
-}
-uint8_t check_m(uint16_t ans, uint16_t guess)
+uint8_t check(uint16_t ans, uint16_t guess)
 {
     uint8_t result = 0, i, valAns, valGuess;
     uint8_t existAns[10] = {0,0,0,0,0,0,0,0,0,0};
@@ -79,27 +56,6 @@ uint8_t check_m(uint16_t ans, uint16_t guess)
     }
     return result;
 }
-
-typedef struct{
-    uint16_t num;
-    uint8_t res;
-}guess_input_t;
-
-bool parse_input(const char *str,bool mastermind,guess_input_t *input)
-{
-    unsigned int num,a,b;
-    uint16_t num_bcd;
-    if(sscanf(str,"%u,%ua%ub",&num,&a,&b)!=3){
-        return false;
-    }
-    num_bcd=uint2bcd((uint16_t)num);
-    if(!mastermind && has_dup_digit(num_bcd)){
-        return false;
-    }
-    input->num=num_bcd;
-    input->res=(uint8_t)((a<<4)|b);
-    return true;
-}
 void print_help(const char *app_name)
 {
     char *app_name_last_posix=strrchr(app_name,'/');
@@ -113,33 +69,36 @@ void print_help(const char *app_name)
 }
 int main(int argc, char** argv){
     int optind=1;
-    unsigned char opt;
     bool mastermind=false;
-    guess_input_t guess[GUESS_CHANCES];
-    uint8_t len,i,cmp;
-    uint16_t n0,n;
+    uint16_t g_num[GUESS_CHANCES],n0,n;
+    uint8_t g_res[GUESS_CHANCES],len,i;
     bool passed;
-    if(strcmp(argv[optind],"-m")==0){
+    if(optind<argc && strcmp(argv[optind],"-m")==0){
         mastermind=true;
         optind++;
     }
-    
-    len=argc-optind;
-    if(len<=0){
-        fprintf(stderr,"Guess history required.\n");
-        print_help(argv[0]);
-        return 1;
-    }
-    if(len>GUESS_CHANCES){
-        len=GUESS_CHANCES;
-    }
-    for(i=0;i<len;i++){
-        if(!parse_input(argv[optind+i],mastermind,&guess[i])){
+    for(i=0; optind<argc && len<GUESS_CHANCES; optind++,i++){
+        unsigned int num=0xffff,a=0xff,b=0xff;
+        sscanf(argv[optind],"%u,%ua%ub",&num,&a,&b);
+        if(num>9999 || a>3 || b>4){
             fprintf(stderr,"Invalid input at parameter %u.\n",i+1);
             print_help(argv[0]);
             return 1;
         }
+        n=uint2bcd((uint16_t)num);
+        if(!mastermind && has_dup_digit(n)){
+            fprintf(stderr,"Duplicated digit at parameter %u.\n",i+1);
+            return 1;
+        }
+        g_num[i]=n;
+        g_res[i]=(uint8_t)((a<<4)|b);
     }
+    len=i;
+    if(len<=0){
+        print_help(argv[0]);
+        return 1;
+    }
+    
     for(n0=0;n0<=9999;n0++){
         n=uint2bcd(n0);
         if(!mastermind && has_dup_digit(n)){
@@ -147,8 +106,7 @@ int main(int argc, char** argv){
         }
         passed=true;
         for(i=0;i<len;i++){
-            cmp=(mastermind ? check_m(guess[i].num,n) : check_s(guess[i].num,n));
-            if(cmp!=guess[i].res){
+            if(check(n,g_num[i])!=g_res[i]){
                 passed=false;
                 break;
             }
