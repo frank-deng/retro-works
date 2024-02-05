@@ -266,7 +266,7 @@ void print_report(uint32_t report_s[GUESS_CHANCES], uint32_t report_m[GUESS_CHAN
         total_m+=report_m[i];
         printf("%-2u      %10lu %10lu\n", i+1, report_s[i], report_m[i]);
     }
-    printf("Total: %lu\n", total_s);
+    printf("Total:  %10lu %10lu\n", total_s, total_m);
 }
 
 void read_file(char *path, uint32_t *report_s, uint32_t *report_m)
