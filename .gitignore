@@ -18,3 +18,4 @@ test.py
 .outside
 POEM_OUT.PCX
 web.config
+*.wav
