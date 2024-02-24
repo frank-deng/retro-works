@@ -1,31 +1,42 @@
 Retro Programming Works 怀旧编程作品
 ====================================
 
-一些古董平台上的编程作品。仅供娱乐。  
-Some retro programming works for vintage platforms. For entertainment use only.
+被模拟的PC Emulated PC
+----------------------
 
-1992's PC
----------
+### 年代 Era
+
+* 1995 ~ 1998
 
 ### 配置 Configuration
 
-* CPU: V20 (80186 Compatible)
-* RAM: 640k
-* Floppy Drive A: 5.25" 1.2M High Density 
-* Floppy Drive B: 5.25" 360k Double Side 
-* Display: CGA with green monochrome monitor
+* CPU 80486DX2 66MHz
+* 8M RAM
+* 512M HDD
+* S3 864 Graphics Adapter with 512k VRAM
+* CD-ROM
+* Sound Blaster 16 With Wavetable Daughterboard
+* Mouse
+* 56k Modem
 
-### 主要用途 Main Usage
+主要用途 Main Usage
+------------------
 
 * BASIC编程 BASIC Programming
-* WPS中英文文字处理 WPS Chinese & English Text Processing
-* 俄罗斯方块游戏 Tetris game
-* 2048游戏 2048 Game
-* 黑白棋游戏 Reversi Game
-* 英文打字练习 English Typing Training
-* 五笔打字练习 Wubi Input Training
+* C/C++编程 C/C++ Programming
+* 英语学习 English learning
+* 英汉字典 English-Chinese dictionary
+* 中英文文字处理 Chinese & English text processing
+* 电子表格和图表处理 Spreadsheet and chart processing
+* 多媒体光盘浏览 Viewing multimedia CDs
+* 图片浏览 Image viewing
+* 音乐和视频播放 Music & video playback
+* 拨号上网 Surfing online via dial-up network
+* 拨号连接远程服务器 Connecting to remote server via dial-up network
+* （禁止游戏 NO GAMING）
 
-### 截图欣赏 Screenshots
+截图欣赏 Screenshots
+-------------------
 
 #### BASIC编程 BASIC Programming
 
@@ -59,8 +70,14 @@ Some retro programming works for vintage platforms. For entertainment use only.
 屏保 Screensaver  
 ![Screensaver](screenshots/lines.png)
 
+屏保（VGA模式） Screensaver (VGA mode)  
+![Screensaver](screenshots/lines_vga.png)
+
 谢尔宾斯基地毯 Sierpinski Carpet  
 ![Sierpinski Carpet](screenshots/Carpet.png)
+
+谢尔宾斯基地毯（VGA模式） Sierpinski Carpet (VGA mode)  
+![Sierpinski Carpet VGA Mode](screenshots/Carpet2.png)
 
 数独求解程序 Sudoku Solver  
 ![Sudoku Solver](screenshots/Sudoku_Solver.png)
@@ -96,43 +113,6 @@ Some retro programming works for vintage platforms. For entertainment use only.
 24点求解器 24 Game Solver  
 ![Moon River](screenshots/24_Game_Solver.png)
 
-
-1997's PC
----------
-
-配置 Configuration
-
-* CPU 80486DX2 66MHz
-* 8M RAM
-* 512M HDD
-* S3 864 Graphics Adapter with 512k VRAM
-* CD-ROM
-* Sound Blaster 16 With Wavetable Card
-* Mouse
-* 56k Modem
-
-主要用途 Main Usage
-
-* BASIC编程 BASIC Programming
-* C/C++编程 C/C++ Programming
-* 英语学习 English learning
-* 英汉字典 English-Chinese dictionary
-* 中英文文字处理 Chinese & English text processing
-* 电子表格和图表处理 Spreadsheet and chart processing
-* 多媒体光盘浏览 Viewing multimedia CDs
-* 图片浏览 Image viewing
-* 音乐和视频播放 Music & video playback
-* 拨号上网 Surfing online via dial-up network
-* 拨号连接远程服务器 Connecting to remote server via dial-up network
-* （禁止游戏 NO GAMING）
-
-### 截图欣赏 Screenshots
-
-#### BASIC编程 BASIC Programming
-
-谢尔宾斯基地毯（VGA模式） Sierpinski Carpet (VGA mode)  
-![Sierpinski Carpet VGA Mode](screenshots/Carpet2.png)
-
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](screenshots/Poem_UCDOS.png)
 
@@ -153,6 +133,8 @@ UCDOS特显程序可用字体 Fonts available for UCDOS Special Display Tool
 
 UCDOS可用英文字体 English fonts available for UCDOS  
 ![English Fonts](screenshots/TX_Fonts2.png)
+
+#### C/C++编程 C/C++ Programming
 
 中文数字 Chinese Number  
 ![Chinese Number for UCDOS](screenshots/Chinese_Number_UCDOS.png)
@@ -278,15 +260,6 @@ When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk
 
 选择`Epson LQ1600K`作为打印机驱动程序，之后可以从Windows 3.x的应用程序中使用DOSBox-x的虚拟打印机打印到PNG图片。  
 Select `Epson LQ1600K` as the printer driver, then you can print document into PNG files from Windows 3.x applications via DOSBox-x's virtual printer.
-
-### X11禁止Ctrl+Alt+Fn键切换终端 Disable Switching TTY Via Ctrl+Alt+Fn Under X11
-
-将以下内容添加到`/etc/xorg.conf`：  
-Add the following code to `/etc/xorg.conf`:
-
-	Section "ServerFlags"
-	    Option "DontVTSwitch" "true"
-	EndSection
 
 ### 不同Linux环境安装编译环境的方式 How To Install Build Environment for Linux
 
