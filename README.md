@@ -159,10 +159,7 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 实用命令 Useful Commands
 ------------------------
 
-Linux下挂载虚拟软盘（使用GB2312编码的文件名）  
-Mount floppy image under Linux (Use GB2312 for filename encoding)
-
-	sudo mount -o loop,codepage=936,iocharset=utf8 floppy.img /mnt
+### 制作Windows 3.x下播放的视频 Make Video For Windows 3.x
 
 使用ffmpeg制作可在Windows 3.1下播放的视频  
 Convert video into format accepted by Windows 3.1
@@ -188,22 +185,13 @@ Convert video into VCD and split the source video into multiple discs (Maximum 1
 Windows 3.2和Windows 95使用**金山影霸II**播放PAL制式VCD，使用XingMPEG Player播放NTSC制式VCD。  
 Under Windows 3.2 and Windows 95, use SoftVCD II (JinShanYinBa II) to play PAL VCD, use XingMPEG Player to play NTSC VCD.
 
-DOSBox使用的Autoexec命令，用于挂载原始硬盘镜像和软盘镜像  
-DOSBox autoexec command for mounting raw harddisk image and floppy image
-
-	@imgmount 0 /home/frank/.dosbox/floppy.img -fs none
-	@imgmount 2 /home/frank/.dosbox/hdd.img -fs none -t hdd -size 512,63,16,X
-
-对于一些BIN/CUE，MDF/MDS等非ISO格式的光盘映像文件，可以尝试在Linux下使用`iat`命令转换成ISO文件  
-For CD-ROM image files in non-ISO format like BIN/CUE, MDF/MDS, etc., try to use `iat` command under Linux to convert them into ISO file.
-
 ### 减少CPU占用 Reduce CPU Usage
 
 **如何在使用模拟器运行DOS、Windows 3.x、Windows 9x时减少CPU占用：**  
 **How to reduce CPU usage when running DOS, Windows 3.x, Windows 9x with emulators:**
 
 MS-DOS 6.22自带`POWER.EXE`，在`CONFIG.SYS`里添加以下配置即可：  
-MS-DOS 6.22 already has `POWER.EXE` installed, you can add the following configuration into `CONFIG.SYS`:
+MS-DOS 6.22 has pre-installed `POWER.EXE`, you can add the following configuration into `CONFIG.SYS`:
 
 	DEVICEHIGH=C:\DOS\POWER.EXE ADV:MAX
 
@@ -224,7 +212,7 @@ Windows 9x requires installing *AmnHLT* or *Amn Refrigerator*.
 ### DOS下启用UMB Activate UMB for DOS
 
 在`CONFIG.SYS`中找到内容为`DEVICE=C:\DOS\EMM386.EXE`的行，然后在其后面加上`NOEMS`参数。  
-Open `CONFIG.SYS` and find the line with `DEVICE=C:\DOS\EMM386.EXE`, then append `NOEMS` parameter to it.
+Open `CONFIG.SYS` and find the line with `DEVICE=C:\DOS\EMM386.EXE`, then append `NOEMS` parameter after it.
 
 ### DOS下添加CD-ROM支持 Add CD-ROM support for MS-DOS
 
@@ -265,3 +253,14 @@ Select `Epson LQ1600K` as the printer driver, then you can print document into P
 
 * Debian/Ubuntu: `sudo apt-get install build-essential`
 * Tiny Core: `tce-load -wi compiletc`
+* Termux: `pkg install build-essential`
+
+### 其它 Miscellaneous
+
+Linux下挂载虚拟软盘（使用GB2312编码的文件名）  
+Mount floppy image under Linux (Use GB2312 for filename encoding)
+
+	sudo mount -o loop,codepage=936,iocharset=utf8 floppy.img /mnt
+
+对于一些BIN/CUE，MDF/MDS等非ISO格式的光盘映像文件，可以尝试在Linux下使用`iat`命令转换成ISO文件  
+For CD-ROM image files in non-ISO format like BIN/CUE, MDF/MDS, etc., try to use `iat` command under Linux to convert them into ISO file.
