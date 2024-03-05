@@ -36,27 +36,6 @@ async def read_line(reader,writer,echo=True,max_len=1024):
         pass
     return res
 
-async def run_ppp_session(args):
-    __master, __slave = pty.openpty()
-    fcntl.fcntl(__master, fcntl.F_SETFL, fcntl.fcntl(__master, fcntl.F_GETFL) | os.O_NONBLOCK)
-    fcntl.fcntl(__slave, fcntl.F_SETFL, fcntl.fcntl(__slave, fcntl.F_GETFL) | os.O_NONBLOCK)
-    ptyPath="/proc/%d/fd/%d"%(os.getpid(),__slave)
-    subprocess.Popen([pppdExec,ptyPath,] + args, bufsize=0, start_new_session=True,
-        stdin=__slave, stdout=__slave, stderr=__slave)
-    try:
-        while True:
-            writer.write(os.read(__master, 1024))
-            try:
-                content=await asyncio.wait_for(reader.read(1024), timeout=0.01)
-                if not content:
-                    raise BrokenPipeError
-                os.write(__master, content)
-            except asyncio.TimeoutError:
-                pass
-    finally:
-        __slave.close()
-        __master.close()
-
 async def service_main(reader,writer):
     global loginInfo
     writer.write(b'\r\nLogin:')
@@ -75,7 +54,11 @@ async def service_main(reader,writer):
         await writer.drain()
         return True
     elif username in session_info:
-        session_info[username].close()
+        writer_orig=session_info[username]
+        session_info[username]=writer
+        writer_orig.close()
+        await writer_orig.wait_closed()
+    else:
         session_info[username]=writer
     __master, __slave = pty.openpty()
     fcntl.fcntl(__master, fcntl.F_SETFL, fcntl.fcntl(__master, fcntl.F_GETFL) | os.O_NONBLOCK)
@@ -84,8 +67,11 @@ async def service_main(reader,writer):
     subprocess.Popen([pppdExec,ptyPath,] + __loginInfo['options'], bufsize=0, start_new_session=True,
         stdin=__slave, stdout=__slave, stderr=__slave)
     try:
-        while True:
-            writer.write(os.read(__master, 1024))
+        while not writer.is_closing():
+            try:
+                writer.write(os.read(__master, 1024))
+            except BlockingIOError:
+                pass
             try:
                 content=await asyncio.wait_for(reader.read(1024), timeout=0.01)
                 if not content:
@@ -93,10 +79,13 @@ async def service_main(reader,writer):
                 os.write(__master, content)
             except asyncio.TimeoutError:
                 pass
+            except BlockingIOError:
+                pass
     finally:
-        __slave.close()
-        __master.close()
-    await writer.drain()
+        os.close(__slave)
+        os.close(__master)
+        if username in session_info and session_info[username]==writer:
+            del session_info[username]
     return False
 
 async def service_handler(reader,writer):
@@ -113,8 +102,9 @@ async def service_handler(reader,writer):
     except Exception as e:
         print_exc()
     finally:
-        writer.close()
-        await writer.wait_closed()
+        if not writer.is_closing():
+            writer.close()
+            await writer.wait_closed()
 		
 async def main(host,port):
     server=await asyncio.start_server(service_handler,

@@ -27,8 +27,8 @@ Enable IP Forwarding: Modify `/etc/sysctl.conf` and change the value of `net.ipv
 在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
-	@reboot user python3 /path/to/telnet-ssh-adapter.py -P 2345 -c path/to/ssh.conf
-	@reboot root python3 /path/to/ppp-manager.py -P 2333 -c path/to/ppp.conf
+	@reboot user python3 /path/to/telnet-ssh-adapter.py -P 2333 -c path/to/ssh.conf
+	@reboot root python3 /path/to/ppp-manager.py -P 2345 -c path/to/ppp.conf
 	@reboot root iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
 
 在`/etc/ppp/options`中加入以下配置：  
@@ -53,7 +53,7 @@ Add the following command to `/opt/bootlocal.sh`:
 
 	sysctl -w net.ipv4.ip_forward=1
 	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
-	python3 /path/to/ppp-manager.py --port 2333 --config path/to/ppp.conf --pppd /path/to/pppd &
+	python3 /path/to/ppp-manager.py --port 2345 --config path/to/ppp.conf --pppd /path/to/pppd &
 
 执行`backup`命令保存修改。  
 Use `backup` command to save all the modifications.
@@ -139,8 +139,8 @@ Encoding conversion won't work after reattaching to existing GNU Screen session.
 
 ## Windows 3.x客户端使用方法 Windows 3.x Client Usage
 
-设置新的PPP连接时需要将电话号码设置成`12333`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
-When setting up new PPP connection, set phone number with `12333`, set IP address with `192.168.7.2`, leave username and password blank.
+设置新的PPP连接时需要将电话号码设置成`12345`，IP地址设置成`192.168.7.2`，用户名和密码为空。  
+When setting up new PPP connection, set phone number with `12345`, set IP address with `192.168.7.2`, leave username and password blank.
 
 如果您有多部虚拟机连接相同的PPP服务器，则需要在每部虚拟机内的系统中分别配置不同的IP地址。比如配置Windows 3.2的IP地址为`192.168.7.2`，Windows 95的IP地址为`192.168.7.3`。  
 If you have multiple virtual machines connecting to the same PPP server, then you have to set different IP addresses for each virtual machine. For example, set Windows 3.2's IP address as `192.168.7.2`, and set Windows 95's IP addresss as `192.168.7.3`.
