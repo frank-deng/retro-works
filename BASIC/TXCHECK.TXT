@@ -1,0 +1,28 @@
+A
+org 100h
+push ax
+push bx
+push si
+mov si,0
+cs:
+mov word ptr [si],0
+mov ax,db00
+int 2fh
+cmp al,ff
+jnz 126
+cmp bx,5450
+jnz 126
+mov ax,11
+int 79h
+jnz 126
+cs:
+mov word ptr [si],1
+pop si
+pop bx
+pop ax
+retf
+
+N TXCHECK.BIN
+RCX
+2a
+W

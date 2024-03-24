@@ -1,0 +1,28 @@
+A
+org 100h
+push ds
+push es
+push si
+push di
+push ax
+push bx
+mov si,0
+mov di,0
+mov ax,0
+mov bx,0
+mov ds,ax
+mov es,bx
+int 7eh
+pop bx
+pop ax
+pop di
+pop si
+pop es
+pop ds
+retf
+
+N HZGET.BIN
+RCX
+1f
+W
+Q
