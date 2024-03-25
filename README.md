@@ -38,10 +38,35 @@ Retro Programming Works 怀旧编程作品
 截图欣赏 Screenshots
 -------------------
 
+#### C/C++编程 C/C++ Programming
+
+IP地址计算器 IP Address Calculator  
+![IP Calculator](screenshots/IPCalc.png)
+
+UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS  
+![IP Calculator](screenshots/IPCalc_UCDOS.png)
+
+中文数字 Chinese Number  
+![Chinese Number for UCDOS](screenshots/Chinese_Number_UCDOS.png)
+
+#### PPP服务器 PPP Server
+
+天气预报 Weather Forecast  
+![Weather Forecast](screenshots/retro-site_1.png)
+
+我的博客 My Blog  
+![My Blog](screenshots/retro-site_2.png)
+
+带数学公式的文章 Article with Equation  
+![Math](screenshots/retro-site_3.png)
+
 #### BASIC编程 BASIC Programming
 
 2048游戏 2048 Game  
 ![2048](screenshots/2048.png)
+
+2048游戏（使用UCDOS特显程序） 2048 Game (Using UCDOS Special Display Tool)  
+![Happy New Year](screenshots/2048_UCDOS.png)
 
 俄罗斯方块 Tetris  
 ![Tetris](screenshots/Tetris.png)
@@ -49,23 +74,11 @@ Retro Programming Works 怀旧编程作品
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](screenshots/guessnum.png)
 
-九九乘法表 9x9 Multiplication Table  
-![Multiplication Table](screenshots/Chengfa.png)
+24点求解器 24 Game Solver  
+![Moon River](screenshots/24_Game_Solver.png)
 
-求1000以内的质数 Get prime numbers under 1000  
-![Prime Numbers](screenshots/primes.png)
-
-显示杨辉三角 Display Yanghui Triangle  
-![Yanghui Triangle](screenshots/Yanghui.png)
-
-条形图 Bar Chart  
-![Bar Chart](screenshots/barchart.png)
-
-饼图 Pie Chart  
-![Pie Chart](screenshots/piechart.png)
-
-绘制几何形状 Drawing Geometric Shapes  
-![Shapes](screenshots/Shapes.png)
+数独求解程序 Sudoku Solver  
+![Sudoku Solver](screenshots/Sudoku_Solver.png)
 
 屏保 Screensaver  
 ![Screensaver](screenshots/lines.png)
@@ -79,82 +92,24 @@ Retro Programming Works 怀旧编程作品
 谢尔宾斯基地毯（VGA模式） Sierpinski Carpet (VGA mode)  
 ![Sierpinski Carpet VGA Mode](screenshots/Carpet2.png)
 
-数独求解程序 Sudoku Solver  
-![Sudoku Solver](screenshots/Sudoku_Solver.png)
-
 显示古诗 Poem Showing  
 ![Poem](screenshots/poem.png)
-
-显示古诗（使用BSAVE图像数据） Poem Showing (Using BSAVE Image Data)  
-![Poem 2](screenshots/poem2.png)
-
-新年快乐 Happy New Year  
-![Happy New Year](screenshots/New_Year.png)
-
-诸事皆顺 Everything Goes Well  
-![Everything Goes Well](screenshots/Well.png)
-
-月亮河 *Moon River*  
-![Moon River](screenshots/Moon_River.png)
-
-图案 Patterns  
-![Pattern 1](screenshots/Pattern_1.png)  
-  
-![Pattern 2](screenshots/Pattern_2.png)  
-  
-![Pattern 3](screenshots/Pattern_3.png)
-
-中文数字 Chinese Number  
-![Chinese Number](screenshots/Chinese_Number.png)
-
-罗马数字 Roman Number  
-![Roman Number](screenshots/Roman_Number.png)
-
-24点求解器 24 Game Solver  
-![Moon River](screenshots/24_Game_Solver.png)
 
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](screenshots/Poem_UCDOS.png)
 
+显示古诗（使用BSAVE图像数据） Poem Showing (Using BSAVE Image Data)  
+![Poem 2](screenshots/poem2.png)
+
 显示带插图的古诗（使用UCDOS特显程序） Poem With Picture (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](screenshots/Poem2_UCDOS.png)
+
+新年快乐 Happy New Year  
+![Happy New Year](screenshots/New_Year.png)
 
 新年快乐（使用UCDOS特显程序） Happy New Year (Using UCDOS Special Display Tool)  
 ![Happy New Year for UCDOS](screenshots/New_Year_UCDOS.png)
 
-2048游戏（使用UCDOS特显程序） 2048 Game (Using UCDOS Special Display Tool)  
-![Happy New Year](screenshots/2048_UCDOS.png)
-
-UCDOS特显程序256色列表 256-Color Table of UCDOS Special Display Tool  
-![Color Table](screenshots/TX.png)
-
-UCDOS特显程序可用字体 Fonts available for UCDOS Special Display Tool  
-![Fonts](screenshots/TX_Fonts.png)
-
-UCDOS可用英文字体 English fonts available for UCDOS  
-![English Fonts](screenshots/TX_Fonts2.png)
-
-#### C/C++编程 C/C++ Programming
-
-中文数字 Chinese Number  
-![Chinese Number for UCDOS](screenshots/Chinese_Number_UCDOS.png)
-
-IP地址计算器 IP Address Calculator  
-![IP Calculator](screenshots/IPCalc.png)
-
-UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS  
-![IP Calculator](screenshots/IPCalc_UCDOS.png)
-
-#### PPP服务器 PPP Server
-
-天气预报 Weather Forecast  
-![Weather Forecast](screenshots/retro-site_1.png)
-
-我的博客 My Blog  
-![My Blog](screenshots/retro-site_2.png)
-
-带数学公式的文章 Article with Equation  
-![Math](screenshots/retro-site_3.png)
 
 实用命令 Useful Commands
 ------------------------
