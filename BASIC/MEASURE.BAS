@@ -42,16 +42,17 @@ SUB MainLoop
   DO
     CLS
     RES=0: CALL MeasureAndDrawStr(MSTR,RES,W,H,FASC,FHZK,ATTR,XADJ)
-    LOCATE 1,1:PRINT "0.内容：";MSTR;
-    LOCATE 3,1:PRINT "1.字符宽度（px）：";W;
-    LOCATE 3,26:PRINT "2.字符高度（px）：";H;
-    LOCATE 3,51:PRINT "3.西文字体：";FASC;
-    LOCATE 4,1:PRINT "4.中文字体：";FHZK;
-    LOCATE 4,26:PRINT "5.字符属性：";ATTR;
-    LOCATE 4,51:PRINT "6.字距调整（px）：";XADJ;
-    LOCATE 6,1:PRINT "字符串长度（px）：";RES;
-    LOCATE 8,1:PRINT "按0-6选择要修改的项目，按Esc或q退出。";
+    LOCATE 25,1:PRINT "字符串长度：";RES;"px";
+    LOCATE 1,1:PRINT "0.内容：";MSTR
+    PRINT "1.字符宽度：";W;"px";TAB(25);
+    PRINT "2.字符高度：";H;"px";TAB(50);
+    PRINT "3.西文字体：";FASC
+    PRINT "4.中文字体：";FHZK;TAB(25);
+    PRINT "5.字符属性：";ATTR;TAB(50);
+    PRINT "6.字距调整：";XADJ;"px"
+    PRINT "按0-6选择要修改的项目，按Esc或q退出。";
     K$="": DO: K$=INPUT$(1): LOOP WHILE K$=""
+    PRINT "":PRINT ""
     SELECT CASE K$
       CASE CHR$(27)
         RUNNING=0
@@ -60,19 +61,19 @@ SUB MainLoop
       CASE "Q"
         RUNNING=0
       CASE "0"
-        LOCATE 9,1:INPUT "内容：",MSTR
+        INPUT "内容：",V$: IF V$<>"" THEN MSTR=V$
       CASE "1"
-        LOCATE 9,1:INPUT "字符宽度（px）：",W
+        INPUT "字符宽度（px）：",V$: IF V$<>"" THEN W=VAL(V$)
       CASE "2"
-        LOCATE 9,1:INPUT "字符高度（px）：",H
+        INPUT "字符高度（px）：",V$: IF V$<>"" THEN H=VAL(V$)
       CASE "3"
-        LOCATE 9,1:INPUT "西文字体（0-10）：",FASC
+        INPUT "西文字体（0-10）：",V$: IF V$<>"" THEN FASC=VAL(V$)
       CASE "4"
-        LOCATE 9,1:INPUT "中文字体（0-33）：",FHZK
+        INPUT "中文字体（0-33）：",V$: IF V$<>"" THEN FHZK=VAL(V$)
       CASE "5"
-        LOCATE 9,1:INPUT "字符属性：",ATTR
+        INPUT "字符属性：",V$: IF V$<>"" THEN ATTR=VAL(V$)
       CASE "6"
-        LOCATE 9,1:INPUT "字距调整（px）：",XADJ
+        INPUT "字距调整（px）：",V$: IF V$<>"" THEN XADJ=VAL(V$)
     END SELECT
   LOOP UNTIL (RUNNING=0)
 END SUB
@@ -85,7 +86,7 @@ SUB MeasureAndDrawStr(STR AS STRING, RES AS INTEGER, W AS INTEGER, H AS INTEGER,
       I=I+1: CH$=CH$+MID$(STR,I+1,1): FONT=FONTHZK
     END IF
     CALL GetChar(CH$,FONT,WA,H,ATTR)
-    CALL DrawChar(WA,H,RES,180,15)
+    CALL DrawChar(WA,H,RES,128,15)
     DX=WA+DIST: IF DX>0 THEN RES=RES+DX
     I=I+1
   WEND
