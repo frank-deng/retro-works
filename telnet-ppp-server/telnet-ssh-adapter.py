@@ -79,6 +79,9 @@ async def service_main(reader,writer):
                 pass
         writer.write(b'\x1b[1;1f\x1b[2J')
         await writer.drain()
+    except paramiko.ssh_exception.SSHException:
+        writer.write(b'Login Failed.\r\n')
+        await writer.drain()
     except paramiko.ssh_exception.AuthenticationException:
         writer.write(b'Login Failed.\r\n')
         await writer.drain()
@@ -148,3 +151,4 @@ if '__main__'==__name__:
         loginInfo=json.load(f)
     
     asyncio.run(main(args.host,args.port))
+
