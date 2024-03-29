@@ -111,9 +111,9 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 ![Happy New Year for UCDOS](screenshots/New_Year_UCDOS.png)
 
 图案 Patterns  
-![Pattern 1](PICTURES/Pattern_VGA_1.png)  
+![Pattern 1](screenshots/Pattern_VGA_1.png)  
   
-![Pattern 2](PICTURES/Pattern_VGA_2.png)  
+![Pattern 2](screenshots/Pattern_VGA_2.png)  
 
 
 实用命令 Useful Commands
