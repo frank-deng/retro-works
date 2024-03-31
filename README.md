@@ -115,8 +115,8 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
   
 ![Pattern 2](screenshots/Pattern_VGA_2.png)  
 
-繁花图案 Flower Pattern  
-![Flower](screenshots/Flower.png)
+繁花曲线 Flower Curves  
+![Flower](screenshots/Flower_Curves.png)
 
 
 实用命令 Useful Commands
