@@ -126,20 +126,20 @@ if '__main__'==__name__:
     parser.add_argument(
         '--host',
         '-H',
-        help='Specify binding host for the telnetd server.',
+        help='Specify binding host for the PPP server.',
         default=''
     )
     parser.add_argument(
         '--port',
         '-P',
-        help='Specify port for the telnetd server.',
+        help='Specify port for the PPP server.',
         type=int,
         default=23
     )
     parser.add_argument(
         '--config',
         '-c',
-        help='Specify config file for the telnetd server.',
+        help='Specify config file for the PPP server.',
         default='./ppp.conf'
     )
     parser.add_argument(

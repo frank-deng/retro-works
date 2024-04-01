@@ -5,7 +5,7 @@ IE3浏览器可通过PPP协议访问部署在服务端的HTML站点。
 IE3 browser can access the HTML site deployed at server side via PPP protocol.
 
 PPP服务器需要在Linux环境（如Debian、Ubuntu、TinyCore）中运行。  
-PPP server, Telnet server require running under Linux environments like Debian, Ubuntu, TinyCore.
+PPP server requires running under Linux environments like Debian, Ubuntu, TinyCore.
 
 **严禁将PPP服务器部署到生产环境或含有敏感数据的环境！！！**  
 **DO NOT deploy PPP server to production environment or environment with sensitive data!!!**
@@ -20,7 +20,7 @@ Execute the following commands to install softwares required:
 开启IP转发：将`/etc/sysctl.conf`中的`net.ipv4.ip_forward`的值改为`1`。  
 Enable IP Forwarding: Modify `/etc/sysctl.conf` and change the value of `net.ipv4.ip_forward` into `1`.
 
-在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器和Telnet服务器：  
+在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
 	@reboot root python3 /path/to/ppp-manager.py -P 2345 -c path/to/ppp.conf
@@ -61,7 +61,7 @@ Use `backup` command to save all the modifications.
 ## VirtualBox NAT配置端口转发 Configure NAT Port Forwarding for VirtualBox
 
 如果PPP服务器是部署在VirtualBox虚拟机里的Linux系统上，且虚拟机网卡连接的是NAT网络，则需要在虚拟机网卡的端口转发设置中为虚拟机里的PPP服务器添加端口转发规则，以使得主机上的DOSBox-X能访问虚拟机里的服务。  
-If PPP server and Telnet server are deployed on the VirtualBox Linux guest, and guest network adapter is attacted to NAT. Then you must add port forwarding rules for PPP server and Telnet server inside guest machine, so as to enable host DOSBox-x accessing them.
+If PPP server is deployed in the VirtualBox Linux guest, and guest network adapter is attacted to NAT. Then you must add port forwarding rules for the PPP server inside guest machine, so as to enable host DOSBox-x accessing them.
 
 转发规则各个字段意义如下：  
 Meanings of port forwarding rule columns:
