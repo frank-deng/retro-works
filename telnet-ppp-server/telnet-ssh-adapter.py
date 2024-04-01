@@ -93,7 +93,6 @@ async def service_main(reader,writer):
 
 async def service_handler(reader,writer):
     try:
-        writer.write(b'\x1b[1;1f\x1b[2J')
         while True:
             await service_main(reader,writer)
     except asyncio.TimeoutError:
