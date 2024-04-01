@@ -42,6 +42,11 @@ Add the following configuration to `/etc/ppp/options`:
 	mtu 576
 	noauth
 
+执行以下命令配置`firewalld`开放所需端口：  
+Use the following command to configure `firewalld` opening the port required:
+
+    sudo firewall-cmd --add-port=2333/tcp --permanent
+
 ## Tiny Core Linux PPP服务器配置 Tiny Core Linux PPP Server Configuration
 
 安装所需软件包 Install packages required
