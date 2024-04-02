@@ -86,26 +86,14 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 屏保（VGA模式） Screensaver (VGA mode)  
 ![Screensaver](screenshots/lines_vga.png)
 
-谢尔宾斯基地毯 Sierpinski Carpet  
-![Sierpinski Carpet](screenshots/Carpet.png)
-
 谢尔宾斯基地毯（VGA模式） Sierpinski Carpet (VGA mode)  
 ![Sierpinski Carpet VGA Mode](screenshots/Carpet2.png)
-
-显示古诗 Poem Showing  
-![Poem](screenshots/poem.png)
 
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](screenshots/Poem_UCDOS.png)
 
-显示古诗（使用BSAVE图像数据） Poem Showing (Using BSAVE Image Data)  
-![Poem 2](screenshots/poem2.png)
-
 显示带插图的古诗（使用UCDOS特显程序） Poem With Picture (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](screenshots/Poem2_UCDOS.png)
-
-新年快乐 Happy New Year  
-![Happy New Year](screenshots/New_Year.png)
 
 新年快乐（使用UCDOS特显程序） Happy New Year (Using UCDOS Special Display Tool)  
 ![Happy New Year for UCDOS](screenshots/New_Year_UCDOS.png)
@@ -117,7 +105,6 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 
 繁花曲线 Flower Curves  
 ![Flower](screenshots/Flower_Curves.png)
-
 
 实用命令 Useful Commands
 ------------------------
