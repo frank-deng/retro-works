@@ -28,40 +28,22 @@ Use the following command to configure `firewalld` opening the port required:
 
     sudo firewall-cmd --add-port=2333/tcp --permanent
 
-## VirtualBox NAT配置端口转发 Configure NAT Port Forwarding for VirtualBox
+## 虚拟机NAT网络配置端口转发 Configure NAT Port Forwarding for VMs
 
-如果Telnet服务器是部署在VirtualBox虚拟机里的Linux系统上，且虚拟机网卡连接的是NAT网络，则需要在虚拟机网卡的端口转发设置中为虚拟机里的Telnet服务器添加端口转发规则，以使得主机上的DOSBox-X能访问虚拟机里的服务。  
-If Telnet server are deployed on the VirtualBox Linux guest, and guest network adapter is attacted to NAT. Then you must add port forwarding rules for the Telnet server inside guest machine, so as to enable host DOSBox-x accessing them.
+如果虚拟机网卡连接的是NAT网络，则需要为虚拟机添加端口转发规则，以使得主机上的应用能访问虚拟机里的服务。  
+If the guest VM's network adapter is attacted to NAT. Then you must add port forwarding rules for the guest VM，so as to enable host apps accessing services inside guest VM.
 
-转发规则各个字段意义如下：  
-Meanings of port forwarding rule columns:
+* 协议选TCP。  
+  Select TCP protocol.
+* 主机端口可任意指定一个主机上未使用的端口，连接此端口可访问虚拟机里的服务。  
+  Use any unused port as the Host Port, connecting to this port to access the services inside VM.
+* 子系统端口为PPP服务器在虚拟机中使用的端口，比如2345。  
+  Set Guest Port with the port used by PPP server inside VM, e.g. 2345.
 
-* **名称 Name**  
-可任意指定，也可以留空。  
-Any value is acceptable, including blank value.
-* **协议 Protocol**  
-此处固定选择`TCP`（此处UDP没有使用）。  
-Always select `TCP` here (UDP is unused here).
-* **主机IP Host IP**  
-可以不指定，也可以指定`127.0.0.1`以限制只有在主机上运行的程序可以访问对应的服务。  
-Leave it blank, or specify `127.0.0.1` to limit only programs running on the host machine can access the service.
-* **主机端口 Host Port**  
-可任意指定一个主机上未使用的端口。  
-Any port number not used on the host machine are acceptable.
-* **子系统IP Guest IP**  
-在虚拟机的Linux里使用`ip address`命令查看虚拟机网卡对应的IP地址，一般是`10.0.2.15`。  
-Use command `ip address` inside Linux guest to get the IP address of the guest network card, in most cases it's `10.0.2.15`.
-* **子系统端口 Guest Port**  
-Telnet服务器在虚拟机中使用的端口  
-Port numbers of the Telnet server inside virtual machine.
+## 虚拟机访问主机上的服务 Access Services on the Host from VM
 
-虚拟机里的程序可以通过`虚拟路由器IP`+`主机上的服务对应的端口号`来访问主机上的服务。虚拟路由器IP可通过以下步骤获得：  
-Programs inside virtual machine can access host services via `Virtual Router IP` + `port of the host service`. You can get the virtual router IP via the following steps:
-
-1. 在虚拟机的Linux终端中输入`ip route show`命令。  
-Execute command `ip route show` in the guest Linux terminal.
-2. 在上一步的命令输出中找到`default via`后面的IP地址，该地址即为客户机的虚拟路由器IP，VirtualBox客户机中一般为`10.0.2.2`。  
-Find out the IP address after `default via` from the output of the step above, this is the virtual router IP for the guest machine. For VirtualBox guests it's `10.0.2.2` in most cases.
+`ip route show`命令的输出中`default via`后面的IP地址是客户机的虚拟路由器IP，一般为`10.0.2.2`。虚拟机中的程序可通过`虚拟路由器IP + 端口`连接主机上的服务。  
+Check the output of `ip route show` command, the IP after `default via` is the virtual router IP for the guest machine, normally `10.0.2.2`. Programs inside VM can access the services on the host via `Virtual Router IP + Port`.
 
 ## DOSBox串口配置 Configure DOSBox's Serial Interface
 
