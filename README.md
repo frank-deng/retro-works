@@ -80,9 +80,6 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 数独求解程序 Sudoku Solver  
 ![Sudoku Solver](screenshots/Sudoku_Solver.png)
 
-屏保 Screensaver  
-![Screensaver](screenshots/lines.png)
-
 屏保（VGA模式） Screensaver (VGA mode)  
 ![Screensaver](screenshots/lines_vga.png)
 
