@@ -1,0 +1,71 @@
+A
+org 100h
+push ax
+push bx
+push si
+mov si,0
+cs:
+mov word ptr [si],0
+mov ax,db00
+int 2fh
+cmp al,ff
+jnz 126
+cmp bx,5450
+jnz 126
+mov ax,1
+int 79h
+jnz 126
+cs:
+mov word ptr [si],1
+pop si
+pop bx
+pop ax
+retf
+
+N hzchk.bin
+RCX
+2a
+W
+
+A
+org 100h
+push ds
+push es
+push si
+push di
+push ax
+push bx
+mov si,0
+mov di,0
+mov ax,0
+mov bx,0
+mov ds,ax
+mov es,bx
+int 7eh
+pop bx
+pop ax
+pop di
+pop si
+pop es
+pop ds
+retf
+
+N HZGET.BIN
+RCX
+1f
+W
+
+A
+org 100h
+push ax
+mov ax,ff0b
+int 16h
+pop ax
+retf
+
+N PREDRAW.BIN
+RCX
+8
+W
+Q
+

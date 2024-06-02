@@ -1,8 +1,8 @@
 Retro Programming Works 怀旧编程作品
 ====================================
 
-被模拟的PC Emulated PC
-----------------------
+被模拟的PC 1 Emulated PC 1
+------------------------
 
 ### 年代 Era
 
@@ -19,8 +19,7 @@ Retro Programming Works 怀旧编程作品
 * Mouse
 * 56k Modem
 
-主要用途 Main Usage
-------------------
+### 主要用途 Main Usage
 
 * BASIC编程 BASIC Programming
 * C/C++编程 C/C++ Programming
@@ -34,6 +33,31 @@ Retro Programming Works 怀旧编程作品
 * 拨号上网 Surfing online via dial-up network
 * 拨号连接远程服务器 Connecting to remote server via dial-up network
 * （禁止游戏 NO GAMING）
+
+被模拟的PC 2 Emulated PC 2
+-------------------------
+
+### 年代 Era
+
+* 1990 ~ 1992
+
+### 配置 Configuration
+
+* CPU: V20 (80186 Compatible)
+* RAM: 640k
+* Floppy Drive A: 5.25" 1.2M High Density
+* Floppy Drive B: 5.25" 360k Double Side
+* Display: CGA with green monochrome monitor
+
+### 主要用途 Main Usage
+
+* BASIC编程 BASIC Programming
+* WPS中英文文字处理 WPS Chinese & English Text Processing
+* 俄罗斯方块游戏 Tetris game
+* 2048游戏 2048 Game
+* 黑白棋游戏 Reversi Game
+* 英文打字练习 English Typing Training
+* 五笔打字练习 Wubi Input Training
 
 截图欣赏 Screenshots
 -------------------
@@ -65,20 +89,35 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 2048游戏 2048 Game  
 ![2048](screenshots/2048.png)
 
+![2048](screenshots/oldpc/2048.png)
+
 2048游戏（使用UCDOS特显程序） 2048 Game (Using UCDOS Special Display Tool)  
 ![Happy New Year](screenshots/2048_UCDOS.png)
 
 俄罗斯方块 Tetris  
 ![Tetris](screenshots/Tetris.png)
 
+![Tetris](screenshots/oldpc/Tetris.png)
+
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](screenshots/guessnum.png)
+
+![Bulls and Cows](screenshots/oldpc/guessnum.png)
 
 24点求解器 24 Game Solver  
 ![Moon River](screenshots/24_Game_Solver.png)
 
+![24 Game Solver](screenshots/oldpc/24_Game_Solver.png)
+
 数独求解程序 Sudoku Solver  
 ![Sudoku Solver](screenshots/Sudoku_Solver.png)
+
+![Sudoku Solver](screenshots/oldpc/Sudoku_Solver.png)
+
+屏保 Screensaver  
+![Screensaver](screenshots/lines.png)
+
+![Screensaver](screenshots/oldpc/lines.png)
 
 屏保（VGA模式） Screensaver (VGA mode)  
 ![Screensaver](screenshots/lines_vga.png)
@@ -86,25 +125,81 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 谢尔宾斯基地毯（VGA模式） Sierpinski Carpet (VGA mode)  
 ![Sierpinski Carpet VGA Mode](screenshots/Carpet2.png)
 
+谢尔宾斯基地毯 Sierpinski Carpet  
+![Sierpinski Carpet](screenshots/oldpc/Carpet.png)
+
 显示古诗（使用UCDOS特显程序） Poem Showing (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](screenshots/Poem_UCDOS.png)
+
+显示古诗 Poem Showing  
+![Poem](screenshots/oldpc/poem.png)
 
 显示带插图的古诗（使用UCDOS特显程序） Poem With Picture (Using UCDOS Special Display Tool)  
 ![Poem for UCDOS](screenshots/Poem2_UCDOS.png)
 
+显示古诗（使用BSAVE图像数据） Poem Showing (Using BSAVE Image Data)  
+![Poem With Picture](screenshots/oldpc/poem2.png)
+
 新年快乐（使用UCDOS特显程序） Happy New Year (Using UCDOS Special Display Tool)  
 ![Happy New Year for UCDOS](screenshots/New_Year_UCDOS.png)
+
+新年快乐 Happy New Year  
+![Happy New Year](screenshots/oldpc/New_Year.png)
 
 诸事皆顺（使用UCDOS特显程序） Everything Goes Well (Using UCDOS Special Display Tool)  
 ![Everything Goes Well](screenshots/Well.png)
 
-图案 Patterns  
+诸事皆顺 Everything Goes Well  
+![Everything Goes Well](screenshots/oldpc/Well.png)
+
+图案（VGA模式） Patterns (VGA mode)  
 ![Pattern 1](screenshots/Pattern_VGA_1.png)  
   
 ![Pattern 2](screenshots/Pattern_VGA_2.png)  
 
-繁花曲线 Flower Curves  
+图案 Patterns  
+![Pattern 1](screenshots/oldpc/Pattern_1.png)  
+  
+![Pattern 2](screenshots/oldpc/Pattern_2.png)  
+  
+![Pattern 3](screenshots/oldpc/Pattern_3.png)
+
+繁花曲线（VGA模式） Flower Curves (VGA mode)  
 ![Flower](screenshots/Flower_Curves.png)
+
+繁花曲线 Flower Curves  
+![Flower](screenshots/oldpc/Flower_Curves.png)
+
+月亮河 *Moon River*  
+![Moon River](screenshots/oldpc/Moon_River.png)
+
+中文数字 Chinese Number  
+![Chinese Number](screenshots/oldpc/Chinese_Number.png)
+
+猜数字求解器 Bulls and Cows Solver  
+![Bulls and Cows Solver](screenshots/oldpc/guessnum_solver.png)
+
+九九乘法表 9x9 Multiplication Table  
+![Multiplication Table](screenshots/oldpc/Chengfa.png)
+
+求1000以内的质数 Get prime numbers under 1000  
+![Prime Numbers](screenshots/oldpc/primes.png)
+
+斐波那契数列 Fibonacci Sequence  
+![Fibonacci Sequence](screenshots/oldpc/Fibonacci.png)
+
+显示杨辉三角 Display Yanghui Triangle  
+![Yanghui Triangle](screenshots/oldpc/Yanghui.png)
+
+条形图 Bar Chart  
+![Bar Chart](screenshots/oldpc/barchart.png)
+
+饼图 Pie Chart  
+![Pie Chart](screenshots/oldpc/piechart.png)
+
+绘制几何形状 Drawing Geometric Shapes  
+![Shapes](screenshots/oldpc/Shapes.png)
+
 
 实用命令 Useful Commands
 ------------------------

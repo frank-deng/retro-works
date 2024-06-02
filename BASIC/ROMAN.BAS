@@ -1,0 +1,12 @@
+10 DEFINT A-Z: DIM ROMAN$(30)
+20 DATA "I","II","III","IV","V","VI","VII","VIII","IX","X","XX","XXX","XL","L","LX","LXX","LXXX","XC"
+30 DATA "C","CC","CCC","CD","D","DC","DCC","DCCC","CM","M","MM","MMM"
+40 FOR I=0 TO 29: READ ROMAN$(I): NEXT I
+60 INPUT "Input number:",N
+70 IF N>3999 OR N<1 THEN PRINT "Invalid Number.":END
+80 P=0: RES$=""
+90 WHILE N>0: D=N MOD 10
+100 IF D>0 THEN RES$=ROMAN$(P*9+D-1)+RES$
+110 P=P+1: N=N\10: WEND
+120 PRINT "Roman number:";RES$
+130 END
