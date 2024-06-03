@@ -115,8 +115,6 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 ![Sudoku Solver](screenshots/oldpc/Sudoku_Solver.png)
 
 屏保 Screensaver  
-![Screensaver](screenshots/lines.png)
-
 ![Screensaver](screenshots/oldpc/lines.png)
 
 屏保（VGA模式） Screensaver (VGA mode)  
