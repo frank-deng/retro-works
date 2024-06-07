@@ -105,7 +105,7 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 ![Bulls and Cows](screenshots/oldpc/guessnum.png)
 
 24点求解器 24 Game Solver  
-![Moon River](screenshots/24_Game_Solver.png)
+![24 Game Solver](screenshots/24_Game_Solver.png)
 
 ![24 Game Solver](screenshots/oldpc/24_Game_Solver.png)
 
@@ -155,21 +155,11 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
   
 ![Pattern 2](screenshots/Pattern_VGA_2.png)  
 
-图案 Patterns  
-![Pattern 1](screenshots/oldpc/Pattern_1.png)  
-  
-![Pattern 2](screenshots/oldpc/Pattern_2.png)  
-  
-![Pattern 3](screenshots/oldpc/Pattern_3.png)
-
 繁花曲线（VGA模式） Flower Curves (VGA mode)  
 ![Flower](screenshots/Flower_Curves.png)
 
 繁花曲线 Flower Curves  
 ![Flower](screenshots/oldpc/Flower_Curves.png)
-
-月亮河 *Moon River*  
-![Moon River](screenshots/oldpc/Moon_River.png)
 
 中文数字 Chinese Number  
 ![Chinese Number](screenshots/oldpc/Chinese_Number.png)
@@ -188,15 +178,6 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 
 显示杨辉三角 Display Yanghui Triangle  
 ![Yanghui Triangle](screenshots/oldpc/Yanghui.png)
-
-条形图 Bar Chart  
-![Bar Chart](screenshots/oldpc/barchart.png)
-
-饼图 Pie Chart  
-![Pie Chart](screenshots/oldpc/piechart.png)
-
-绘制几何形状 Drawing Geometric Shapes  
-![Shapes](screenshots/oldpc/Shapes.png)
 
 
 实用命令 Useful Commands
