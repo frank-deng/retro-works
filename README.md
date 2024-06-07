@@ -170,9 +170,6 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 九九乘法表 9x9 Multiplication Table  
 ![Multiplication Table](screenshots/oldpc/Chengfa.png)
 
-求1000以内的质数 Get prime numbers under 1000  
-![Prime Numbers](screenshots/oldpc/primes.png)
-
 斐波那契数列 Fibonacci Sequence  
 ![Fibonacci Sequence](screenshots/oldpc/Fibonacci.png)
 
