@@ -114,12 +114,6 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 
 ![Sudoku Solver](screenshots/oldpc/Sudoku_Solver.png)
 
-屏保 Screensaver  
-![Screensaver](screenshots/oldpc/lines.png)
-
-屏保（VGA模式） Screensaver (VGA mode)  
-![Screensaver](screenshots/lines_vga.png)
-
 谢尔宾斯基地毯（VGA模式） Sierpinski Carpet (VGA mode)  
 ![Sierpinski Carpet VGA Mode](screenshots/Carpet2.png)
 
