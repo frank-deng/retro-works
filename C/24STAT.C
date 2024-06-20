@@ -1,18 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <math.h>
 
 #define MAX_NUM 13
 #define MIN_NUM 1
-#define MAX_ANS 100
-#define MIN_ANS 0
 #define NUM_CNT 4
 #define OP_CNT 3
 #define ANS_MIN 0
-#define ANS_MAX 100
-
-static FILE *g_fpcnt=NULL;
-static FILE *g_fpexpr=NULL;
+#define ANS_MAX 99
 
 typedef enum {
     OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MAX
@@ -40,48 +36,40 @@ static inline double calc(double a, op_t op0, double b)
     return res;
 }
 
-// abcd### a#(b#(c#d))
-static inline double expr0calc(double *n, op_t *op){
-    return calc(n[0], op[0], calc(n[1], op[1], calc(n[2], op[2], n[3])));
-}
-
-// abc#d## a#((b#c)#d)
-static inline double expr1calc(double *n, op_t *op){
-    return calc(n[0], op[0], calc(calc(n[1], op[1], n[2]), op[2], n[3]));
-}
-
-// abc##d# (a#(b#c))#d
-static inline double expr2calc(double *n, op_t *op){
-    return calc(calc(n[0], op[0], calc(n[1], op[1], n[2])), op[2], n[3]);
-}
-
-// ab#cd## (a#b)#(c#d)
-static inline double expr3calc(double *n, op_t *op){
-    return calc(calc(n[0], op[0], n[1]), op[1], calc(n[2], op[2], n[3]));
-}
-
-// ab#c#d# ((a#b)#c)#d
-static inline double expr4calc(double *n, op_t *op){
-    return calc(calc(calc(n[0], op[0], n[1]), op[1], n[2]), op[2], n[3]);
-}
-
-static int calc_res(double *n, op_t *op, unsigned int ans)
+static int calc_res(double *n, op_t *op, double ans)
 {
-    if(fabs(expr0calc(n,op)-(double)ans)<0.0001){
+    double res;
+    
+    // abcd### a#(b#(c#d))
+    res=calc(n[0], op[0], calc(n[1], op[1], calc(n[2], op[2], n[3])));
+    if(fabs(res-ans)<0.0001){
         return 0;
     }
-    if(fabs(expr1calc(n,op)-(double)ans)<0.0001){
+    
+    // abc#d## a#((b#c)#d)
+    res=calc(n[0], op[0], calc(calc(n[1], op[1], n[2]), op[2], n[3]));
+	if(fabs(res-ans)<0.0001){
         return 1;
     }
-    if(fabs(expr2calc(n,op)-(double)ans)<0.0001){
+    
+    // abc##d# (a#(b#c))#d
+    res=calc(calc(n[0], op[0], calc(n[1], op[1], n[2])), op[2], n[3]);
+    if(fabs(res-ans)<0.0001){
         return 2;
     }
-    if(fabs(expr3calc(n,op)-(double)ans)<0.0001){
+    
+    // ab#cd## (a#b)#(c#d)
+    res=calc(calc(n[0], op[0], n[1]), op[1], calc(n[2], op[2], n[3]));
+    if(fabs(res-ans)<0.0001){
         return 3;
     }
-    if(fabs(expr4calc(n,op)-(double)ans)<0.0001){
+    
+    // ab#c#d# ((a#b)#c)#d
+    res=calc(calc(calc(n[0], op[0], n[1]), op[1], n[2]), op[2], n[3]);
+    if(fabs(res-ans)<0.0001){
         return 4;
     }
+    
     return -1;
 }
 static void print_expr(int idx, unsigned int* n0, unsigned int *n, op_t *op, unsigned int ans)
@@ -91,50 +79,35 @@ static void print_expr(int idx, unsigned int* n0, unsigned int *n, op_t *op, uns
         "(%u%c%u)%c(%u%c%u)=%u","((%u%c%u)%c%u)%c%u=%u",
     };
     const char opc[]={'+','-','*','/'};
-    fprintf(g_fpexpr,"%u,%u,%u,%u,%u,",n0[0],n0[1],n0[2],n0[3],ans);
-    fprintf(g_fpexpr,expr[idx],n[0],opc[op[0]],n[1],opc[op[1]],n[2],opc[op[2]],n[3],ans);
-    fprintf(g_fpexpr,"\n");
+    printf("%u,%u,%u,%u,",n0[0],n0[1],n0[2],n0[3]);
+    if(idx>=0){
+    	printf(expr[idx],n[0],opc[op[0]],n[1],opc[op[1]],n[2],opc[op[2]],n[3],ans);
+    }else{
+        printf("No Answer");
+    }
+    printf("\n");
 }
 
-static bool cycle_opers(unsigned int* n0, unsigned int a, unsigned int b,
-	unsigned int c, unsigned int d, unsigned int ans)
+static int cycle_opers(double *n, op_t *op, double ans)
 {
-    op_t op[OP_CNT];
-    unsigned int n2[NUM_CNT];
-    double n[NUM_CNT];
-    n[0]=(double)a;
-    n[1]=(double)b;
-    n[2]=(double)c;
-    n[3]=(double)d;
-    n2[0]=a;
-    n2[1]=b;
-    n2[2]=c;
-    n2[3]=d;
     for(op[0]=OP_ADD; op[0]<OP_MAX; op[0]++){
         for(op[1]=OP_ADD; op[1]<OP_MAX; op[1]++){
-            for(op[2]=OP_ADD; op[2]<OP_MAX; op[2]++){
+           for(op[2]=OP_ADD; op[2]<OP_MAX; op[2]++){
                 int res=calc_res(n,op,ans);
                 if(res>=0){
-                    if(NULL!=g_fpexpr){
-                    	print_expr(res,n0,n2,op,ans);
-                    }
-                    return true;
+                    return res;
                 }
 			}
     	}
     }
-finish:
-    return false;
+    return -1;
 }
 
-static bool check_ans(unsigned int a, unsigned int b, unsigned int c, unsigned int d, unsigned int ans)
+static int check_ans(unsigned int *nsrc, unsigned int ans, unsigned int *nbuf, op_t *op)
 {
     unsigned int i,j,k;
-    unsigned int n[NUM_CNT];
-    n[0]=a;
-    n[1]=b;
-    n[2]=c;
-    n[3]=d;
+    int res=-1;
+    double ndbl[NUM_CNT];
     for(i=0;i<NUM_CNT;i++){
         for(j=0;j<NUM_CNT;j++){
             if(i==j){
@@ -144,40 +117,37 @@ static bool check_ans(unsigned int a, unsigned int b, unsigned int c, unsigned i
                 if(i==k || j==k){
                		continue;
             	}
-                if(cycle_opers(n,n[i],n[j],n[k],n[6-i-j-k],ans)){
-                    return true;
+                nbuf[0]=nsrc[i];
+                nbuf[1]=nsrc[j];
+                nbuf[2]=nsrc[k];
+                nbuf[3]=nsrc[6-i-j-k];
+                ndbl[0]=(double)(nbuf[0]); ndbl[1]=(double)(nbuf[1]);
+                ndbl[2]=(double)(nbuf[2]); ndbl[3]=(double)(nbuf[3]);
+                res=cycle_opers(ndbl,op,(double)ans);
+                if(res>=0){
+                    return res;
                 }
             }
     	}
     }
-finish:
-    return false;
+    return res;
 }
 
-unsigned int get_num_cumb_count()
+unsigned int get_ans_combs(unsigned int ans, bool show_expr)
 {
-    unsigned int a,b,c,d,cnt=0;
-    for(a=MIN_NUM; a<=MAX_NUM; a++){
-        for(b=a; b<=MAX_NUM; b++){
-        	for(c=b; c<=MAX_NUM; c++){
-        		for(d=c; d<=MAX_NUM; d++){
-                    cnt++;
-    			}
-    		}
-    	}
-    }
-    return cnt;
-}
-
-unsigned int get_ans_combs(unsigned int ans)
-{
-    unsigned int a,b,c,d,cnt=0;
-    for(a=MIN_NUM; a<=MAX_NUM; a++){
-        for(b=a; b<=MAX_NUM; b++){
-        	for(c=b; c<=MAX_NUM; c++){
-        		for(d=c; d<=MAX_NUM; d++){
-                    if(check_ans(a,b,c,d,ans)){
+    unsigned int cnt=0;
+    unsigned int n[NUM_CNT],n2[NUM_CNT];
+    op_t op[OP_CNT];
+    for(n[0]=MIN_NUM; n[0]<=MAX_NUM; n[0]++){
+        for(n[1]=n[0]; n[1]<=MAX_NUM; n[1]++){
+        	for(n[2]=n[1]; n[2]<=MAX_NUM; n[2]++){
+        		for(n[3]=n[2]; n[3]<=MAX_NUM; n[3]++){
+                    int expr=check_ans(n,ans,n2,op);
+                    if(expr>=0){
                     	cnt++;
+                    }
+                    if(show_expr){
+                        print_expr(expr,n,n2,op,ans);
                     }
     			}
     		}
@@ -189,25 +159,17 @@ unsigned int get_ans_combs(unsigned int ans)
 int main(int argc, char *argv[])
 {
     unsigned int ans;
-    g_fpcnt=stdout;
     if(argc>=2){
-        g_fpcnt=fopen(argv[1],"w");
-        if(NULL==g_fpcnt){
-            g_fpcnt=stdout;
+        ans=(unsigned int)strtoul(argv[1],NULL,10);
+        if(ans>ANS_MAX || ans<ANS_MIN){
+            fprintf(stderr,"Answer must between %u and %u.\n",ANS_MIN,ANS_MAX);
+            return 1;
         }
-    }
-    if(argc>=3){
-        g_fpexpr=fopen(argv[2],"w");
+        get_ans_combs(ans,true);
+        return 0;
     }
     for(ans=ANS_MIN; ans<=ANS_MAX; ans++){
-        unsigned int combs=get_ans_combs(ans);
-        fprintf(g_fpcnt,"%u,%u\n",ans,combs);
-    }
-    if(NULL!=g_fpcnt && stdout!=g_fpcnt){
-        fclose(g_fpcnt);
-    }
-    if(NULL!=g_fpexpr){
-        fclose(g_fpexpr);
+        printf("%u,%u\n",ans,get_ans_combs(ans,false));
     }
     return 0;
 }
