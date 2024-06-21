@@ -270,6 +270,10 @@ Select `Epson LQ1600K` as the printer driver, then you can print document into P
 * Tiny Core: `tce-load -wi compiletc`
 * Termux: `pkg install build-essential`
 
+### UCDOS WPS更改文字颜色为亮黄色 Change Text Color Into Light Yellow For UCDOS WPS
+
+    wps /FE /S
+
 ### 其它 Miscellaneous
 
 Linux下挂载虚拟软盘（使用GB2312编码的文件名）  
