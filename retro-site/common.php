@@ -9,6 +9,5 @@ mb_language('uni');
 mb_regex_encoding('UTF-8');
 ob_start('mb_output_handler');
 header('content-type: text/html; charset=GB2312');
-require('config.php');
 require('data.php');
 

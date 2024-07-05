@@ -6,6 +6,7 @@ $Parsedown = new Parsedown();
 $_TITLE=$_HEADER='你问我答';
 
 $question=null;
+$result=null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach(explode('&',file_get_contents("php://input")) as $item){
         $kv=explode('=',$item);

@@ -205,6 +205,9 @@ class FetchBlogs extends DataManager{
             if (!$_CONFIG['BLOGS_DATA']) {
                 return;
             }
+	    if (!file_exists($_CONFIG['BLOGS_DATA'])){
+		return;
+	    }
             $blogsData = file_get_contents($_CONFIG['BLOGS_DATA']);
             if (!$blogsData) {
                 return;
@@ -317,6 +320,7 @@ class FetchWeather extends DataManager{
     }
 }
 function GetAccessToken($id, $secret){
+    global $_CONFIG;
     $ch=curl_init();
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);
     curl_setopt($ch, CURLOPT_TIMEOUT, $_CONFIG['REQUEST_TIMEOUT']);

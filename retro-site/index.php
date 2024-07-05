@@ -1,11 +1,14 @@
 <?php
 require('common.php');
-$loadNews=new FetchNews($_GET['news']!=='0');
+$loadNews=new FetchNews();
 $loadBlogs=new FetchBlogs();
 $loadWeather=null;
 $weatherStr='没有天气信息 <font size=2>[<a href=\'selectCity.php\'>选择城市</a>]</font>&nbsp;';
 try{
-    $location=$_COOKIE['location'];
+    $location=null;
+    if(isset($_COOKIE['location'])){
+        $location=$_COOKIE['location'];
+    }
     if($location){
         $location=explode(',',$location);
         $loadWeather=new FetchWeather($location[0],$location[1]);
