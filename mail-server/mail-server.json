@@ -1,0 +1,12 @@
+{
+  "frank":{
+    "password":"77646f5a4f3166637627abe998e7a1470fe72d8b430f067dafa86263f1f23f94"
+  },
+  "test":{
+    "module":"emailtest"
+  },
+  "niwenwoda":{
+    "module":"askbot",
+    "erine_key":["client_id","client_secret"]
+  }
+}
