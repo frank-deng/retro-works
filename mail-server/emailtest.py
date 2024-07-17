@@ -15,12 +15,17 @@ def process_email(msg_raw):
                 payload=part.get_payload(decode=True).decode(charset)
     else:
         charset=msg.get_content_charset()
+        print(msg.get_payload(decode=True),'\n')
         payload=msg.get_payload(decode=True).decode(charset)
     msg_reply = EmailMessage()
     msg_reply['From']='test@10.0.2.2'
     msg_reply['To']=msg['From']
     msg_reply['Subject']="Re: "+msg['subject']
-    msg_reply.set_content(payload.encode(charset),'text','plain',cte='7bit')
+    print(payload)
+    payload_new="测试成功OK。\n\n----------"
+    for line in payload.split('\n'):
+        payload_new+=f"\n> {line.rstrip()}"
+    msg_reply.set_content(payload_new.encode(charset,'ignore'),'text','plain',cte='7bit')
     msg_reply.set_param('charset',charset)
     return msg_reply
 
@@ -39,3 +44,5 @@ async def run(params,recvQueue,sendQueue):
             })
         except:
             print_exc()
+            with open('error.eml','wb') as fp:
+                fp.write(msgInfo['msg'])

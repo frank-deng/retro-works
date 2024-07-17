@@ -49,11 +49,14 @@ async def handler(key,msg):
         return
     access_token=await getAccessToken(key[0],key[1])
     ans=await askBot(access_token,question)
+    payload=ans+'\n\n----------'
+    for line in question.split('\n'):
+        payload+=(f"\n> {line}").rstrip()
     msg2 = EmailMessage()
     msg2['From']='niwenwoda@10.0.2.2'
     msg2['To']=msg['From']
     msg2['Subject']="Re: "+msg['subject']
-    msg2.set_content(ans.encode(charset),'text','plain',cte='7bit')
+    msg2.set_content(payload.encode(charset),'text','plain',cte='7bit')
     msg2.set_param('charset',charset)
     return msg2
 
