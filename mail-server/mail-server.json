@@ -5,6 +5,10 @@
   "test":{
     "module":"emailtest"
   },
+  "savemail":{
+    "module":"savemail",
+    "path":"."
+  },
   "niwenwoda":{
     "module":"askbot",
     "erine_key":["client_id","client_secret"]
