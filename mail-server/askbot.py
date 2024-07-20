@@ -1,6 +1,7 @@
 import aiohttp,asyncio,json,sys
-import email
+import email,email.charset
 from email.message import EmailMessage
+from email.charset import Charset
 from codecs import decode
 from traceback import print_exc
 
@@ -41,44 +42,45 @@ def msg_get_data(msg):
         for part in msg.walk():
             if part.get_content_type() in {'text/plain','text/html'}:
                 charset=part.get_content_charset()
-                payload=part.get_payload(decode=True).decode(charset)
+                payload=part.get_payload(decode=True)
     else:
         charset=msg.get_content_charset()
-        payload=msg.get_payload(decode=True).decode(charset)
-    subject=decode(msg['subject'].encode('ascii'), charset)
-    return subject,payload,charset
-    
-def content_append_msg(msg):
-    subject,content,charset=msg_get_data(msg)
+        payload=msg.get_payload(decode=True)
+    charset=Charset(charset).get_output_charset()
+    subject,subjectCharset=email.header.decode_header(msg['Subject'])[0]
+    if subjectCharset is None:
+        subjectCharset=charset
+    subjectCharset=Charset(subjectCharset).get_output_charset()
+    if isinstance(subject,bytes):
+        subject=subject.decode(subjectCharset)
+    elif 'hz-gb-2312'==charset:
+        subject=subject.encode('ascii').decode(subjectCharset)
+    subject=subject.strip()
+    payload=payload.decode(charset,errors='ignore')
+    return subject,payload
+
+def msg_apply_reply(text,textOrig):
     marker='> '
-    res='\n\n----------'
-    if 'Date' in msg:
-        res+=f"\n{marker}Date: {msg['Date']}"
-    if 'From' in msg:
-        res+=f"\n{marker}From: {msg['From']}"
-    if 'To' in msg:
-        res+=f"\n{marker}To: {msg['To']}"
-    if 'Subject' in msg:
-        res+=f"\n{marker}Subject: {subject}"
-    res+=f"\n{marker}"
-    for line in content.rstrip().split('\n'):
+    res=f"{text.rstrip()}\n\n----------"
+    for line in textOrig.rstrip().split('\n'):
         res+=f"\n{marker}{line.rstrip()}"
     return res
 
 async def handler(key,msg):
-    subject,question,charset=msg_get_data(msg)
+    subject,question=msg_get_data(msg)
+    access_token=await getAccessToken(key[0],key[1])
+    content=msg_apply_reply(await askBot(access_token,question), question)
+    reply_charset='hz-gb-2312'
     msg_reply = EmailMessage()
-    msg_reply.set_param('charset',charset)
     msg_reply['From']='niwenwoda@10.0.2.2'
     msg_reply['To']=msg['From']
-    msg_reply['Subject']="Re: "+msg['Subject']
-    access_token=await getAccessToken(key[0],key[1])
-    ans=await askBot(access_token,question)
-    content=ans+content_append_msg(msg)
-    msg_reply.set_content(content.encode(charset,'ignore'),'text','plain',cte='7bit')
+    msg_reply['Subject']=f"Re: {subject.encode(reply_charset).decode('ascii')}"
+    msg_reply.set_content(content.encode(reply_charset,'ignore'),'text','plain',cte='7bit')
+    msg_reply.set_param('charset',reply_charset)
     return msg_reply
 
 async def run(params,recvQueue,sendQueue):
+    email.charset.add_codec('cn-gb','gb2312')
     while True:
         msgInfo=await recvQueue.get()
         try:

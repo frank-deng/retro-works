@@ -1,8 +1,8 @@
 import email,asyncio
 import email.charset
 from email.message import EmailMessage
+from email.charset import Charset
 from traceback import print_exc
-from codecs import decode
 
 def msg_get_data(msg):
     charset=None
@@ -11,29 +11,41 @@ def msg_get_data(msg):
         for part in msg.walk():
             if part.get_content_type() in {'text/plain','text/html'}:
                 charset=part.get_content_charset()
-                payload=part.get_payload()
+                payload=part.get_payload(decode=True)
     else:
         charset=msg.get_content_charset()
-        payload=msg.get_payload()
-    return payload,charset
+        payload=msg.get_payload(decode=True)
+    charset=Charset(charset).get_output_charset()
+    subject,subjectCharset=email.header.decode_header(msg['Subject'])[0]
+    if subjectCharset is None:
+        subjectCharset=charset
+    subjectCharset=Charset(subjectCharset).get_output_charset()
+    if isinstance(subject,bytes):
+        subject=subject.decode(subjectCharset)
+    elif 'hz-gb-2312'==charset:
+        subject=subject.encode('ascii').decode(subjectCharset)
+    subject=subject.strip()
+    payload=payload.decode(charset,errors='ignore')
+    return subject,payload
     
-def content_append_msg(msg):
-    content,charset=msg_get_data(msg)
-    res='\n\n----------'
-    for line in content.rstrip().split('\n'):
-        res+=(f"\n> {line}").rstrip()
+def msg_apply_reply(text,textOrig):
+    marker='> '
+    res=f"{text.rstrip()}\n\n----------"
+    for line in textOrig.rstrip().split('\n'):
+        res+=f"\n{marker}{line.rstrip()}"
     return res
     
 def process_email(msg_raw):
     msg=email.message_from_bytes(msg_raw)
-    content,charset=msg_get_data(msg)
-    msg_reply = EmailMessage()
-    msg_reply.set_param('charset',charset)
+    subject,content=msg_get_data(msg)
+    content=msg_apply_reply("测试成功OK。",content)
+    reply_charset='hz-gb-2312'
+    msg_reply=EmailMessage()
     msg_reply['From']=msg['To']
     msg_reply['To']=msg['From']
-    msg_reply['Subject']="Re: "+msg['Subject']
-    content="测试成功OK。"+content_append_msg(msg)
-    msg_reply.set_content(content.encode(charset,'ignore'),'text','plain',cte='7bit')
+    msg_reply['Subject']=f"Re: {subject.encode(reply_charset).decode('ascii')}"
+    msg_reply.set_content(content.encode(reply_charset,'ignore'),'text','plain',cte='7bit')
+    msg_reply.set_param('charset',reply_charset)
     return msg_reply
 
 async def run(params,recvQueue,sendQueue):
