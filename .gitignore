@@ -18,6 +18,7 @@ test.py
 .outside
 web.config
 *.wav
+*.eml
 
 build
 dist

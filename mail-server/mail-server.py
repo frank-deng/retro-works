@@ -318,7 +318,7 @@ class SMTPService:
         return match[1]
     
     async def run(self):
-        self.__writer.write(b'220 mysite.net\r\n')
+        self.__writer.write(b'220 Email Server 10.0.2.2\r\n')
         while self.__running:
             line=b''
             try:
@@ -365,22 +365,30 @@ async def service_handler_smtp(reader,writer):
             writer.close()
             await writer.wait_closed()
 
+server_pop3=None
+server_smtp=None
+
+def close_server(a,b):
+    global server_pop3,server_smtp
+    if server_pop3 is not None:
+        server_pop3.close()
+    if server_smtp is not None:
+        server_smtp.close()
+
 async def main(args):
-    global mailCenter
+    global mailCenter,server_pop3,server_smtp
     server_pop3,server_smtp,dummy = await asyncio.gather(
         asyncio.start_server(service_handler_pop3,host=args.host,port=args.port_pop3),
         asyncio.start_server(service_handler_smtp,host=args.host,port=args.port_smtp),
         mailCenter.load(args.config)
     )
-    loop = asyncio.get_event_loop()
-    for s in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(s, lambda: server_pop3.close())
-        loop.add_signal_handler(s, lambda: server_smtp.close())
+    signal.signal(signal.SIGINT, close_server)
+    signal.signal(signal.SIGTERM, close_server)
     try:
         async with server_pop3:
             async with server_smtp:
                 await asyncio.gather(server_pop3.serve_forever(), server_smtp.serve_forever())
-    except asyncio.exceptions.CancelledError:
+    except (asyncio.exceptions.CancelledError, KeyboardInterrupt):
         pass
     except Exception as e:
         print_exc()

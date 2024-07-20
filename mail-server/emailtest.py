@@ -1,4 +1,5 @@
 import email,asyncio
+import email.charset
 from email.message import EmailMessage
 from traceback import print_exc
 from codecs import decode
@@ -10,33 +11,22 @@ def msg_get_data(msg):
         for part in msg.walk():
             if part.get_content_type() in {'text/plain','text/html'}:
                 charset=part.get_content_charset()
-                payload=part.get_payload(decode=True).decode(charset)
+                payload=part.get_payload()
     else:
         charset=msg.get_content_charset()
-        payload=msg.get_payload(decode=True).decode(charset)
-    subject=decode(msg['subject'].encode('ascii'), charset)
-    return subject,payload,charset
+        payload=msg.get_payload()
+    return payload,charset
     
 def content_append_msg(msg):
-    subject,content,charset=msg_get_data(msg)
-    marker='> '
+    content,charset=msg_get_data(msg)
     res='\n\n----------'
-    if 'Date' in msg:
-        res+=f"\n{marker}Date: {msg['Date']}"
-    if 'From' in msg:
-        res+=f"\n{marker}From: {msg['From']}"
-    if 'To' in msg:
-        res+=f"\n{marker}To: {msg['To']}"
-    if 'Subject' in msg:
-        res+=f"\n{marker}Subject: {subject}"
-    res+=f"\n{marker}"
     for line in content.rstrip().split('\n'):
-        res+=f"\n{marker}{line.rstrip()}"
+        res+=(f"\n> {line}").rstrip()
     return res
     
 def process_email(msg_raw):
     msg=email.message_from_bytes(msg_raw)
-    subject,content,charset=msg_get_data(msg)
+    content,charset=msg_get_data(msg)
     msg_reply = EmailMessage()
     msg_reply.set_param('charset',charset)
     msg_reply['From']=msg['To']
@@ -47,6 +37,7 @@ def process_email(msg_raw):
     return msg_reply
 
 async def run(params,recvQueue,sendQueue):
+    email.charset.add_codec('cn-gb','gb2312')
     while True:
         msgInfo=await recvQueue.get()
         try:
