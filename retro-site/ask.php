@@ -70,4 +70,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <h5><font color='#00007f'>以下是相关回答：</font></h5><?=$Parsedown->text($result['result'])?>
 <p align='center'><hr></p>
 <?php } ?>
+<p align='center'><font face='Times New Roman'>E-Mail: <a href='mailto:niwenwoda@10.0.2.2'>niwenwoda@10.0.2.2</a></font></p>
 </body></html>
