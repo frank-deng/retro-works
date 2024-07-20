@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import asyncio,signal,json,hashlib,os,re,threading,importlib
+import asyncio,signal,json,hashlib,os,re,threading,importlib,platform
 from uuid import uuid4 as uuidgen
 from traceback import print_exc
 
@@ -382,8 +382,12 @@ async def main(args):
         asyncio.start_server(service_handler_smtp,host=args.host,port=args.port_smtp),
         mailCenter.load(args.config)
     )
-    signal.signal(signal.SIGINT, close_server)
-    signal.signal(signal.SIGTERM, close_server)
+    loop = asyncio.get_event_loop()
+    for s in (signal.SIGINT, signal.SIGTERM):
+        if 'Windows'==platform.system():
+            signal.signal(s, close_server)
+        else:
+            loop.add_signal_handler(s, lambda:close_server(None,None))
     try:
         async with server_pop3:
             async with server_smtp:
