@@ -77,7 +77,7 @@ async def handler(key,msg):
     msg_reply = EmailMessage()
     msg_reply['From']='niwenwoda@10.0.2.2'
     msg_reply['To']=msg['From']
-    msg_reply['Subject']=f"Re: {subject.encode(reply_charset).decode('ascii')}"
+    msg_reply['Subject']="Re: "+msg['Subject']
     msg_reply.set_content(content.encode(reply_charset,'ignore'),'text','plain',cte='7bit')
     msg_reply.set_param('charset',reply_charset)
     return msg_reply
@@ -87,10 +87,11 @@ async def run(params,recvQueue,sendQueue):
         msgInfo=await recvQueue.get()
         try:
             msg_reply=await handler(params['erine_key'],email.message_from_bytes(msgInfo['msg']))
+            msg_reply_data=msg_reply.as_bytes().replace(b'\n',b'\r\n')
             sendQueue.put_nowait({
                 'from':'test',
                 'to':msgInfo['from'],
-                'msg':msg_reply.as_bytes().replace(b'\n',b'\r\n')
+                'msg':msg_reply_data
             })
         except:
             print_exc()

@@ -1,8 +1,11 @@
 import email,asyncio
 import email.charset
 from email.message import EmailMessage
-from email.charset import Charset
 from traceback import print_exc
+
+CHARSET_ALIAS={
+        'cn-gb':'gb2312'
+}
 
 def msg_get_data(msg):
     charset=None
@@ -15,11 +18,11 @@ def msg_get_data(msg):
     else:
         charset=msg.get_content_charset()
         payload=msg.get_payload(decode=True)
-    charset=Charset(charset).get_output_charset()
+    charset=CHARSET_ALIAS.get(charset,charset)
     subject,subjectCharset=email.header.decode_header(msg['Subject'])[0]
     if subjectCharset is None:
         subjectCharset=charset
-    subjectCharset=Charset(subjectCharset).get_output_charset()
+    subjectCharset=CHARSET_ALIAS.get(subjectCharset,subjectCharset)
     if isinstance(subject,bytes):
         subject=subject.decode(subjectCharset)
     elif 'hz-gb-2312'==charset:
@@ -43,7 +46,7 @@ def process_email(msg_raw):
     msg_reply=EmailMessage()
     msg_reply['From']=msg['To']
     msg_reply['To']=msg['From']
-    msg_reply['Subject']=f"Re: {subject.encode(reply_charset).decode('ascii')}"
+    msg_reply['Subject']="Re: "+msg['Subject']
     msg_reply.set_content(content.encode(reply_charset,'ignore'),'text','plain',cte='7bit')
     msg_reply.set_param('charset',reply_charset)
     return msg_reply
