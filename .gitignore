@@ -23,4 +23,5 @@ web.config
 build
 dist
 *.egg-info
+mail-server.json
 

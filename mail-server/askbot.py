@@ -1,9 +1,12 @@
 import aiohttp,asyncio,json,sys
-import email,email.charset
+import email
 from email.message import EmailMessage
-from email.charset import Charset
 from codecs import decode
 from traceback import print_exc
+
+CHARSET_ALIAS={
+        'cn-gb':'gb2312'
+}
 
 async def getAccessToken(client_id,client_secret):
     url='https://aip.baidubce.com/oauth/2.0/token'
@@ -46,11 +49,11 @@ def msg_get_data(msg):
     else:
         charset=msg.get_content_charset()
         payload=msg.get_payload(decode=True)
-    charset=Charset(charset).get_output_charset()
+    charset=CHARSET_ALIAS.get(charset,charset)
     subject,subjectCharset=email.header.decode_header(msg['Subject'])[0]
     if subjectCharset is None:
         subjectCharset=charset
-    subjectCharset=Charset(subjectCharset).get_output_charset()
+    subjectCharset=CHARSET_ALIAS.get(subjectCharset,subjectCharset)
     if isinstance(subject,bytes):
         subject=subject.decode(subjectCharset)
     elif 'hz-gb-2312'==charset:
@@ -80,7 +83,6 @@ async def handler(key,msg):
     return msg_reply
 
 async def run(params,recvQueue,sendQueue):
-    email.charset.add_codec('cn-gb','gb2312')
     while True:
         msgInfo=await recvQueue.get()
         try:
