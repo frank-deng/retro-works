@@ -43,7 +43,7 @@ Retro Programming Works 怀旧编程作品
 
 ### 配置 Configuration
 
-* CPU: V20 (80186 Compatible)
+* CPU: 8088 4.77MHz
 * RAM: 640k
 * Floppy Drive A: 5.25" 1.2M High Density
 * Floppy Drive B: 5.25" 360k Double Side
@@ -98,6 +98,11 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 ![Tetris](screenshots/Tetris.png)
 
 ![Tetris](screenshots/oldpc/Tetris.png)
+
+贪吃蛇游戏 Snake Game  
+![Snake](screenshots/Snake.png)
+
+![Snake](screenshots/oldpc/Snake.png)
 
 猜数字游戏 Bulls and Cows  
 ![Bulls and Cows](screenshots/guessnum.png)
