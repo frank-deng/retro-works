@@ -1,0 +1,69 @@
+A
+org 100h
+push ax
+push bx
+push cx
+push dx
+push bp
+push si
+push di
+push ds
+push es
+mov si,0
+mov ax,0
+cs:
+mov [0158],si
+cs:
+mov [015a],ax
+mov ds,ax
+mov cx,9
+push [si]
+add si,2
+loop 11dh
+pop es
+pop ds
+pop di
+pop si
+pop bp
+pop dx
+pop cx
+pop bx
+pop ax
+int 00h
+pushf
+push es
+push ds
+push di
+push si
+push bp
+push dx
+push cx
+push bx
+push ax
+cs:
+mov ax,[015a]
+mov ds,ax
+cs:
+mov si,[0158]
+mov cx,0a
+pop [si]
+add si,2
+loop 147h
+pop es
+pop ds
+pop di
+pop si
+pop bp
+pop dx
+pop cx
+pop bx
+pop ax
+retf
+dw 0,0
+
+N INTX.BIN
+RCX
+5C
+W
+Q
+
