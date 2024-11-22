@@ -1,25 +1,22 @@
 A
 org 100h
+push si
+mov si,0
 push ax
+mov ax,0
 push bx
 push cx
 push dx
 push bp
-push si
 push di
 push ds
 push es
-mov si,0
-mov ax,0
-cs:
-mov [0158],si
-cs:
-mov [015a],ax
 mov ds,ax
 mov cx,9
 push [si]
-add si,2
-loop 11dh
+inc si
+inc si
+loop 114h
 pop es
 pop ds
 pop di
@@ -40,30 +37,28 @@ push dx
 push cx
 push bx
 push ax
-cs:
-mov ax,[015a]
+mov ax,0
 mov ds,ax
-cs:
-mov si,[0158]
 mov cx,0a
+mov si,0
 pop [si]
-add si,2
-loop 147h
+inc si
+inc si
+loop 13ah
 pop es
 pop ds
 pop di
-pop si
 pop bp
 pop dx
 pop cx
 pop bx
 pop ax
+pop si
 retf
-dw 0,0
 
 N INTX.BIN
 RCX
-5C
+4a
 W
 Q
 
