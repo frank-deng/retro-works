@@ -10,69 +10,62 @@ code segment
 org 100h
 
 start:
-push ds
-push es
 push si
-push di
-push ax
 mov si,0 ;Addr of param
-mov ax,0 ;Segment of param
-mov ds,ax
+push di
 mov di,0 ;Addr of bitmap
-mov ax,0 ;Segment of bitmap
-mov es,ax
+push ax
+mov ax,0 ;Segment of param
 push bx
+mov bx,0 ;Segment of bitmap
 push cx
 push dx
-
-mov ax,word ptr[si+2]
-mov word ptr[cs:YCounter],ax
-mov dx,word ptr[SI+6]
+push ds
+push es
+push bp
+push word ptr[si+2]
+mov ds,ax
+mov es,bx
+mov ah,0x0c
 mov al,byte ptr[si+8]
-
+mov dx,word ptr[SI+6]
 YLoop:
 mov cx,word ptr[SI+4]
-mov bx,word ptr[SI]
-mov ah,0x80
-
+mov bp,word ptr[SI]
+mov bh,0x80
 XLoop:
-push ax
-and ah,byte ptr[es:di]
+mov bl,bh
+and bl,byte ptr[es:di]
 jz DrawingEnd
-mov ah,0x0c
 int 0x10
-
 DrawingEnd:
-pop ax
-dec bx
+dec bp
 jz XLoopEnd
-
 inc cx
-cmp ah,1
+cmp bh,1
 jne NextByteEnd
 inc di
 NextByteEnd:
-ror ah,1
+ror bh,1
 jmp XLoop
-
 XLoopEnd:
 inc di
 inc dx
 sub word ptr[si+2],1
 jnz YLoop
-
 FinallyExit:
+pop word ptr[si+2]
+pop bp
+pop es
+pop ds
 pop dx
 pop cx
 pop bx
 pop ax
 pop di
 pop si
-pop es
-pop ds
 retf
 
-YCounter:
-dw 0
 code ends
 end start
+
