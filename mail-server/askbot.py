@@ -23,14 +23,16 @@ async def getAccessToken(client_id,client_secret):
     return None
     
 async def askBot(access_token,question):
-    url=f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token={access_token}"
+    url=f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token={access_token}"
     jsonData={
         'messages':[
             {
                 'role':'user',
-                'content':question
+                'content':question,
+                'temperature':0.01,
+                'top_p':0,
             }
-        ]
+        ],
     }
     async with aiohttp.ClientSession() as session:
         async with session.post(url,json=jsonData) as response:
