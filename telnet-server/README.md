@@ -82,6 +82,15 @@ For VIM users, it's necessary to add the following configuration to `/etc/vim/vi
 
 	set ambiwidth=double
 
+`.bashrc`中推荐添加以下内容，用于显示`screen`会话信息。  
+Recommended `.bashrc` snippet for displaying `screen` session info.
+
+	if [[ -n $STY ]]; then
+		STYTEXT="[$STY]"
+	fi
+	PS1="[$?]$STYTEXT \W\n\\$ "
+
+
 ### 已知问题 Known Issues
 
 字符编码转换功能在重新连接已有GNU Screen会话后会失效。需要重启GNU Screen恢复字符编码转换功能。
