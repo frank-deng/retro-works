@@ -38,8 +38,9 @@ class MailUserRobot:
 
     async def append(self,userFrom,msg):
         self.__recvQueue.put_nowait({
+            'id':str(uuidgen()),
             'from':userFrom,
-            'msg':msg
+            'msg':msg,
         })
 
     def close(self):
@@ -79,7 +80,7 @@ class MailCenter:
         password=self.__password.get(user,None)
         if password is None:
            return None
-        passwordInHash=hashlib.sha256(passwordIn.encode('iso8859-1')).hexdigest();
+        passwordInHash=hashlib.sha256(passwordIn.encode('iso8859-1')).hexdigest()
         if password != passwordInHash:
            return None
         return self.__user[user]
@@ -123,6 +124,8 @@ class POP3Service:
         self.__handlerDict={
             'USER':self.__handleUser,
             'PASS':self.__handlePass,
+            'UIDL':self.__handleUidl,
+            'LIST':self.__handleList,
             'STAT':self.__handleStat,
             'RETR':self.__handleRetr,
             'DELE':self.__handleDel,
@@ -192,7 +195,41 @@ class POP3Service:
             self.__writer.write(b'+OK\r\n')
         except IndexError:
             self.__writer.write(b'-ERR Failed to delete mail\r\n')
-    
+
+    async def __handleUidl(self, line):
+        content=line.decode('iso8859-1','ignore').strip()
+        match=re.search(r'^[^\s]+\s+([^\s]+)',content)
+        if match is None:
+            self.__writer.write(b'-ERR Missing email num\r\n')
+            return
+        idx=int(match[1])-1
+        try:
+            mailid=self.__mailList[idx]['id']
+            self.__writer.write(f'+OK {mailid}\r\n'.encode('iso8859-1'))
+        except IndexError:
+            self.__writer.write(b'-ERR Failed to get mail\r\n')
+
+    async def __handleList(self, line):
+        content=line.decode('iso8859-1','ignore').strip()
+        match=re.search(r'^[^\s]+\s+([^\s]+)',content)
+        if match is None:
+            mail_count=len(self.__mailList)
+            size_total=0
+            for item in self.__mailList:
+                size_total+=len(item['msg'])
+            self.__writer.write(f'+OK {mail_count} messages ({size_total} bytes)\r\n'.encode('iso8859-1'))
+            for idx in range(len(self.__mailList)):
+                msg_size=len(self.__mailList[idx]['msg'])
+                self.__writer.write(f'{idx+1} {msg_size}\r\n'.encode('iso8859-1'))
+            self.__writer.write(b'.\r\n')
+        else:
+            idx=int(match[1])-1
+            try:
+                msg_size=len(self.__mailList[idx]['msg'])
+                self.__writer.write(f'+OK {idx} {msg_size}\r\n'.encode('iso8859-1'))
+            except IndexError:
+                self.__writer.write(b'-ERR Failed to get mail\r\n')
+
     async def __handleNoop(self,line):
         self.__writer.write(b'+OK\r\n')
 
@@ -223,6 +260,7 @@ class POP3Service:
             handler=self.__handlerDict.get(cmd,None)
             if handler is None:
                 self.__writer.write(b'-ERR Invalid Command\r\n')
+                print('POP3 unhandled command:', line)
             elif (cmd not in self.__noAuthCmd) and (self.__mailList is None):
                 self.__writer.write(b'-ERR Not Authorized\r\n')
             else:
@@ -241,11 +279,13 @@ class SMTPService:
         self.__rcpt=set()
         self.__handlerDict={
             'HELO':self.__handleGreeting,
+            'EHLO':self.__handleGreeting,
             'MAIL':self.__handleSrc,
             'RCPT':self.__handleRcpt,
             'DATA':self.__handleData,
             'NOOP':self.__handleNoop,
             'QUIT':self.__handleQuit,
+            'RSET':self.__handleNoop,
         }
 
     async def __handleGreeting(self,line):
@@ -331,6 +371,7 @@ class SMTPService:
             handler=self.__handlerDict.get(cmd,None)
             if handler is None:
                 self.__writer.write(b'502 Unimplemented Command\r\n')
+                print('SMTP unhandled command:', line)
                 continue
             try:
                 await handler(line)
