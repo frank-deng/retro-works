@@ -1,6 +1,8 @@
 import aiohttp,asyncio,json,sys
 import email
 from email.message import EmailMessage
+from email.message import Message
+from email.header import Header
 from codecs import decode
 from traceback import print_exc
 
@@ -75,13 +77,12 @@ async def handler(key,msg):
     subject,question=msg_get_data(msg)
     access_token=await getAccessToken(key[0],key[1])
     content=msg_apply_reply(await askBot(access_token,question), question)
-    reply_charset='hz-gb-2312'
-    msg_reply = EmailMessage()
-    msg_reply['From']='niwenwoda@10.0.2.2'
+    reply_charset='HZ-GB-2312'
+    msg_reply = Message()
+    msg_reply['From']=msg['To']
     msg_reply['To']=msg['From']
-    msg_reply['Subject']="Re: "+msg['Subject']
-    msg_reply.set_content(content.encode(reply_charset,'ignore'),'text','plain',cte='7bit')
-    msg_reply.set_param('charset',reply_charset)
+    msg_reply['Subject']=Header("Re: "+subject, reply_charset)
+    msg_reply.set_payload(content.replace('\n','\r\n'), charset=reply_charset)
     return msg_reply
 
 async def run(params,recvQueue,sendQueue):
