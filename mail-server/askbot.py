@@ -4,8 +4,7 @@ from email.message import EmailMessage
 from email.message import Message
 from email.header import Header
 from codecs import decode
-from traceback import print_exc
-import logging
+import traceback,logging
 
 CHARSET_ALIAS={
         'cn-gb':'gb2312'
@@ -25,7 +24,11 @@ async def getAccessToken(client_id,client_secret):
                 return res['access_token']
     return None
     
-async def askBot(access_token,question):
+async def ask_erine(params,question):
+    key=params['erine_key']
+    access_token=await getAccessToken(key[0],key[1])
+    if access_token is None:
+        return None
     url=f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token={access_token}"
     jsonData={
         'messages':[
@@ -41,6 +44,29 @@ async def askBot(access_token,question):
         async with session.post(url,json=jsonData) as response:
             res=json.loads(await response.text())
             return res.get('result',None)
+    return None
+
+async def ask_deepseek(params,question):
+    headers={
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer '+params['deepseek_key']
+    }
+    jsonData={
+        "model": "deepseek-chat",
+        "stream": False,
+        "temperature": 0,
+        "messages": [
+            {
+                "role":"user",
+                "content":question
+            }
+        ],
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post('https://api.deepseek.com/chat/completions',headers=headers,json=jsonData) as response:
+            res=json.loads(await response.text())
+            return res['choices'][0]['message']['content']
     return None
 
 def msg_get_data(msg):
@@ -74,29 +100,36 @@ def msg_apply_reply(text,textOrig):
         res+=f"\n{marker}{line.rstrip()}"
     return res
 
-async def handler(key,msg):
+async def handler(userName,params,msg):
     subject,question=msg_get_data(msg)
-    access_token=await getAccessToken(key[0],key[1])
-    content=msg_apply_reply(await askBot(access_token,question), question)
+    content=msg_apply_reply(await globals()[params['handler']](params,question), question)
     reply_charset='HZ-GB-2312'
     msg_reply = Message()
-    msg_reply['From']=msg['To']
+    msg_reply['From']=userName
     msg_reply['To']=msg['From']
     msg_reply['Subject']=Header("Re: "+subject, reply_charset)
-    msg_reply.set_payload(content.replace('\n','\r\n'), charset=reply_charset)
+    content=content.replace('\n','\r\n')
+    content_gb2312=content.encode('gb2312','replace')
+    msg_reply.set_payload(content_gb2312.decode('gb2312'), charset=reply_charset)
     return msg_reply
 
-async def run(params,recvQueue,sendQueue):
-    logging.basicConfig(filename=params['log_file'], level=logging.ERROR)
+import logging
+logging.basicConfig(filename='askbot.log',filemode='a',level=logging.INFO)
+logger=logging.getLogger(__name__)
+
+async def run(userName,params,recvQueue,sendQueue):
+    global logger
     while True:
         msgInfo=await recvQueue.get()
         try:
-            msg_reply=await handler(params['erine_key'],email.message_from_bytes(msgInfo['msg']))
+            msg_reply=await handler(userName,params,email.message_from_bytes(msgInfo['msg']))
             msg_reply_data=msg_reply.as_bytes().replace(b'\n',b'\r\n')
             sendQueue.put_nowait({
-                'from':'test',
+                'from':userName,
                 'to':msgInfo['from'],
                 'msg':msg_reply_data
             })
         except:
-            logging.error(traceback.format_exc())
+            logger.error(traceback.format_exc())
+
+

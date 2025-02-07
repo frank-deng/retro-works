@@ -51,7 +51,7 @@ def process_email(msg_raw):
     msg_reply.set_param('charset',reply_charset)
     return msg_reply
 
-async def run(params,recvQueue,sendQueue):
+async def run(userName,params,recvQueue,sendQueue):
     email.charset.add_codec('cn-gb','gb2312')
     while True:
         msgInfo=await recvQueue.get()

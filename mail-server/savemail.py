@@ -1,6 +1,6 @@
 import asyncio,datetime,os
 
-async def run(params,recvQueue,sendQueue):
+async def run(userName,params,recvQueue,sendQueue):
     while True:
         msgInfo=await recvQueue.get()
         try:

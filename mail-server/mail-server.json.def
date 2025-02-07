@@ -11,6 +11,12 @@
   },
   "niwenwoda":{
     "module":"askbot",
+    "handler":"ask_erine",
     "erine_key":["client_id","client_secret"]
+  },
+  "deepsseek":{
+    "module":"askbot",
+    "handler":"ask_deepseek",
+    "deepseek_key":"sk-0123456789abcdef0123456789abcdef"
   }
 }

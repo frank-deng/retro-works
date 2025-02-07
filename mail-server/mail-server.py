@@ -34,7 +34,7 @@ class MailUserRobot:
         self.__user=userName
         self.__recvQueue=asyncio.Queue()
         self.__module=importlib.import_module(params['module'])
-        self.__task=asyncio.create_task(self.__module.run(params,self.__recvQueue,sendQueue))
+        self.__task=asyncio.create_task(self.__module.run(userName+'@10.0.2.2',params,self.__recvQueue,sendQueue))
 
     async def append(self,userFrom,msg):
         self.__recvQueue.put_nowait({
