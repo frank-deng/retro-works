@@ -5,6 +5,7 @@ from email.message import Message
 from email.header import Header
 from codecs import decode
 from traceback import print_exc
+import logging
 
 CHARSET_ALIAS={
         'cn-gb':'gb2312'
@@ -86,6 +87,7 @@ async def handler(key,msg):
     return msg_reply
 
 async def run(params,recvQueue,sendQueue):
+    logging.basicConfig(filename=params['log_file'], level=logging.ERROR)
     while True:
         msgInfo=await recvQueue.get()
         try:
@@ -97,4 +99,4 @@ async def run(params,recvQueue,sendQueue):
                 'msg':msg_reply_data
             })
         except:
-            print_exc()
+            logging.error(traceback.format_exc())
