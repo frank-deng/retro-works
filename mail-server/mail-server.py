@@ -446,26 +446,27 @@ if '__main__'==__name__:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--host',
-        help='Specify binding host for the PPP server.',
+        help='Specify binding host for the e-mail server.',
         default=''
     )
     parser.add_argument(
         '--port_pop3',
-        help='Specify port for the PPP server.',
+        help='Specify port for the e-mail server.',
         type=int,
         default=110
     )
     parser.add_argument(
         '--port_smtp',
-        help='Specify port for the PPP server.',
+        help='Specify port for the e-mail server.',
         type=int,
         default=25
     )
     parser.add_argument(
         '--config',
         '-c',
-        help='Specify config file for the telnetd server.',
+        help='Specify config file for the e-mail server.',
         default='./mail-server.json'
     )
-    args = parser.parse_args();
+    args = parser.parse_args()
     asyncio.run(main(args))
+
