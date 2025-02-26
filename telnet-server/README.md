@@ -68,14 +68,14 @@ Change DOSBox configuration under seciton `[serial]`:
 在`~/.screenrc`中加入以下配置：  
 Add the following configuration to `~/.screenrc`:
 
-	defflow off
-	deflogin on
 	cjkwidth on
 	vbell off
-	term ansi.sys
 	shell /bin/bash
 	encoding UTF-8 GBK
-	setenv RUN_SCREEN yes
+	bind r source ~/.screenrc
+
+字符编码转换功能在使用`screen -R`重新连接已有GNU Screen会话后会失效，需要重启GNU Screen或重新连接后按`Ctrl-A r`恢复字符编码转换功能。  
+Encoding conversion won't work after reattaching to existing GNU Screen session via `screen -R`. Restarting GNU Screen or press `Ctrl-A r` to get encoding conversion work again.
 
 对于VIM用户，需要在`/etc/vim/vimrc`中添加以下配置以保证全角双引号和制表符能在终端中正常显示：  
 For VIM users, it's necessary to add the following configuration to `/etc/vim/vimrc` for properly displaying fullwidth quote marks and line drawing characters in terminal:
@@ -89,12 +89,6 @@ Recommended `.bashrc` snippet for displaying `screen` session info.
 		STYTEXT="[$STY]"
 	fi
 	PS1="[$?]$STYTEXT \W\n\\$ "
-
-
-### 已知问题 Known Issues
-
-字符编码转换功能在重新连接已有GNU Screen会话后会失效。需要重启GNU Screen恢复字符编码转换功能。
-Encoding conversion won't work after reattaching to existing GNU Screen session. Restarting GNU Screen is needed to get encoding conversion work again.
 
 ## 启用Linux的串口终端（可选） Enable serial console under Linux (Optional)
 
