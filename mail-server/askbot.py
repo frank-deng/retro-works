@@ -1,4 +1,4 @@
-import aiohttp,asyncio,json,sys
+import aiohttp,asyncio,json,sys,re
 import email
 from email.message import EmailMessage
 from email.message import Message
@@ -9,6 +9,30 @@ import traceback,logging
 CHARSET_ALIAS={
         'cn-gb':'gb2312'
 }
+
+def __parse_content(text):
+    cur=''
+    remainder=''
+    isReply=True
+    for line in text.split('\n'):
+        line=line.rstrip()
+        if re.match(r'^[\-]{8,}$',line):
+            isReply=False
+        elif isReply:
+            cur+=line+'\n'
+        else:
+            remainder+=re.sub(r'^[\:\|\>]\s?','',line,count=1)+'\n'
+    return cur,remainder
+
+def parse_content(remain):
+    res=[]
+    while True:
+        text,remain=__parse_content(remain)
+        res.append(text)
+        if not remain:
+            break
+    res.reverse()
+    return res
 
 async def getAccessToken(client_id,client_secret):
     url='https://aip.baidubce.com/oauth/2.0/token'
@@ -24,21 +48,28 @@ async def getAccessToken(client_id,client_secret):
                 return res['access_token']
     return None
     
-async def ask_erine(params,question):
+async def ask_erine(params,content):
     key=params['erine_key']
     access_token=await getAccessToken(key[0],key[1])
     if access_token is None:
         return None
     url=f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token={access_token}"
+    messages=[]
+    for i in range(len(content)):
+        if ((i % 1) == 0):
+            messages.append({
+                    'role':'user',
+                    'content':content[i],
+            })
+        else:
+            messages.append({
+                    'role':'assistant',
+                    'content':content[i],
+            })
     jsonData={
-        'messages':[
-            {
-                'role':'user',
-                'content':question,
-                'temperature':0.01,
-                'top_p':0,
-            }
-        ],
+        'messages':messages,
+        'temperature':0.01,
+        'top_p':0,
     }
     async with aiohttp.ClientSession() as session:
         async with session.post(url,json=jsonData) as response:
@@ -46,22 +77,29 @@ async def ask_erine(params,question):
             return res.get('result',None)
     return None
 
-async def ask_deepseek(params,question):
+async def ask_deepseek(params,content):
     headers={
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer '+params['deepseek_key']
     }
+    messages=[]
+    for i in range(len(content)):
+        if ((i % 1) == 0):
+            messages.append({
+                    'role':'user',
+                    'content':content[i],
+            })
+        else:
+            messages.append({
+                    'role':'assistant',
+                    'content':content[i],
+            })
     jsonData={
         "model": "deepseek-chat",
         "stream": False,
         "temperature": 0,
-        "messages": [
-            {
-                "role":"user",
-                "content":question
-            }
-        ],
+        "messages": messages,
     }
     async with aiohttp.ClientSession() as session:
         async with session.post('https://api.deepseek.com/chat/completions',headers=headers,json=jsonData) as response:
@@ -101,13 +139,17 @@ def msg_apply_reply(text,textOrig):
     return res
 
 async def handler(userName,params,msg):
-    subject,question=msg_get_data(msg)
-    content=msg_apply_reply(await globals()[params['handler']](params,question), question)
+    subject,content=msg_get_data(msg)
+    conversation=parse_content(content)
+    content=msg_apply_reply(await globals()[params['handler']](params,conversation), content)
     reply_charset='HZ-GB-2312'
     msg_reply = Message()
     msg_reply['From']=userName
     msg_reply['To']=msg['From']
-    msg_reply['Subject']=Header("Re: "+subject, reply_charset)
+    if re.match(r'Re:\s+', subject):
+        msg_reply['Subject']=Header(subject, reply_charset)
+    else:
+        msg_reply['Subject']=Header("Re: "+subject, reply_charset)
     content=content.replace('\n','\r\n')
     content_gb2312=content.encode('gb2312','replace')
     msg_reply.set_payload(content_gb2312.decode('gb2312'), charset=reply_charset)
