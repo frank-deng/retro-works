@@ -42,7 +42,7 @@ int 0x10
 loop printnum
 mov ax,0x1301
 mov bx,7
-mov cx,offset memstrend-offset memstr
+mov cx,offset drvstr0-offset memstr
 mov dx,4
 mov bp,offset memstr
 int 0x10
@@ -56,6 +56,28 @@ jmp print_mem
 mem_finish:
 mov ax,8
 call sleep
+mov ax,0x1301
+mov bx,7
+mov dx,0x0305
+mov cx,offset drvstr1-offset drvstr0
+mov bp,offset drvstr0
+int 0x10
+mov dx,0x0407
+mov cx,offset drvstr2-offset drvstr1
+mov bp,offset drvstr1
+int 0x10
+mov dx,0x0507
+mov cx,offset drvstr3-offset drvstr2
+mov bp,offset drvstr2
+int 0x10
+mov dx,0x0605
+mov cx,offset drvstrend-offset drvstr3
+mov bp,offset drvstr3
+int 0x10
+mov ah,2
+mov dx,0x0800
+mov bh,0
+int 0x10
 
 in al,0x61
 or al,0x3
@@ -74,13 +96,9 @@ in al,0x61
 and al,0xFC
 out 0x61,al
 
-mov ah,2
-mov dx,0x0200
-mov bh,0
-int 0x10
-
 mov ax,20
 call sleep
+
 ret
 
 sleep:
@@ -102,7 +120,11 @@ ret
 memtracked dw 0
 timer dw 0
 memstr db "K OK"
-memstrend:
+drvstr0 db "---- DRIVE TYPE ----"
+drvstr1 db "DRIVE A  1.2 MB"
+drvstr2 db "DRIVE B  360 KB"
+drvstr3 db "--------------------"
+drvstrend:
 
 code ends
 end start
