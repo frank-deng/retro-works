@@ -45,7 +45,7 @@ Retro Programming Works 怀旧编程作品
 
 * CPU: 8088 4.77MHz
 * RAM: 640k
-* Floppy Drive A: 5.25" 1.2M High Density
+* Floppy Drive A: 5.25" 360k Double Side
 * Floppy Drive B: 5.25" 360k Double Side
 * Display: CGA with green monochrome monitor
 
@@ -56,8 +56,6 @@ Retro Programming Works 怀旧编程作品
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
 * 黑白棋游戏 Reversi Game
-* 英文打字练习 English Typing Training
-* 五笔打字练习 Wubi Input Training
 
 截图欣赏 Screenshots
 -------------------
