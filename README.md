@@ -55,7 +55,6 @@ Retro Programming Works 怀旧编程作品
 * WPS中英文文字处理 WPS Chinese & English Text Processing
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
-* 黑白棋游戏 Reversi Game
 
 截图欣赏 Screenshots
 -------------------
