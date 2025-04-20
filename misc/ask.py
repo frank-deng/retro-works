@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 #-*- coding:utf-8-*
 
-import asyncio,signal,json,hashlib,os,sys,readline,re,threading,importlib,platform
-import subprocess as subp
+import asyncio,signal,json,os,sys,readline,re,subprocess
 import aiohttp
 
 async def getAccessToken(client_id,client_secret):
@@ -35,18 +34,21 @@ async def askBot(access_token,question):
     }
     async with aiohttp.ClientSession() as session:
         async with session.post(url,json=jsonData) as response:
+            proc=subprocess.Popen(['less','-FRX'],stdin=subprocess.PIPE)
             async for chunk in response.content:
                 chunk_str=re.sub('^data: ', '', chunk.decode().strip())
                 if not chunk_str:
                     continue
                 data=json.loads(chunk_str).get('result')
-                result+=data
-                print(data, end='')
-    print('')
+                proc.stdin.write(data.encode('utf-8'))
+                proc.stdin.flush()
+            proc.stdin.close()
+            proc.wait()
 
-async def input_interactive():
+async def input_stdin():
     content=''
-    print('请输入您的问题：')
+    if sys.stdin.isatty():
+        print('请输入您的问题：')
     try:
         while True:
             line=input()
@@ -57,7 +59,8 @@ async def input_interactive():
                 content+=line+'\n'
     except EOFError:
         pass
-    print('回答中……')
+    if sys.stdin.isatty():
+        print('回答中……')
     return content
 
 def process_content(template):
@@ -75,12 +78,12 @@ async def main(args):
     client_id=os.environ.get('CLIENT_ID')
     client_secret=os.environ.get('CLIENT_SECRET')
     if (not client_id) or (not client_secret):
-        print('Environ CLIENT_ID and CLIENT_SECRET not set yet.')
+        print('Environ CLIENT_ID and CLIENT_SECRET not set yet.',file=sys.stderr)
         return
     access_token=await getAccessToken(os.environ.get('CLIENT_ID'),os.environ.get('CLIENT_SECRET'))
     content=''
     if len(args.question)==0:
-        content=await input_interactive()
+        content=await input_stdin()
     else:
         content=process_content(args.question)
     sys.stdin.close()
