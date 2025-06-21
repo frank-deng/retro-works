@@ -5,9 +5,10 @@ from uuid import uuid4 as uuidgen
 from traceback import print_exc
 
 class MailUserNormal:
-    def __init__(self,userName):
+    def __init__(self,userName,params):
         self.__user=userName
         self.__mailList=[]
+        self.__hosts=set(params['hosts'])
         self.__lock=asyncio.Lock()
 
     async def getAll(self):
@@ -28,13 +29,17 @@ class MailUserNormal:
                 'msg':msg
             })
 
+    def checkHosts(self, hostIn):
+        return hostIn in self.__hosts
+
+
 class MailUserRobot:
     __task=None
     def __init__(self,userName,params,sendQueue):
         self.__user=userName
         self.__recvQueue=asyncio.Queue()
         self.__module=importlib.import_module(params['module'])
-        self.__task=asyncio.create_task(self.__module.run(userName+'@10.0.2.2',params,self.__recvQueue,sendQueue))
+        self.__task=asyncio.create_task(self.__module.run(self.__user,params,self.__recvQueue,sendQueue))
 
     async def append(self,userFrom,msg):
         self.__recvQueue.put_nowait({
@@ -47,8 +52,8 @@ class MailUserRobot:
         if self.__task is not None:
             self.__task.cancel()
 
+
 class MailCenter:
-    __acceptedHosts={'10.0.2.2'}
     __task=None
     def __init__(self):
         self.__user={}
@@ -69,7 +74,7 @@ class MailCenter:
             for userName in jsonData:
                 userDetail=jsonData[userName]
                 if 'password' in userDetail:
-                    self.__user[userName]=MailUserNormal(userName)
+                    self.__user[userName]=MailUserNormal(userName,userDetail.copy())
                     self.__password[userName]=userDetail['password']
                 elif 'module' in userDetail:
                     self.__user[userName]=MailUserRobot(userName,userDetail.copy(),self.__sendQueue)
@@ -90,12 +95,15 @@ class MailCenter:
         if match is None:
             return None
         user,host = match[1],match[2]
-        if (host not in self.__acceptedHosts) or (user not in self.__user):
+        userObj = self.__user.get(addr, self.__user.get(user, None))
+        if userObj is None:
             return None
-        elif isSender and (user not in self.__password):
+        elif isinstance(userObj, MailUserNormal) and not userObj.checkHosts(host):
             return None
-        else:
+        elif isinstance(userObj, MailUserNormal):
             return user
+        else:
+            return addr
     
     async def sendTo(self,userFrom,userTo,msg):
         if userTo not in self.__user:
