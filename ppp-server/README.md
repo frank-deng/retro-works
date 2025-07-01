@@ -46,17 +46,36 @@ Use the following command to configure `firewalld` opening the port required:
 
 安装所需软件包 Install packages required
 
-	tce-load -wi pppd iptables python3.9
+	tce-load -wi pppd iptables dnsmasq python3.9
+
+添加以下配置到`/usr/local/etc/dnsmasq.conf`：  
+Add the following configuration to `/usr/local/etc/dnsmasq.conf`:
+
+	port=53
+	listen-address=10.0.2.15
+	bind-interfaces
+	no-resolv
+	no-hosts
+	address=/mysite.com/10.0.2.2
+	address=/www.mysite.com/10.0.2.2
 
 在`/opt/bootlocal.sh`中添加以下命令：  
 Add the following command to `/opt/bootlocal.sh`:
 
 	sysctl -w net.ipv4.ip_forward=1
 	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
+	iptables -A INPUT -p udp --dport 53 -j ACCEPT
+	iptables -A INPUT -p tcp --dport 53 -j ACCEPT
+	dnsmasq -C /usr/local/etc/dnsmasq.conf &
 	python3 /path/to/ppp-manager.py --port 2345 --config path/to/ppp.conf --pppd /path/to/pppd &
 
-执行`sudo backup`命令保存修改。  
-Use `sudo backup` command to save all the modifications.
+添加以下内容到`/opt/.filetool.lst`：  
+Add the following content to `/opt/.filetool.lst`:
+
+	usr/local/etc/dnsmasq.conf
+
+执行`sudo filetool.sh -b`命令保存修改。  
+Execute `sudo filetool.sh -b` command to save all the modifications.
 
 ## 虚拟机NAT网络配置端口转发 Configure NAT Port Forwarding for VMs
 
@@ -90,6 +109,9 @@ Add new PPP connection with phone number `12345`, set IP address as automaticall
 
 检查“使用远程网上的默认网关”选项是否被选中，否则将无法连接目标服务器。  
 Check whether "Use default gateway on remote network" box is checked, or you'll be unable to connect to the target server.
+
+设置DNS地址为`10.0.2.15`。  
+Set DNS address as `10.0.2.15`.
 
 检查“拨号后出现终端窗口”选项是否被选中，否则将无法登录。  
 Check whether "Bring up terminal window after dialing" box is checked, or you'll be unable to login.
