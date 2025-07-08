@@ -46,7 +46,7 @@ Use the following command to configure `firewalld` opening the port required:
 
 安装所需软件包 Install packages required
 
-	tce-load -wi pppd iptables dnsmasq python3.9
+	tce-load -wi pppd iptables dnsmasq python3.9 expat2
 
 添加以下配置到`/usr/local/etc/dnsmasq.conf`：  
 Add the following configuration to `/usr/local/etc/dnsmasq.conf`:
