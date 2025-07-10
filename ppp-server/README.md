@@ -48,8 +48,8 @@ Use the following command to configure `firewalld` opening the port required:
 
 	tce-load -wi pppd iptables dnsmasq python3.9 expat2
 
-添加以下配置到`/usr/local/etc/dnsmasq.conf`：  
-Add the following configuration to `/usr/local/etc/dnsmasq.conf`:
+添加以下配置到`/home/tc/dnsmasq.conf`：  
+Add the following configuration to `/home/tc/dnsmasq.conf`:
 
 	port=53
 	listen-address=10.0.2.15
@@ -63,16 +63,11 @@ Add the following configuration to `/usr/local/etc/dnsmasq.conf`:
 Add the following command to `/opt/bootlocal.sh`:
 
 	sysctl -w net.ipv4.ip_forward=1
+	dnsmasq -C /home/tc/dnsmasq.conf &
+	python3 /path/to/ppp-manager.py --port 2345 --config path/to/ppp.conf --pppd /path/to/pppd &
 	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
 	iptables -A INPUT -p udp --dport 53 -j ACCEPT
 	iptables -A INPUT -p tcp --dport 53 -j ACCEPT
-	dnsmasq -C /usr/local/etc/dnsmasq.conf &
-	python3 /path/to/ppp-manager.py --port 2345 --config path/to/ppp.conf --pppd /path/to/pppd &
-
-添加以下内容到`/opt/.filetool.lst`：  
-Add the following content to `/opt/.filetool.lst`:
-
-	usr/local/etc/dnsmasq.conf
 
 执行`sudo filetool.sh -b`命令保存修改。  
 Execute `sudo filetool.sh -b` command to save all the modifications.
