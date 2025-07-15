@@ -46,8 +46,14 @@ class PPPApp(Logger):
         if self.__proc is not None:
             try:
                 await asyncio.wait_for(self.__proc.communicate(),timeout=10)
+                self.logger.debug('pppd stopped normally')
             except asyncio.TimeoutError:
                 self.__proc.kill()
+                await asyncio.wait_for(self.__proc.wait(),timeout=10)
+            finally:
+                self.__proc=None
+        await asyncio.sleep(1)
+        self.logger.debug('pppd stopped')
 
     def __proc_args(self,args,**kwargs):
         res=[]
@@ -65,7 +71,7 @@ class PPPApp(Logger):
         args=self.__proc_args(self.__pppd_options,
                               pty="/proc/%d/fd/%d"%(os.getpid(),self.__slave),
                               ip_addr=self.__ipaddr)
-        self.logger.debug(' '.join(args))
+        self.logger.debug('$'.join(args))
         self.__proc=await asyncio.create_subprocess_exec(
             *[self.__pppd_exec,]+args,
             bufsize=0,
@@ -73,8 +79,7 @@ class PPPApp(Logger):
             stdin=self.__slave,
             stdout=self.__slave,
             stderr=self.__slave)
-        self.__writer.write(b'Success\r\n')
-        await self.__writer.drain()
+        self.logger.debug('pppd started')
         while True:
             try:
                 self.__writer.write(os.read(self.__master,1024))
@@ -175,6 +180,8 @@ class PPPConnection(Logger):
             userinfo=None
             while userinfo is None:
                 userinfo=await self.__login()
+            self.__writer.write(b'Login Succeed.\r\n')
+            await self.__writer.drain()
             async with PPPApp(self.__config,self.__reader,self.__writer,userinfo=userinfo) as app:
                 await app.run_forever()
         except (asyncio.CancelledError,asyncio.TimeoutError,ConnectionResetError,BrokenPipeError) as e:

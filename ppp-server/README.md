@@ -52,6 +52,7 @@ Use the following command to configure `firewalld` opening the port required:
 Add the following configuration to `/home/tc/dnsmasq.conf`:
 
 	port=53
+	listen-address=10.0.2.15
 	bind-interfaces
 	no-resolv
 	no-hosts
