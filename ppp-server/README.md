@@ -62,13 +62,8 @@ Add the following configuration to `/home/tc/dnsmasq.conf`:
 在`/opt/bootlocal.sh`中添加以下命令：  
 Add the following command to `/opt/bootlocal.sh`:
 
-	IP_ADDR='10.0.2.15'
-	sysctl -w net.ipv4.ip_forward=1
-	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
 	cd /home/tc && python3 ppp-manager.py -c ppp-manager.ini &
 	while ! ifconfig|grep $IP_ADDR; do sleep 1; done && /usr/local/sbin/dnsmasq -C /home/tc/dnsmasq.conf &
-	iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination :8080
-	iptables -t nat -A OUTPUT -d 0.0.0.0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 
 执行`sudo filetool.sh -b`命令保存修改。  
 Execute `sudo filetool.sh -b` command to save all the modifications.
