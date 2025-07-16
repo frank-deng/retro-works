@@ -349,33 +349,53 @@ class PPPServer(PPPUserManager):
                 self.__conn.discard(conn)
                 self.logger.debug(f'End conn. Connections: {len(self.__conn)}')
 
-async def initializer(config):
-    logger=logging.getLogger(initializer.__name__)
-    cmds=[
-        ['sysctl','-w','net.ipv4.ip_forward=1'],
-        ['iptables','-t','nat','-A','POSTROUTING','-s',config.get('pppd','ppp_client_subnet'),'-j','MASQUERADE'],
-    ]
-    routes=config.get('pppd','routes',fallback='')
-    reader=csv.reader(StringIO(routes),delimiter=' ',skipinitialspace=True)
-    for row in reader:
-        cmds.append(['iptables']+row)
-    procs=[]
-    for cmd in cmds:
-        proc=asyncio.create_subprocess_exec(*cmd,
-            stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
-        procs.append(proc)
-    procs=await asyncio.gather(*procs)
-    results=await asyncio.gather(*[proc.communicate() for proc in procs])
-    for stdout,stderr in results:
-        if stdout:
-            logger.debug(stdout)
-        if stderr:
-            logger.error(stderr)
 
-		
+class Initializer(Logger):
+    def __init__(self,config):
+        self.__init_cmds=[
+            ('sysctl','-w','net.ipv4.ip_forward=1'),
+            ('iptables','-t','nat','-A','POSTROUTING','-s',
+                config.get('pppd','ppp_client_subnet'),'-j','MASQUERADE'),
+        ]
+        reader=csv.reader(StringIO(config.get('pppd','routes',fallback='')),
+                          delimiter=' ',skipinitialspace=True)
+        for row in reader:
+            self.__init_cmds.append(tuple(['iptables']+row))
+
+    async def __run_cmd(self,cmd):
+        try:
+            self.logger.debug(f'cmd: {" ".join(cmd)}')
+            proc=await asyncio.create_subprocess_exec(*cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
+            stdout,stderr=await proc.communicate()
+            return stdout.decode(),stderr.decode(),proc.returncode
+        except FileNotFoundError as e:
+            self.logger.error(f'cmd: {" ".join(cmd)}\n{e}')
+            return None,None,None
+        except Exception as e:
+            self.logger.error(f'cmd: {" ".join(cmd)}\n{e}',exc_info=True)
+            return None,None,None
+
+    async def __aenter__(self):
+        tasks=[self.__run_cmd(cmd) for cmd in self.__init_cmds]
+        res_all=await asyncio.gather(*tasks)
+        for i,(stdout,stderr,retcode) in enumerate(res_all):
+            cmd_str=' '.join(self.__init_cmds[i])
+            if stdout:
+                self.logger.debug(f'{cmd_str}\n{stdout}')
+            if stderr or retcode:
+                self.logger.error(f'[{retcode}]{cmd_str}\n{stderr}\n{stdout}')
+        return self
+
+    async def __aexit__(self,exc_type,exc_val,exc_tb):
+        pass
+
+
 async def main(config):
     try:
-        await initializer(config)
+        async with Initializer(config):
+            pass
         async with PPPServer(config) as server:
             loop = asyncio.get_event_loop()
             for s in (signal.SIGINT,signal.SIGTERM,signal.SIGQUIT):
