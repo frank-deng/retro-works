@@ -45,7 +45,7 @@ class PPPApp(Logger):
         if self.__master is not None:
             os.close(self.__master)
         await self.__writer.drain()
-        if self.__proc is not None:
+        if self.__proc is not None and self.__proc.returncode is None:
             try:
                 await asyncio.wait_for(self.__proc.communicate(),timeout=10)
                 self.logger.debug('pppd stopped normally')
@@ -369,7 +369,7 @@ class Initializer(Logger):
             '--keep-in-foreground','--pid-file=','--no-resolv',
             '--no-hosts','--bind-interfaces'
         ]
-        dnsmasq_key_blacklist={'local_ip','router_ip','pid-file',
+        dnsmasq_key_blacklist={'local_ip','router_ip','dnsmasq','pid-file',
                                'no-resolv','no-hosts','bind-interfaces'}
         for key in config['dns']:
             if key in dnsmasq_key_blacklist:
@@ -384,62 +384,78 @@ class Initializer(Logger):
         self.logger.debug(f'dnsmasq cmd: {" ".join(self.__dnsmasq_cmd)}')
         self.__local_ip=config.get('server','local_ip')
 
-    async def __check_ip(self,ip):
-        proc=await asyncio.create_subprocess_exec('ifconfig','-a',
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE)
-        stdout,stderr=await asyncio.wait_for(proc.communicate(),timeout=10)
-        if stderr:
-            self.logger.error(stderr.decode(),exc_info=True)
-        if f'inet addr:{ip}' in stdout.decode():
-            return True
-        return False
+    async def __run_cmd(self,cmd,*,timeout=None):
+        cmd_str=" ".join(cmd)
+        proc=None
+        try:
+            proc=await asyncio.create_subprocess_exec(*cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
+            stdout,stderr=None,None
+            if timeout is None:
+                stdout,stderr=await proc.communicate()
+            else:
+                stdout,stderr=await asyncio.wait_for(proc.communicate(),
+                                                     timeout=timeout)
+            stdout,stderr,retcode=stdout.decode(),stderr.decode(),proc.returncode
+            proc=None
+            self.logger.debug(f'[{retcode}]{cmd_str}\n{stderr}\n---\n{stdout}')
+            return stdout,stderr,retcode
+        except asyncio.TimeoutError:
+            self.logger.error(f'Timeout:{cmd_str}')
+            return None,None,None
+        except FileNotFoundError as e:
+            self.logger.error(f'FileNotFound:{cmd_str}')
+            return None,None,None
+        except Exception as e:
+            self.logger.error(f'{e}:{cmd_str}',exc_info=True)
+            return None,None,None
+        finally:
+            if proc is not None and proc.returncode is None:
+                proc.kill()
+                await proc.wait()
 
     async def __task_dnsmasq(self):
         proc=None
         try:
-            times=10
+            times=5
             ip_ready=False
             while not ip_ready and times>0:
-                ip_ready=await self.__check_ip(self.__local_ip)
+                stdout,_,_=await self.__run_cmd(['ifconfig','-a'],timeout=10)
+                if stdout and f'inet addr:{self.__local_ip}' in stdout:
+                    ip_ready=True
+                    break
                 times-=1
                 await asyncio.sleep(1)
-            if ip_ready:
-                proc=await asyncio.create_subprocess_exec(*self.__dnsmasq_cmd)
+            if not ip_ready:
+                self.logger.error(f'IP {self.__local_ip} not ready')
+                return
+            proc=await asyncio.create_subprocess_exec(*self.__dnsmasq_cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
+            stdout,stderr=await proc.communicate()
+            stdout,stderr,retcode=stdout.decode(),stderr.decode(),proc.returncode
+            self.logger.error(f'Failed to start dnsmasq, ret:{retcode}\n{stderr}\n---\n{stdout}')
         except asyncio.CancelledError:
             pass
         except Exception as e:
             self.logger.error(e,exc_info=True)
         finally:
-            if proc is not None:
+            if proc is not None and proc.returncode is None:
                 proc.kill()
                 await proc.wait()
 
-    async def __run_cmd(self,cmd):
+    async def __aenter__(self):
         try:
             self.__dns_task=asyncio.create_task(self.__task_dnsmasq())
-            self.logger.debug(f'cmd: {" ".join(cmd)}')
-            proc=await asyncio.create_subprocess_exec(*cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE)
-            stdout,stderr=await proc.communicate()
-            return stdout.decode(),stderr.decode(),proc.returncode
-        except FileNotFoundError as e:
-            self.logger.error(f'cmd: {" ".join(cmd)}\n{e}')
-            return None,None,None
+            for cmd in self.__init_cmds:
+                await self.__run_cmd(cmd,timeout=10)
         except Exception as e:
-            self.logger.error(f'cmd: {" ".join(cmd)}\n{e}',exc_info=True)
-            return None,None,None
-
-    async def __aenter__(self):
-        self.__task=asyncio.create_task(self.__task_dnsmasq())
-        for cmd in self.__init_cmds:
-            stdout,stderr,retcode=await self.__run_cmd(cmd)
-            cmd_str=' '.join(cmd)
-            if stdout:
-                self.logger.debug(f'{cmd_str}\n{stdout}')
-            if stderr:
-                self.logger.error(f'[{retcode}]{cmd_str}\n{stderr}\n{stdout}')
+            self.logger.error(e,exc_info=True)
+            if self.__dns_task is not None:
+                self.__dns_task.cancel()
+                await self.__dns_task
+                self.__dns_task=None
         return self
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
@@ -450,7 +466,7 @@ class Initializer(Logger):
 
 async def main(config):
     try:
-        async with Initializer(config):
+        async with Initializer(config) as _:
             async with PPPServer(config) as server:
                 loop = asyncio.get_event_loop()
                 for s in (signal.SIGINT,signal.SIGTERM,signal.SIGQUIT):
@@ -478,5 +494,7 @@ if '__main__'==__name__:
     )
     try:
         asyncio.run(main(config))
+    except KeyboardInterrupt:
+        pass
     except Exception as e:
         logging.getLogger(main.__name__).critical(e,exc_info=True)
