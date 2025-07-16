@@ -351,19 +351,73 @@ class PPPServer(PPPUserManager):
 
 
 class Initializer(Logger):
+    __dns_task=None
     def __init__(self,config):
         self.__init_cmds=[
             ('sysctl','-w','net.ipv4.ip_forward=1'),
             ('iptables','-t','nat','-A','POSTROUTING','-s',
                 config.get('pppd','ppp_client_subnet'),'-j','MASQUERADE'),
         ]
-        reader=csv.reader(StringIO(config.get('pppd','routes',fallback='')),
-                          delimiter=' ',skipinitialspace=True)
+        reader=csv.reader(
+            StringIO(config.get('pppd','routes',fallback='')),
+            delimiter=' ',skipinitialspace=True)
         for row in reader:
             self.__init_cmds.append(tuple(['iptables']+row))
 
+        self.__dnsmasq_cmd=[
+            config.get('dns','dnsmasq',fallback='dnsmasq'),
+            '--keep-in-foreground','--pid-file=','--no-resolv',
+            '--no-hosts','--bind-interfaces'
+        ]
+        dnsmasq_key_blacklist={'local_ip','router_ip','pid-file',
+                               'no-resolv','no-hosts','bind-interfaces'}
+        for key in config['dns']:
+            if key in dnsmasq_key_blacklist:
+                continue
+            val=config['dns'][key]
+            if not val:
+                self.__dnsmasq_cmd.append(f'--{key}')
+                continue
+            for v in val.split('\n'):
+                v=v.strip()
+                self.__dnsmasq_cmd.append(f'--{key}={v}')
+        self.logger.debug(f'dnsmasq cmd: {" ".join(self.__dnsmasq_cmd)}')
+        self.__local_ip=config.get('server','local_ip')
+
+    async def __check_ip(self,ip):
+        proc=await asyncio.create_subprocess_exec('ifconfig','-a',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE)
+        stdout,stderr=await asyncio.wait_for(proc.communicate(),timeout=10)
+        if stderr:
+            self.logger.error(stderr.decode(),exc_info=True)
+        if f'inet addr:{ip}' in stdout.decode():
+            return True
+        return False
+
+    async def __task_dnsmasq(self):
+        proc=None
+        try:
+            times=10
+            ip_ready=False
+            while not ip_ready and times>0:
+                ip_ready=await self.__check_ip(self.__local_ip)
+                times-=1
+                await asyncio.sleep(1)
+            if ip_ready:
+                proc=await asyncio.create_subprocess_exec(*self.__dnsmasq_cmd)
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
+        finally:
+            if proc is not None:
+                proc.kill()
+                await proc.wait()
+
     async def __run_cmd(self,cmd):
         try:
+            self.__dns_task=asyncio.create_task(self.__task_dnsmasq())
             self.logger.debug(f'cmd: {" ".join(cmd)}')
             proc=await asyncio.create_subprocess_exec(*cmd,
                 stdout=asyncio.subprocess.PIPE,
@@ -378,29 +432,30 @@ class Initializer(Logger):
             return None,None,None
 
     async def __aenter__(self):
-        tasks=[self.__run_cmd(cmd) for cmd in self.__init_cmds]
-        res_all=await asyncio.gather(*tasks)
-        for i,(stdout,stderr,retcode) in enumerate(res_all):
-            cmd_str=' '.join(self.__init_cmds[i])
+        self.__task=asyncio.create_task(self.__task_dnsmasq())
+        for cmd in self.__init_cmds:
+            stdout,stderr,retcode=await self.__run_cmd(cmd)
+            cmd_str=' '.join(cmd)
             if stdout:
                 self.logger.debug(f'{cmd_str}\n{stdout}')
-            if stderr or retcode:
+            if stderr:
                 self.logger.error(f'[{retcode}]{cmd_str}\n{stderr}\n{stdout}')
         return self
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
-        pass
+        if self.__dns_task is not None:
+            self.__dns_task.cancel()
+            await self.__dns_task
 
 
 async def main(config):
     try:
         async with Initializer(config):
-            pass
-        async with PPPServer(config) as server:
-            loop = asyncio.get_event_loop()
-            for s in (signal.SIGINT,signal.SIGTERM,signal.SIGQUIT):
-                loop.add_signal_handler(s,lambda:asyncio.create_task(server.shutdown()))
-            await server.serve_forever()
+            async with PPPServer(config) as server:
+                loop = asyncio.get_event_loop()
+                for s in (signal.SIGINT,signal.SIGTERM,signal.SIGQUIT):
+                    loop.add_signal_handler(s,lambda:asyncio.create_task(server.shutdown()))
+                await server.serve_forever()
     except Exception as e:
         logging.getLogger(main.__name__).critical(e,exc_info=True)
 

@@ -48,17 +48,6 @@ Use the following command to configure `firewalld` opening the port required:
 
 	tce-load -wi pppd iptables dnsmasq python3.9 expat2
 
-添加以下配置到`/home/tc/dnsmasq.conf`：  
-Add the following configuration to `/home/tc/dnsmasq.conf`:
-
-	port=53
-	listen-address=10.0.2.15
-	bind-interfaces
-	no-resolv
-	no-hosts
-	address=/mysite.com/10.0.2.2
-	address=/www.mysite.com/10.0.2.2
-
 在`/opt/bootlocal.sh`中添加以下命令：  
 Add the following command to `/opt/bootlocal.sh`:
 
