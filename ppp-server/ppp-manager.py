@@ -33,7 +33,7 @@ class PPPApp(Logger):
         self.__reader,self.__writer=reader,writer
         self.__pppd_exec=config.get('pppd','exec',fallback='/usr/local/sbin/pppd')
         self.__pppd_options=config.get('pppd','options',fallback='').split()
-        self.__ipaddr=userinfo[0]
+        self.__ipaddr=userinfo['ip_addr']
         self.logger.debug(' '.join(self.__pppd_options))
 
     async def __aenter__(self):
@@ -225,21 +225,28 @@ class PPPConnection(Logger):
 
 class PPPUserManager(Logger):
     def __init__(self,config):
-        self.__userlist_file=config.get('server','userlist')
         self.__passwd={}
         self.__userinfo={}
         self.__conn_info_lock=asyncio.Lock()
         self.__conn_user={}
         self.__conn_id={}
+        users=set()
+        for key in config['users']:
+            if key in config['DEFAULT']:
+                continue
+            username,item=key.split('.')
+            users.add(username)
+            if item=='password':
+                self.__passwd[username]=config['users'][key]
+            elif item=='ip_addr':
+                self.__userinfo[username]={'ip_addr':config['users'][key]}
+        for user in users:
+            if user not in self.__passwd or user not in self.__userinfo:
+                raise ValueError(f'Incomplete data for user {user}')
+            self.logger.debug(f'{user} {self.__passwd[user]} {self.__userinfo[user]}')
 
     async def __aenter__(self):
-        with open(self.__userlist_file,'r',encoding='utf-8') as fp:
-            for line in fp:
-                line_data=line.strip().split('|')
-                username=line_data[0]
-                self.__passwd[username]=line_data[1]
-                self.__userinfo[username]=tuple(line_data[2:])
-                self.logger.debug(f'{line_data}')
+        return self
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
         self.__passwd={}
