@@ -10,41 +10,28 @@ PPP server requires running under Linux environments like Debian, Ubuntu, TinyCo
 **严禁将PPP服务器部署到生产环境或含有敏感数据的环境！！！**  
 **DO NOT deploy PPP server to production environment or environment with sensitive data!!!**
 
-## Linux PPP服务器配置 Linux PPP Server Configuration
+推荐在TinyCore Linux虚拟机上部署。  
+TinyCore Linux VM is recommended.
 
-执行以下命令安装所需软件：  
-Execute the following commands to install softwares required:
+## Linux PPP服务器部署 Deploy Linux PPP Server
 
-	sudo apt-get install iptables python3 ppp
-
-开启IP转发：将`/etc/sysctl.conf`中的`net.ipv4.ip_forward`的值改为`1`。  
-Enable IP Forwarding: Modify `/etc/sysctl.conf` and change the value of `net.ipv4.ip_forward` into `1`.
+安装`iptables`、`python3`、`ppp`、`dnsmasq`。  
+Install `iptables`, `python3`, `ppp`, `dnsmasq`.
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器：  
 Add the following command to `/etc/crontab`, so as to start PPP server on boot:
 
-	@reboot root python3 /path/to/ppp-manager.py -P 2345 -c path/to/ppp.conf
-	@reboot root iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
-
-在`/etc/ppp/options`中加入以下配置：  
-Add the following configuration to `/etc/ppp/options`:
-
-	lock
-	nodetach
-	multilink
-	enable-session
-	defaultroute
-	mtu 576
-	noauth
+	@reboot root python3 /path/to/ppp-manager.py -c path/to/ppp-manager.ini
 
 执行以下命令配置`firewalld`开放所需端口：  
 Use the following command to configure `firewalld` opening the port required:
 
     sudo firewall-cmd --add-port=2345/tcp --permanent
 
-## Tiny Core Linux PPP服务器配置 Tiny Core Linux PPP Server Configuration
+## Tiny Core Linux PPP服务器部署 Deploy PPP Server On Tiny Core Linux
 
-安装所需软件包 Install packages required
+安装所需软件包：  
+Install packages required:
 
 	tce-load -wi pppd iptables dnsmasq python3.9 expat2
 
@@ -52,7 +39,6 @@ Use the following command to configure `firewalld` opening the port required:
 Add the following command to `/opt/bootlocal.sh`:
 
 	cd /home/tc && python3 ppp-manager.py -c ppp-manager.ini &
-	while ! ifconfig|grep $IP_ADDR; do sleep 1; done && /usr/local/sbin/dnsmasq -C /home/tc/dnsmasq.conf &
 
 执行`sudo filetool.sh -b`命令保存修改。  
 Execute `sudo filetool.sh -b` command to save all the modifications.
@@ -90,15 +76,6 @@ Add new PPP connection with phone number `12345`, set IP address as automaticall
 检查“使用远程网上的默认网关”选项是否被选中，否则将无法连接目标服务器。  
 Check whether "Use default gateway on remote network" box is checked, or you'll be unable to connect to the target server.
 
-设置DNS地址为`10.0.2.15`。  
-Set DNS address as `10.0.2.15`.
-
 检查“拨号后出现终端窗口”选项是否被选中，否则将无法登录。  
 Check whether "Bring up terminal window after dialing" box is checked, or you'll be unable to login.
-
-当连接成功时，打开浏览器，使用URL`http://目标站点IP`访问目标站点。  
-When connection established, open browser and use URL `http://Target IP` to access the target site.
-
-`ip route show`命令的输出中`default via`后面的IP地址是客户机的虚拟路由器IP，一般为`10.0.2.2`。因此当PPP服务器在虚拟机中运行时，可使用URL`http://10.0.2.2`访问主机上部署的站点。  
-Check the output of `ip route show` command, the IP after `default via` is the virtual router IP for the guest machine, normally `10.0.2.2`. So when PPP service is deployed inside VM, use URL `http://10.0.2.2` to access the site on the host machine.
 
