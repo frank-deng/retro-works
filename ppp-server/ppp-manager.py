@@ -16,12 +16,9 @@ from util import Logger
 from util import TCPServer
 from util import LoginHandler
 from util import SingleUserConnManager
+from util import ProcessHandler
 
-class PPPApp(Logger):
-    __master=None
-    __slave=None
-    __proc=None
-
+class PPPApp(ProcessHandler):
     @staticmethod
     def __proc_args(args,**kwargs):
         res=[]
@@ -32,64 +29,21 @@ class PPPApp(Logger):
             res.append(item_new)
         return res
 
-    def __init__(self,config,reader,writer,*,userinfo,bufsize=1024):
-        self.__reader,self.__writer=reader,writer
+    def __init__(self,config,reader,writer,*,userinfo):
+        super().__init__(reader,writer)
         self.__pppd_exec=config.get('pppd','exec',fallback='/usr/local/sbin/pppd')
         self.__pppd_options=config.get('pppd','options',fallback='').split()
         self.__ipaddr=userinfo['ip_addr']
-        self.__bufsize=bufsize
-        self.logger.debug(' '.join(self.__pppd_options))
 
-    async def __aenter__(self):
-        self.__master,self.__slave=pty.openpty()
-        fcntl.fcntl(self.__master, fcntl.F_SETFL, fcntl.fcntl(self.__master, fcntl.F_GETFL) | os.O_NONBLOCK)
-        fcntl.fcntl(self.__slave, fcntl.F_SETFL, fcntl.fcntl(self.__slave, fcntl.F_GETFL) | os.O_NONBLOCK)
+    async def create_subprocess_exec(self,slave_fd):
         args=self.__class__.__proc_args(self.__pppd_options,
-            pty="/proc/%d/fd/%d"%(os.getpid(),self.__slave),
+            pty="/proc/%d/fd/%d"%(os.getpid(),slave_fd),
             ip_addr=self.__ipaddr)
-        self.logger.debug('$'.join(args))
-        self.__proc=await asyncio.create_subprocess_exec(
+        self.logger.debug(' '.join(args))
+        return await asyncio.create_subprocess_exec(
             *[self.__pppd_exec,]+args,
-            bufsize=0,
-            start_new_session=True,
-            stdin=self.__slave,
-            stdout=self.__slave,
-            stderr=self.__slave)
-        self.logger.debug('pppd started')
-        return self
-
-    async def __aexit__(self,exc_type,exc_val,exc_tb):
-        if self.__slave is not None:
-            os.close(self.__slave)
-        if self.__master is not None:
-            os.close(self.__master)
-        await self.__writer.drain()
-        if self.__proc is not None and self.__proc.returncode is None:
-            try:
-                await asyncio.wait_for(self.__proc.communicate(),timeout=10)
-                self.logger.debug('pppd stopped normally')
-            except asyncio.TimeoutError:
-                self.__proc.kill()
-                await asyncio.wait_for(self.__proc.wait(),timeout=10)
-            finally:
-                self.__proc=None
-        await asyncio.sleep(1)
-        self.logger.debug('pppd stopped')
-
-    async def run_forever(self):
-        while True:
-            try:
-                self.__writer.write(os.read(self.__master,self.__bufsize))
-                await self.__writer.drain()
-            except BlockingIOError:
-                pass
-            try:
-                content=await asyncio.wait_for(self.__reader.read(self.__bufsize),timeout=1)
-                if not content:
-                    break
-                os.write(self.__master, content)
-            except (asyncio.TimeoutError,BlockingIOError):
-                pass
+            bufsize=0,start_new_session=True,
+            stdin=slave_fd,stdout=slave_fd,stderr=slave_fd)
 
 
 class PPPUserManager(SingleUserConnManager):
@@ -148,7 +102,7 @@ class PPPServer(TCPServer,PPPUserManager):
                     asyncio.sleep(3)
             await login_handler.write(b'Login Succeed.\r\n')
             async with PPPApp(self.__config,reader,writer,userinfo=userinfo) as app:
-                await app.run_forever()
+                pass
         finally:
             await self.logout(username,writer)
 

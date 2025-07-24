@@ -2,6 +2,8 @@ import asyncio
 import logging
 import time
 import hashlib
+import os
+import pty
 
 class Logger:
     _logger=None
@@ -245,4 +247,120 @@ class SingleUserConnManager(Logger):
                 self.logger.debug(f'Deleted {username} {id_curr}')
             else:
                 self.logger.debug(f'{username} not deleted {id_del}!={id_curr}')
+
+
+class ProcessHandler(Logger):
+    __buf_size=4096
+    __proc=None
+    __master_fd=None
+    __slave_fd=None
+    __pty_reader=None
+    __tasks=None
+    def __init__(self,reader,writer,*,buf_size=4096):
+        self.__reader,self.__writer=reader,writer
+        self.__buf_size=buf_size
+        self.__loop=asyncio.get_running_loop()
+        self.__queue=asyncio.Queue()
+
+    async def __aenter__(self):
+        try:
+            self.__master_fd,self.__slave_fd=pty.openpty()
+            self.__proc=await self.create_subprocess_exec(self.__slave_fd)
+            os.set_blocking(self.__master_fd,False)
+            self.__tasks=(
+                asyncio.create_task(self.__pty_to_tcp()),
+                asyncio.create_task(self.__tcp_to_pty())
+            )
+        except Exception as e:
+            await self.__cleanup()
+            raise
+        return self
+
+    async def __aexit__(self,exc_type,exc_val,exc_tb):
+        if self.__tasks is not None:
+            await asyncio.wait(self.__tasks,return_when=asyncio.FIRST_COMPLETED)
+        await self.__cleanup()
+
+    def __fd_ready(self):
+        try:
+            data=os.read(self.__master_fd,self.__buf_size)
+            if not data:
+                self.__loop.call_soon(self.__queue.put_nowait,b"")
+                return
+            self.__queue.put_nowait(data)
+        except (OSError,asyncio.CancelledError):
+            self.__queue.put_nowait(b"")
+
+    async def __pty_to_tcp(self):
+        self.__loop.add_reader(self.__master_fd,self.__fd_ready)
+        try:
+            while True:
+                data=await self.__queue.get()
+                if not data:
+                    break
+                self.__writer.write(data)
+                await self.__writer.drain()
+        except (ConnectionResetError,asyncio.CancelledError):
+            pass
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
+        finally:
+            self.__loop.remove_reader(self.__master_fd)
+
+    async def __write_fd(self,data):
+        n=None
+        while data:
+            try:
+                n=os.write(self.__master_fd,data)
+                data=data[n:]
+            except BlockingIOError:
+                self.logger.debug(f'Partial data written {n}/{len(data)}')
+                await asyncio.sleep(0.01)
+
+    async def __tcp_to_pty(self):
+        try:
+            while True:
+                data=await self.__reader.read(self.__buf_size)
+                if not data:
+                    break
+                await self.__write_fd(data)
+        except (ConnectionResetError,OSError,asyncio.CancelledError):
+            pass
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
+
+    async def __cleanup(self):
+        try:
+            if self.__tasks is not None:
+                for task in self.__tasks:
+                    if not task.done():
+                        task.cancel()
+                await asyncio.gather(*self.__tasks)
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
+        finally:
+            self.__close_fd(self.__master_fd)
+            self.__close_fd(self.__slave_fd)
+            await self.__stop_proc()
+
+    def __close_fd(self,fd):
+        try:
+            if fd is not None:
+                os.close(fd)
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
+
+    async def __stop_proc(self):
+        try:
+            if self.__proc is None or self.__proc.returncode is not None:
+                return
+            await asyncio.wait_for(self.__proc.communicate(),timeout=10)
+        except asyncio.TimeoutError:
+            self.__proc.kill()
+            await asyncio.wait_for(self.__proc.wait(),timeout=10)
+        finally:
+            self.__proc=None
+
+    async def create_subprocess_exec(self,slave_fd):
+        pass
 
