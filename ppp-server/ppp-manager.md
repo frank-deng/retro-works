@@ -13,27 +13,19 @@ PPP server requires running under Linux environments like Debian, Ubuntu, TinyCo
 推荐在TinyCore Linux虚拟机上部署。  
 TinyCore Linux VM is recommended.
 
-## Linux PPP服务器部署 Deploy Linux PPP Server
-
-安装`iptables`、`python3`、`ppp`、`dnsmasq`。  
-Install `iptables`, `python3`, `ppp`, `dnsmasq`.
-
-在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器：  
-Add the following command to `/etc/crontab`, so as to start PPP server on boot:
-
-	@reboot root python3 /path/to/ppp-manager.py -c path/to/ppp-manager.ini
-
-执行以下命令配置`firewalld`开放所需端口：  
-Use the following command to configure `firewalld` opening the port required:
-
-    sudo firewall-cmd --add-port=2345/tcp --permanent
-
 ## Tiny Core Linux PPP服务器部署 Deploy PPP Server On Tiny Core Linux
 
 安装所需软件包：  
 Install packages required:
 
 	tce-load -wi pppd iptables dnsmasq python3.9 expat2
+
+将以下文件传至PPP服务器上的`/home/tc`目录：  
+Transfer the following files to `/home/tc` directory on the PPP server:
+
+	ppp-manager.py
+	util.py
+	ppp-manager.ini
 
 在`/opt/bootlocal.sh`中添加以下命令：  
 Add the following command to `/opt/bootlocal.sh`:
@@ -42,6 +34,28 @@ Add the following command to `/opt/bootlocal.sh`:
 
 执行`sudo filetool.sh -b`命令保存修改。  
 Execute `sudo filetool.sh -b` command to save all the modifications.
+
+## Linux PPP服务器部署 Deploy Linux PPP Server
+
+安装`iptables`、`python3`、`ppp`、`dnsmasq`。  
+Install `iptables`, `python3`, `ppp`, `dnsmasq`.
+
+将以下文件传至Linux服务器：  
+Transfer the following files to the Linux server:
+
+	ppp-manager.py
+	util.py
+	ppp-manager.ini
+
+在`/etc/crontab`中加入以下命令，实现开机时自动启动PPP服务器：  
+Add the following command to `/etc/crontab`, so as to start PPP server on boot:
+
+	@reboot root cd /path/to/ppp-manager && python3 ppp-manager.py
+
+执行以下命令配置`firewalld`开放所需端口：  
+Use the following command to configure `firewalld` opening the port required:
+
+    sudo firewall-cmd --add-port=2345/tcp --permanent
 
 ## 虚拟机NAT网络配置端口转发 Configure NAT Port Forwarding for VMs
 
