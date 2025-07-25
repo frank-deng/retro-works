@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 
 import asyncio
+import logging
 import signal
 import hashlib
-import subprocess
-import pty
-import fcntl
 import os
 import configparser
-import logging
 import csv
 from io import StringIO
 
@@ -31,13 +28,13 @@ class PPPApp(ProcessHandler):
 
     def __init__(self,config,reader,writer,*,userinfo):
         super().__init__(reader,writer)
-        self.__pppd_exec=config.get('pppd','exec',fallback='/usr/local/sbin/pppd')
-        self.__pppd_options=config.get('pppd','options',fallback='').split()
+        self.__pppd_exec=config.get('ppp','pppd',fallback='/usr/local/sbin/pppd')
+        self.__pppd_options=config.get('ppp','pppd_options').split()
         self.__ipaddr=userinfo['ip_addr']
 
     async def create_subprocess_exec(self,slave_fd):
         args=self.__class__.__proc_args(self.__pppd_options,
-            pty="/proc/%d/fd/%d"%(os.getpid(),slave_fd),
+            pty=f"/proc/{os.getpid()}/fd/{slave_fd}",
             ip_addr=self.__ipaddr)
         self.logger.debug(' '.join(args))
         return await asyncio.create_subprocess_exec(
@@ -67,7 +64,11 @@ class PPPUserManager(SingleUserConnManager):
             self.logger.debug(f'{user} {self.__passwd[user]} {self.__userinfo[user]}')
 
     async def login(self,username,password,writer):
-        if username is None or password is None or self.__passwd.get(username,'')!=password:
+        if username is None or password is None:
+            return None
+        username=username.decode('UTF-8')
+        password=hashlib.sha256(password).hexdigest()
+        if self.__passwd.get(username,'')!=password:
             return None
         await super().login(username,writer)
         return self.__userinfo[username]
@@ -75,14 +76,15 @@ class PPPUserManager(SingleUserConnManager):
 
 class PPPServer(TCPServer,PPPUserManager):
     def __init__(self,config):
-        self.__config=config
-        host=config.get('server','host',fallback='0.0.0.0')
-        port=config.getint('server','port',fallback=2345)
-        max_conn=config.getint('server','max_connection',fallback=None)
-        TCPServer.__init__(self,port,host=host,max_conn=max_conn)
+        TCPServer.__init__(self,
+            config.getint('server','port',fallback=2345),
+            host=config.get('server','host',fallback='0.0.0.0'),
+            max_conn=config.getint('server','max_connection',fallback=None)
+        )
         PPPUserManager.__init__(self,config)
         self.__login_retry=config.getint('server','login_retry',fallback=None)
         self.__login_timeout=config.getint('server','login_timeout',fallback=None)
+        self.__config=config
 
     async def handler(self,reader,writer):
         username,userinfo=None,None
@@ -113,10 +115,10 @@ class Initializer(Logger):
         self.__init_cmds=[
             ('sysctl','-w','net.ipv4.ip_forward=1'),
             ('iptables','-t','nat','-A','POSTROUTING','-s',
-                config.get('pppd','ppp_client_subnet'),'-j','MASQUERADE'),
+                config.get('ppp','ppp_client_subnet'),'-j','MASQUERADE'),
         ]
         reader=csv.reader(
-            StringIO(config.get('pppd','routes',fallback='')),
+            StringIO(config.get('server','routes',fallback='')),
             delimiter=' ',skipinitialspace=True)
         for row in reader:
             self.__init_cmds.append(tuple(['iptables']+row))
@@ -126,10 +128,10 @@ class Initializer(Logger):
             '--keep-in-foreground','--pid-file=','--no-resolv',
             '--no-hosts','--bind-interfaces'
         ]
-        dnsmasq_key_blacklist={'local_ip','router_ip','dnsmasq','pid-file',
+        dnsmasq_key_blacklist={'dnsmasq','pid-file','keep-in-foreground',
                                'no-resolv','no-hosts','bind-interfaces'}
         for key in config['dns']:
-            if key in dnsmasq_key_blacklist:
+            if key in config['DEFAULT'] or key in dnsmasq_key_blacklist:
                 continue
             val=config['dns'][key]
             if not val:

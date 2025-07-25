@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import time
-import hashlib
 import os
 import pty
 
@@ -204,8 +203,6 @@ class LoginHandler(ReadlineHandler):
         password=await self.readline(echo=False)
         if password is None:
             return None,None
-        username=username.decode('UTF-8')
-        password=hashlib.sha256(password).hexdigest();
         return username,password
 
 

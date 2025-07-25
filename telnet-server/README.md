@@ -107,3 +107,8 @@ Check whether serial console is enabled on `/dev/ttyS0`:
 
 	systemctl status serial-getty@ttyS0.service
 
+TinyCore Linux中可以在`/opt/bootlocal.sh`中加入以下命令启用串口登录：  
+To enable serial login for TinyCore Linux, add the following command to `/opt/bootlocal.sh`:
+
+	while true; do /sbin/getty 115200 ttyS0; done &
+
