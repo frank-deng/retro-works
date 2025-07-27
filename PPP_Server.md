@@ -20,24 +20,51 @@ Install packages required:
 
 	tce-load -wi pppd socat iptables dnsmasq
 
-将以下文件传至PPP服务器：  
-Transfer the following files the PPP server:
+在PPP服务器上添加以下文件，各文件内容如下：  
+Add the following files to PPP server, each file has content below:
 
-    dnsmasq.conf -> /etc/
-    options -> /etc/ppp
-    chap-secrets -> /etc/ppp
-    ppp-server.sh -> /home/tc
+### `/etc/ppp/options`
+
+	require-chap
+	nodefaultroute
+	mtu 576
+	proxyarp
+	lock
+	ms-dns 10.0.2.15
+	10.0.2.15:
+
+### `/etc/ppp/chap-secrets`
+
+	ppp	  *  ppp   192.168.7.1
+	ppp2  *  ppp2  192.168.7.2
+
+### `/etc/dnsmasq.conf`
+
+	server=8.8.8.8
+	listen-address=10.0.2.15
+	address=/mysite.com/10.0.2.2
+	address=/www.mysite.com/10.0.2.2
+	bind-interfaces
+	no-resolv
+	no-hosts
 
 在`/opt/bootlocal.sh`中添加以下命令：  
 Add the following command to `/opt/bootlocal.sh`:
 
-	sh /home/tc/ppp-server.sh &
+	sysctl -w net.ipv4.ip_forward=1
+	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
+	iptables -t nat -A PREROUTING -d 10.0.2.2 -p tcp --dport 80 -j DNAT --to-destination :8080
+	iptables -t nat -A OUTPUT -d 10.0.2.2 -p tcp --dport 80 -j REDIRECT --to-port 8080
+	while ! ifconfig -a|grep -q "inet addr:10.0.2.15"; do sleep 1; done;
+	dnsmasq
+	socat TCP-LISTEN:2345,reuseaddr,fork EXEC:'sh -c "/usr/local/sbin/pppd \$(tty)"',pty,stderr,setsid &
 
 在`/opt/.filetool.lst`中添加以下路径：  
 Add the following path to `/opt/.filetool.lst`:
 
 	etc/dnsmasq.conf
 	etc/ppp
+	usr/local/etc/ppp
 
 执行`sudo filetool.sh -b`命令保存修改。  
 Execute `sudo filetool.sh -b` command to save all the modifications.
