@@ -1,32 +1,40 @@
-Telnet服务器
-============
+如何配置Telnet服务器 How To Deploy Telnet Server
+================================================
 
 Telnet服务器可使用类似Telix、HyperTerminal的终端仿真程序通过拨号方式连接。  
 Use terminal emulators like Telix, HyperTerminal to dial to the Telnet server.
 
-Telnet服务器需要在Linux环境（如Debian、Ubuntu）中运行。  
-Telnet server require running under Linux environments like Debian, Ubuntu.
+Telnet服务器需要在Linux环境（如Debian、Ubuntu）中运行，且需要依赖`socat`。  
+Telnet server require running under Linux environments like Debian, Ubuntu, `socat` is required.
 
 **严禁将Telnet服务器部署到生产环境或含有敏感数据的环境！！！**  
-**DO NOT deploy Telnet server to production environment or environment with sensitive data!!!**
+**Deploying Telnet server to production environment or environment with sensitive data is FORBIDDEN!!!**
 
-## Telnet服务器配置 Telnet Server Configuration
+## Telnet服务器部署 Telnet Server Deployment
 
-执行以下命令安装所需软件：  
-Execute the following commands to install softwares required:
+安装`socat`。  
+Install `socat`.
 
-	sudo apt-get install python3
-	sudo pip3 install paramiko
+新建`/usr/local/bin/telnet_login.sh`，内容如下：  
+Create `/usr/local/bin/telnet_login.sh` with the follwing content:
+
+	#!/bin/bash
+	TERM='ansi.sys'
+	TTY=$(tty)
+	TTY=${TTY#/dev/}
+	while true; do
+		setsid /sbin/agetty --noclear $TTY 57600 $TERM || sleep 1;
+	done
 
 在`/etc/crontab`中加入以下命令，实现开机时自动启动Telnet服务器：  
 Add the following command to `/etc/crontab` to start the Telnet server on boot:
 
-	@reboot user python3 /path/to/telnet-ssh-adapter.py -P 2333 -c path/to/ssh.conf
+	@reboot root socat TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/telnet_login.sh',pty,raw,echo=0
 
 执行以下命令配置`firewalld`开放所需端口：  
 Use the following command to configure `firewalld` opening the port required:
 
-    sudo firewall-cmd --add-port=2333/tcp --permanent
+	sudo firewall-cmd --add-port=2333/tcp --permanent
 
 ## 虚拟机NAT网络配置端口转发 Configure NAT Port Forwarding for VMs
 
