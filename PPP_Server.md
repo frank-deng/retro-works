@@ -1,8 +1,8 @@
-PPP服务器
-=========
+PPP上网配置 Configure PPP Internet Access
+=========================================
 
-Windows 3.x/95虚拟机里的浏览器可通过PPP协议访问部署在服务端的HTML站点。  
-Windows 3.x/95 VM can access the HTML site deployed at server side via PPP protocol.
+使用PPP服务器，Windows 3.x/95虚拟机里的浏览器可通过PPP协议访问部署在服务端的HTML站点。  
+Using PPP server, Windows 3.x/95 VM can access the HTML website deployed at server side via PPP protocol.
 
 PPP服务器需要在Linux环境（如Debian、Ubuntu、TinyCore）中运行。  
 PPP server requires running under Linux environments like Debian, Ubuntu, TinyCore.
@@ -20,10 +20,8 @@ Install packages required:
 
 	tce-load -wi pppd socat iptables dnsmasq
 
-在PPP服务器上添加以下文件，各文件内容如下：  
-Add the following files to PPP server, each file has content below:
-
-### `/etc/ppp/options`
+新建或覆盖`/etc/ppp/options`，内容如下：  
+Create or replace `/etc/ppp/options` with the following content:
 
 	require-chap
 	nodefaultroute
@@ -33,12 +31,14 @@ Add the following files to PPP server, each file has content below:
 	ms-dns 10.0.2.15
 	10.0.2.15:
 
-### `/etc/ppp/chap-secrets`
+新建或覆盖`/etc/ppp/chap-secrets`，内容如下：  
+Create or replace `/etc/ppp/chap-secrets` with the following content:
 
-	ppp	  *  ppp   192.168.7.1
+	ppp   *  ppp   192.168.7.1
 	ppp2  *  ppp2  192.168.7.2
 
-### `/etc/dnsmasq.conf`
+新建或覆盖`/etc/dnsmasq.conf`，内容如下：  
+Create or replace `/etc/dnsmasq.conf` with the following content:
 
 	server=8.8.8.8
 	listen-address=10.0.2.15
