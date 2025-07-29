@@ -26,6 +26,7 @@ Create or replace `/etc/ppp/options` with the following content:
 	require-chap
 	nodefaultroute
 	mtu 576
+	nodetach
 	proxyarp
 	lock
 	ms-dns 10.0.2.15
@@ -53,11 +54,15 @@ Add the following command to `/opt/bootlocal.sh`:
 
 	sysctl -w net.ipv4.ip_forward=1
 	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
-	iptables -t nat -A PREROUTING -d 10.0.2.2 -p tcp --dport 80 -j DNAT --to-destination :8080
-	iptables -t nat -A OUTPUT -d 10.0.2.2 -p tcp --dport 80 -j REDIRECT --to-port 8080
 	while ! ifconfig -a|grep -q "inet addr:10.0.2.15"; do sleep 1; done;
 	dnsmasq
-	socat TCP-LISTEN:2345,reuseaddr,fork EXEC:'sh -c "/usr/local/sbin/pppd \$(tty)"',pty,stderr,setsid &
+	socat TCP-LISTEN:2345,reuseaddr,fork EXEC:'sh -c "/usr/local/sbin/pppd /dev/tty"',pty,stderr,setsid &
+
+当主机无法使用80端口，需要使用8080端口时，PPP服务器内用以下命令将访问`10.0.2.2:80`的请求转发到`10.0.2.2:8080`：  
+When the host machine cannot use 80 port and use 8080 port instead, use the following command in PPP server to forward `10.0.2.2:80` requests to `10.0.2.2:8080`:
+
+	iptables -t nat -A PREROUTING -d 10.0.2.2 -p tcp --dport 80 -j DNAT --to-destination :8080
+	iptables -t nat -A OUTPUT -d 10.0.2.2 -p tcp --dport 80 -j REDIRECT --to-port 8080
 
 在`/opt/.filetool.lst`中添加以下路径：  
 Add the following path to `/opt/.filetool.lst`:

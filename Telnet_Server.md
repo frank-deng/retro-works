@@ -4,19 +4,16 @@
 Telnet服务器可使用类似Telix、HyperTerminal的终端仿真程序通过拨号方式连接。  
 Use terminal emulators like Telix, HyperTerminal to dial to the Telnet server.
 
-Telnet服务器需要在Linux环境（如Debian、Ubuntu）中运行，且需要依赖`socat`。  
-Telnet server require running under Linux environments like Debian, Ubuntu, `socat` is required.
+Telnet服务器需要在Linux环境（如Debian、Ubuntu）中运行，且需事先安装`socat`。  
+Telnet server require running under Linux environments like Debian, Ubuntu, and `socat` must be installed first.
 
 **严禁将Telnet服务器部署到生产环境或含有敏感数据的环境！！！**  
 **Deploying Telnet server to production environment or environment with sensitive data is FORBIDDEN!!!**
 
 ## Telnet服务器部署 Telnet Server Deployment
 
-安装`socat`。  
-Install `socat`.
-
-新建`/usr/local/bin/telnet_login.sh`，内容如下：  
-Create `/usr/local/bin/telnet_login.sh` with the follwing content:
+安装`socat`后，新建`/usr/local/bin/telnet_login.sh`，内容如下：  
+After installing `socat`, create `/usr/local/bin/telnet_login.sh` with the follwing content:
 
 	#!/bin/bash
 	TERM='ansi.sys'
