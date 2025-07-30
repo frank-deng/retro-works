@@ -95,6 +95,14 @@ Change DOSBox configuration under seciton `[serial]`:
 	serial1 = modem
 	phonebookfile = phonebook.txt
 
+## 文件传输 File Transmission
+
+Debian、Ubuntu、OpenEuler安装`lrzsz`包后可通过Xmodem/Ymodem/Zmodem协议互传数据。  
+For Debian, Ubuntu, OpenEuler, install `lrzsz` package to transmit files via Xmodem/Ymodem/Zmodem protocol.
+
+Alpine Linux需要从源码编译安装lrzsz。  
+Alpine Linux need compile lrzsz from source.
+
 ## GNU Screen
 
 [GNU Screen](https://www.gnu.org/software/screen/)可实现多终端窗口管理，以及将服务端UTF-8编码转换为古董电脑客户端使用的GBK、Shift-JIS编码的功能。
