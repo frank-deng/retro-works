@@ -1,21 +1,21 @@
-如何配置Telnet服务器 How To Deploy Telnet Server
-================================================
+终端拨号连接服务器 Dial-In Terminal Connection Server
+=====================================================
 
-Telnet服务器可使用类似Telix、HyperTerminal的终端仿真程序通过拨号方式连接。  
-Use terminal emulators like Telix, HyperTerminal to dial to the Telnet server.
+终端拨号连接服务器可使用类似Telix、HyperTerminal的终端仿真程序通过拨号方式连接。  
+Use terminal emulators like Telix, HyperTerminal to dial to the dial-up terminal connection server.
 
-Telnet服务器需要在Linux环境（如Debian、Ubuntu）中运行，且需事先安装`socat`。  
-Telnet server require running under Linux environments like Debian, Ubuntu, and `socat` must be installed first.
+终端拨号连接服务器需要在Linux环境（如Debian、Ubuntu）中运行，且需事先安装`socat`。  
+Dial-in terminal connection server requires Linux environments like Debian, Ubuntu, and `socat` must be installed first.
 
-**严禁将Telnet服务器部署到生产环境或含有敏感数据的环境！！！**  
-**Deploying Telnet server to production environment or environment with sensitive data is FORBIDDEN!!!**
+**严禁将终端拨号连接服务器部署到生产环境或含有敏感数据的环境！！！**  
+**Deploying dial-in terminal connection server to production environment or environment with sensitive data is FORBIDDEN!!!**
 
-## Telnet服务器部署 Telnet Server Deployment
+## 部署 Deployment
 
 ### Debian/Ubuntu/OpenEuler
 
-安装`socat`后，新建`/usr/local/bin/telnet_login.sh`并设置权限为`500`或`700`，内容如下：  
-After installing `socat`, create `/usr/local/bin/telnet_login.sh` and set the permission as `500` or `700`, file content is as following:
+安装`socat`后，新建`/usr/local/bin/dialin_login.sh`并设置权限为`500`或`700`，内容如下：  
+After installing `socat`, create `/usr/local/bin/dialin_login.sh` and set the permission as `500` or `700`, file content is as following:
 
 	#!/bin/bash
 	TERM='ansi.sys'
@@ -25,10 +25,10 @@ After installing `socat`, create `/usr/local/bin/telnet_login.sh` and set the pe
 		setsid /sbin/agetty --noclear $TTY 57600 $TERM || sleep 1;
 	done
 
-在`/etc/crontab`中加入以下命令，实现开机时自动启动Telnet服务器：  
-Add the following command to `/etc/crontab` to start the Telnet server on boot:
+在`/etc/crontab`中加入以下命令，实现开机自启动：  
+Add the following command to `/etc/crontab` to start on boot:
 
-	@reboot root socat TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/telnet_login.sh',pty,raw,echo=0
+	@reboot root socat TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/dialin_login.sh',pty,raw,echo=0
 
 执行以下命令配置`firewalld`开放所需端口：  
 Use the following command to configure `firewalld` opening the port required:
@@ -37,8 +37,8 @@ Use the following command to configure `firewalld` opening the port required:
 
 ### Alpine Linux
 
-安装`socat`后，新建`/usr/local/bin/telnet_login.sh`并设置权限为`500`或`700`，内容如下：  
-After installing `socat`, create `/usr/local/bin/telnet_login.sh` and set the permission as `500` or `700`, file content is as following:
+安装`socat`后，新建`/usr/local/bin/dialin_login.sh`并设置权限为`500`或`700`，内容如下：  
+After installing `socat`, create `/usr/local/bin/dialin_login.sh` and set the permission as `500` or `700`, file content is as following:
 
 	#!/bin/sh
 	TERM='ansi'
@@ -47,23 +47,23 @@ After installing `socat`, create `/usr/local/bin/telnet_login.sh` and set the pe
 		setsid /sbin/getty 57600 $TTY $TERM || sleep 1;
 	done
 
-新建`/etc/init.d/telnet-service`，内容如下：  
-Create `/etc/init.d/telnet-service` with the follwing content:
+新建`/etc/init.d/dialin-service`，内容如下：  
+Create `/etc/init.d/dialin-service` with the follwing content:
 
 	#!/sbin/openrc-run
-	name="Telnet Service"
+	name="Dial-In Service"
 	command="/usr/bin/socat"
-	command_args="TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/telnet_login.sh',pty,raw,echo=0"
-	pidfile="/run/telnet_service.pid"
+	command_args="TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/dialin_login.sh',pty,raw,echo=0"
+	pidfile="/run/dialin-service.pid"
 	command_background=true
 	depend() {
 	        need net
 	}
 
-配置`/etc/init.d/telnet-service`开机自启动：  
-Configure `/etc/init.d/telnet-service` auto start:
+配置开机自启动：  
+Starting service on boot:
 
-	rc-update add telnet-service default
+	rc-update add dialin-service default
 
 ## 虚拟机NAT网络配置端口转发 Configure NAT Port Forwarding for VMs
 
