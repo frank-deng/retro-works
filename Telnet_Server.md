@@ -12,8 +12,10 @@ Telnet server require running under Linux environments like Debian, Ubuntu, and 
 
 ## Telnet服务器部署 Telnet Server Deployment
 
-安装`socat`后，新建`/usr/local/bin/telnet_login.sh`，内容如下：  
-After installing `socat`, create `/usr/local/bin/telnet_login.sh` with the follwing content:
+### Debian/Ubuntu/OpenEuler
+
+安装`socat`后，新建`/usr/local/bin/telnet_login.sh`并设置权限为`500`或`700`，内容如下：  
+After installing `socat`, create `/usr/local/bin/telnet_login.sh` and set the permission as `500` or `700`, file content is as following:
 
 	#!/bin/bash
 	TERM='ansi.sys'
@@ -32,6 +34,36 @@ Add the following command to `/etc/crontab` to start the Telnet server on boot:
 Use the following command to configure `firewalld` opening the port required:
 
 	sudo firewall-cmd --add-port=2333/tcp --permanent
+
+### Alpine Linux
+
+安装`socat`后，新建`/usr/local/bin/telnet_login.sh`并设置权限为`500`或`700`，内容如下：  
+After installing `socat`, create `/usr/local/bin/telnet_login.sh` and set the permission as `500` or `700`, file content is as following:
+
+	#!/bin/sh
+	TERM='ansi'
+	TTY=$(tty)
+	while true; do
+		setsid /sbin/getty 57600 $TTY $TERM || sleep 1;
+	done
+
+新建`/etc/init.d/telnet-service`，内容如下：  
+Create `/etc/init.d/telnet-service` with the follwing content:
+
+	#!/sbin/openrc-run
+	name="Telnet Service"
+	command="/usr/bin/socat"
+	command_args="TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/telnet_login.sh',pty,raw,echo=0"
+	pidfile="/run/telnet_service.pid"
+	command_background=true
+	depend() {
+	        need net
+	}
+
+配置`/etc/init.d/telnet-service`开机自启动：  
+Configure `/etc/init.d/telnet-service` auto start:
+
+	rc-update add telnet-service default
 
 ## 虚拟机NAT网络配置端口转发 Configure NAT Port Forwarding for VMs
 
