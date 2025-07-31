@@ -56,7 +56,7 @@ Add the following command to `/opt/bootlocal.sh`:
 	iptables -t nat -A POSTROUTING -s 192.168.7.0/24 -j MASQUERADE
 	while ! ifconfig -a|grep -q "inet addr:10.0.2.15"; do sleep 1; done;
 	dnsmasq
-	socat TCP-LISTEN:2345,reuseaddr,fork EXEC:'sh -c "/usr/local/sbin/pppd /dev/tty"',pty,stderr,setsid &
+	socat TCP-LISTEN:2345,reuseaddr,fork system:'/usr/local/sbin/pppd "$SOCAT_PTY"',pty,stderr,setsid &
 
 当主机无法使用80端口，需要使用8080端口时，PPP服务器内用以下命令将访问`10.0.2.2:80`的请求转发到`10.0.2.2:8080`：  
 When the host machine cannot use 80 port and use 8080 port instead, use the following command in PPP server to forward `10.0.2.2:80` requests to `10.0.2.2:8080`:
