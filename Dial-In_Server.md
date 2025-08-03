@@ -97,8 +97,11 @@ Change DOSBox configuration under seciton `[serial]`:
 
 ## 文件传输 File Transmission
 
-Debian、Ubuntu、OpenEuler、Alpine Linux安装`ckermit`包后可通过Kermit协议互传数据。  
-For Debian, Ubuntu, OpenEuler, install `ckermit` package to transmit files via Xmodem/Ymodem/Zmodem protocol.
+Debian、Ubuntu、Alpine Linux安装`ckermit`包后可通过Kermit协议互传数据。  
+For Debian, Ubuntu, install `ckermit` package to transmit files via Xmodem/Ymodem/Zmodem protocol.
+
+OpenEuler需要编译安装`ckermit`。  
+OpenEuler need compile `ckermit` from source.
 
 ### 限制 Limitations
 
