@@ -97,11 +97,13 @@ Change DOSBox configuration under seciton `[serial]`:
 
 ## 文件传输 File Transmission
 
-Debian、Ubuntu、OpenEuler安装`lrzsz`包后可通过Xmodem/Ymodem/Zmodem协议互传数据。  
-For Debian, Ubuntu, OpenEuler, install `lrzsz` package to transmit files via Xmodem/Ymodem/Zmodem protocol.
+Debian、Ubuntu、OpenEuler、Alpine Linux安装`ckermit`包后可通过Kermit协议互传数据。  
+For Debian, Ubuntu, OpenEuler, install `ckermit` package to transmit files via Xmodem/Ymodem/Zmodem protocol.
 
-Alpine Linux需要从源码编译安装lrzsz。  
-Alpine Linux need compile lrzsz from source.
+### 限制 Limitations
+
+`screen`拉起的shell中不可使用`ckermit`。  
+Shell launched by `screen` cannot use `ckermit`.
 
 ## GNU Screen
 
