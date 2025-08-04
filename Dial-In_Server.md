@@ -118,6 +118,7 @@ Shell launched by `screen` cannot use `ckermit`.
 在`~/.screenrc`中加入以下配置：  
 Add the following configuration to `~/.screenrc`:
 
+	startup_message off
 	cjkwidth on
 	vbell off
 	shell /bin/bash
