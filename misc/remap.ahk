@@ -14,6 +14,6 @@ Up::PgUp
 Down::PgDn
 #HotIf
 #HotIf WinActive("ahk_exe 86box.exe")
-!Tab::Return
-#Tab::Return
+LWin::F13
+RWin::F13
 #HotIf
