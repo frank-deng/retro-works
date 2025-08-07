@@ -127,6 +127,9 @@ def cli(ctx,config_file):
     try:
         with open(config_file, 'rb') as f:
             config=tomllib.load(f)
+    except FileNotFoundError as e:
+        click.echo(click.style(f'Failed to load {config_file}: {e}',fg='red'),err=True)
+        ctx.exit(code=1)
     except tomllib.TOMLDecodeError as e:
         click.echo(click.style(f'Failed to load {config_file}: {e}',fg='red'),err=True)
         ctx.exit(code=1)

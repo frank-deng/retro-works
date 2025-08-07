@@ -13,7 +13,3 @@ Right::Enter
 Up::PgUp
 Down::PgDn
 #HotIf
-#HotIf WinActive("ahk_exe 86box.exe")
-LWin::F13
-RWin::F13
-#HotIf

@@ -3,9 +3,13 @@ import platform
 import os
 import atexit
 import errno
-import fcntl
 import signal
 import functools
+if 'Windows'!=platform.system():
+    import fcntl
+else:
+    import msvcrt
+
 
 class DaemonIsRunningError(RuntimeError):
     pass
@@ -18,13 +22,15 @@ class DaemonAbnormalExitError(RuntimeError):
 
 class PIDFileManager:
     __pidfile=None
-    __fd=None
+    __fp=None
     def __init__(self,pidfile:str=None):
         self.__pidfile=pidfile
 
     def __atexit(self):
-        if self.__fd is not None:
-            self.__fd.close()
+        if self.__fp is not None:
+            if 'Windows'==platform.system():
+                msvcrt.locking(self.__fp.fileno(),msvcrt.LK_UNLCK,os.path.getsize(self.__pidfile))
+            self.__fp.close()
         if self.__pidfile is not None:
             os.remove(self.__pidfile)
             self.__pidfile=None
@@ -33,24 +39,37 @@ class PIDFileManager:
     def is_running(self):
         if self.__pidfile is None or not os.path.isfile(self.__pidfile):
             return False
-        with open(self.__pidfile,'r') as f:
+        if 'Windows'==platform.system():
             try:
-                fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
+                fd = os.open(self.__pidfile, os.O_RDWR | os.O_EXCL)
+                os.close(fd)
                 return False
-            except IOError as e:
-                if e.errno not in (errno.EAGAIN, errno.EACCES):
-                    raise
+            except OSError as e:
                 return True
+        else:
+            with open(self.__pidfile,'r') as f:
+                try:
+                    fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
+                    return False
+                except IOError as e:
+                    if e.errno not in (errno.EAGAIN, errno.EACCES):
+                        raise
+                    return True
 
     def start(self):
         if self.__pidfile is None:
             return
         if self.is_running():
             raise DaemonIsRunningError
-        self.__fp=open(self.__pidfile,'w')
-        fcntl.flock(self.__fp,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        self.__fp.write(str(os.getpid()))
-        self.__fp.flush()
+        with open(self.__pidfile,'w') as fp:
+            fp.write(str(os.getpid()))
+            fp.flush()
+        if 'Windows'==platform.system():
+            self.__fp=open(self.__pidfile,'r+b')
+            msvcrt.locking(self.__fp.fileno(),msvcrt.LK_LOCK,os.path.getsize(self.__pidfile))
+        else:
+            self.__fp=open(self.__pidfile,'w')
+            fcntl.flock(self.__fp,fcntl.LOCK_EX|fcntl.LOCK_NB)
         atexit.register(self.__atexit)
 
 def __do_detach():
