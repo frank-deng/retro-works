@@ -25,3 +25,4 @@ dist
 *.egg-info
 mail-server.json
 
+*.toml
