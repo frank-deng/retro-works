@@ -7,12 +7,14 @@ from util.tcpserver import TCPServer
 class SMTPHandler(Logger):
     __running=True
     __mailFrom=None
-    def __init__(self,mailCenter,reader,writer,*,host='',timeout=60):
+    def __init__(self,mailCenter,reader,writer,*,host='',timeout=60,
+                 greeting_host='10.0.2.2'):
         self.__mailCenter=mailCenter
         self.__reader=reader
         self.__writer=writer
         self.__host=host
         self.__timeout=timeout
+        self.__greeting_host=greeting_host
         self.__rcpt=set()
         self.__handlerDict={
             'HELO':self.__handleGreeting,
@@ -122,6 +124,7 @@ class SMTPServer(TCPServer):
 
     async def handler(self,reader,writer):
         smtphandler=SMTPHandler(self.__mailCenter,
-                                reader,writer,timeout=self.__timeout)
+                                reader,writer,timeout=self.__timeout,
+                                greeting_host=self.__greeting_host)
         await smtphandler.run()
 
