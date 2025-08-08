@@ -5,10 +5,12 @@ import atexit
 import errno
 import signal
 import functools
-if 'Windows'!=platform.system():
-    import fcntl
+if 'win32'==sys.platform:
+    import win32event
+    import win32api
+    import win32con
 else:
-    import msvcrt
+    import fcntl
 
 
 class DaemonIsRunningError(RuntimeError):
@@ -28,8 +30,6 @@ class PIDFileManager:
 
     def __atexit(self):
         if self.__fp is not None:
-            if 'Windows'==platform.system():
-                msvcrt.locking(self.__fp.fileno(),msvcrt.LK_UNLCK,os.path.getsize(self.__pidfile))
             self.__fp.close()
         if self.__pidfile is not None:
             os.remove(self.__pidfile)
@@ -39,42 +39,34 @@ class PIDFileManager:
     def is_running(self):
         if self.__pidfile is None or not os.path.isfile(self.__pidfile):
             return False
-        if 'Windows'==platform.system():
+        with open(self.__pidfile,'r') as f:
             try:
-                fd = os.open(self.__pidfile, os.O_RDWR | os.O_EXCL)
-                os.close(fd)
+                fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
                 return False
-            except OSError as e:
+            except IOError as e:
+                if e.errno not in (errno.EAGAIN, errno.EACCES):
+                    raise
                 return True
-        else:
-            with open(self.__pidfile,'r') as f:
-                try:
-                    fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
-                    return False
-                except IOError as e:
-                    if e.errno not in (errno.EAGAIN, errno.EACCES):
-                        raise
-                    return True
 
     def start(self):
         if self.__pidfile is None:
             return
         if self.is_running():
             raise DaemonIsRunningError
-        with open(self.__pidfile,'w') as fp:
-            fp.write(str(os.getpid()))
-            fp.flush()
-        if 'Windows'==platform.system():
-            self.__fp=open(self.__pidfile,'r+b')
-            msvcrt.locking(self.__fp.fileno(),msvcrt.LK_LOCK,os.path.getsize(self.__pidfile))
-        else:
-            self.__fp=open(self.__pidfile,'w')
-            fcntl.flock(self.__fp,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        self.__fp=open(self.__pidfile,'w')
+        fcntl.flock(self.__fp,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        self.__fp.write(str(os.getpid()))
+        self.__fp.flush()
         atexit.register(self.__atexit)
 
+    def start_windows(self):
+        if self.__pidfile is None:
+            return
+        self.__fp=win32event.CreateMutex(None,True,self.__pidfile)
+        if win32api.GetLastError()==win32con.ERROR_ALREADY_EXISTS:
+            raise DaemonIsRunningError
+
 def __do_detach():
-    if 'Windows'==platform.system():
-        return True
     if os.fork():
         return False
     os.setsid()
@@ -95,10 +87,13 @@ def daemonize(key_pidfile:str,key_detach:str):
         @functools.wraps(func)
         def wrapper(config,*args,**kwargs):
             pidman=PIDFileManager(config.get(key_pidfile,None))
-            if pidman.is_running():
-                raise DaemonIsRunningError
             detach=config.get(key_detach,False)
-            if not detach or __do_detach():
+            if 'win32'==sys.platform:
+                pidman.start_windows()
+                func(config,*args,**kwargs)
+            elif pidman.is_running():
+                raise DaemonIsRunningError
+            elif not detach or __do_detach():
                 pidman.start()
                 func(config,*args,**kwargs)
         return wrapper

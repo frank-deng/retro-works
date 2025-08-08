@@ -144,6 +144,10 @@ def cli(ctx,config_file):
 @cli.command()
 @click.pass_context
 def stop(ctx):
+    if 'win32'==sys.platform:
+        click.echo(click.style(f'Stopping server on Windows is not supported yet.',fg='red'),err=True)
+        ctx.exit(1)
+
     config=ctx.obj
     if 'pid_file' not in config:
         click.echo(click.style(f'PID file not specified in the config file.',fg='yellow'),err=True)
