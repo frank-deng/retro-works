@@ -8,7 +8,7 @@ import functools
 if 'win32'==sys.platform:
     import win32event
     import win32api
-    import win32con
+    import winerror
 else:
     import fcntl
 
@@ -63,7 +63,7 @@ class PIDFileManager:
         if self.__pidfile is None:
             return
         self.__fp=win32event.CreateMutex(None,True,self.__pidfile)
-        if win32api.GetLastError()==win32con.ERROR_ALREADY_EXISTS:
+        if win32api.GetLastError()==winerror.ERROR_ALREADY_EXISTS:
             raise DaemonIsRunningError
 
 def __do_detach():
