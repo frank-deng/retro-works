@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from util import Logger
 
 
@@ -13,9 +14,12 @@ class TCPServer(Logger):
         self.__wait_close=asyncio.Event()
 
     async def __aenter__(self):
+        reuse_port=True
+        if 'win32'==sys.platform:
+            reuse_port=None
         self.__server=await asyncio.start_server(self.__handler,
             host=self.__host,port=self.__port,
-            reuse_address=True,reuse_port=True)
+            reuse_address=True,reuse_port=reuse_port)
         return self
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
