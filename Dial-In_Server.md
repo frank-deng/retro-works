@@ -28,12 +28,13 @@ After installing `socat`, create `/usr/local/bin/dialin_login.sh` and set the pe
 在`/etc/crontab`中加入以下命令，实现开机自启动：  
 Add the following command to `/etc/crontab` to start on boot:
 
-	@reboot root socat TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/dialin_login.sh',pty,raw,echo=0
+	@reboot root socat TCP-LISTEN:23,reuseaddr,fork EXEC:'sh /usr/local/bin/dialin_login.sh',pty,raw,echo=0 &
 
 执行以下命令配置`firewalld`开放所需端口：  
 Use the following command to configure `firewalld` opening the port required:
 
-	sudo firewall-cmd --add-port=2333/tcp --permanent
+	sudo firewall-cmd --add-port=23/tcp --permanent
+	sudo firewall-cmd --reload
 
 ### Alpine Linux
 
@@ -53,7 +54,7 @@ Create `/etc/init.d/dialin-service` with the follwing content:
 	#!/sbin/openrc-run
 	name="Dial-In Service"
 	command="/usr/bin/socat"
-	command_args="TCP-LISTEN:2333,reuseaddr,fork EXEC:'sh /usr/local/bin/dialin_login.sh',pty,raw,echo=0"
+	command_args="TCP-LISTEN:23,reuseaddr,fork EXEC:'sh /usr/local/bin/dialin_login.sh',pty,raw,echo=0"
 	pidfile="/run/dialin-service.pid"
 	command_background=true
 	depend() {
@@ -74,8 +75,8 @@ If the guest VM's network adapter is attacted to NAT. Then you must add port for
   Select TCP protocol.
 * 主机端口可任意指定一个主机上未使用的端口，连接此端口可访问虚拟机里的服务。  
   Use any unused port as the Host Port, connecting to this port to access the services inside VM.
-* 子系统端口为PPP服务器在虚拟机中使用的端口，比如2345。  
-  Set Guest Port with the port used by PPP server inside VM, e.g. 2345.
+* 子系统端口为拨号连接服务器在虚拟机中使用的端口，一般为23。  
+  Set Guest Port with the port used by the Dial-in server inside VM, usually 23.
 
 ## 虚拟机访问主机上的服务 Access Services on the Host from VM
 
