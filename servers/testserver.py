@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import asyncio
 from util import Logger
 from util.tcpserver import TCPServer
@@ -95,7 +93,7 @@ class CommandHandler(Logger):
 
 class TestServer(TCPServer):
     def __init__(self,config):
-        super().__init__(config['port'])
+        super().__init__(config['testServer']['port'],host=config['testServer']['host'])
 
     async def handler(self,reader,writer):
         try:

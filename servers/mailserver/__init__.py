@@ -123,6 +123,7 @@ class MailCenter(Logger):
 
 class MailServer(MailCenter):
     def __init__(self,config):
+        config=config['mail']
         super().__init__(config)
         self.__pop3Server=POP3Server(self,config)
         self.__smtpServer=SMTPServer(self,config)

@@ -49,8 +49,7 @@ async def getAccessToken(client_id,client_secret):
     return None
     
 async def ask_erine(params,content):
-    key=params['erine_key']
-    access_token=await getAccessToken(key[0],key[1])
+    access_token=await getAccessToken(params['client_id'],params['client_secret'])
     if access_token is None:
         return None
     url=f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token={access_token}"
