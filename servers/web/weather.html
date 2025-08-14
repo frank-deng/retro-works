@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<p><b>当前城市：</b>{{location_str}} <font size='2'>[<a href='select_city.asp'>选择城市</a>]</font></p>{% if warning %}<p>
+{% for item in warning %}
+<div><font color='{{item['level_rgb']}}'>{{item['text']}}</font></div>
+{% endfor %}
+</p>{% endif %}<table>
+	<tr>
+		<th align='left'>天气</th>
+		<td rowspan='3' width='10px'></td>
+		<td>{{now['text']}}</td>
+		<td rowspan='3' width='20px'></td>
+		<th align='left'>温度</th>
+		<td rowspan='3' width='10px'></td>
+		<td>{{now['temp']}}℃</td>
+		<td rowspan='2' width='20px'></td>
+		<th align='left'>空气污染指数</th>
+		<td rowspan='2' width='10px'></td>
+		<td>{{air['aqi']}}</td>
+	</tr>
+	<tr>
+		<th align='left'>湿度</th>
+		<td>{{now['humidity']}}%</td>
+		<th align='left'>能见度</th>
+		<td>{{now['vis']}}km</td>
+		<th align='left'>空气质量等级</th>
+		<td>{{air['category']}}</td>
+	</tr>
+	<tr>
+		<th align='left'>风向</th>
+		<td>{{now['windDir']}}</td>
+		<th align='left'>风速</th>
+		<td colspan=5>{{now['windScale']}}级（{{now['windSpeed']}}km/h）</td>
+	</tr>
+</table>
+<p align='center'><img src='/static/ELEGLINE.GIF'/></p>
+<h3>6天天气预报</h3>
+<table width='100%'>
+	<tr>
+		<th align='left'>日期</th>
+		<th align='left'>天气</th>
+		<th align='left'>温度</th>
+		<th align='left'>湿度</th>
+		<th align='left'>风向</th>
+		<th align='left'>风速</th>
+	</tr>
+{% for item in forecast %}
+	<tr>
+		<td>{{item['fxDate']}}</td>
+		<td>{{item['textDay']}}/{{item['textNight']}}</td>
+		<td>{{item['tempMin']}}℃/{{item['tempMax']}}℃</td>
+		<td>{{item['humidity']}}%</td>
+		<td>{{item['windDirDay']}}/{{item['windDirNight']}}</td>
+		<td>{{item['windScaleDay']}}级/{{item['windScaleNight']}}级</td>
+	</tr>
+{% endfor %}
+</table>
+<p align='center'><img src='/static/ELEGLINE.GIF'/></p>
+<h3>气象指数</h3>
+<ul>
+{% for sugg in indices %}
+	<li>
+		<b>{{sugg['name']}}</b>：{{sugg['category']}}
+		<div>{{sugg['text']}}</div>
+	</li>
+{% endfor %}
+</ul>
+<p align='center'><img src='/static/ELEGLINE.GIF'/></p>
+{% endblock %}

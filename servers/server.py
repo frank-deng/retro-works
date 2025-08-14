@@ -3,7 +3,6 @@
 import logging
 import sys
 import tomllib
-import importlib
 import asyncio
 import signal
 import click
@@ -11,6 +10,7 @@ import os
 import platform
 import time
 from util import Logger
+from util import load_module
 from util.watchdog import watchdog
 from util.daemon import daemonize
 from util.daemon import stop_daemon
@@ -23,6 +23,7 @@ class ServiceManager(Logger):
     def __init__(self,config):
         self.__conf=config
         self.__modules=[]
+        self.__wait_close=asyncio.Event()
         for module in config['modules']:
             server_instance=self.__server_init(module,self.__conf)
             if server_instance is None:
@@ -34,15 +35,10 @@ class ServiceManager(Logger):
     def __server_init(self,module_path,config):
         server_instance=None
         try:
-            selector=None
-            if ':' in module_path:
-                module_path,selector=module_path.split(':')
-            module=importlib.import_module(module_path)
-            if selector is not None:
-                module=getattr(module,selector)
+            module=load_module(module_path)
             server_instance=module(config)
         except Exception as e:
-            self.logger.error(f'Failed to load server {server_key}: {e}',
+            self.logger.error(f'Failed to load module {module_path}: {e}',
                               exc_info=True)
         return server_instance
 
@@ -64,6 +60,10 @@ class ServiceManager(Logger):
             return None,e
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
+        await self.__wait_close.wait()
+        for server in self.__modules:
+            if hasattr(server,'close'):
+                server.close()
         await asyncio.gather(*[self.__module_aexit(s,exc_type,exc_val,exc_tb) \
                 for s in self.__modules])
 
@@ -73,9 +73,8 @@ class ServiceManager(Logger):
         except Exception as e:
             self.logger.error(e,exc_info=True)
 
-    def close(self):
-        for server in self.__modules:
-            server.close()
+    def close(self,*args):
+        self.__wait_close.set()
 
 
 @watchdog('watchdog_timeout')

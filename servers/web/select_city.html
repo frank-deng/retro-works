@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block content %}<form action='select_city.asp' method='get'>
+请输入城市：<input type='text' name='city' value='{{city}}'><input type='submit' value='搜索'><hr>
+</form>
+{% if cityList %}<h3>请选择城市</h3>
+{% for city in cityList %}
+<li><a href='weather.asp?location={{city['id']}}'>{{city['name']}}</a></li>
+{% endfor %}
+</ul>{% endif %}{% endblock %}
