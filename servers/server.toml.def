@@ -16,7 +16,7 @@ encoding="gbk"
 template_dir="web"
 image_max_size=[360,960]
 links=[
-	{label="我的博客",link="blogs"},
+	{label="我的博客",link="blogs/"},
 	{label="天气预报",link="weather.asp"}
 ]
 tianapi_key="xxx"
@@ -45,6 +45,12 @@ module="web.news:news_handler"
 [[web.routes]]
 path="/news_images/{image_key}.jpg"
 module="web.news:news_image_handler"
+
+[[web.routes]]
+path="/blogs/{path:.*}"
+module="web:StaticWithIndex"
+rootdir="../blog-maker/dist"
+index=["index.html","index.htm"]
 
 [mail.pop3]
 host="127.0.0.1"

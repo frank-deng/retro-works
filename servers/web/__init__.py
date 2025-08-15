@@ -1,12 +1,34 @@
 import asyncio
 import aiohttp
 import aiohttp_jinja2
+import os
+import inspect
 from jinja2 import FileSystemLoader
 from aiohttp import web
 from util import Logger
 from util import load_module
 
 from web.news import NewsManager
+
+class StaticWithIndex(Logger):
+    def __init__(self,route_param):
+        self.__route_param=route_param
+
+    async def __call__(self,req):
+        config=req.app['config']
+        rootdir=os.path.abspath(self.__route_param['rootdir'])
+        path=req.match_info['path'].strip().strip('/')
+        path=os.path.abspath(os.path.join(rootdir,path))
+        self.logger.debug(f'{rootdir}\n{path}')
+        if not path.startswith(rootdir):
+            raise web.HTTPForbidden()
+        if os.path.isfile(path):
+            return web.FileResponse(path)
+        for index_file in self.__route_param.get('index',['index.html']):
+            index_path=os.path.join(path,index_file)
+            if os.path.isfile(index_path):
+                return web.FileResponse(index_path)
+        raise web.HTTPNotFound()
 
 class WebServer(Logger):
     __runner=None
@@ -31,12 +53,15 @@ class WebServer(Logger):
                 return
             if 'static' in route:
                 self.__app.router.add_static(path,route['static'])
+                return
+            methods=route.get('method','GET')
+            module=load_module(route['module'])
+            if inspect.isclass(module):
+                self.__app.router.add_route(methods,path,module(route))
             else:
-                methods=route.get('method','GET')
-                self.__app.router.add_route(methods,path,load_module(route['module']))
+                self.__app.router.add_route(methods,path,module)
         except Exception as e:
             self.logger.error(f'Failed to load route:{e}',exc_info=True)
-
 
     async def __aenter__(self):
         self.__runner=web.AppRunner(self.__app,access_log=None)
