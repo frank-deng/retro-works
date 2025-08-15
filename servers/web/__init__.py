@@ -39,7 +39,7 @@ class WebServer(Logger):
 
 
     async def __aenter__(self):
-        self.__runner=web.AppRunner(self.__app)
+        self.__runner=web.AppRunner(self.__app,access_log=None)
         await self.__runner.setup()
         self.__site=web.TCPSite(self.__runner,self.__host,self.__port)
         await self.__site.start()
