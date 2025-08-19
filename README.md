@@ -176,14 +176,7 @@ UCDOS下运行IP地址计算器 IP Address Calculator Under UCDOS
 实用命令 Useful Commands
 ------------------------
 
-### 制作Windows 3.x下播放的视频 Make Video For Windows 3.x
-
-使用ffmpeg制作可在Windows 3.1下播放的视频  
-Convert video into format accepted by Windows 3.1
-
-	ffmpeg -i input.mp4 -c:v cinepak|msvideo1 -c:a pcm_s16le|pcm_u8|adpcm_ima_wav\
-		-vf "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2"\
-		-r 12 -ac 1 -ar 22050 -y output.avi
+### 制作VCD并在Windows 95下播放
 
 使用ffmpeg制作VCD  
 Convert video into VCD
@@ -199,7 +192,7 @@ Convert video into VCD and split the source video into multiple discs (Maximum 1
 	ffmpeg -ss 00:60:00 -t 00:30:00 -i input.mp4 -target pal-vcd|ntsc-vcd output2.mpg
 	vcdimager -t vcd2 -l "Part 2" -c output2.cue -b output2.bin output2.mpg
 
-Windows 3.2和Windows 95使用**金山影霸II**播放PAL制式VCD，使用XingMPEG Player播放NTSC制式VCD。  
+Windows 95使用**金山影霸II**播放PAL制式VCD，使用XingMPEG Player播放NTSC制式VCD。  
 Under Windows 3.2 and Windows 95, use SoftVCD II (JinShanYinBa II) to play PAL VCD, use XingMPEG Player to play NTSC VCD.
 
 ### 减少CPU占用 Reduce CPU Usage
@@ -225,11 +218,6 @@ For Windows 3.x, copy `WQGHLT.386` to `C:\WINDOWS\SYSTEM\`, then open `C:\WINDOW
 
 Windows 9x需要安装*AmnHLT*或*Amn Refrigerator*。  
 Windows 9x requires installing *AmnHLT* or *Amn Refrigerator*.
-
-### DOS下启用UMB Activate UMB for DOS
-
-在`CONFIG.SYS`中找到内容为`DEVICE=C:\DOS\EMM386.EXE`的行，然后在其后面加上`NOEMS`参数。  
-Open `CONFIG.SYS` and find the line with `DEVICE=C:\DOS\EMM386.EXE`, then append `NOEMS` parameter after it.
 
 ### DOS下添加CD-ROM支持 Add CD-ROM support for MS-DOS
 
@@ -266,12 +254,6 @@ When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk
 选择`Epson LQ1600K`作为打印机驱动程序，之后可以从Windows 3.x的应用程序中使用DOSBox-x的虚拟打印机打印到PNG图片。  
 Select `Epson LQ1600K` as the printer driver, then you can print document into PNG files from Windows 3.x applications via DOSBox-x's virtual printer.
 
-### 不同Linux环境安装编译环境的方式 How To Install Build Environment for Linux
-
-* Debian/Ubuntu: `sudo apt-get install build-essential`
-* Tiny Core: `tce-load -wi compiletc`
-* Termux: `pkg install build-essential`
-
 ### UCDOS WPS更改文字颜色为亮黄色 Change Text Color Into Light Yellow For UCDOS WPS
 
     wps /FE /S
@@ -285,3 +267,4 @@ Mount floppy image under Linux (Use GB2312 for filename encoding)
 
 对于一些BIN/CUE，MDF/MDS等非ISO格式的光盘映像文件，可以尝试在Linux下使用`iat`命令转换成ISO文件  
 For CD-ROM image files in non-ISO format like BIN/CUE, MDF/MDS, etc., try to use `iat` command under Linux to convert them into ISO file.
+
