@@ -55,8 +55,10 @@ Select `Epson LQ1600K` as the printer driver, then you can print document into P
 
 DOSBox-x printer paper size recommends width 83 and height 114, which corresponds to A4 size.
 
-Prevent DOSBox-X From Corrupting Disk Image
--------------------------------------------
+DOSBox-X Configuration Skills
+-----------------------------
 
-Set configuration `locking disk image mount` with `true` in the configuration file of DOSBox-X if poasible. So as to prevent disk image corruption due to multiple running instances writing to the same disk image.
+Set configuration `locking disk image mount` with `true` if poasible. So as to prevent disk image corruption due to multiple running instances writing to the same disk image.
+
+Use configuration `hard drive data rate limit` to specify the speed of hard drive and CD-ROM drive. Use configuration `floppy drive data rate limit` to specify the speed of floppy drive (Some earlier version DOSBox-X did not support adjusting floppy drive speed independently).
 

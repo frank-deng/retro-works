@@ -55,8 +55,10 @@ Windows 3.x下使用DOSBox-x的打印机
 
 DOSBox-x虚拟打印机纸张大小推荐宽83，高114，对应A4纸大小。
 
-DOSBox-X防止硬盘镜像损坏
-------------------------
+DOSBox-X配置技巧
+----------------
 
-如果可能，请在DOSBox-X配置文件中将`locking disk image mount`配置项设为`true`，防止多个运行中的实例写入相同硬盘镜像导致硬盘镜像损坏。
+如果可能，请将`locking disk image mount`配置项设为`true`，防止多个运行中的实例写入相同硬盘镜像导致硬盘镜像损坏。
+
+硬盘/光驱速度可通过`hard drive data rate limit`配置项调整。软驱速度可通过`floppy drive data rate limit`配置项调整（DOSBox-X部分早期版本不支持单独调整软驱速度）。
 
