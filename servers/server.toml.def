@@ -16,7 +16,6 @@ encoding="gbk"
 template_dir="web"
 image_max_size=[360,960]
 links=[
-	{label="我的博客",link="blogs/"},
 	{label="天气预报",link="weather.asp"}
 ]
 tianapi_key="xxx"
