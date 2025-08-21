@@ -30,12 +30,9 @@ if __name__ == '__main__':
     duration = [];
     for arg in args:
         for fname in glob(arg):
-            try:
-                with audioread.audio_open(fname) as f:
-                    duration.append(f.duration);
-                    files.append(fname);
-            except Exception as e:
-                sys.stderr.write(str(e) + "\n");
+            with audioread.audio_open(fname) as f:
+                duration.append(f.duration);
+                files.append(fname);
     
     if len(files) == 0:
         sys.stderr.write("No audio file found.\n");
