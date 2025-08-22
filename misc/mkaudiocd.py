@@ -39,7 +39,7 @@ if __name__ == '__main__':
         exit(1);
 
     try:
-        writeCue(duration, targetCue, targetAudio);
+        writeCue(duration, targetCue, os.path.basename(targetAudio));
     except Exception as e:
         sys.stderr.write(str(e) + "\n");
         exit(1);
