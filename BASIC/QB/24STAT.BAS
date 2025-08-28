@@ -34,7 +34,7 @@ ON KEY(15) GOSUB QuitHandler
 KEY(15) ON
 
 PRINT "Press Esc to exit with current progress saved"
-PRINT USING "Progress: ####/####  ##.#%";IDX,IDXMAX,IDX*100/IDXMAX;
+PRINT USING "Progress: ####/####  ##.#%";IDX,IDXMAX,CDBL(IDX)*100/IDXMAX;
 MOF=IDX\16:MMASK=BM(IDX AND 15)
 WHILE N(0)<=NMAX
   CALL CALC24(N(),IP,MOF,MMASK)
@@ -57,7 +57,7 @@ WHILE N(0)<=NMAX
     IDX=IDX+1
     MOF=IDX\16:MMASK=BM(IDX AND 15)
     LOCATE ,1
-    PRINT USING "Progress: ####/####  ##.#%";IDX,IDXMAX,IDX*100/IDXMAX;
+    PRINT USING "Progress: ####/####  ##.#%";IDX,IDXMAX,CDBL(IDX)*100/IDXMAX;
   END IF
   IF ACT>0 THEN
     CALL SNAPSHOT
@@ -70,7 +70,10 @@ FOR G=0 TO GOALMAX
   PRINT #1,LTRIM$(RTRIM$(STR$(G)));",";LTRIM$(RTRIM$(STR$(COUNTRES(G))))
 NEXT G
 CLOSE #1
-REM KILL FTMP$
+ON ERROR GOTO ErrorHandler
+KILL FTMP$
+KILL FTMP2$
+ON ERROR GOTO 0
 END
 
 ErrorHandler:
