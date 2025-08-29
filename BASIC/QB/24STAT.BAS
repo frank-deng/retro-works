@@ -27,15 +27,10 @@ ELSE
   ACT=0
 END IF
 
-ON TIMER(120) GOSUB SaveHandler
-TIMER ON
-KEY 15,CHR$(0)+CHR$(1)
-ON KEY(15) GOSUB QuitHandler
-KEY(15) ON
-
-PRINT "Press Esc to exit with current progress saved"
+PRINT "Press any key to exit with current progress saved"
 PRINT USING "Processed: ####/#### ###.#%  ";IDX,IDXMAX,CDBL(IDX)*100/IDXMAX;
 MOF=IDX\16:MMASK=BM(IDX AND 15)
+T0#=TIMER
 WHILE N(0)<=NMAX
   CALL CALC24(N(),IP,MOF,MMASK)
   IP=IP+1
@@ -59,10 +54,9 @@ WHILE N(0)<=NMAX
     LOCATE ,1
     PRINT USING "Processed: ####/#### ###.#%  ";IDX,IDXMAX,CDBL(IDX)*100/IDXMAX;
   END IF
-  IF ACT>0 THEN
-    CALL SNAPSHOT
-    IF ACT=2 THEN PRINT "":END
-  END IF
+  IF INKEY$<>"" THEN CALL SNAPSHOT:END
+  T#=TIMER
+  IF T#<T0# OR T#-T0#>120 THEN T0#=T#:CALL SNAPSHOT
 WEND
 PRINT ""
 OPEN FRES$ FOR OUTPUT AS #1
@@ -79,12 +73,6 @@ END
 
 ErrorHandler:
 ACT=2:RESUME NEXT
-
-SaveHandler:
-ACT=1:RETURN
-
-QuitHandler:
-ACT=2:RETURN
 
 SUB SNAPSHOT
   OPEN FTMP$ FOR OUTPUT AS #1
