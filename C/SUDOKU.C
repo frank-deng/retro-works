@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
 
 #define HELP_TEXT "Usage:\n    %s file\n    %s map_file file\n"
@@ -24,14 +22,14 @@ enum{
 };
 
 typedef struct {
-    uint8_t x;
-    uint8_t y;
-    uint8_t grp;
-    uint16_t map;
-    uint8_t last_num;
+    unsigned char x;
+    unsigned char y;
+    unsigned char grp;
+    unsigned short map;
+    unsigned char last_num;
 } stack_item_t;
 
-static uint8_t group[9][9] = {
+static unsigned char group[9][9] = {
     {0,0,0,1,1,1,2,2,2},
     {0,0,0,1,1,1,2,2,2},
     {0,0,0,1,1,1,2,2,2},
@@ -42,7 +40,7 @@ static uint8_t group[9][9] = {
     {6,6,6,7,7,7,8,8,8},
     {6,6,6,7,7,7,8,8,8},
 };
-static uint8_t board[9][9] = {
+static unsigned char board[9][9] = {
     {0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0},
@@ -54,13 +52,13 @@ static uint8_t board[9][9] = {
     {0,0,0,0,0,0,0,0,0},
 };
 
-static uint16_t mapx[9],mapy[9],mapgrp[9];
+static unsigned short mapx[9],mapy[9],mapgrp[9];
 static stack_item_t stack[81];
-static uint8_t stack_len=0;
+static unsigned char stack_len=0;
 
-static inline uint8_t trailing_zeros(uint16_t n)
+static unsigned char trailing_zeros(unsigned short n)
 {
-    uint8_t res=0;
+    unsigned char res=0;
     if(0==(n&0xff)){
         res+=8;
         n>>=8;
@@ -79,7 +77,7 @@ static inline uint8_t trailing_zeros(uint16_t n)
     }
     return res;
 }
-static inline uint8_t next_num(uint16_t map, uint8_t n)
+static unsigned char next_num(unsigned short map, unsigned char n)
 {
     if(0==map){
         return 0;
@@ -92,8 +90,8 @@ static inline uint8_t next_num(uint16_t map, uint8_t n)
     }
     return 0;
 }
-void printboard(bool jigsaw){
-    uint8_t x, y;
+void printboard(int jigsaw){
+    unsigned char x, y;
     for (y = 0; y < 9; y++){
         for (x = 0; x < 9; x++){
             printf("%d ", board[y][x]);
@@ -109,7 +107,7 @@ void printboard(bool jigsaw){
 }
 int read_jigsaw_map(char *filename)
 {
-    uint8_t x, y, grp_cells[9]={0,0,0,0,0,0,0,0,0}, i;
+    unsigned char x, y, grp_cells[9]={0,0,0,0,0,0,0,0,0}, i;
     unsigned int n;
     FILE *fp = fopen(filename, "r");
     if (NULL==fp){
@@ -139,8 +137,8 @@ int read_jigsaw_map(char *filename)
     return E_OK;
 }
 int read_sudoku(char *filename){
-    uint8_t x, y, grp;
-    uint16_t nmap;
+    unsigned char x, y, grp;
+    unsigned short nmap;
     stack_item_t *sp=stack;
     unsigned int n;
     int ret=E_OK;
@@ -166,7 +164,7 @@ int read_sudoku(char *filename){
                 sp++;
                 stack_len++;
             } else {
-                nmap = (((uint16_t)1)<<n);
+                nmap = (((unsigned short)1)<<n);
                 if((mapx[x] & nmap)||(mapy[y] & nmap)||(mapgrp[grp] & nmap)){
                     fprintf(stderr, DUP_NUM_POS, y+1, x+1);
                     ret=E_INVAL;
@@ -183,12 +181,12 @@ finally_exit:
     return ret;
 }
 int calc_sudoku_step1(){
-    uint8_t x, y, grp, n, i;
-    uint16_t nmap;
-    bool running=true;
+    unsigned char x, y, grp, n, i;
+    unsigned short nmap;
+    int running=1;
     stack_item_t *sp=stack, *sp0=stack;
     while(running){
-        running=false;
+        running=0;
         sp=sp0=stack;
         for (i = 0; i < stack_len; i++, sp++) {
             x = sp->x;
@@ -208,7 +206,7 @@ int calc_sudoku_step1(){
                 mapx[x] |= nmap;
                 mapy[y] |= nmap;
                 mapgrp[grp] |= nmap;
-                running=true;
+                running=1;
             }
         }
         stack_len = sp0-stack;
@@ -216,8 +214,8 @@ int calc_sudoku_step1(){
     return ((stack_len==0) ? E_OK : E_AGAIN);
 }
 int calc_sudoku_step2(){
-    uint8_t x, y, grp, n, i;
-    uint16_t map;
+    unsigned char x, y, grp, n, i;
+    unsigned short map;
     stack_item_t *sp=stack, *stack_tail=stack+stack_len;
     for (i = 0; i < stack_len; i++, sp++) {
         x = sp->x;
@@ -296,3 +294,4 @@ int main(int argc, char *argv[]){
     printboard(mapfile!=NULL);
     return 0;
 }
+
