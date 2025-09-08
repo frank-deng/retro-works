@@ -1,7 +1,5 @@
------
-title: Configure PPP Internet Access
-tags: [Internet]
------
+Configure PPP Internet Access
+=============================
 
 Using PPP server, Windows 3.x/95 VM can access the HTML website deployed at server side via PPP protocol.
 

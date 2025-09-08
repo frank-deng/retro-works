@@ -1,7 +1,5 @@
------
-title: DOS Skills
-tags: [DOS]
------
+DOS Skills
+==========
 
 Add CD-ROM support for MS-DOS
 -----------------------------

@@ -1,7 +1,5 @@
------
-title: Dial-In Terminal Connection Server
-tags: [Server,Linux]
------
+Dial-In Terminal Connection Server
+==================================
 
 Use terminal emulators like Telix, HyperTerminal to dial to the dial-up terminal connection server.
 

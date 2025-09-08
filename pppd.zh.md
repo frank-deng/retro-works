@@ -1,7 +1,5 @@
------
-title: PPP上网配置
-tags: [Internet]
------
+PPP上网配置
+===========
 
 使用PPP服务器，Windows 3.x/95虚拟机里的浏览器可通过PPP协议访问部署在服务端的HTML站点。
 
