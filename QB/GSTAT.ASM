@@ -1,24 +1,26 @@
-org 0h
-;ans,guess,table_len,ds,si,es,di
+;How to compile
+;tasm gstat.asm
+;tlink /t /x gstat.obj
+;bsave.exe gstat.com gstat.bin
+;Params: ans,guess,table_len,si,ds,di,es
+code segment
+org 100h
+assume cs:code
+start:
 push bp
 mov bp,sp
-sub sp,4
-mov word[bp-2],0
+sub sp,2
+push ds
+push es
+mov word ptr[bp-2],0
 mov ax,[bp+6]
 mov bx,[bp+8]
 call comp
-cmp ax,0x40
-je main_finish
-push ds
 mov dx,ax
 mov si,[bp+10]
 mov cx,[si]
-mov ax,[bp+12]
-mov ds,ax
-mov si,[bp+14]
-mov ax,[bp+16]
-mov es,ax
-mov di,[bp+18]
+lds si,[bp+12]
+les di,[bp+16]
 proc_loop:
 mov ax,[si]
 cmp ax,bx
@@ -28,28 +30,21 @@ cmp ax,dx
 jne proc_next_num
 mov ax,[si]
 mov es:[di],ax
-inc di
-inc di
-inc word[bp-2]
+add di,2
+inc word ptr[bp-2]
 proc_next_num:
-inc si
-inc si
+add si,2
 loop proc_loop
+pop es
 pop ds
 mov ax,[bp-2]
 mov si,[bp+10]
 mov [si],ax
-main_finish:
 mov sp,bp
 pop bp
 retf 14
 
 comp:
-cmp ax,bx
-jne comp_main
-mov ax,0x40
-ret
-comp_main:
 push bp
 mov bp,sp
 sub sp,20
@@ -63,29 +58,26 @@ mov dx,ax
 mov ax,ss
 mov es,ax
 xor ax,ax
-mov di,bp
-sub di,20
+lea di,[bp-20]
 mov cx,10
 cld
 rep stosw
 mov cx,bx
-and cx,0xf0f
+and cx,0f0fh
 call comp_writeres
 mov cx,bx
 shr cx,4
-and cx,0xf0f
+and cx,0f0fh
 call comp_writeres
 mov cx,dx
-and cx,0xf0f
+and cx,0f0fh
 call comp_writeres
 mov cx,dx
 shr cx,4
-and cx,0xf0f
+and cx,0f0fh
 call comp_writeres
 mov cx,10
-mov di,bp
-dec di
-dec di
+lea di,[bp-2]
 comp_countb:
 mov bx,ss:[di]
 cmp bh,bl
@@ -95,8 +87,7 @@ jmp comp_countb_next
 comp_countb_min:
 add al,bh
 comp_countb_next:
-dec di
-dec di
+sub di,2
 loop comp_countb
 comp_finish:
 pop di
@@ -114,13 +105,15 @@ mov di,cx
 xor ch,ch
 xchg cx,di
 shl di,1
-inc byte ss:[bp-20+di]
+inc byte ptr ss:[bp-20+di]
 mov cl,ch
 xor ch,ch
 mov di,cx
 shl di,1
-inc byte ss:[bp-19+di]
+inc byte ptr ss:[bp-19+di]
 ret
 comp_a:
-add al,0x10
+add al,10h
 ret
+code ends
+end start
