@@ -1,7 +1,7 @@
-;How to compile
-;tasm gstat.asm
-;tlink /t /x gstat.obj
-;bsave.exe gstat.com gstat.bin
+;How to compile:
+;TASM UTIL
+;TLINK /t /x UTIL
+;REN UTIL.COM UTIL.BIN
 code segment
 org 100h
 assume cs:code
@@ -65,7 +65,7 @@ mov sp,bp
 pop bp
 retf 8
 
-; color,x,y,w,h,si,ds
+;Params: color,x,y,w,h,si,ds
 drawbitmap:
 push bp
 mov bp,sp

@@ -1,6 +1,7 @@
-;How to compile
-;tasm gstat.asm
-;tlink /t /x gstat.obj
+;How to compile:
+;TASM GSTAT
+;TLINK /t /x GSTAT
+;REN GSTAT.COM GSTAT.BIN
 ;Params: ans,guess,table_len,si,ds,di,es
 code segment
 org 100h
