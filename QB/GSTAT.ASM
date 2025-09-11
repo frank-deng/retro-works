@@ -1,12 +1,16 @@
 ;How to compile
 ;tasm gstat.asm
 ;tlink /t /x gstat.obj
-;bsave.exe gstat.com gstat.bin
 ;Params: ans,guess,table_len,si,ds,di,es
 code segment
 org 100h
 assume cs:code
 start:
+db 0fdh
+dw 0
+dw 100h
+dw endcode-startcode
+startcode:
 push bp
 mov bp,sp
 sub sp,2
@@ -115,5 +119,7 @@ ret
 comp_a:
 add al,10h
 ret
+endcode:
+db 1ah
 code ends
 end start
