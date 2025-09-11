@@ -34,6 +34,18 @@ mov ax,11h
 int 79h
 jne envtestend
 mov word ptr[si],3
+mov ax,0ff00h
+mov bx,0a03h
+push es
+push si
+push bp
+int 10h
+pop bp
+pop si
+pop es
+cmp al,0ffh
+je envtestend
+mov word ptr[si],7
 envtestend:
 mov sp,bp
 pop bp
