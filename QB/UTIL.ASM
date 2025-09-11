@@ -6,8 +6,14 @@ code segment
 org 100h
 assume cs:code
 start:
-dw envtest-start
-dw getcharbitmap-start
+db 0fdh
+dw 0
+dw 100h
+dw codeend-codestart
+codestart:
+dw envtest-codestart
+dw getcharbitmap-codestart
+dw drawbitmap-codestart
 
 envtest:
 push bp
@@ -46,6 +52,60 @@ pop ds
 mov sp,bp
 pop bp
 retf 8
+
+; color,x,y,w,h,si,ds
+drawbitmap:
+push bp
+mov bp,sp
+push ds
+lds si,[bp+16]
+mov dx,[bp+10]
+mov ax,[bp+6]
+
+yloop:
+cmp word ptr[bp+14],0
+je drawfinish
+mov cx,[bp+8]
+mov bl,80h
+mov bh,[si]
+mov di,[bp+12]
+
+xloop:
+cmp di,0
+je xloopend
+mov ah,bh
+and ah,bl
+jz skipdraw
+mov ah,0ch
+int 10h
+skipdraw:
+cmp bl,1
+jne keepcurbytex
+inc si
+mov bh,[si]
+keepcurbytex:
+ror bl,1
+inc cx
+dec di
+jmp xloop
+
+xloopend:
+cmp bl,80h
+je keepcurbyte
+inc si
+keepcurbyte:
+inc dx
+dec word ptr[bp+14]
+jmp yloop
+
+drawfinish:
+pop ds
+mov sp,bp
+pop bp
+retf 14
+
+codeend:
+db 1ah
 
 code ends
 end start
