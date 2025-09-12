@@ -4,8 +4,12 @@
 #include <time.h>
 
 #define HELP_TEXT "Usage:\n    %s file\n    %s map_file file\n"
-#define START_CALC "Calculating Sudoku..."
-#define END_CALC "Finished.\n"
+#define MSG_TIMEOUT (2)
+#define CYCLES_BEFORE_MSG (256)
+#define CLR_LINE "\r                             \r"
+#define CALC_PROC CLR_LINE##"Calculating Sudoku...%c"
+#define END_CALC CLR_LINE##"\a\r"
+
 #define INVALID_GROUP_NUM_POS "Invalid group number at line %d, column %d.\n"
 #define GROUP_MALFORMED "Group #%u has %u cells, not 9, please check.\n"
 #define INVALID_NUM_POS "Invalid number at line %d, column %d.\n"
@@ -238,6 +242,34 @@ int calc_sudoku_step1(){
     }
     return ((stack_len==0) ? E_OK : E_AGAIN);
 }
+void display_msg(int finish)
+{
+    static time_t ts=0;
+    static u16 counter=0;
+    static int showmsg=0;
+    time_t tnow;
+    static char ch[]={'-','\\','|','/'};
+    if(ts==0){
+        ts=time(NULL);
+    }
+    if(showmsg && finish){
+	fprintf(stderr,END_CALC);
+	return;
+    }
+    if(counter<CYCLES_BEFORE_MSG){
+	counter++;
+	return;
+    }
+    counter=0;
+    tnow=time(NULL);
+    if(showmsg && tnow!=ts){
+	ts=tnow;
+	fprintf(stderr,CALC_PROC,ch[tnow&3]);
+    }else if(!showmsg && (tnow-ts)>=MSG_TIMEOUT){
+	ts=tnow;
+	showmsg=1;
+    }
+}
 int calc_sudoku_step2(){
     u8 x, y, grp, n, i;
     u16 map;
@@ -280,7 +312,9 @@ int calc_sudoku_step2(){
             mapgrp[grp]|=map;
             sp++;
         }
+	display_msg(0);
     }
+    display_msg(1);
     return E_OK;
 }
 void print_help(const char *app_name)
