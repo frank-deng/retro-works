@@ -6,20 +6,17 @@
 #define HELP_TEXT "Usage:\n    %s file\n    %s map_file file\n"
 #define MSG_TIMEOUT (2)
 #define CYCLES_BEFORE_MSG (256)
-#define CLR_LINE "\r                             \r"
-#define CALC_PROC CLR_LINE##"Calculating Sudoku...%c"
-#define END_CALC CLR_LINE##"\a\r"
+#define CALC_PROC "\rCalculating...%c"
+#define END_CALC "\a\r"
 
-#define INVALID_GROUP_NUM_POS "Invalid group number at line %d, column %d.\n"
-#define GROUP_MALFORMED "Group #%u has %u cells, not 9, please check.\n"
-#define INVALID_NUM_POS "Invalid number at line %d, column %d.\n"
-
-#define LINE_TOO_MANY_NUM "Too many numbers at line %u\n"
-#define DUP_NUM_POS "Duplicated number detected at line %u, row %u, column %u.\n"
 #define OPEN_FILE_FAILED "Failed to open Sudoku file.\n"
-
+#define LINE_NOT_NINE_NUM "Not 9 numbers at line %u.\n"
+#define NOT_NINE_ROWS "Rows must be 9.\n"
 #define OPEN_JIGSAW_FILE_FAILED "Failed to open Sudoku jigsaw map file.\n"
-#define NO_ANSWER_POS "No ansert at line %d, column %d.\n"
+#define GROUP_TOO_MANY_CELLS "Group #%u has more than 9 cells.\n"
+#define DUP_NUM_POS "Duplicated number at line %u, row %u, column %u.\n"
+
+#define NO_ANSWER_POS "No answer at row %d, column %d.\n"
 #define NO_ANSWER "No answer.\n"
 
 typedef unsigned char u8;
@@ -118,34 +115,62 @@ void printboard(int jigsaw){
 }
 int read_jigsaw_map(char *filename)
 {
-    u8 x, y, grp_cells[81], i;
-    unsigned int n;
+    u8 x=0, y=0, grp_cells[9]={0,0,0,0,0,0,0,0,0}, n;
+    u16 linenum=1;
+    char buf[80],*p;
+    int ret=E_OK;
     FILE *fp = fopen(filename, "r");
     if (NULL==fp){
         fprintf(stderr, OPEN_JIGSAW_FILE_FAILED);
         return E_FAIL;
     }
-    for (y = 0; y < 9; y++){
-        for (x = 0; x < 9; x++){
-            fscanf(fp, "%u", &n);
-            if (n > 9 || n < 1) {
-                fclose(fp);
-                fprintf(stderr, INVALID_GROUP_NUM_POS, y+1, x+1);
-                return E_INVAL;
-            }
-            i = n-1;
-            group[y][x]=i;
-            grp_cells[i]++;
-        }
+    while(fgets(buf,sizeof(buf),fp)!=NULL){
+	if(buf[0]=='#'){
+	    linenum++;
+	    continue;
+	}
+	x=0;
+	for(p=buf; *p!='\0' && (p-buf)<sizeof(buf); p++){
+	    if(*p<'1' || *p>'9'){
+                continue;
+	    }
+	    if(x>=9){
+                fprintf(stderr,LINE_NOT_NINE_NUM,linenum);
+                ret=E_INVAL;
+                goto finally_exit;
+	    }
+	    n=*p-'1';
+	    group[y][x]=n;
+            grp_cells[n]++;
+	    if(grp_cells[n]>9){
+                fprintf(stderr,GROUP_TOO_MANY_CELLS,n+1);
+                ret=E_INVAL;
+                goto finally_exit;
+	    }
+	    x++;
+	}
+	if(x>0){
+	    if(y>=9){
+                fprintf(stderr,NOT_NINE_ROWS);
+                ret=E_INVAL;
+                goto finally_exit;
+	    }else if(x!=9){
+                fprintf(stderr,LINE_NOT_NINE_NUM,linenum);
+                ret=E_INVAL;
+                goto finally_exit;
+	    }
+	    y++;
+	}
+	linenum++;
     }
+    if(y!=9){
+        fprintf(stderr,NOT_NINE_ROWS);
+        ret=E_INVAL;
+        goto finally_exit;
+    }
+finally_exit:
     fclose(fp);
-    for(i=0; i<9; i++){
-        if(grp_cells[i] != 9){
-            fprintf(stderr, GROUP_MALFORMED, i+1, grp_cells[i]);
-            return E_INVAL;
-        }
-    }
-    return E_OK;
+    return ret;
 }
 int read_sudoku(char *filename){
     u8 x=0, y=0, grp, n;
@@ -169,7 +194,7 @@ int read_sudoku(char *filename){
                 continue;
 	    }
 	    if(x>=9){
-                fprintf(stderr,LINE_TOO_MANY_NUM,linenum);
+                fprintf(stderr,LINE_NOT_NINE_NUM,linenum);
                 ret=E_INVAL;
                 goto finally_exit;
 	    }
@@ -186,7 +211,7 @@ int read_sudoku(char *filename){
 		nmap=1;
 		nmap<<=n;
                 if((mapx[x] & nmap)||(mapy[y] & nmap)||(mapgrp[grp] & nmap)){
-                    fprintf(stderr, DUP_NUM_POS, y+1, x+1);
+                    fprintf(stderr, DUP_NUM_POS, linenum, y+1, x+1);
                     ret=E_INVAL;
                     goto finally_exit;
                 }
@@ -197,13 +222,23 @@ int read_sudoku(char *filename){
 	    x++;
 	}
 	if(x>0){
-	    if(x!=9 || y>=9){
+	    if(y>=9){
+                fprintf(stderr,NOT_NINE_ROWS);
+                ret=E_INVAL;
+                goto finally_exit;
+	    }else if(x!=9){
+                fprintf(stderr,LINE_NOT_NINE_NUM,linenum);
                 ret=E_INVAL;
                 goto finally_exit;
 	    }
 	    y++;
 	}
 	linenum++;
+    }
+    if(y!=9){
+        fprintf(stderr,NOT_NINE_ROWS);
+        ret=E_INVAL;
+        goto finally_exit;
     }
 finally_exit:
     fclose(fp);
