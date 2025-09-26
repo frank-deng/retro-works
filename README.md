@@ -10,9 +10,9 @@ Retro Programming Works 怀旧编程作品
 
 ### 配置 Configuration
 
-* CPU 80486-DX4
-* 8M RAM
-* 512M HDD
+* CPU 80486DX4-100
+* 16M RAM
+* 1G HDD
 * S3 Graphics Adapter with 1M VRAM
 * 3.5 Inch Floppy Drive x1
 * CD-ROM
