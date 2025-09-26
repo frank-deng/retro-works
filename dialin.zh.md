@@ -15,7 +15,7 @@
 安装`socat`后，新建`/usr/local/bin/dialin_login.sh`并设置权限为`500`或`700`，内容如下：
 
 	#!/bin/bash
-	TERM='ansi.sys'
+	TERM='ansi'
 	TTY=$(tty)
 	TTY=${TTY#/dev/}
 	while true; do

@@ -15,7 +15,7 @@ Deployment
 After installing `socat`, create `/usr/local/bin/dialin_login.sh` and set the permission as `500` or `700`, file content is as following:
 
 	#!/bin/bash
-	TERM='ansi.sys'
+	TERM='ansi'
 	TTY=$(tty)
 	TTY=${TTY#/dev/}
 	while true; do

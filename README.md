@@ -10,12 +10,13 @@ Retro Programming Works 怀旧编程作品
 
 ### 配置 Configuration
 
-* CPU 80486DX2 66MHz
+* CPU 80486-DX4
 * 8M RAM
 * 512M HDD
-* S3 864 Graphics Adapter with 512k VRAM
+* S3 Graphics Adapter with 1M VRAM
+* 3.5 Inch Floppy Drive x1
 * CD-ROM
-* Sound Blaster 16 With Wavetable Daughterboard
+* Sound Blaster 16
 * Mouse
 * 56k Modem
 
@@ -23,11 +24,9 @@ Retro Programming Works 怀旧编程作品
 
 * BASIC编程 BASIC Programming
 * C/C++编程 C/C++ Programming
-* 英语学习 English learning
 * 英汉字典 English-Chinese dictionary
 * 中英文文字处理 Chinese & English text processing
 * 电子表格和图表处理 Spreadsheet and chart processing
-* 多媒体光盘浏览 Viewing multimedia CDs
 * 图片浏览 Image viewing
 * 音乐和视频播放 Music & video playback
 * 拨号上网 Surfing online via dial-up network
