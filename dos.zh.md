@@ -32,6 +32,21 @@ Windows 3.x需要将`WQGHLT.386`复制到`C:\WINDOWS\SYSTEM\`，然后打开`C:\
 
 	device=wqghlt.386
 
+DOS优化内存配置
+---------------
+
+`CONFIG.SYS`开头添加以下配置：
+
+	DEVICE=C:\DOS\HIMEM.SYS
+	DEVICE=C:\DOS\EMM386.EXE NOEMS
+	DOS=HIGH,UMB
+
+之后的模块用`DEVICEHIGH`加载。
+
+`AUTOEXEC.BAT`中的常驻命令添加`LH`前缀。
+
+可使用DOS自带的`MEMMAKER`命令腾出更多常规内存。
+
 UCDOS WPS更改颜色
 -----------------
 

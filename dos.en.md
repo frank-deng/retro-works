@@ -32,6 +32,21 @@ For Windows 3.x, copy `WQGHLT.386` to `C:\WINDOWS\SYSTEM\`, then open `C:\WINDOW
 
 	device=wqghlt.386
 
+Optimize Memory For DOS
+-----------------------
+
+Add the following configuration to the start of `CONFIG.SYS`:
+
+	DEVICE=C:\DOS\HIMEM.SYS
+	DEVICE=C:\DOS\EMM386.EXE NOEMS
+	DOS=HIGH,UMB
+
+Use `DEVICEHIGH` to load more modules.
+
+Residental commands in `AUTOEXEC.BAT` add `LH` prefix.
+
+Use DOS built-in `MEMMAKER` command to spare more convensional memory.
+
 Change Text Color For UCDOS WPS
 -------------------------------
 
