@@ -35,6 +35,7 @@ Windows 3.2下推荐安装以下软件：
 * Microsoft Office 4.2（需要精选要安装的组件，详细见“Microsoft Office 4.2安装说明”）
 * 长城全真中文字体
 * LView Pro（简单图片处理，可添加文字）
+* 五笔字形输入法
 
 Microsoft Office 4.2安装说明
 ----------------------------
