@@ -23,14 +23,12 @@ Retro Programming Works 怀旧编程作品
 ### 主要用途 Main Usage
 
 * BASIC编程 BASIC Programming
-* C/C++编程 C/C++ Programming
 * 英汉字典 English-Chinese dictionary
-* 中英文文字处理 Chinese & English text processing
-* 电子表格和图表处理 Spreadsheet and chart processing
+* 文字处理 Text processing
+* 电子表格 Spreadsheet processing
 * 图片浏览 Image viewing
-* 音乐和视频播放 Music & video playback
 * 拨号上网 Surfing online via dial-up network
-* 拨号连接远程服务器 Connecting to remote server via dial-up network
+* 拨号连接远程服务器 Connecting to remote server via dial-up
 * （禁止游戏 NO GAMING）
 
 8086 PC
