@@ -12,7 +12,7 @@ Retro Programming Works 怀旧编程作品
 
 * CPU 80486DX4-100
 * 8M RAM
-* 512M HDD + 1G HDD
+* 512M HDD
 * S3 Graphics Adapter with 512k VRAM
 * 3.5 Inch Floppy Drive x1
 * CD-ROM
@@ -52,4 +52,25 @@ Retro Programming Works 怀旧编程作品
 * WPS中英文文字处理 WPS Chinese & English Text Processing
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
+
+PC9821
+------
+
+### 年代 Era
+
+* 1993 ~ 1995
+
+### 配置 Configuration
+
+* CPU 80486SX-33
+* 4M RAM
+* 128M HDD
+* Mouse
+* 56k Modem
+
+### 主要用途 Main Usage
+
+* 拨号连接远程服务器 Connecting to remote server via dial-up
+* 使用PC98的图形层显示背景图片  
+  Display background image via PC98's graphic layer
 
