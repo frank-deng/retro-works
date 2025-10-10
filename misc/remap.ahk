@@ -30,8 +30,6 @@ LWin & /::vkE2
 ;Disable IME keys
 LWin::Return
 RWin::Return
-Ctrl & Shift::Return
-Ctrl & Space::Return
 LWin & Space::Return
 RWin & Space::Return
 
