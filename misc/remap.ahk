@@ -32,7 +32,9 @@ LWin & /::vkE2
 ;Disable IME keys
 LWin::Return
 RWin::Return
+AppsKey::Return
 LWin & Space::Return
 RWin & Space::Return
+Ctrl & Space::Return
 
 #HotIf
