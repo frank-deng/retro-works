@@ -48,7 +48,7 @@ Microsoft Office 4.2可选组件非常多，部分组件可能存在功能冗余
 * Word只安装本体和“联机帮助、示例”中的 Word帮助、示例
 * Excel除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”
 * Microsoft PowerPoint和Microsoft Office管理器不安装
-* 共享应用程序只安装Equation Editor、WordArt、Media Player
+* 共享应用程序只安装WordArt、Media Player
 * “转换程序、过滤程序和数据存取”中，安装所有文字转换程序和图形过滤程序，数据存取不安装
 * 工具中只安装“MS Info”
 
