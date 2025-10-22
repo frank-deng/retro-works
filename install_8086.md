@@ -4,6 +4,8 @@
 MS-DOS 3.3系统软盘
 ------------------
 
+使用`FORMAT B: /S /8 /V`命令制作可引导系统盘。
+
 MS-DOS 3.3系统盘中推荐放入以下文件：
 
 	ATTRIB.EXE
@@ -18,7 +20,6 @@ MS-DOS 3.3系统盘中推荐放入以下文件：
 	FORMAT.COM
 	GWBASIC.EXE
 	LABEL.COM
-	MODE.COM
 	MORE.COM
 	SYS.COM
 
