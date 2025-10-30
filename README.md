@@ -31,6 +31,10 @@ Retro Programming Works 怀旧编程作品
 * 拨号连接远程服务器 Connecting to remote server via dial-up
 * （禁止游戏 NO GAMING）
 
+### 补充说明
+
+* 为保证可维护性，DOS自带的QBASIC建议将代码规模控制在600行以内，用DEBUG的a命令输入QBASIC程序配套的汇编例程时，建议将指令数控制在200条以内。
+
 8086 PC
 -------
 
