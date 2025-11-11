@@ -1,0 +1,50 @@
+.TITLE:DOSBox-X配置技巧
+.TEXT:3
+如果可能，请将locking disk image mount配置项设为true，防止多个运行中的实例写入相同硬盘镜像导致硬盘镜像损坏。
+硬盘/光驱速度可通过hard drive data rate limit配置项调整。软驱速度可通过floppy drive data rate limit配置项调整（DOSBox-X部分早期版本不支持单独调整软驱速度）。
+
+
+.TITLE:DOS减少CPU占用
+.TEXT:4
+MS-DOS 6.22自带POWER.EXE，在CONFIG.SYS中添加以下配置即可：
+  DEVICEHIGH=C:\DOS\POWER.EXE ADV:MAX
+其它版本的MS-DOS需要将IDLE.COM复制到C:\，然后从AUTOEXEC.BAT中运行该命令。
+IDLE.COM可以在Microsoft Virtual PC 2007中找到。
+
+.TITLE:DOS下添加CD-ROM支持
+.TEXT:7
+将OAKCDROM.SYS和MSCDEX.EXE复制到C:\（OAKCDROM.SYS和MSCDEX.EXE可在Windows 9x的安装光盘中找到）。
+在CONFIG.SYS中添加以下配置：
+  DEVICEHIGH=C:\OAKCDROM.SYS /D:CD1
+  LASTDRIVE=Z
+在AUTOEXEC.BAT中添加以下命令：
+  LH MSCDEX.EXE /D:CD1 /L:Z
+/L:Z用来指定CD-ROM对应的盘符。
+
+.TITLE:UCDOS WPS更改颜色
+.TEXT:4
+UCDOS WPS默认的蓝底绿字难以看清，可用WPS /FE /S命令改为更清楚的蓝底黄字。
+
+用WPS /?命令获取命令行帮助信息。
+
+
+.TITLE:Windows 3.2减少CPU占用
+.TEXT:4
+将WQGHLT.386复制到C:\WINDOWS\SYSTEM\。
+打开C:\WINDOWS\SYSTEM.INI并在[386enh]小节中添加以下配置：
+  device=wqghlt.386
+
+
+.TITLE:Windows 3.x下使用DOSBox-X的打印机
+.TEXT:3
+选择Epson LQ1600K作为打印机驱动程序，之后可以从Windows 3.x的应用程序中使用
+DOSBox-X的虚拟打印机打印到PNG图片。
+DOSBox-X虚拟打印机纸张大小推荐宽83，高114，对应A4纸大小。
+
+.TITLE:如何在Windows 3.x下安装S3显卡驱动
+.TEXT:4
+安装Windows 3.x时使用标准VGA显示驱动，安装完成后在“Windows 设置程序”中更改显卡
+驱动。
+安装显卡驱动时如果提示插入S3 Trio 64V Flat Mode Driver软盘，则此时需要将路径填写成C:\WINDOWS\SYSTEM\以完成显卡驱动的安装。
+
+
