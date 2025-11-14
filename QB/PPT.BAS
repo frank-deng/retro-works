@@ -32,21 +32,22 @@ TYPE FontFormatT
 END TYPE
 COMMON SHARED FFMT AS FontFormatT
 COMMON SHARED SLIDECNT, ACTIONCNT, CURRENTSLIDE, ACTION$, INITCMD AS STRING, FILENAME$
+COMMON SHARED NOTELEN AS INTEGER,NOTECUR AS INTEGER
 DECLARE FUNCTION n$ (n%)
 DECLARE SUB TX (s AS STRING)
 DECLARE SUB DrawText (x AS INTEGER, y AS INTEGER, text AS STRING)
 
 DIM SHARED ASM(100)
 TYPE FontDataT
-    CH0 AS STRING * 1
-    CH1 AS STRING * 1
-    FONT AS INTEGER
-    W AS INTEGER
-    H AS INTEGER
-    TOP AS INTEGER
-    BOTTOM AS INTEGER
-    ATTR AS INTEGER
-    BUFLEN AS INTEGER
+  CH0 AS STRING * 1
+  CH1 AS STRING * 1
+  FONT AS INTEGER
+  W AS INTEGER
+  H AS INTEGER
+  TOP AS INTEGER
+  BOTTOM AS INTEGER
+  ATTR AS INTEGER
+  BUFLEN AS INTEGER
 END TYPE
 DIM SHARED BITMAP(8194) AS INTEGER
 
@@ -54,6 +55,7 @@ DIM SHARED SLIDE(64) AS SlideT
 DIM SHARED CONTENT(2048) AS STRING
 DIM SHARED ACTIONARR(512) AS ActionT
 DIM SHARED MUSIC(64) AS STRING
+DIM SHARED NOTES(64) AS STRING
 
 DEF SEG=VARSEG(ASM(0))
 BLOAD "UTIL.BIN",VARPTR(ASM(0))
@@ -66,22 +68,22 @@ FFMT.W=16
 FFMT.H=16
 FFMT.ATTR=1
 FFMT.CL=7
+NOTELEN=0:NOTECUR=0
 OPEN "LPT3" FOR OUTPUT AS #1
-CLS : INPUT "请输入文件名：", FILENAME$
+CLS
+INPUT "请输入文件名：", FILENAME$
 IF FILENAME$ = "" THEN FILENAME$ = "PPT.TXT"
 PRINT "加载中……"
 CALL LoadData(FILENAME$)
 CALL MainLoop
-TX ("KB1,1M3CU1,1")
+CALL TX("KB1,1M3CU1,1")
 CLOSE
 END
 
 ERROREND:
-ERRVAL = ERR
-TX ("KB1,1M3CU1,1")
-CLOSE
-PRINT "Error:"; ERRVAL; ERL
-END
+CALL TX("KB1,1M3CU1,1"):CLOSE
+PRINT NOTECUR;NOTES(NOTECUR)
+ON ERROR GOTO 0
 
 SUB TX (s AS STRING)
     PRINT #1, CHR$(14); "["; s; "]";
@@ -183,30 +185,48 @@ SUB DisplayData(DT AS STRING)
   END IF
 END SUB
 SUB DisplaySlide (ID AS INTEGER)
-    S=SLIDE(ID).LSTART
-    E=SLIDE(ID).LEND
-    IF S<E THEN
-      FOR I = S TO E-1
-        L=LEN(CONTENT(I)): P=1: DO: P2=INSTR(P+1,CONTENT(I),CHR$(&H0A))
-          IF P2>0 THEN
-            DT$=MID$(CONTENT(I),P,P2-P): P=P2+1
-          ELSE
-            DT$=MID$(CONTENT(I),P): P=0
-          END IF
-          CALL DisplayData(DT$)
-        LOOP UNTIL (P=0)
-      NEXT I
+  STATIC M$,I,S,E
+  S=SLIDE(ID).LSTART
+  E=SLIDE(ID).LEND
+  IF S<E THEN
+    FOR I = S TO E-1
+      L=LEN(CONTENT(I)): P=1: DO: P2=INSTR(P+1,CONTENT(I),CHR$(&H0A))
+        IF P2>0 THEN
+          DT$=MID$(CONTENT(I),P,P2-P): P=P2+1
+        ELSE
+          DT$=MID$(CONTENT(I),P): P=0
+        END IF
+        CALL DisplayData(DT$)
+      LOOP UNTIL (P=0)
+    NEXT I
+  END IF
+  PLAY "MB MN T120 O4"
+  NOTECUR=0:NOTELEN=0:M$=MUSIC(ID):NCNT=0
+  FOR I=0 TO 64:NOTES(I)="":NEXT I
+  I=1:WHILE I<=LEN(M$)
+    C$=MID$(M$,I,1):C2$=MID$(M$,I,2)
+    IF C2$="MF" OR C2$="MB" OR C2$="MN" OR C2$="ML" OR C2$="MS" THEN
+      C$=C2$
+      I=I+2
+    ELSE
+      I=I+1
     END IF
-    IF MUSIC(ID) <> "" THEN PLAY "MB": PLAY "X" + VARPTR$(MUSIC(ID))
+    IF C$<>" " THEN
+      IF INSTR("CDEFGABcdefgab",C$)>0 THEN NCNT=NCNT+1
+      IF NCNT>4 AND NOTELEN<63 THEN NOTELEN=NOTELEN+1:NCNT=0
+      NOTES(NOTELEN)=NOTES(NOTELEN)+C$
+    END IF
+  WEND
+  IF LEN(NOTES(NOTELEN))>0 THEN NOTELEN=NOTELEN+1
 END SUB
 
 FUNCTION GetSlideIdx% (n AS STRING)
-    GetSlideIdx% = -1
-    FOR I = 0 TO SLIDECNT-1 STEP 1
-        IF RTRIM$(n) = RTRIM$(SLIDE(I).SNAME) THEN
-            GetSlideIdx% = I: EXIT FUNCTION
-        END IF
-    NEXT I
+  GetSlideIdx% = -1
+  FOR I = 0 TO SLIDECNT-1 STEP 1
+    IF RTRIM$(n) = RTRIM$(SLIDE(I).SNAME) THEN
+      GetSlideIdx% = I: EXIT FUNCTION
+    END IF
+  NEXT I
 END FUNCTION
 
 SUB ProcessLine (MODE AS STRING, DATATEXT AS STRING)
@@ -218,7 +238,7 @@ SUB ProcessLine (MODE AS STRING, DATATEXT AS STRING)
       IF SLIDE(SLIDECNT-1).LSTART=E THEN
         CONTENT(E) = DATATEXT
         SLIDE(SLIDECNT-1).LEND=E+1
-      ELSEIF LEN(CONTENT(E-1)) + LEN(DATATEXT) > 256 THEN
+      ELSEIF LEN(CONTENT(E-1)) + LEN(DATATEXT) < 256 THEN
         CONTENT(E-1) = CONTENT(E-1) + CHR$(&H0A) + DATATEXT
       ELSE
         CONTENT(E) = DATATEXT
@@ -242,141 +262,143 @@ SUB ProcessLine (MODE AS STRING, DATATEXT AS STRING)
 END SUB
 
 SUB LoadData (FILENAME AS STRING)
-    STATIC INITOK AS INTEGER
-    INITOK=0
-    INITCMD = ""
-    SLIDECNT = 0
-    ACTIONCNT = 0
-    CURRENTSLIDE = 0
-    ACTION$ = ""
-    OPEN FILENAME FOR INPUT AS #2
-    MODE$ = ""
-    DO
+  STATIC INITOK AS INTEGER
+  INITOK=0
+  INITCMD = ""
+  SLIDECNT = 0
+  ACTIONCNT = 0
+  CURRENTSLIDE = 0
+  ACTION$ = ""
+  OPEN FILENAME FOR INPUT AS #2
+  MODE$ = ""
+  DO
+    LINE INPUT #2, DATATEXT$
+    DATATEXT$ = LTRIM$(RTRIM$(DATATEXT$))
+    SELECT CASE DATATEXT$
+      CASE ""
+      CASE ".SLIDE"
+        IF SLIDECNT>65 THEN PANIC("最多支持65页")
+        SLIDECNT = SLIDECNT + 1
+        I=SLIDECNT-1
+        MUSIC(I)=""
         LINE INPUT #2, DATATEXT$
-        DATATEXT$ = LTRIM$(RTRIM$(DATATEXT$))
-        SELECT CASE DATATEXT$
-            CASE ""
-            CASE ".SLIDE"
-                IF SLIDECNT>65 THEN PANIC("最多支持65页")
-                SLIDECNT = SLIDECNT + 1
-                I=SLIDECNT-1
-                LINE INPUT #2, DATATEXT$
-                SLIDE(I).SNAME=DATATEXT$
-                IF I=0 THEN
-                  SLIDE(I).LSTART=0
-                ELSE
-                  SLIDE(I).LSTART=SLIDE(I-1).LEND
-                END IF
-                SLIDE(I).LEND=SLIDE(I).LSTART
-                LCOUNT=0
-            CASE ".INIT"
-                IF INITOK=1 THEN PANIC("只允许出现1次.INIT")
-                INITOK=1
-                MODE$ = DATATEXT$
-            CASE ".CONTENT"
-                MODE$ = DATATEXT$
-            CASE ".ACTION"
-                MODE$ = DATATEXT$
-            CASE ".MUSIC"
-                MODE$ = DATATEXT$
-            CASE ELSE
-                CALL ProcessLine(MODE$, DATATEXT$)
-        END SELECT
-    LOOP UNTIL (EOF(2))
-    CLOSE #2
+        SLIDE(I).SNAME=DATATEXT$
+        IF I=0 THEN
+          SLIDE(I).LSTART=0
+        ELSE
+          SLIDE(I).LSTART=SLIDE(I-1).LEND
+        END IF
+        SLIDE(I).LEND=SLIDE(I).LSTART
+        LCOUNT=0
+      CASE ".INIT"
+        IF INITOK=1 THEN PANIC("只允许出现1次.INIT")
+        INITOK=1
+        MODE$ = DATATEXT$
+      CASE ".CONTENT"
+        MODE$ = DATATEXT$
+      CASE ".ACTION"
+        MODE$ = DATATEXT$
+      CASE ".MUSIC"
+        MODE$ = DATATEXT$
+      CASE ELSE
+        CALL ProcessLine(MODE$, DATATEXT$)
+    END SELECT
+  LOOP UNTIL (EOF(2))
+  CLOSE #2
 END SUB
 
 SUB MainLoop
   ON ERROR GOTO ERROREND
-    TX (INITCMD)
-    CALL DisplaySlide(CURRENTSLIDE)
-    DO
-        'Handle keyboard action
-        K$ = ""
-        DO
-            K$ = INKEY$
-        LOOP WHILE K$ = ""
+  TX (INITCMD)
+  CALL DisplaySlide(CURRENTSLIDE)
+  DO
+    'Handle keyboard action
+    K$="":WHILE K$=""
+      K$=INKEY$
+      IF NOTECUR<NOTELEN AND PLAY(0)<2 THEN
+        PLAY "X"+VARPTR$(NOTES(NOTECUR)):NOTECUR=NOTECUR+1
+      END IF
+    WEND
+    SELECT CASE K$
+      CASE " "
+          K$ = "SPACE"
+      CASE CHR$(27)
+          K$ = "ESC"
+      CASE CHR$(9)
+          K$ = "TAB"
+      CASE CHR$(0) + "G"
+          K$ = "HOME"
+      CASE CHR$(0) + "O"
+          K$ = "END"
+      CASE CHR$(0) + "I"
+          K$ = "PAGEUP"
+      CASE CHR$(0) + "Q"
+          K$ = "PAGEDOWN"
+      CASE CHR$(0) + "H"
+          K$ = "UP"
+      CASE CHR$(0) + "P"
+          K$ = "DOWN"
+      CASE CHR$(0) + "K"
+          K$ = "LEFT"
+      CASE CHR$(0) + "M"
+          K$ = "RIGHT"
+      CASE CHR$(0) + "R"
+          K$ = "INSERT"
+      CASE CHR$(0) + "S"
+          K$ = "DELETE"
+      CASE CHR$(0) + ";"
+          K$ = "F1"
+      CASE CHR$(0) + "<"
+          K$ = "F2"
+      CASE CHR$(0) + "="
+          K$ = "F3"
+      CASE CHR$(0) + ">"
+          K$ = "F4"
+      CASE CHR$(0) + "?"
+          K$ = "F5"
+      CASE CHR$(0) + "@"
+          K$ = "F6"
+      CASE CHR$(0) + "A"
+          K$ = "F7"
+      CASE CHR$(0) + "B"
+          K$ = "F8"
+      CASE CHR$(0) + "C"
+          K$ = "F9"
+      CASE CHR$(0) + "D"
+          K$ = "F10"
+      CASE CHR$(0) + CHR$(133)
+          K$ = "F11"
+      CASE CHR$(0) + CHR$(134)
+          K$ = "F12"
+    END SELECT
 
-        SELECT CASE K$
-            CASE " "
-                K$ = "SPACE"
-            CASE CHR$(27)
-                K$ = "ESC"
-            CASE CHR$(9)
-                K$ = "TAB"
-            CASE CHR$(0) + "G"
-                K$ = "HOME"
-            CASE CHR$(0) + "O"
-                K$ = "END"
-            CASE CHR$(0) + "I"
-                K$ = "PAGEUP"
-            CASE CHR$(0) + "Q"
-                K$ = "PAGEDOWN"
-            CASE CHR$(0) + "H"
-                K$ = "UP"
-            CASE CHR$(0) + "P"
-                K$ = "DOWN"
-            CASE CHR$(0) + "K"
-                K$ = "LEFT"
-            CASE CHR$(0) + "M"
-                K$ = "RIGHT"
-            CASE CHR$(0) + "R"
-                K$ = "INSERT"
-            CASE CHR$(0) + "S"
-                K$ = "DELETE"
-            CASE CHR$(0) + ";"
-                K$ = "F1"
-            CASE CHR$(0) + "<"
-                K$ = "F2"
-            CASE CHR$(0) + "="
-                K$ = "F3"
-            CASE CHR$(0) + ">"
-                K$ = "F4"
-            CASE CHR$(0) + "?"
-                K$ = "F5"
-            CASE CHR$(0) + "@"
-                K$ = "F6"
-            CASE CHR$(0) + "A"
-                K$ = "F7"
-            CASE CHR$(0) + "B"
-                K$ = "F8"
-            CASE CHR$(0) + "C"
-                K$ = "F9"
-            CASE CHR$(0) + "D"
-                K$ = "F10"
-            CASE CHR$(0) + CHR$(133)
-                K$ = "F11"
-            CASE CHR$(0) + CHR$(134)
-                K$ = "F12"
-        END SELECT
+    SELECT CASE K$
+      CASE ""
+      CASE "ESC"
+          EXIT SUB
+      CASE "HOME"
+          CURRENTSLIDE = 0: ACTION$ = "SWITCHSLIDE"
+      CASE "END"
+          CURRENTSLIDE = SLIDECNT - 1: ACTION$ = "SWITCHSLIDE"
+      CASE "PAGEUP"
+          IF CURRENTSLIDE > 0 THEN CURRENTSLIDE = CURRENTSLIDE - 1: ACTION$ = "SWITCHSLIDE"
+      CASE "PAGEDOWN"
+          IF CURRENTSLIDE < SLIDECNT - 1 THEN CURRENTSLIDE = CURRENTSLIDE + 1: ACTION$ = "SWITCHSLIDE"
+      CASE ELSE
+          CALL HandleKeyboard(K$)
+    END SELECT
 
-        SELECT CASE K$
-            CASE ""
-            CASE "ESC"
-                EXIT SUB
-            CASE "HOME"
-                CURRENTSLIDE = 0: ACTION$ = "SWITCHSLIDE"
-            CASE "END"
-                CURRENTSLIDE = SLIDECNT - 1: ACTION$ = "SWITCHSLIDE"
-            CASE "PAGEUP"
-                IF CURRENTSLIDE > 0 THEN CURRENTSLIDE = CURRENTSLIDE - 1: ACTION$ = "SWITCHSLIDE"
-            CASE "PAGEDOWN"
-                IF CURRENTSLIDE < SLIDECNT - 1 THEN CURRENTSLIDE = CURRENTSLIDE + 1: ACTION$ = "SWITCHSLIDE"
-            CASE ELSE
-                CALL HandleKeyboard(K$)
-        END SELECT
-
-        SELECT CASE ACTION$
-            CASE "SWITCHSLIDE"
-                ACTION$ = ""
-                CALL DisplaySlide(CURRENTSLIDE)
-            CASE "LOADPPT"
-                ACTION$ = ""
-                CALL LoadData(FILENAME$)
-                CALL DisplaySlide(CURRENTSLIDE)
-        END SELECT
-        ACTION$ = ""
-    LOOP
+    SELECT CASE ACTION$
+      CASE "SWITCHSLIDE"
+          ACTION$ = ""
+          CALL DisplaySlide(CURRENTSLIDE)
+      CASE "LOADPPT"
+          ACTION$ = ""
+          CALL LoadData(FILENAME$)
+          CALL DisplaySlide(CURRENTSLIDE)
+    END SELECT
+    ACTION$ = ""
+  LOOP
 END SUB
 
 FUNCTION n$ (A AS INTEGER)
