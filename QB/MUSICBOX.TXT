@@ -9,13 +9,12 @@ $$@32,64=7,3#1^0
 $$-224|17(15:点歌台
 $$-224|19(0:点歌台
 $$-224|18(13:点歌台
-{^0=0@16,16%1(14}
+{^0=0@24,24%1(14}
 {-30|110}{1、歌唱祖国}
-{-30|126}{2、Moon River}
-{-30|142}{3、We wish you a Merry Christmas}
-{-30|158}{4、千与千寻}
-{-30|174}{5、小猪佩奇}
-{-30|190}{6、Nokia Tune}
+{-30|134}{2、Moon River}
+{-30|158}{3、We wish you a Merry Christmas}
+{-30|182}{4、千与千寻}
+{-30|206}{5、小猪佩奇}
 .ACTION
 1:歌唱祖国
 2:Moon River
@@ -78,7 +77,7 @@ ANYKEY:目录
 .SLIDE
 千与千寻
 .CONTENT
-{-30|158(15}{4、千与千寻}
+{-30|182(15}{4、千与千寻}
 .MUSIC
 T120L8O3
 CD ECG4.E L4DGDL8 C<A>E4.C L4<BP4B ABL8>CD <G4>C4DE F4FEDC D4P4CD
@@ -91,18 +90,9 @@ ANYKEY:目录
 .SLIDE
 小猪佩奇
 .CONTENT
-{-30|174(15}{5、小猪佩奇}
+{-30|206(15}{5、小猪佩奇}
 .MUSIC
 T100O3L8 GE16C16D<GL16GB>DFL8ECP64 GE16C16D<GL16GB>DFL8ECP64
-.ACTION
-ANYKEY:目录
-
-.SLIDE
-Nokia Tune
-.CONTENT
-{-30|190(15}{6、Nokia Tune}
-.MUSIC
-T120O4L16 GF<A8B8> ED<F8G8> DC<E8G8> C2
 .ACTION
 ANYKEY:目录
 
