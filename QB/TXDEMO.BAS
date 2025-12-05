@@ -28,27 +28,19 @@ TX ("M10CU1,0CO8KB1,0CL0")
 I = 0
 FOR y = 0 TO 15
   FOR x = 0 TO 15
-    TX ("CO" + n$(I) + "B" + n$(x * 40) + "," + n$(y * 30) + "," + n$(x * 40 + 40) + "," + n$(y * 30 + 30))
-    I = I + 1
+    TX("CO"+n$(I)+"B"+n$(x*40)+","+n$(y*15)+","+n$(x*40+40)+","+n$(y*15+15))
+    I=I+1
   NEXT x
 NEXT y
 WHILE INPUT$(1) = "": WEND
 
 TX ("CL0CO0B0,0,640,480CO7")
-I = 0
-FOR y = 0 TO 8
-  FOR x = 0 TO 3
-    TX ("{(7@52,52=" + n$(I) + "-" + n$(x * 160) + "|" + n$(y * 53) + "}")
-    TX ("{×ÖÌå" + n$(I) + "}")
-    I = I + 1
-  NEXT x
-NEXT y
-WHILE INPUT$(1) = "": WEND
-
-TX ("CL0CO0B0,0,640,480CO7")
-FOR FONT=1 TO 10
-CALL DrawStr("ABCDEFGHIJKLMNOPQRSTUVWXYZ",0,(FONT-1)*48,FONT,12,24,7)
-CALL DrawStr("1234567890 !@#%^&*(),.?+=~`",0,(FONT-1)*48+24,FONT,12,24,7)
+FOR FONT=0 TO 3
+  TX ("{(7@52,52=" + n$(FONT) + "-" + n$(FONT*160) + "|0}")
+  TX ("{×ÖÌå" + n$(FONT) + "}")
+NEXT FONT
+FOR FONT=0 TO 10
+  CALL DrawStr("Font"+STR$(FONT),(FONT AND 1)*320,(FONT\2)*52+52,FONT,26,52,7)
 NEXT FONT
 WHILE INPUT$(1) = "": WEND
 
