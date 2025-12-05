@@ -1,10 +1,11 @@
-import aiohttp,asyncio,json,sys,re
+import aiohttp,asyncio,json,sys,re,os
+from datetime import datetime
 import email
 from email.message import EmailMessage
 from email.message import Message
 from email.header import Header
 from codecs import decode
-import traceback,logging
+import logging
 
 CHARSET_ALIAS={
         'cn-gb':'gb2312'
@@ -135,12 +136,21 @@ def msg_apply_reply(text,textOrig):
     res=f"{text.rstrip()}\n\n----------"
     for line in textOrig.rstrip().split('\n'):
         res+=f"\n{marker}{line.rstrip()}"
-    return res
+    return res.replace('\r','').replace('\n','\r\n')
+
+def save_result(params,content):
+    now=datetime.now()
+    date_str=now.strftime("%Y%m%d_%H%M%S")
+    filename=f"{params['handler']}_{date_str}_{now.microsecond}.json"
+    path=f"{params['storage_dir']}{os.sep}{filename}"
+    with open(path,"w") as fp:
+        fp.write(content)
 
 async def handler(userName,params,msg):
     subject,content=msg_get_data(msg)
     conversation=parse_content(content)
     content=msg_apply_reply(await globals()[params['handler']](params,conversation), content)
+    save_result(params,content)
     reply_charset='HZ-GB-2312'
     msg_reply = Message()
     msg_reply['From']=userName
@@ -149,7 +159,6 @@ async def handler(userName,params,msg):
         msg_reply['Subject']=Header(subject, reply_charset)
     else:
         msg_reply['Subject']=Header("Re: "+subject, reply_charset)
-    content=content.replace('\n','\r\n')
     content_gb2312=content.encode('gb2312','replace')
     msg_reply.set_payload(content_gb2312.decode('gb2312'), charset=reply_charset)
     return msg_reply

@@ -73,11 +73,13 @@ module="mailserver.askbot"
 handler="ask_erine"
 client_id="xxx"
 client_secret="xxx"
+storage_dir="answer"
 
 [mail.user."deepseek@mysite.com"]
 module="mailserver.askbot"
 handler="ask_deepseek"
 deepseek_key="xxx"
+storage_dir="answer"
 
 [testServer]
 host="127.0.0.1"

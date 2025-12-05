@@ -26,3 +26,4 @@ dist
 mail-server.json
 
 *.toml
+/servers/answer/
