@@ -278,12 +278,11 @@ SUB InitSoundCard(SB AS SBType)
   IF SB.DMA<0 OR SB.DMA>3 OR SB.HDMA<4 OR SB.HDMA>7 THEN
     SB.STAT=0:EXIT SUB 'Invalid Parameter
   END IF
-  CALL ResetDSP(SB)
-  IF SB.STAT=-1 THEN EXIT SUB 'No sound card
+  CALL ResetDSP(SB):IF SB.STAT=0 THEN EXIT SUB 'No sound card
   CALL WriteDSP(SB,&HE1)
   SB.VER0=ReadDSP(SB)
   SB.VER1=ReadDSP(SB)
-  IF SB.VER0<4 THEN SB.STAT=-2:EXIT SUB 'Pre-SB16 sound card not supported
+  IF SB.VER0<4 THEN SB.STAT=0:EXIT SUB 'Pre-SB16 sound card not supported
 END SUB
 
 SUB SetMode(SB AS SBType,S16 AS INTEGER)
@@ -319,6 +318,7 @@ SUB SetMode(SB AS SBType,S16 AS INTEGER)
 END SUB
 
 SUB ResetDSP(SB AS SBType)
+  STATIC STAT
   SB.STAT=0
   OUT SB.BASEPORT+&H6,1:CT=0
   DO
