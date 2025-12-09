@@ -40,7 +40,7 @@ Retro Programming Works 怀旧编程作品
 
 用中文写文章的最小配置。
 
-### 配置 Configuration
+### 配置
 
 * CPU: 8088 4.77MHz
 * RAM: 640k
@@ -48,10 +48,45 @@ Retro Programming Works 怀旧编程作品
 * Floppy Drive B: 5.25" 360k Double Side
 * Display: CGA with green monochrome monitor
 
-### 主要用途 Main Usage
+### 主要用途
 
-* BASIC编程 BASIC Programming
-* WPS中英文文字处理 WPS Chinese & English Text Processing
-* 俄罗斯方块游戏 Tetris game
-* 2048游戏 2048 Game
+* BASIC编程
+* WPS中英文文字处理
+* 俄罗斯方块游戏
+* 2048游戏
+
+### 所用软盘说明
+
+#### MS-DOS 3.3系统软盘
+
+使用`FORMAT B: /S /8 /V`命令制作320k系统引导盘。系统盘中推荐放入以下文件：
+
+	ATTRIB.EXE
+	CHKDSK.COM
+	DEBUG.COM
+	DISKCOMP.COM
+	DISKCOPY.COM
+	EDLIN.COM
+	FC.EXE
+	FIND.EXE
+	FORMAT.COM
+	GWBASIC.EXE
+	LABEL.COM
+	MORE.COM
+	SORT.EXE
+	SYS.COM
+	TREE.COM
+	XCOPY.EXE
+
+#### CCDOS软盘
+
+存放CCDOS汉字系统的基本程序和字库文件。依次输入`CHLIB`、`VDKEY`命令启动CCDOS汉字系统。
+
+#### WPS软盘
+
+存放WPS、拼音输入法、五笔字形输入法、CCDOS退出程序。输入`PY`、`WBX`命令加载拼音/五笔字形输入法。输入`QUIT`命令退出CCDOS。
+
+#### 数据盘
+
+存放所有BASIC程序文件及其依赖数据、WPS文档，以及俄罗斯方块游戏TETRIS.COM。常驻B驱动器。
 
