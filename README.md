@@ -1,19 +1,17 @@
 Retro Programming Works 怀旧编程作品
 ====================================
 
-486 PC
-------
+1995s PC
+--------
 
-### 年代 Era
-
-* 1995 ~ 1998
+多媒体电脑，串口互联互通。
 
 ### 配置 Configuration
 
-* CPU 80486DX4-100
+* Pentium 75 CPU
 * 8M RAM
 * 512M HDD
-* S3 Graphics Adapter with 512k VRAM
+* S3 Graphics Adapter with 1M VRAM
 * 3.5 Inch Floppy Drive x1
 * CD-ROM
 * Sound Blaster 16
@@ -36,12 +34,11 @@ Retro Programming Works 怀旧编程作品
 * 为保证可维护性，DOS自带的QBASIC建议将代码规模控制在600行以内，用DEBUG的a命令输入QBASIC程序配套的汇编例程时，建议将指令数控制在200条以内。
 * QBASIC调用汇编代码的场景，TASM格式的汇编代码可以用DOS自带的`debug`工具的`a`命令输入，此时涉及跳转地址的地方需要手工计算相关地址。
 
-8086 PC
--------
 
-### 年代 Era
+1990s PC
+--------
 
-* 1990 ~ 1992
+用中文写文章的最小配置。
 
 ### 配置 Configuration
 
@@ -57,25 +54,4 @@ Retro Programming Works 怀旧编程作品
 * WPS中英文文字处理 WPS Chinese & English Text Processing
 * 俄罗斯方块游戏 Tetris game
 * 2048游戏 2048 Game
-
-PC9821
-------
-
-### 年代 Era
-
-* 1993 ~ 1995
-
-### 配置 Configuration
-
-* CPU 80486SX-33
-* 4M RAM
-* 128M HDD
-* Mouse
-* 56k Modem
-
-### 主要用途 Main Usage
-
-* 拨号连接远程服务器 Connecting to remote server via dial-up
-* 使用PC98的图形层显示背景图片  
-  Display background image via PC98's graphic layer
 
