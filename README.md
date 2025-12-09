@@ -4,7 +4,7 @@ Retro Programming Works 怀旧编程作品
 1995s PC
 --------
 
-多媒体电脑，串口互联互通。
+多媒体互联网全能电脑，串口互联互通。
 
 ### 配置 Configuration
 
@@ -20,14 +20,13 @@ Retro Programming Works 怀旧编程作品
 
 ### 主要用途 Main Usage
 
-* BASIC编程 BASIC Programming
-* 英汉字典 English-Chinese dictionary
-* 文字处理 Text processing
-* 电子表格 Spreadsheet processing
-* 图片浏览 Image viewing
-* 拨号上网 Surfing online via dial-up network
-* 拨号连接远程服务器 Connecting to remote server via dial-up
-* （禁止游戏 NO GAMING）
+* BASIC编程
+* 英汉字典
+* 文字处理
+* 电子表格
+* 图片浏览
+* 拨号上网
+* 拨号连接远程服务器
 
 ### 补充说明
 
@@ -59,7 +58,9 @@ Retro Programming Works 怀旧编程作品
 
 #### MS-DOS 3.3系统软盘
 
-使用`FORMAT B: /S /8 /V`命令制作320k系统引导盘。系统盘中推荐放入以下文件：
+使用`FORMAT B: /S /8 /V`命令制作320k系统引导盘。
+
+系统盘中推荐放入以下文件：
 
 	ATTRIB.EXE
 	CHKDSK.COM
@@ -80,13 +81,26 @@ Retro Programming Works 怀旧编程作品
 
 #### CCDOS软盘
 
-存放CCDOS汉字系统的基本程序和字库文件。依次输入`CHLIB`、`VDKEY`命令启动CCDOS汉字系统。
+存放CCDOS汉字系统的基本程序和字库文件。
+
+依次输入`CHLIB`、`VDKEY`命令启动CCDOS汉字系统。
 
 #### WPS软盘
 
-存放WPS、拼音输入法、五笔字形输入法、CCDOS退出程序。输入`PY`、`WBX`命令加载拼音/五笔字形输入法。输入`QUIT`命令退出CCDOS。
+存放WPS、拼音输入法、五笔字形输入法、CCDOS退出程序。
+
+输入`PY`、`WBX`命令加载拼音/五笔字形输入法。
+
+输入`QUIT`命令退出CCDOS。
 
 #### 数据盘
 
-存放所有BASIC程序文件及其依赖数据、WPS文档，以及俄罗斯方块游戏TETRIS.COM。常驻B驱动器。
+存放所有BASIC程序文件及其依赖数据、WPS文档，以及俄罗斯方块游戏TETRIS.COM。
+
+常驻B驱动器。
+
+### 补充说明
+
+* 对于640k RAM的机器，同时加载CCDOS、拼音输入法、五笔字形输入法后，用WPS编辑文章时，单个文件大小控制在2.4k左右，超过此大小容易死机。
+* GWBASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量，开发前需仔细评估程序复杂度。
 
