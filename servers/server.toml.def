@@ -1,6 +1,6 @@
 log_file="server.log"
-log_level="DEBUG"
-pid_file="/data/data/com.termux/files/usr/tmp/server.pid"
+log_level="INFO"
+pid_file="server.pid"
 detach=true
 watchdog_timeout=10
 modules=[
@@ -78,8 +78,4 @@ storage_dir="answer"
 module="mailserver.askbot:MailUserRobotDeepseek"
 deepseek_key="xxx"
 storage_dir="answer"
-
-[testServer]
-host="127.0.0.1"
-port=6666
 
