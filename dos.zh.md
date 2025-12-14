@@ -61,13 +61,6 @@ UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更�
 
 安装显卡驱动时如果提示插入S3 Trio 64V Flat Mode Driver软盘，则此时需要将路径填写成`C:\WINDOWS\SYSTEM\`以完成显卡驱动的安装。
 
-Windows 3.x下使用DOSBox-x的打印机
---------------------------------
-
-选择`Epson LQ1600K`作为打印机驱动程序，之后可以从Windows 3.x的应用程序中使用DOSBox-x的虚拟打印机打印到PNG图片。
-
-DOSBox-x虚拟打印机纸张大小推荐宽83，高114，对应A4纸大小。
-
 DOSBox-X配置技巧
 ----------------
 

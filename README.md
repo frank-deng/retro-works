@@ -11,7 +11,7 @@ Retro Programming Works 怀旧编程作品
 * Pentium 75 CPU
 * 8M RAM
 * 512M HDD
-* S3 Graphics Adapter with 1M VRAM
+* S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持640x480高彩色）
 * 3.5 Inch Floppy Drive x1
 * CD-ROM
 * Sound Blaster 16
@@ -28,7 +28,7 @@ Retro Programming Works 怀旧编程作品
 * 拨号上网
 * 拨号连接远程服务器
 
-### 软件阵容
+### 安装说明
 
 DOS下推荐安装以下软件：
 
@@ -46,9 +46,7 @@ Windows 3.2安装时，以下组件不推荐安装：
 * 录音机及其帮助
 * 造字程序及其帮助
 
-Windows 3.2声卡驱动不推荐安装任何附加组件，包括播放器、录音机、CD唱机等。
-
-Windows 3.2不建议安装`[MCI] CD Audio`驱动，除非有光盘需要播放CD音轨。
+Windows 3.2声卡驱动不推荐安装任何附加组件，包括播放器、录音机、CD唱机等。不建议安装`[MCI] CD Audio`驱动，除非有光盘需要播放CD音轨。
 
 Windows 3.2下推荐安装以下软件：
 

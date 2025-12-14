@@ -61,13 +61,6 @@ Use the basic VGA driver for the initial install, then change the video driver u
 
 When the driver spouted up a prompt to Insert the Trio 64V Flat Mode Driver disk, redirect the installer to `C:\WINDOWS\SYSTEM\` to complete the graphics driver install.
 
-Use DOSBox-x's printer under Windows 3.x
-----------------------------------------
-
-Select `Epson LQ1600K` as the printer driver, then you can print document into PNG files from Windows 3.x applications via DOSBox-x's virtual printer.
-
-DOSBox-x printer paper size recommends width 83 and height 114, which corresponds to A4 size.
-
 DOSBox-X Configuration Skills
 -----------------------------
 
