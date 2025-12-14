@@ -69,15 +69,13 @@ hosts=["10.0.2.2","mysite.com"]
 password="77646f5a4f3166637627abe998e7a1470fe72d8b430f067dafa86263f1f23f94"
 
 [mail.user."niwenwoda@mysite.com"]
-module="mailserver.askbot"
-handler="ask_erine"
+module="mailserver.askbot:MailUserRobotErine"
 client_id="xxx"
 client_secret="xxx"
 storage_dir="answer"
 
 [mail.user."deepseek@mysite.com"]
-module="mailserver.askbot"
-handler="ask_deepseek"
+module="mailserver.askbot:MailUserRobotDeepseek"
 deepseek_key="xxx"
 storage_dir="answer"
 
