@@ -4,19 +4,14 @@ __test__
 *.swp
 *.o
 *.COM
-*.com
 *.so
 *.obj
 *.com
+*.EXE
 *.exe
 *.err
 *.log
-config.py
-config.php
-test.py
-1.txt
 .outside
-web.config
 *.wav
 *.eml
 
@@ -27,3 +22,5 @@ mail-server.json
 
 *.toml
 /servers/answer/
+
+sudoku
