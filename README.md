@@ -63,10 +63,10 @@ Windows 3.2下推荐安装以下软件：
 
 Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、实用价值低等问题，推荐安装的组件如下：
 
-* Word只安装本体和“联机帮助、示例”中的“Word帮助”、“示例”
+* Word除本体外，只安装“联机帮助、示例”中的“Word帮助”、“示例”
 * Excel除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”
 * Microsoft PowerPoint和Microsoft Office管理器不安装
-* 共享应用程序只安装Media Player，如需写简单公式可额外安装Equation Editor
+* 共享应用程序只安装“Media Player”
 * “转换程序、过滤程序和数据存取”中，安装所有文字转换程序和图形过滤程序，“数据存取”不安装
 * 工具中只安装“MS Info”
 
@@ -74,6 +74,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 
 * 为保证可维护性，DOS自带的QBASIC建议将代码规模控制在600行以内，用DEBUG的a命令输入QBASIC程序配套的汇编例程时，建议将指令数控制在200条以内。
 * QBASIC调用汇编代码的场景，TASM格式的汇编代码可以用DOS自带的`debug`工具的`a`命令输入，此时涉及跳转地址的地方需要手工计算相关地址。
+* Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 
 
 1990s PC
