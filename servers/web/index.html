@@ -33,14 +33,14 @@
     <tr>
         <td colspan=2 height='24px' valign='middle'>
             <img src='/static/BULL1A.GIF'/>
-            <b>今日热点</b>　<a href='news.asp'><font size='2'>更多&gt;&gt;</font></a>
+            <b>今日新闻</b>
         </td>
     </tr>
     <tr><td colspan=2 height='6px'></td></tr>
     {% for item in news %}
     <tr>
         <td width='10px'></td>
-	<td><img src='/static/BULLET3.GIF'/> <a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></td>
+	<td><img src='/static/BULLET3.GIF'/> {{item['title']|safe}}</td>
     </tr>
     {% endfor %}
 </table><p align='center'><img src='/static/CONTLINE.GIF'></p>
