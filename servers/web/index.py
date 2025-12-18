@@ -27,16 +27,12 @@ async def get_weather(config,locid):
         logger.error(e,exc_info=True)
         return None
 
-async def get_news(newsManager):
-    newsList=await newsManager.newsList()
-    return newsList[:10]
-
 async def index(req:Request):
     config=req.app['config']
     links=config['web']['links']
     weather,news=await asyncio.gather(
         get_weather(config,req.cookies.get('location',None)),
-        get_news(req.app['newsManager'])
+        req.app['newsManager'].newsList()
     )
 
     context={

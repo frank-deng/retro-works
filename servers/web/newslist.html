@@ -1,8 +1,0 @@
-{% extends "base.html" %}{% block content %}
-<table width='100%'>
-{% for item in news %}
-<tr><td><img src='/static/BULLET3.GIF'/> <a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></td></tr>
-{% endfor %}
-<tr><td height='20px' width='100%' align='center' valign='middle'><img src='/static/PROFLINE.GIF'/></td></tr>
-</table>
-{% endblock %}
