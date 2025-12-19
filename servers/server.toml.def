@@ -16,6 +16,7 @@ encoding="gbk"
 template_dir="web"
 image_max_size=[360,960]
 links=[
+	{label="我的博客",link="blogs/"},
 	{label="天气预报",link="weather.asp"}
 ]
 tianapi_key="xxx"
@@ -36,14 +37,6 @@ module="web.weather:select_city"
 [[web.routes]]
 path="/weather.asp"
 module="web.weather:weather"
-
-[[web.routes]]
-path="/news.asp"
-module="web.news:news_handler"
-
-[[web.routes]]
-path="/news_images/{image_key}.jpg"
-module="web.news:news_image_handler"
 
 [[web.routes]]
 path="/blogs/{path:.*}"

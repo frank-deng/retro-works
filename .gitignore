@@ -17,8 +17,8 @@ __test__
 
 build
 dist
+posts
 *.egg-info
-mail-server.json
 
 *.toml
 /servers/answer/
