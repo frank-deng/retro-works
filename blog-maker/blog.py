@@ -11,14 +11,13 @@ import json
 from datetime import datetime
 import click
 import dateutil
-import mistune
+import markdown2
 from jinja2 import Environment,FileSystemLoader
 from lxml import etree,html
 
 class DefaultProcessor:
     def __init__(self,conf):
         self.__config=conf
-        self.__markdown=mistune.create_markdown(renderer='html',plugins=['table'])
 
     def __apply_font(self,parent,text):
         english_pattern = r'[a-zA-Z0-9\s!-~]+'
@@ -37,13 +36,37 @@ class DefaultProcessor:
                 e.text=segment
                 parent.append(e)
 
+    def __copy_element(self,parent_old,parent_new):
+        for item in parent_old:
+            if isinstance(item,etree._Comment):
+                continue
+            tag=item.tag
+            item_new=etree.Element(tag)
+            parent_new.append(item_new)
+            for key,value in item.attrib.items():
+                item_new.set(key,value)
+            item_new.text=item.text
+            item_new.tail=item.tail
+            self.__copy_element(item,item_new)
+
     def __process_element(self,parent_old,parent_new):
         for item in parent_old:
+            if isinstance(item,etree._Comment):
+                continue
             tag=item.tag
             if tag=='strong':
                 tag='b'
+            elif tag=='code':
+                tag='pre'
             item_new=etree.Element(tag)
             parent_new.append(item_new)
+            for key,value in item.attrib.items():
+                item_new.set(key,value)
+            if tag in ('pre','code'):
+                item_new.text=item.text
+                item_new.tail=item.tail
+                self.__copy_element(item,item_new)
+                continue
             if item.text:
                 self.__apply_font(item_new,item.text)
             self.__process_element(item,item_new)
@@ -51,14 +74,17 @@ class DefaultProcessor:
                 self.__apply_font(item_new,item.tail)
 
     def __process_html(self,content):
-        old_tree=etree.fromstring('<html>'+content+'</html>')
-        new_root=etree.Element(old_tree.tag)
-        self.__process_element(old_tree,new_root)
-        return html.tostring(new_root,encoding='utf-8').decode('utf-8').replace(r'^\<html\>','').replace(r'\</html\>$','')
+        old_tree=html.fromstring("<html>"+content+"</html>")
+        new_tree=html.document_fromstring("<html></html>")
+        self.__process_element(old_tree,new_tree)
+        res=html.tostring(new_tree,encoding='utf-8').decode('utf-8')
+        res=re.sub(r'^\<html\>\<body\>','',res)
+        res=re.sub(r'\</body\>\</html\>$','',res)
+        return res
 
     def parse(self,meta,content):
-        html=self.__markdown(content)
-        return self.__process_html(html)
+        html=markdown2.markdown(content,extras=['tables'])
+        return self.__process_html(meta.get('Title','')),self.__process_html(html)
 
 
 class BlogMaker:
@@ -135,7 +161,7 @@ class BlogMaker:
                 shutil.rmtree(path_del)
         shutil.copytree('static',os.path.join(target_dir,'static'))
 
-    def __save_file(self,meta,content):
+    def __save_file(self,meta,titleProcessed,content):
         template=self.__jinja2.get_template(meta.get('Layout',self.__config['defaultLayout']))
         target_dir=self.__config['outputPath']
         target_file=os.path.join(target_dir,meta['Id']+'.htm')
@@ -143,7 +169,7 @@ class BlogMaker:
         res=template.render(
             encoding=encoding,
             title=meta.get('Title',''),
-            titleProcessed=meta.get('Title',''),
+            titleProcessed=titleProcessed,
             date=meta['Date'].strftime('%Y-%m-%d %H:%M'),
             content=content
         )
@@ -180,8 +206,8 @@ class BlogMaker:
                 meta,content=self.__process_file(os.path.basename(file),fp)
                 if meta is None or content is None:
                     continue
-                content=self.__defaultProcessor.parse(meta,content)
-                self.__save_file(meta,content)
+                title,content=self.__defaultProcessor.parse(meta,content)
+                self.__save_file(meta,title,content)
                 posts.append(meta)
                 idx=idx+1
         if len(posts)==0:
