@@ -108,6 +108,7 @@ class BlogMaker:
             encoding=encoding,
             title=meta.get('Title',''),
             titleProcessed=meta.get('Title',''),
+            date=meta['Date'].strftime('%Y-%m-%d %H:%M'),
             content=content
         )
         with open(target_file,'wb') as f:
