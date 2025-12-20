@@ -20,9 +20,45 @@ class DefaultProcessor:
         self.__config=conf
         self.__markdown=mistune.create_markdown(renderer='html',plugins=['table'])
 
+    def __apply_font(self,parent,text):
+        english_pattern = r'[a-zA-Z0-9\s!-~]+'
+        other_pattern = r'( |[^a-zA-Z0-9\s!-~])+'
+        pattern = re.compile(f'({english_pattern}|{other_pattern})')
+        for match in pattern.finditer(text):
+            segment=match.group()
+            if re.match(english_pattern, segment):
+                e=etree.Element('font')
+                e.attrib['face']=self.__config['font']['ascii']
+                e.text=segment
+                parent.append(e)
+            else:
+                e=etree.Element('font')
+                e.attrib['face']=self.__config['font']['cjk']
+                e.text=segment
+                parent.append(e)
+
+    def __process_element(self,parent_old,parent_new):
+        for item in parent_old:
+            tag=item.tag
+            if tag=='strong':
+                tag='b'
+            item_new=etree.Element(tag)
+            parent_new.append(item_new)
+            if item.text:
+                self.__apply_font(item_new,item.text)
+            self.__process_element(item,item_new)
+            if item.tail:
+                self.__apply_font(item_new,item.tail)
+
+    def __process_html(self,content):
+        old_tree=etree.fromstring('<html>'+content+'</html>')
+        new_root=etree.Element(old_tree.tag)
+        self.__process_element(old_tree,new_root)
+        return html.tostring(new_root,encoding='utf-8').decode('utf-8').replace(r'^\<html\>','').replace(r'\</html\>$','')
+
     def parse(self,meta,content):
-        html=self.__markdown(content).replace('<strong>','<b>').replace('</strong>','</b>')
-        return html
+        html=self.__markdown(content)
+        return self.__process_html(html)
 
 
 class BlogMaker:
@@ -136,6 +172,7 @@ class BlogMaker:
         self.__prepare_target()
         files=[f for f in glob.glob(os.path.join(self.__config['markdownPath'],'*.md')) if os.path.isfile(f)]
         files.sort()
+        files.reverse()
         idx=0
         posts=[]
         for file in files:
