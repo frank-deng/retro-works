@@ -12,6 +12,17 @@ import click
 import dateutil
 import mistune
 from jinja2 import Environment,FileSystemLoader
+from lxml import etree,html
+
+class DefaultProcessor:
+    def __init__(self,conf):
+        self.__config=conf
+        self.__markdown=mistune.create_markdown(renderer='html',plugins=['table'])
+
+    def parse(self,meta,content):
+        html=self.__markdown(content).replace('<strong>','<b>').replace('</strong>','</b>')
+        return html
+
 
 class BlogMaker:
     PARSE_META=0
@@ -41,10 +52,10 @@ class BlogMaker:
             click.echo(click.style(f'Failed to load {config_file}: {e}',fg='red'),err=True)
         if output is not None:
             self.__config['outputPath']=output
-        self.__markdown=mistune.create_markdown(renderer='html',plugins=['table'])
-        self.__jinja2=Environment(loader=FileSystemLoader('template')) 
+        self.__jinja2=Environment(loader=FileSystemLoader('template'))
+        self.__defaultProcessor=DefaultProcessor(self.__config)
 
-    def __process_markdown(self,fname,fp):
+    def __process_file(self,fname,fp):
         step=BlogMaker.PARSE_META
         fnparsed=re.findall(r'^(19\d\d|20\d\d)(0\d|1[0-2])([0-2]\d|3[01])_([0-1]\d|2[0-3])([0-5]\d)(.*)?\.md$',fname)
         if fnparsed is None or len(fnparsed)==0:
@@ -75,8 +86,10 @@ class BlogMaker:
                 meta[key]=dateutil.parse(val)
             else:
                 meta[key]=val
-        content=self.__markdown(content).replace('<strong>','<b>').replace('</strong>','</b>')
         return meta,content
+
+    def __proc_markdown(self,meta,content):
+        return self.__markdown(content).replace('<strong>','<b>').replace('</strong>','</b>')
 
     def __prepare_target(self):
         target_dir=self.__config['outputPath']
@@ -124,13 +137,17 @@ class BlogMaker:
         posts=[]
         for file in files:
             with open(file,'r',encoding='utf-8') as fp:
-                meta,content=self.__process_markdown(os.path.basename(file),fp)
+                meta,content=self.__process_file(os.path.basename(file),fp)
                 if meta is None or content is None:
                     continue
+                self.__defaultProcessor.parse(meta,content)
                 self.__save_file(meta,content)
                 posts.append(meta)
                 idx=idx+1
-        self.__save_index(posts)
+        if len(posts)==0:
+            click.echo(click.style(f'No article processed',fg='yellow'))
+        else:
+            self.__save_index(posts)
 
 
 @click.group(invoke_without_command=True)
