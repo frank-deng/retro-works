@@ -45,7 +45,7 @@
     {% endfor %}
 </table><p align='center'><img src='/static/CONTLINE.GIF'></p>
 {% endif %}
-{% if blogs %}
+{% if blog %}
 <table width='100%'>
     <tr>
         <td colspan=2 height='24px' valign='middle'>
@@ -54,12 +54,12 @@
         </td>
     </tr>
     <tr><td colspan=2 height='6px'></td></tr>
-    <?php foreach($blogs as $item){ ?>
+    {% for item in blog %}
     <tr>
         <td width='10px'></td>
-        <td><img src='/static/BULLET3.GIF'/> <a href='blog/<?=$item['link']?>'><?=$item['title']?></a></td>
+	<td><img src='/static/BULLET3.GIF'/> <a href='blog/{{item['link']}}'>{{item['title']}}</a></td>
     </tr>
-    <?php } ?>
+    {% endfor %}
 </table><p align='center'><img src='/static/CONTLINE.GIF'></p>
 {% endif %}
 </td></tr>

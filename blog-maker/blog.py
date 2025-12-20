@@ -7,6 +7,7 @@ import re
 import glob
 import tomllib
 import shutil
+import json
 from datetime import datetime
 import click
 import dateutil
@@ -88,9 +89,6 @@ class BlogMaker:
                 meta[key]=val
         return meta,content
 
-    def __proc_markdown(self,meta,content):
-        return self.__markdown(content).replace('<strong>','<b>').replace('</strong>','</b>')
-
     def __prepare_target(self):
         target_dir=self.__config['outputPath']
         for item in os.listdir(target_dir):
@@ -128,6 +126,10 @@ class BlogMaker:
         res=template.render(encoding=encoding,posts=posts)
         with open(os.path.join(self.__config['outputPath'],'index.htm'),'wb') as f:
             f.write(res.encode(encoding,'replace'))
+        jsonFile=self.__config.get('jsonFile')
+        if jsonFile:
+            with open(os.path.join(self.__config['outputPath'],jsonFile),'w') as f:
+                f.write(json.dumps(posts,indent=2,ensure_ascii=False))
 
     def parse(self):
         self.__prepare_target()
@@ -140,7 +142,7 @@ class BlogMaker:
                 meta,content=self.__process_file(os.path.basename(file),fp)
                 if meta is None or content is None:
                     continue
-                self.__defaultProcessor.parse(meta,content)
+                content=self.__defaultProcessor.parse(meta,content)
                 self.__save_file(meta,content)
                 posts.append(meta)
                 idx=idx+1

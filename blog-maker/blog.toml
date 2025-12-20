@@ -2,6 +2,7 @@ encoding="GB2312"
 markdownPath="posts"
 defaultLayout="post.html"
 outputPath="dist"
+jsonFile="blog.json"
 font.ascii="Times New Roman"
 font.cjk="宋体"
 

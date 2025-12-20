@@ -15,8 +15,9 @@ port=8080
 encoding="gbk"
 template_dir="web"
 image_max_size=[360,960]
+blog_data_file="../blog-maker/dist/blog.json"
 links=[
-	{label="我的博客",link="blogs/"},
+	{label="我的博客",link="blog/"},
 	{label="天气预报",link="weather.asp"}
 ]
 tianapi_key="xxx"
@@ -39,7 +40,7 @@ path="/weather.asp"
 module="web.weather:weather"
 
 [[web.routes]]
-path="/blogs/{path:.*}"
+path="/blog/{path:.*}"
 module="web:StaticWithIndex"
 rootdir="../blog-maker/dist"
 index=["index.html","index.htm"]
