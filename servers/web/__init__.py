@@ -1,5 +1,3 @@
-import asyncio
-import aiohttp
 import aiohttp_jinja2
 import os
 import inspect

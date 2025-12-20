@@ -1,12 +1,10 @@
-import aiohttp,asyncio,json,sys,re,os
+import aiohttp,asyncio,json,re,os
 from typing import ClassVar
 from mailserver import MailUserRobot
 from datetime import datetime
 import email
-from email.message import EmailMessage
 from email.message import Message
 from email.header import Header
-from codecs import decode
 from uuid import uuid4 as uuidgen
 
 class MailUserRobotAI(MailUserRobot):

@@ -1,5 +1,4 @@
 import sys
-import platform
 import os
 import atexit
 import errno

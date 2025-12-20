@@ -5,7 +5,6 @@ detach=true
 watchdog_timeout=10
 modules=[
 "web:WebServer",
-"testserver:TestServer",
 "mailserver:MailServer"
 ]
 
@@ -14,7 +13,6 @@ host="127.0.0.1"
 port=8080
 encoding="gbk"
 template_dir="web"
-image_max_size=[360,960]
 blog_data_file="../blog-maker/dist/blog.json"
 links=[
 	{label="我的博客",link="blog/"},

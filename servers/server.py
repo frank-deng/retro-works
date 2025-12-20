@@ -8,7 +8,6 @@ import signal
 import click
 import os
 import platform
-import time
 from util import Logger
 from util import load_module
 from util.watchdog import watchdog

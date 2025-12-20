@@ -1,4 +1,4 @@
-import asyncio,hashlib,os,re,importlib
+import asyncio,hashlib,re
 from uuid import uuid4 as uuidgen
 from util import Logger
 from util import load_module
