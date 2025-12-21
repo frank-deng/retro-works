@@ -26,17 +26,25 @@ async def deepseek(question):
     }
     async with aiohttp.ClientSession() as session:
         async with session.post('https://api.deepseek.com/chat/completions',headers=headers,json=jsonData,timeout=aiohttp.ClientTimeout(total=300)) as response:
-            proc=subprocess.Popen(['less','-FRX'],stdin=subprocess.PIPE)
+            target=sys.stdout.buffer
+            proc=None
+            if sys.stdout.isatty():
+                try:
+                    proc=subprocess.Popen(['less','-FRX'],stdin=subprocess.PIPE)
+                    target=proc.stdin
+                except Exception as e:
+                    print(e,file=sys.stderr)
             async for chunk in response.content:
                 chunk_str=re.sub('^data: ', '', chunk.decode().strip())
                 if not chunk_str or chunk_str == '[DONE]':
                     continue
                 data=json.loads(chunk_str)
                 text = data['choices'][0]['delta']['content']
-                proc.stdin.write(text.encode('utf-8'))
-                proc.stdin.flush()
-            proc.stdin.close()
-            proc.wait()
+                target.write(text.encode('utf-8'))
+                target.flush()
+            if proc is not None:
+                proc.stdin.close()
+                proc.wait()
 
 USAGE=f"""Usage:
 
@@ -76,4 +84,3 @@ def main():
 
 if '__main__'==__name__:
     exit(main())
-
