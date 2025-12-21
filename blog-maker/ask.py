@@ -3,6 +3,7 @@
 
 import asyncio,json,os,sys,re,subprocess
 import aiohttp
+import click
 
 class AskBot:
     async def _ondata(self,chunk):
@@ -116,29 +117,40 @@ class AskBotErine(AskBot):
                 await self._handleResponse(response)
 
 
-async def async_main(question):
-    askBot=AskBotErine()
+MODELS={
+    'deepseek':AskBotDeepSeek,
+    'erine':AskBotErine
+}
+
+async def async_main(model,question):
+    if model not in MODELS:
+        raise RuntimeError(f'Unsupported model "{model}".')
+    askBot=MODELS[model]()
     await askBot.ask(question)
 
-USAGE=f"""Usage:
+@click.command(context_settings={
+    'help_option_names': ['-h', '--help', '-?'],
+    'ignore_unknown_options': True
+})
+@click.option('--model', '-m', default='deepseek', show_default=True,
+              help='Model to use (deepseek, erine, etc.)')
+@click.argument('question', nargs=-1, required=False)
+@click.pass_context
+def main(ctx,model,question):
+    """Examples:
 
-{sys.argv[0]} question
-{sys.argv[0]} <<< question
-echo question | {sys.argv[0]}
-{sys.argv[0]} < question.txt
-cat question.txt | {sys.argv[0]}
+\b
+ask.py question
+ask.py <<< question
+echo question | ask.py
+ask.py < question.txt
+cat question.txt | ask.py
+ask.py question < question.txt
 """
-
-def main():
-    content=''
-    ishelp=False
-    if len(sys.argv)==2 and sys.argv[1] in ('-?','-h','--help'):
-        ishelp=True
-    else:
-        content=' '.join(sys.argv[1:])+'\n'
-    if ishelp or (sys.stdin.isatty() and not content.strip()):
-        print(USAGE,file=sys.stderr)
-        exit(1)
+    content=' '.join(question)
+    if sys.stdin.isatty() and not content.strip():
+        click.echo(ctx.get_help(),err=True)
+        ctx.exit(1)
     if not sys.stdin.isatty():
         try:
             while True:
@@ -146,18 +158,18 @@ def main():
         except EOFError:
             pass
     try:
-        asyncio.run(async_main(content))
-        return 0
+        asyncio.run(async_main(model,content))
     except BrokenPipeError:
         pass
     except KeyboardInterrupt:
         pass
     except RuntimeError as e:
-        print(e,file=sys.stderr)
-        return 1
+        click.secho(e,fg='red',err=True)
+        ctx.exit(1)
     except KeyError as e:
-        print(e,file=sys.stderr)
-        return 1
+        click.secho(e,fg='red',err=True)
+        ctx.exit(1)
+    ctx.exit(0)
 
 if '__main__'==__name__:
-    exit(main())
+    main()
