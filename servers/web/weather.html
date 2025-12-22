@@ -12,17 +12,17 @@
 		<td rowspan='3' width='20px'></td>
 		<th align='left'>温度</th>
 		<td rowspan='3' width='10px'></td>
-		<td>{{now['temp']}}℃</td>
+		<td><font face='Times New Roman'>{{now['temp']}}</font>℃</td>
 		<td rowspan='2' width='20px'></td>
 		<th align='left'>空气污染指数</th>
 		<td rowspan='2' width='10px'></td>
-		<td>{{air['aqi']}}</td>
+		<td><font face='Times New Roman'>{{air['aqi']}}</font></td>
 	</tr>
 	<tr>
 		<th align='left'>湿度</th>
-		<td>{{now['humidity']}}%</td>
+		<td><font face='Times New Roman'>{{now['humidity']}}%</font></td>
 		<th align='left'>能见度</th>
-		<td>{{now['vis']}}km</td>
+		<td><font face='Times New Roman'>{{now['vis']}}km</font></td>
 		<th align='left'>空气质量等级</th>
 		<td>{{air['category']}}</td>
 	</tr>
@@ -30,11 +30,11 @@
 		<th align='left'>风向</th>
 		<td>{{now['windDir']}}</td>
 		<th align='left'>风速</th>
-		<td colspan=5>{{now['windScale']}}级（{{now['windSpeed']}}km/h）</td>
+		<td colspan=5><font face='Times New Roman'>{{now['windScale']}}</font>级（<font face='Times New Roman'>{{now['windSpeed']}}km/h</font>）</td>
 	</tr>
 </table>
 <p align='center'><img src='/static/ELEGLINE.GIF'/></p>
-<h3>6天天气预报</h3>
+<h3><font face='Times New Roman'>6</font>天天气预报</h3>
 <table width='100%'>
 	<tr>
 		<th align='left'>日期</th>
@@ -46,12 +46,12 @@
 	</tr>
 {% for item in forecast %}
 	<tr>
-		<td>{{item['fxDate']}}</td>
-		<td>{{item['textDay']}}/{{item['textNight']}}</td>
-		<td>{{item['tempMin']}}℃/{{item['tempMax']}}℃</td>
-		<td>{{item['humidity']}}%</td>
-		<td>{{item['windDirDay']}}/{{item['windDirNight']}}</td>
-		<td>{{item['windScaleDay']}}级/{{item['windScaleNight']}}级</td>
+		<td><font face='Times New Roman'>{{item['fxDate']}}</font></td>
+		<td>{{item['textDay']}}<font face='Times New Roman'>/</font>{{item['textNight']}}</td>
+		<td><font face='Times New Roman'>{{item['tempMin']}}</font>℃<font face='Times New Roman'>/{{item['tempMax']}}</font>℃</td>
+		<td><font face='Times New Roman'>{{item['humidity']}}%</font></td>
+		<td>{{item['windDirDay']}}<font face='Times New Roman'>/</font>{{item['windDirNight']}}</td>
+		<td><font face='Times New Roman'>{{item['windScaleDay']}}</font>级<font face='Times New Roman'>/{{item['windScaleNight']}}</font>级</td>
 	</tr>
 {% endfor %}
 </table>

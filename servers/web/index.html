@@ -14,7 +14,7 @@
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
         <td bgcolor='#ffff33' bordercolor='#ff0000' rowspan='2' height='40px' nowrap>
             <img src='/static/CONTBULL.GIF'/><font size='5' face='黑体' color='#000080'><b>欢迎光临我的信息港</b>&nbsp;</font><img src='static/CONTBULL.GIF'/></td>
-	<td bgcolor='#ffff33' bordercolor='#ff0000' nowrap align='right'>{% if weather %}{{weather['location_str']}}&nbsp;{{weather['now']['text']}}&nbsp;{{weather['now']['temp']}}℃&nbsp;AQI：{{weather['air']['aqi']}}&nbsp;{{weather['air']['category']}}{% else %}没有天气信息 <font size=2>[<a href='select_city.asp'>选择城市</a>]</font>&nbsp;{% endif %}</td>
+	<td bgcolor='#ffff33' bordercolor='#ff0000' nowrap align='right'>{% if weather %}{{weather['location_str']}}&nbsp;{{weather['now']['text']}}&nbsp;<font face='Arial'>{{weather['now']['temp']}}</font>℃&nbsp;<font face='Arial'>AQI</font>：<font face='Arial'>{{weather['air']['aqi']}}</font>&nbsp;{{weather['air']['category']}}{% else %}没有天气信息 <font size=2>[<a href='select_city.asp'>选择城市</a>]</font>&nbsp;{% endif %}</td>
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
     </tr>
     <tr>
