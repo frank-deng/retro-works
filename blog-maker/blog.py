@@ -15,7 +15,7 @@ import markdown2
 from jinja2 import Environment,FileSystemLoader
 from lxml import etree,html
 
-class DefaultProcessor:
+class FontProcessor:
     def __init__(self,conf):
         self.__config=conf
 
@@ -73,18 +73,26 @@ class DefaultProcessor:
             if item.tail:
                 self.__apply_font(item_new,item.tail)
 
-    def __process_html(self,content):
+    def apply_font(self,content,singleLine=False):
         old_tree=html.fromstring("<html>"+content+"</html>")
         new_tree=html.document_fromstring("<html></html>")
         self.__process_element(old_tree,new_tree)
         res=html.tostring(new_tree,encoding='utf-8').decode('utf-8')
         res=re.sub(r'^\<html\>\<body\>','',res)
         res=re.sub(r'\</body\>\</html\>$','',res)
+        if singleLine:
+            res=re.sub(r'^\<p\>','',res)
+            res=re.sub(r'\</p\>$','',res)
         return res
+
+
+class DefaultProcessor(FontProcessor):
+    def __init__(self,conf):
+        super().__init__(conf)
 
     def parse(self,meta,content):
         html=markdown2.markdown(content,extras=['tables'])
-        return self.__process_html(meta.get('Title','')),self.__process_html(html)
+        return self.apply_font(meta.get('Title','')),self.apply_font(html)
 
 
 class BlogMaker:
@@ -177,22 +185,29 @@ class BlogMaker:
             f.write(res.encode(encoding,'replace'))
 
     def __save_index(self,postsOrig):
+        fontProc=FontProcessor(self.__config)
         template=self.__jinja2.get_template('index.html')
         encoding=self.__config.get('encoding','UTF-8')
-        posts=[]
+        postsJson=[]
+        postsRender=[]
         for item in postsOrig:
-            posts.append({
+            postsJson.append({
                 'link':item['Id']+'.htm',
                 'tags':item['Tags'],
                 'title':item['Title']
             })
-        res=template.render(encoding=encoding,posts=posts)
+            postsRender.append({
+                'link':item['Id']+'.htm',
+                'tags':fontProc.apply_font('、'.join(item['Tags']),True),
+                'title':item['Title']
+            })
+        res=template.render(encoding=encoding,posts=postsRender)
         with open(os.path.join(self.__config['outputPath'],'index.htm'),'wb') as f:
             f.write(res.encode(encoding,'replace'))
         jsonFile=self.__config.get('jsonFile')
         if jsonFile:
             with open(os.path.join(self.__config['outputPath'],jsonFile),'w') as f:
-                f.write(json.dumps(posts,indent=2,ensure_ascii=False))
+                f.write(json.dumps(postsJson,indent=2,ensure_ascii=False))
 
     def parse(self):
         self.__prepare_target()
