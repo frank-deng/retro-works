@@ -4,10 +4,11 @@ import logging
 from datetime import datetime, timedelta
 from functools import cmp_to_key
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlparse,urlunparse
 from urllib.robotparser import RobotFileParser
 import hashlib
 import base64
+import random
 
 from lxml import html
 from aiohttp.web import Request
@@ -23,15 +24,48 @@ class NewsManager(Logger):
     def __newsListSort(a,b):
         keyA,keyB=a['id'],b['id']
         dateA,dateB=a['date'],b['date']
-        if dateA<dateB or keyA<keyB:
+        if dateA<dateB:
+            return 1
+        elif dateA>dateB:
+            return -1
+        elif keyA<keyB:
+            return 1
+        elif keyA>keyB:
             return 1
         else:
-            return -1
+            return 0
 
     async def __fetch(self,url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 return await response.text()
+
+    async def __newsDetailFetchAll(self,url):
+        tree=html.fromstring(await self.__fetch(url))
+        href_all=None
+        for item in tree.xpath('//a'):
+            href=item.get('href').strip()
+            text=item.text_content().strip()
+            if not href or not text or href=='#':
+                continue
+            if text=='全文':
+                href_all=href
+        if href_all is None:
+            return tree
+        await asyncio.sleep(random.uniform(0.8,2.5))
+        urlinfo=urlparse(url)
+        path=urlinfo.path
+        path_new=path.split('/')
+        path_new[-1]=href_all
+        url_all=urlunparse((
+            urlinfo.scheme,
+            urlinfo.netloc,
+            '/'.join(path_new),
+            urlinfo.params,
+            urlinfo.query,
+            urlinfo.fragment
+        ))
+        return html.fromstring(await self.__fetch(url_all))
 
     async def __addImage(self,imgurl):
         digest=hashlib.sha256(imgurl.encode()).digest()
@@ -92,7 +126,7 @@ class NewsManager(Logger):
             newsInfo=self.__newsLinks.get(newsid,None)
         if newsInfo is None:
             return None
-        tree=html.fromstring(await self.__fetch(newsInfo['url']))
+        tree=await self.__newsDetailFetchAll(newsInfo['url'])
         content=[]
         for item in tree.xpath('//div[@id="js_article_content" or @id="chan_newsDetail"]//p'):
             imgs=item.xpath('./img')
