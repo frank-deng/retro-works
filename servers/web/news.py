@@ -1,20 +1,191 @@
+import asyncio
 import aiohttp
+import logging
+from datetime import datetime, timedelta
+from functools import cmp_to_key
+import re
+from urllib.parse import urlparse
+from urllib.robotparser import RobotFileParser
+import hashlib
+import base64
+
+from lxml import html
+from aiohttp.web import Request
+from aiohttp.web import Response
+from aiohttp_jinja2 import render_string
+from PIL import Image
+from io import BytesIO
+
 from util import Logger
 
 class NewsManager(Logger):
-    __host='https://apis.tianapi.com'
-    def __init__(self,key):
-        self.__key=key
+    @staticmethod
+    def __newsListSort(a,b):
+        keyA,keyB=a['id'],b['id']
+        dateA,dateB=a['date'],b['date']
+        if dateA<dateB or keyA<keyB:
+            return 1
+        else:
+            return -1
 
-    async def __fetch(self,path,params_in=None):
-        params={'key':self.__key}
-        if params_in is not None:
-            params.update(params_in)
+    async def __fetch(self,url):
         async with aiohttp.ClientSession() as session:
-            async with session.post(f'{self.__host}/{path}',data=params) as response:
-                return await response.json()
+            async with session.get(url) as response:
+                return await response.text()
 
-    async def newsList(self,num=10):
-        res=await self.__fetch('generalnews/index',{'num':num})
-        res=res['result']['newslist']
-        return res
+    async def __addImage(self,imgurl):
+        digest=hashlib.sha256(imgurl.encode()).digest()
+        key=base64.urlsafe_b64encode(digest).decode().rstrip('=')[:12]
+        async with self.__imageLinksLock:
+            self.__imageLinks[key]=imgurl
+        return key
+
+    def __init__(self,host):
+        self.__host=host
+        self.__rp=RobotFileParser()
+        self.__newsLinks={}
+        self.__newsLinksLock=asyncio.Lock()
+        self.__imageLinks={}
+        self.__imageLinksLock=asyncio.Lock()
+
+    async def newsList(self):
+        res=[]
+        resp,robots=await asyncio.gather(self.__fetch(self.__host),
+            self.__fetch(self.__host+'/robots.txt'))
+        self.__rp.parse(robots)
+        href_set=set()
+        tree = html.fromstring(resp)
+        for item in tree.xpath('//a'):
+            href=item.get('href').strip()
+            if href in href_set:
+                continue
+            title=item.text_content().strip()
+            if not href or not title or href=='#' or href in href_set:
+                continue
+            href_set.add(href)
+            if not self.__rp.can_fetch('',href):
+                continue
+            linkinfo=urlparse(href)
+            match=re.search(r'(20(\d{2}[01]\d[0-3]\d))/(\d+)\.html$',linkinfo.path)
+            if not match:
+                continue
+            date_str,key=match[1],match[3]
+            date_news=datetime.strptime(date_str,"%Y%m%d").date()
+            date_limit=datetime.now().date()-timedelta(days=30)
+            if date_news<date_limit:
+                continue
+            res.append({
+                'id':key,
+                'url':href,
+                'date':date_news,
+                'title':title
+            })
+        async with self.__newsLinksLock:
+            for item in res:
+                self.__newsLinks[item['id']]=item
+
+        return sorted(res,key=cmp_to_key(self.__class__.__newsListSort))
+
+    async def newsDetail(self,newsid):
+        newsInfo=None
+        async with self.__newsLinksLock:
+            newsInfo=self.__newsLinks.get(newsid,None)
+        if newsInfo is None:
+            return None
+        tree=html.fromstring(await self.__fetch(newsInfo['url']))
+        content=[]
+        for item in tree.xpath('//div[@id="js_article_content" or @id="chan_newsDetail"]//p'):
+            imgs=item.xpath('./img')
+            for img in imgs:
+                src=img.get('src')
+                if src:
+                    content.append({'type':'image','key':await self.__addImage(src)})
+            text=item.text_content().strip()
+            if text:
+                content.append({'type':'text','content':item.text_content()})
+        return {
+            'title':newsInfo['title'],
+            'date':newsInfo['date'].strftime('%Y年%m月%d日'),
+            'content':content
+        }
+
+    async def newsImage(self,key):
+        async with self.__imageLinksLock:
+            return self.__imageLinks.get(key,None)
+
+async def news_detail(req:Request):
+    config=req.app['config']
+    news=await req.app['newsManager'].newsDetail(req.url.query['id'])
+    if news is None:
+        raise aiohttp.web.HTTPNotFound()
+    context={
+        'header':'今日新闻',
+        'title':f'{news["title"]} - 今日新闻',
+        'news_title':news['title'],
+        'news_content':news['content'],
+    }
+    encoding=config['web']['encoding']
+    return Response(
+        body=render_string("news.html",req,context).encode(encoding,errors='replace'),
+        headers={
+            'content-type':f"text/html; charset={encoding}"
+        }
+    )
+
+async def news_handler(req:Request):
+    if 'id' in req.url.query:
+        return await news_detail(req)
+    config=req.app['config']
+    context={
+        'header':'今日新闻',
+        'title':'今日新闻',
+        'news':await req.app['newsManager'].newsList()
+    }
+    encoding=config['web']['encoding']
+    return Response(
+        body=render_string("newslist.html",req,context).encode(encoding,errors='replace'),
+        headers={
+            'content-type':f"text/html; charset={encoding}"
+        }
+    )
+
+def downscale_image(img_data,max_size,quality=80):
+    with Image.open(BytesIO(img_data)) as img:
+        img_new=img
+        width,height=img.width,img.height
+        need_resize=False
+        if width>max_size[0]:
+            height=int(float(height)*float(max_size[0])/float(width))
+            width=max_size[0]
+            need_resize=True
+        if height>max_size[1]:
+            width=int(float(width)*float(max_size[1])/float(height))
+            height=max_size[1]
+            need_resize=True
+        if need_resize:
+            img_new=img.resize((width,height),Image.LANCZOS)
+        outbuf=BytesIO()
+        if img_new.mode != 'RGB':
+            img_new=img_new.convert('RGB')
+        img_new.save(outbuf,format='JPEG',quality=quality)
+        return outbuf.getvalue()
+
+async def news_image_handler(req:Request):
+    logger=logging.getLogger(__name__)
+    config=req.app['config']
+    image_url=await req.app['newsManager'].newsImage(req.match_info['image_key'])
+    if image_url is None:
+        raise aiohttp.web.HTTPNotFound()
+    image_data=None
+    async with aiohttp.ClientSession() as session:
+        async with session.get(image_url) as response:
+            if response.status==200:
+                image_data=await response.read()
+            else:
+                logger.error(response.text())
+    if image_data is None:
+        raise aiohttp.web.HTTPNotFound()
+    image_max_size=tuple(config['web'].get('image_max_size',[360,960]))
+    image_data=await asyncio.to_thread(downscale_image,image_data,image_max_size)
+    return Response(body=image_data)
+

@@ -56,7 +56,7 @@ async def index(req:Request):
         'dateStr':datetime.now().strftime('%Y年%m月%d日'),
         'links':links,
         'weather':weather,
-        'news':news,
+        'news':news[:10],
         'blog':blog
     }
     encoding=config['web']['encoding']
