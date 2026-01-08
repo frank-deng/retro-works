@@ -1,5 +1,6 @@
 {% extends "base.html" %}{% block content %}
-<h3 align='center'>{{news_title}}</h3>{% for line in news_content %}
+<h3 align='center'>{{news_title}}</h3>
+<p align='center'><font size='1' color='#808080'>{{news_date}}</font></p>{% for line in news_content %}
 {% if line['type']=='image' %}
 <p align='center'><img src='news_images/{{line['key']}}.jpg'></p>
 {% elif line['type']=='text' %}

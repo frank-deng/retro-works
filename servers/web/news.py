@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from functools import cmp_to_key
 import re
 from urllib.parse import urlparse,urlunparse
-from urllib.robotparser import RobotFileParser
 import hashlib
 import base64
 import random
@@ -18,8 +17,17 @@ from PIL import Image
 from io import BytesIO
 
 from util import Logger
+from util.robot import RobotChecker
 
 class NewsManager(Logger):
+    __robotChecker=None
+
+    @classmethod
+    async def can_fetch(self,url):
+        if self.__robotChecker is None:
+            self.__robotChecker=RobotChecker()
+        return await self.__robotChecker.can_fetch('',url)
+
     @staticmethod
     def __newsListSort(a,b):
         keyA,keyB=a['id'],b['id']
@@ -36,8 +44,11 @@ class NewsManager(Logger):
             return 0
 
     async def __fetch(self,url):
+        if not self.__class__.can_fetch(url):
+            raise aiohttp.web.HTTPForbidden()
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
+                response.raise_for_status()
                 return await response.text()
 
     async def __newsDetailFetchAll(self,url):
@@ -65,6 +76,8 @@ class NewsManager(Logger):
             urlinfo.query,
             urlinfo.fragment
         ))
+        if not self.__class__.can_fetch(url_all):
+            return tree
         return html.fromstring(await self.__fetch(url_all))
 
     async def __addImage(self,imgurl):
@@ -76,7 +89,6 @@ class NewsManager(Logger):
 
     def __init__(self,host):
         self.__host=host
-        self.__rp=RobotFileParser()
         self.__newsLinks={}
         self.__newsLinksLock=asyncio.Lock()
         self.__imageLinks={}
@@ -84,9 +96,7 @@ class NewsManager(Logger):
 
     async def newsList(self):
         res=[]
-        resp,robots=await asyncio.gather(self.__fetch(self.__host),
-            self.__fetch(self.__host+'/robots.txt'))
-        self.__rp.parse(robots)
+        resp=await self.__fetch(self.__host)
         href_set=set()
         tree = html.fromstring(resp)
         for item in tree.xpath('//a'):
@@ -97,7 +107,7 @@ class NewsManager(Logger):
             if not href or not title or href=='#' or href in href_set:
                 continue
             href_set.add(href)
-            if not self.__rp.can_fetch('',href):
+            if not self.__class__.can_fetch(href):
                 continue
             linkinfo=urlparse(href)
             match=re.search(r'(20(\d{2}[01]\d[0-3]\d))/(\d+)\.html$',linkinfo.path)
@@ -132,14 +142,14 @@ class NewsManager(Logger):
             imgs=item.xpath('./img')
             for img in imgs:
                 src=img.get('src')
-                if src:
+                if src and self.__class__.can_fetch(src):
                     content.append({'type':'image','key':await self.__addImage(src)})
             text=item.text_content().strip()
             if text:
                 content.append({'type':'text','content':item.text_content()})
         return {
             'title':newsInfo['title'],
-            'date':newsInfo['date'].strftime('%Y年%m月%d日'),
+            'date':newsInfo['date'],
             'content':content
         }
 
@@ -156,6 +166,7 @@ async def news_detail(req:Request):
         'header':'今日新闻',
         'title':f'{news["title"]} - 今日新闻',
         'news_title':news['title'],
+        'news_date':news['date'].strftime('%Y年%-m月%-d日'),
         'news_content':news['content'],
     }
     encoding=config['web']['encoding']
@@ -210,6 +221,8 @@ async def news_image_handler(req:Request):
     image_url=await req.app['newsManager'].newsImage(req.match_info['image_key'])
     if image_url is None:
         raise aiohttp.web.HTTPNotFound()
+    if not NewsManager.can_fetch(image_url):
+        raise aiohttp.web.HTTPForbidden()
     image_data=None
     async with aiohttp.ClientSession() as session:
         async with session.get(image_url) as response:
