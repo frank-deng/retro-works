@@ -7,10 +7,11 @@ from datetime import datetime, timedelta
 from util import Logger
 
 class RobotCheckerSite(Logger):
-    def __init__(self,host,timeout_refresh=1440,timeout_failed=2):
+    def __init__(self,host,timeout_refresh=3600,timeout_failed=120):
         self.__host=host
         self.__timeout_refresh=timeout_refresh
         self.__timeout_failed=timeout_failed
+        self.__timeout_fetch=7
         self.__last_load=None
         self.__rp=RobotFileParser()
         self.__load_succ=False
@@ -22,10 +23,10 @@ class RobotCheckerSite(Logger):
             self.__last_load=now
             return True
         delta=now-self.__last_load
-        minutes=int(delta.total_seconds()/60)
-        if not self.__load_succ and minutes<self.__timeout_failed:
+        tm=int(delta.total_seconds())
+        if not self.__load_succ and tm<self.__timeout_failed:
             return False
-        elif self.__load_succ and minutes<self.__timeout_refresh:
+        elif self.__load_succ and tm<self.__timeout_refresh:
             return False
         else:
             return True
@@ -37,7 +38,7 @@ class RobotCheckerSite(Logger):
             url=f'https://{self.__host}/robots.txt'
             res=None
             async with aiohttp.ClientSession() as session:
-                async with session.get(url,timeout=self.__timeout_failed) as response:
+                async with session.get(url,timeout=self.__timeout_fetch) as response:
                     if response.status==404:
                         self.__allow_all=True
                         return True
@@ -62,14 +63,16 @@ class RobotCheckerSite(Logger):
 
 
 class RobotChecker(Logger):
-    def __init__(self,timeout_minutes=1440):
-        self.__timeout_minutes=timeout_minutes
+    def __init__(self,timeout_refresh=3600,timeout_failed=120):
+        self.__timeout_refresh=timeout_refresh
+        self.__timeout_failed=timeout_failed
         self.__site={}
 
     async def can_fetch(self,ua,url):
         parsed=urlparse(url)
         host=urlinfo.netloc
         if host not in self.__site:
-            self.__site=RobotCheckerSite(host,self.__timeout_minutes)
+            self.__site=RobotCheckerSite(host,self.__timeout_refresh,
+                self.__timeout_failed)
         return await self.__site.can_fetch(ua,url)
 

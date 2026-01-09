@@ -9,14 +9,17 @@ from util import Logger
 from pprint import pformat
 
 class WeatherData(Logger):
-    __host='https://nd2k5bdhyy.re.qweatherapi.com'
-    def __init__(self,key):
+    __timeout=5
+    def __init__(self,host,key):
+        self.__host=host
         self.__key=key
 
     async def __fetch(self,session,path,params=None):
         headers={'X-QW-Api-Key':self.__key}
         async with session.get(f'{self.__host}/{path}',params=params,
-                               headers=headers) as response:
+                               headers=headers,
+                               timeout=self.__timeout) as response:
+            response.raise_for_status()
             return await response.json()
 
     async def search_city(self,keyword):
@@ -76,7 +79,8 @@ async def select_city(req:Request):
         if key=='city':
             city=value
     if city:
-        weatherData=WeatherData(config['web']['heweather_key'])
+        weatherData=WeatherData(config['web']['weather_api'],
+            config['web']['weather_key'])
         cityList=await weatherData.search_city(city)
 
     context={
@@ -101,7 +105,8 @@ async def weather(req:Request):
     logger.debug(f'locid:{locid}')
     if locid is None:
         return Response(headers={'Location':'select_city.asp'})
-    weatherData=WeatherData(config['web']['heweather_key'])
+    weatherData=WeatherData(config['web']['weather_api'],
+        config['web']['weather_key'])
     weather=await weatherData.fetch_weather(locid)
     location=weather['location']
     location_str=location['adm1']+'-'+location['adm2']

@@ -20,7 +20,8 @@ links=[
 	{label="天气预报",link="weather.asp"}
 ]
 news_api="xxx"
-heweather_key="xxx"
+weather_api="xxx"
+weather_key="xxx"
 
 [[web.routes]]
 path="/static"

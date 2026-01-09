@@ -21,6 +21,7 @@ from util.robot import RobotChecker
 
 class NewsManager(Logger):
     __robotChecker=None
+    __timeout=5
 
     @classmethod
     async def can_fetch(self,url):
@@ -47,7 +48,7 @@ class NewsManager(Logger):
         if not self.__class__.can_fetch(url):
             raise aiohttp.web.HTTPForbidden()
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
+            async with session.get(url,timeout=self.__timeout) as response:
                 response.raise_for_status()
                 return await response.text()
 
@@ -62,7 +63,9 @@ class NewsManager(Logger):
             if text=='全文':
                 href_all=href
         if href_all is None:
+            self.logger.debug('No need to load full text')
             return tree
+        self.logger.debug('Start load full text')
         await asyncio.sleep(random.uniform(0.8,2.5))
         urlinfo=urlparse(url)
         path=urlinfo.path
@@ -77,6 +80,7 @@ class NewsManager(Logger):
             urlinfo.fragment
         ))
         if not self.__class__.can_fetch(url_all):
+            self.logger.debug('Load full text forbidden')
             return tree
         return html.fromstring(await self.__fetch(url_all))
 
@@ -225,7 +229,7 @@ async def news_image_handler(req:Request):
         raise aiohttp.web.HTTPForbidden()
     image_data=None
     async with aiohttp.ClientSession() as session:
-        async with session.get(image_url) as response:
+        async with session.get(image_url,timeout=5) as response:
             if response.status==200:
                 image_data=await response.read()
             else:

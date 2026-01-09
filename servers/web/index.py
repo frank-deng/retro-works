@@ -15,7 +15,8 @@ async def get_weather(config,locid):
     try:
         warningColorTable={'蓝色':'#0000ff','黄色':'#a0a000',
                            '橙色':'#ff8000','红色':'#ff0000'}
-        weatherData=WeatherData(config['web']['heweather_key'])
+        weatherData=WeatherData(config['web']['weather_api'],
+            config['web']['weather_key'])
         weather=await weatherData.fetch_weather(locid)
         location=weather['location']
         location_str=location['adm2']
@@ -29,14 +30,23 @@ async def get_weather(config,locid):
         logger.error(e,exc_info=True)
         return None
 
+async def get_news(newsManager):
+    logger=logging.getLogger(__name__)
+    res=None
+    try:
+        res=(await newsManager.newsList())[:10]
+    except Exception as e:
+        logger.error(f'Failed to load news {e}',exc_info=True)
+    return res
+
 async def get_blog_data(config):
     logger=logging.getLogger(__name__)
-    blog_data_file=config['web'].get('blog_data_file')
     res=None
-    if not blog_data_file or not os.path.isfile(blog_data_file):
-        logger.debug(f'Blog data file {blog_data_file} not exist')
-        return res
     try:
+        blog_data_file=config['web'].get('blog_data_file')
+        if not blog_data_file or not os.path.isfile(blog_data_file):
+            logger.debug(f'Blog data file {blog_data_file} not exist')
+            return res
         with open(blog_data_file,'r') as f:
             return json.load(f)
     except Exception as e:
@@ -48,7 +58,7 @@ async def index(req:Request):
     links=config['web']['links']
     weather,news,blog=await asyncio.gather(
         get_weather(config,req.cookies.get('location',None)),
-        req.app['newsManager'].newsList(),
+        get_news(req.app['newsManager']),
         get_blog_data(config)
     )
 
@@ -56,7 +66,7 @@ async def index(req:Request):
         'dateStr':datetime.now().strftime('%Y年%m月%d日'),
         'links':links,
         'weather':weather,
-        'news':news[:10],
+        'news':news,
         'blog':blog
     }
     encoding=config['web']['encoding']
