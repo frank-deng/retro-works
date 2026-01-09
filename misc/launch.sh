@@ -10,7 +10,7 @@ if [[ -f $HOME/.machine ]]; then
 fi
 cd $HOME/$MACHINE
 fvwm-root overlay.png
-dosbox-x -nomenu -conf dosbox-x.conf &>/dev/null & PID=$!
+taskset -c 0 dosbox-x -nomenu -conf dosbox-x.conf &>/dev/null & PID=$!
 echo $PID > $PID_FILE
 wait $PID
 rm $PID_FILE
