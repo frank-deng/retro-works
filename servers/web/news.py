@@ -27,7 +27,8 @@ class NewsManager(Logger):
     async def can_fetch(self,url):
         if self.__robotChecker is None:
             self.__robotChecker=RobotChecker()
-        return await self.__robotChecker.can_fetch('',url)
+        USER_AGENT = f'Python/{sys.version_info[0]}.{sys.version_info[1]} aiohttp/{aiohttp.__version__}'
+        return await self.__robotChecker.can_fetch(USER_AGENT,url)
 
     @staticmethod
     def __newsListSort(a,b):
