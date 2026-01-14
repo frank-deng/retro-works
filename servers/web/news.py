@@ -81,7 +81,7 @@ class NewsManager(Logger):
             urlinfo.query,
             urlinfo.fragment
         ))
-        if not self.__class__.can_fetch(url_all):
+        if not await self.__class__.can_fetch(url_all):
             self.logger.debug('Load full text forbidden')
             return tree
         return html.fromstring(await self.__fetch(url_all))
@@ -113,8 +113,6 @@ class NewsManager(Logger):
             if not href or not title or href=='#' or href in href_set:
                 continue
             href_set.add(href)
-            if not await self.__class__.can_fetch(href):
-                continue
             linkinfo=urlparse(href)
             match=re.search(r'(20(\d{2}[01]\d[0-3]\d))/(\d+)\.html$',linkinfo.path)
             if not match:
@@ -123,6 +121,8 @@ class NewsManager(Logger):
             date_news=datetime.strptime(date_str,"%Y%m%d").date()
             date_limit=datetime.now().date()-timedelta(days=30)
             if date_news<date_limit:
+                continue
+            if not await self.__class__.can_fetch(href):
                 continue
             res.append({
                 'id':key,
@@ -228,7 +228,7 @@ async def news_image_handler(req:Request):
     image_url=await req.app['newsManager'].newsImage(req.match_info['image_key'])
     if image_url is None:
         raise aiohttp.web.HTTPNotFound()
-    if not NewsManager.can_fetch(image_url):
+    if not await NewsManager.can_fetch(image_url):
         raise aiohttp.web.HTTPForbidden()
     image_data=None
     async with aiohttp.ClientSession() as session:
