@@ -70,9 +70,10 @@ class RobotChecker(Logger):
 
     async def can_fetch(self,ua,url):
         parsed=urlparse(url)
+        urlinfo=urlparse(url)
         host=urlinfo.netloc
         if host not in self.__site:
-            self.__site=RobotCheckerSite(host,self.__timeout_refresh,
+            self.__site[host]=RobotCheckerSite(host,self.__timeout_refresh,
                 self.__timeout_failed)
-        return await self.__site.can_fetch(ua,url)
+        return await self.__site[host].can_fetch(ua,url)
 

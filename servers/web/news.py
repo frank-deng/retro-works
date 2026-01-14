@@ -1,3 +1,4 @@
+import sys
 import asyncio
 import aiohttp
 import logging
@@ -46,7 +47,7 @@ class NewsManager(Logger):
             return 0
 
     async def __fetch(self,url):
-        if not self.__class__.can_fetch(url):
+        if not await self.__class__.can_fetch(url):
             raise aiohttp.web.HTTPForbidden()
         async with aiohttp.ClientSession() as session:
             async with session.get(url,timeout=self.__timeout) as response:
@@ -112,7 +113,7 @@ class NewsManager(Logger):
             if not href or not title or href=='#' or href in href_set:
                 continue
             href_set.add(href)
-            if not self.__class__.can_fetch(href):
+            if not await self.__class__.can_fetch(href):
                 continue
             linkinfo=urlparse(href)
             match=re.search(r'(20(\d{2}[01]\d[0-3]\d))/(\d+)\.html$',linkinfo.path)
@@ -147,7 +148,7 @@ class NewsManager(Logger):
             imgs=item.xpath('./img')
             for img in imgs:
                 src=img.get('src')
-                if src and self.__class__.can_fetch(src):
+                if src and await self.__class__.can_fetch(src):
                     content.append({'type':'image','key':await self.__addImage(src)})
             text=item.text_content().strip()
             if text:
@@ -167,11 +168,12 @@ async def news_detail(req:Request):
     news=await req.app['newsManager'].newsDetail(req.url.query['id'])
     if news is None:
         raise aiohttp.web.HTTPNotFound()
+    year,month,day=news['date'].year,news['date'].month,news['date'].day
     context={
         'header':'今日新闻',
         'title':f'{news["title"]} - 今日新闻',
         'news_title':news['title'],
-        'news_date':news['date'].strftime('%Y年%-m月%-d日'),
+        'news_date':f'{year}年{month}月{day}日',
         'news_content':news['content'],
     }
     encoding=config['web']['encoding']
