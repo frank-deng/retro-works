@@ -10,6 +10,8 @@ import shutil
 import json
 from datetime import datetime
 import click
+import csv
+from io import StringIO
 import dateutil
 import markdown2
 from jinja2 import Environment,FileSystemLoader
@@ -149,7 +151,7 @@ class BlogMaker:
             key=key.strip()
             val=val.strip()
             if key=='Tags':
-                meta[key]=[v.strip() for v in val.split(',')]
+                meta[key]=[v.strip() for v in next(csv.reader(StringIO(val)))]
             elif key=='Date':
                 meta[key]=dateutil.parse(val)
             else:
