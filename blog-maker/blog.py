@@ -9,9 +9,9 @@ import tomllib
 import shutil
 import json
 from datetime import datetime
-import click
 import csv
 from io import StringIO
+import click
 import dateutil
 import markdown2
 from jinja2 import Environment,FileSystemLoader
@@ -129,7 +129,7 @@ class BlogMaker:
         step=BlogMaker.PARSE_META
         fnparsed=re.findall(r'^(19\d\d|20\d\d)(0\d|1[0-2])([0-2]\d|3[01])_([0-1]\d|2[0-3])([0-5]\d)(.*)?\.md$',fname)
         if fnparsed is None or len(fnparsed)==0:
-            click.echo(click.style(f'Misformatted filename {fname}',fg='yellow'))
+            click.echo(click.style(f'Malformed filename {fname}',fg='yellow'))
             return None,None
         year,month,day,hour,minute=[int(n) for n in fnparsed[0][:5]]
         meta={
