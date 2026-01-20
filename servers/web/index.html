@@ -5,7 +5,7 @@
 	</head>
 	<body topmargin='0' leftmargin='0' rightmargin='0' bottommargin='0' background='static/GRAY.JPG'>{% if weather['warning'] %}{% for item in weather['warning'] %}
 <!--Weather warning-->
-<font color='{{item['level_rgb']}}'><marquee bgcolor='#ffffff' scrolldelay=100 scrollamount=8>{{item['text']}}</marquee></font>
+<font color='{{item['level_rgb']}}'><marquee bgcolor='#ffffff' scrolldelay=100 scrollamount=8>{{item['text']|safe}}</marquee></font>
 {% endfor %}
 {% endif %}
 <!--页头和天气模块-->

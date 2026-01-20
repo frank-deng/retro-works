@@ -2,7 +2,7 @@
 {% block content %}
 <p><b>当前城市：</b>{{location_str}} <font size='2'>[<a href='select_city.asp'>选择城市</a>]</font></p>{% if warning %}<p>
 {% for item in warning %}
-<div><font color='{{item['level_rgb']}}'>{{item['text']}}</font></div>
+<div><font color='{{item['level_rgb']}}'>{{item['text']|safe}}</font></div>
 {% endfor %}
 </p>{% endif %}<table>
 	<tr>

@@ -6,6 +6,7 @@ from aiohttp.web import Request
 from aiohttp.web import Response
 from aiohttp_jinja2 import render_string
 from util import Logger
+from util.fonttool import FontProcessor
 from pprint import pformat
 
 class WeatherData(Logger):
@@ -114,8 +115,10 @@ async def weather(req:Request):
         location_str+='-'+location['name']
     warningColorTable={'蓝色':'#0000ff','黄色':'#a0a000',
                        '橙色':'#ff8000','红色':'#ff0000'}
+    fontProcesor=FontProcessor('Times New Roman','宋体')
     for item in weather['warning']:
         item['level_rgb']=warningColorTable.get(item['level'],'#000000')
+        item['text']=fontProcesor.apply_font(item['text'])
     context={
         'header':'天气预报',
         'title':f'天气预报：{location_str}',

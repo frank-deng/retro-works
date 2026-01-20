@@ -19,6 +19,7 @@ from io import BytesIO
 
 from util import Logger
 from util.robot import RobotChecker
+from util.fonttool import FontProcessor
 
 class NewsManager(Logger):
     __robotChecker=None
@@ -169,12 +170,21 @@ async def news_detail(req:Request):
     if news is None:
         raise aiohttp.web.HTTPNotFound()
     year,month,day=news['date'].year,news['date'].month,news['date'].day
+    fontProcesor=FontProcessor('Times New Roman','宋体')
+    news_content=[]
+    for item in news['content']:
+        if item['type']=='image':
+            news_content.append(item)
+        else:
+            news_content.append({
+                'type':'text','content':fontProcesor.apply_font(item['content'])
+            })
     context={
         'header':'今日新闻',
         'title':f'{news["title"]} - 今日新闻',
-        'news_title':news['title'],
-        'news_date':f'{year}年{month}月{day}日',
-        'news_content':news['content'],
+        'news_title':fontProcesor.apply_font(news['title']),
+        'news_date':fontProcesor.apply_font(f'{year}年{month}月{day}日'),
+        'news_content':news_content
     }
     encoding=config['web']['encoding']
     return Response(
