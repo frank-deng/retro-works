@@ -22,5 +22,6 @@ posts
 
 *.toml
 /servers/answer/
+/ucfont-report/fnt/
 
 sudoku
