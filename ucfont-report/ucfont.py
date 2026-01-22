@@ -272,3 +272,22 @@ class UCFontHZ(UCFont):
     def get_glyph(self,path_obj,qu:int,wei:int):
         return super().get_glyph(path_obj,(qu-0xb0)*94+(wei-0xa1))
 
+
+class UCFontHZGBK(UCFont):
+    def __init__(self,font_file):
+        super().__init__(font_file)
+        self.font_name='宋体GBK'
+
+    def get_glyph(self,path_obj,qu:int,wei:int):
+        if qu<0x81 or qu>0xfe or wei<0x40 or wei==0x7f or wei>0xfe:
+            return None
+        if wei<0x7f:
+            idx=0x2e44+(qu-0x81)*96+(wei-0x40)
+        elif wei<0xa1:
+            idx=0x2e44+(qu-0x81)*96+(wei-0x41)
+        elif qu<0xa1:
+            idx=0x2284+(qu-0x81)*94+(wei-0xa1)
+        else:
+            idx=(qu-0xa1)*94+(wei-0xa1)
+        return super().get_glyph(path_obj,idx)
+
