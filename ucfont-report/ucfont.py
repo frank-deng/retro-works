@@ -203,12 +203,21 @@ class UCFont:
         self.close()
         return False
 
+    def __del__(self):
+        self.close()
+
     def close(self):
         if hasattr(self, '_mm') and self._mm:
-            self._mm.close()
+            try:
+                self._mm.close()
+            except:
+                pass
             self._mm=None
         if hasattr(self, '_file') and self._file:
-            self._file.close()
+            try:
+                self._file.close()
+            except:
+                pass
             self._file=None
 
     def get_glyph(self,path_obj,idx:int):

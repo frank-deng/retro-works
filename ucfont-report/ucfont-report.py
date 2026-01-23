@@ -71,7 +71,7 @@ class HZGBK:
 
     def __next__(self):
         char=None
-        while True:
+        while self.__qu<=0xf7:
             try:
                 self.__next_wei()
                 char=bytes((self.__qu,self.__wei)).decode('gbk')
@@ -117,7 +117,7 @@ class FontChecker:
         if len(self.readfail):
             report.append(f'读取失败{len(self.readfail)}个')
         if len(self.corrupt):
-            report.aopend(f'数据损坏{len(self.corrupt)}个')
+            report.append(f'数据损坏{len(self.corrupt)}个')
         print('，'.join(report))
 
 
