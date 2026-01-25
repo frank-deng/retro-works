@@ -177,13 +177,13 @@ async def news_detail(req:Request):
             news_content.append(item)
         else:
             news_content.append({
-                'type':'text','content':fontProcesor.apply_font(item['content'])
+                'type':'text','content':fontProcesor.apply_font(item['content'],singleLine=True)
             })
     context={
         'header':'今日新闻',
         'title':f'{news["title"]} - 今日新闻',
-        'news_title':fontProcesor.apply_font(news['title']),
-        'news_date':fontProcesor.apply_font(f'{year}年{month}月{day}日'),
+        'news_title':fontProcesor.apply_font(news['title'],singleLine=True),
+        'news_date':fontProcesor.apply_font(f'{year}年{month}月{day}日',singleLine=True),
         'news_content':news_content
     }
     encoding=config['web']['encoding']
