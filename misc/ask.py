@@ -22,7 +22,8 @@ class AskBot:
             fp=open(self.__outfile,'a',encoding='utf8')
             if sys.stdout.isatty():
                 try:
-                    proc=subprocess.Popen(['less','-FRX'],stdin=subprocess.PIPE)
+                    cmd=os.environ.get('VIEWER','less -FRX').split()
+                    proc=subprocess.Popen(cmd,stdin=subprocess.PIPE)
                     target=proc.stdin
                 except Exception as e:
                     print(e,file=sys.stderr)
@@ -155,7 +156,9 @@ def parse_file(fpath,question):
         with open(fpath,'w',encoding='utf8') as fp:
             fp.write(FILE_MARKER+'\n'+question+'\n')
         if sys.stdout.isatty() and sys.stdin.isatty():
-            proc=subprocess.Popen(['vim',fpath])
+            cmd=os.environ.get('EDITOR','vim').split()
+            cmd.append(fpath)
+            proc=subprocess.Popen(cmd)
             if proc is None:
                 raise RuntimeError('Failed to launch editor.')
             proc.wait()
@@ -213,7 +216,6 @@ def write_file(fpath,conversation):
 @click.argument('file', required=True)
 @click.argument('question',nargs=-1,required=False)
 def main(model,file,question):
-    """For VIM users, use :!python ask.py %"""
     try:
         question=' '.join(question)+'\n\n'
         if not sys.stdin.isatty():
