@@ -20,7 +20,6 @@ class AskBot:
         fp=None
         try:
             fp=open(self.__outfile,'a',encoding='utf8')
-            fp.write('\n'+('-'*50)+'\n')
             if sys.stdout.isatty():
                 try:
                     proc=subprocess.Popen(['less','-FRX'],stdin=subprocess.PIPE)
@@ -77,13 +76,13 @@ class AskBotDeepSeek(AskBot):
             "stream": True,
             "messages": [],
         }
-        for idx in range(len(dialogue)):
+        for idx,content in enumerate(dialogue):
             role='user'
             if idx&1:
                 role='assistant'
             jsonData['messages'].append({
                 'role':role,
-                'content':dialogue[idx]
+                'content':content
             })
         async with aiohttp.ClientSession() as session:
             async with session.post('https://api.deepseek.com/chat/completions',
@@ -129,13 +128,13 @@ class AskBotErine(AskBot):
             'stream':True,
         }
         
-        for idx in range(len(dialogue)):
+        for idx,content in enumerate(dialogue):
             role='user'
             if idx&1:
                 role='assistant'
             jsonData['messages'].append({
                 'role':role,
-                'content':dialogue[idx],
+                'content':content,
                 'temperature':0.01,
                 'top_p':0
             })
@@ -150,75 +149,93 @@ MODELS={
 }
 
 
-def create_file(fpath):
-    with open(fpath,'w',encoding='utf8') as fp:
-        fp.write(FILE_MARKER+'\n')
-    if sys.stdout.isatty() and sys.stdin.isatty():
-        proc=subprocess.Popen(['vim',fpath])
-        if proc is None:
-            raise RuntimeError('Failed to launch editor.')
-        proc.wait()
-    elif not sys.stdin.isatty():
-        with open(fpath,'a',encoding='utf8') as fp:
-            for line in sts.stdin:
-                fp.write(line)
-
-
-def parse_file(fpath):
+def parse_file(fpath,question):
+    new_file=False
     if not os.path.exists(fpath):
-        create_file(fpath)
-    if not os.path.isfile(fpath):
+        with open(fpath,'w',encoding='utf8') as fp:
+            fp.write(FILE_MARKER+'\n'+question+'\n')
+        if sys.stdout.isatty() and sys.stdin.isatty():
+            proc=subprocess.Popen(['vim',fpath])
+            if proc is None:
+                raise RuntimeError('Failed to launch editor.')
+            proc.wait()
+        new_file=True
+    elif not os.path.isfile(fpath):
         raise FileNotFoundError(f'{fpath} not a file.')
+
     res=[]
-    question=True
+    isQuestion=True
     with open(fpath,'r',encoding='utf8') as fp:
         marker=fp.readline().rstrip('\n\r')
         if marker!=FILE_MARKER:
             raise ValueError('File format mismatch.')
         content=''
         for line in fp:
-            if question and re.match(r'^[-]{40,}\r?\n$',line):
-                res.append(content.strip())
+            if isQuestion and re.match(r'^[-]{40,}\r?\n$',line):
+                res.append(content.strip('\n\r'))
                 content=''
-                question=False
-            elif not question and re.match(r'^[=]{40,}\r?\n$',line):
-                res.append(content.strip())
+                isQuestion=False
+            elif not isQuestion and re.match(r'^[=]{40,}\r?\n$',line):
+                res.append(content.strip('\n\r'))
                 content=''
-                question=True
+                isQuestion=True
             else:
                 content+=line
-        content=content.strip()
-        if content:
-            res.append(content)
+        if content.strip():
+            res.append(content.strip('\n\r'))
+
+    if not new_file and question.strip():
+        if (len(res)&1)==0:
+            res.append(question)
+        else:
+            res[-1]=question+'\n'+res[-1]
     return res
+
+
+def write_file(fpath,conversation):
+    with open(fpath,'w',encoding='utf8') as fp:
+        fp.write(FILE_MARKER+'\n')
+        for idx,text in enumerate(conversation):
+            fp.write(text.rstrip('\n\r')+'\n')
+            if idx&1:
+                fp.write('='*50+'\n')
+            else:
+                fp.write('-'*50+'\n')
 
 
 @click.command(context_settings={
     'help_option_names': ['-h', '--help', '-?'],
-    'ignore_unknown_options': True
+    'ignore_unknown_options': True,
+    'show_default': False,
 })
 @click.option('--model', '-m', default='deepseek', show_default=True,
               help='Model to use (deepseek, erine, etc.)')
 @click.argument('file', required=True)
-@click.pass_context
-def main(ctx,model,file):
+@click.argument('question',nargs=-1,required=False)
+def main(model,file,question):
     """For VIM users, use :!python ask.py %"""
     try:
-        dialogue=parse_file(file)
+        question=' '.join(question)+'\n\n'
+        if not sys.stdin.isatty():
+            for line in sys.stdin:
+                question+=line
+        question=question.rstrip('\n\r')
+        dialogue=parse_file(file,question)
         if (len(dialogue)&1)==0:
             click.secho('Question not found.',fg='yellow',err=True)
-            ctx.exit(1)
+            return 1
         if model not in MODELS:
             raise RuntimeError(f'Unsupported model "{model}".')
+        write_file(file,dialogue)
         askBot=MODELS[model](file)
         asyncio.run(askBot.ask(dialogue))
-        ctx.exit(0)
+        return 0
     except (BrokenPipeError,KeyboardInterrupt):
-        ctx.exit(0)
+        return 0
     except (RuntimeError,KeyError,FileNotFoundError,ValueError) as e:
         click.secho(e,fg='red',err=True)
-        ctx.exit(1)
+        return 1
 
 if '__main__'==__name__:
-    main()
+    exit(main())
 
