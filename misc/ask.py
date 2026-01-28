@@ -5,6 +5,8 @@ import asyncio,json,os,sys,re,subprocess
 import aiohttp
 import click
 
+FILE_MARKER='# AI Conversation History V1'
+
 class AskBot:
     def __init__(self, outfile):
         self.__outfile=outfile
@@ -148,12 +150,31 @@ MODELS={
 }
 
 
+def create_file(fpath):
+    with open(fpath,'w',encoding='utf8') as fp:
+        fp.write(FILE_MARKER+'\n')
+    if sys.stdout.isatty() and sys.stdin.isatty():
+        proc=subprocess.Popen(['vim',fpath])
+        if proc is None:
+            raise RuntimeError('Failed to launch editor.')
+        proc.wait()
+    elif not sys.stdin.isatty():
+        with open(fpath,'a',encoding='utf8') as fp:
+            for line in sts.stdin:
+                fp.write(line)
+
+
 def parse_file(fpath):
+    if not os.path.exists(fpath):
+        create_file(fpath)
     if not os.path.isfile(fpath):
-        raise FileNotFoundError(f'{fpath} not found or not a file.')
+        raise FileNotFoundError(f'{fpath} not a file.')
     res=[]
     question=True
     with open(fpath,'r',encoding='utf8') as fp:
+        marker=fp.readline().rstrip('\n\r')
+        if marker!=FILE_MARKER:
+            raise ValueError('File format mismatch.')
         content=''
         for line in fp:
             if question and re.match(r'^[-]{40,}\r?\n$',line):
@@ -191,17 +212,12 @@ def main(ctx,model,file):
             raise RuntimeError(f'Unsupported model "{model}".')
         askBot=MODELS[model](file)
         asyncio.run(askBot.ask(dialogue))
-    except BrokenPipeError:
-        pass
-    except KeyboardInterrupt:
-        pass
-    except RuntimeError as e:
+        ctx.exit(0)
+    except (BrokenPipeError,KeyboardInterrupt):
+        ctx.exit(0)
+    except (RuntimeError,KeyError,FileNotFoundError,ValueError) as e:
         click.secho(e,fg='red',err=True)
         ctx.exit(1)
-    except KeyError as e:
-        click.secho(e,fg='red',err=True)
-        ctx.exit(1)
-    ctx.exit(0)
 
 if '__main__'==__name__:
     main()
