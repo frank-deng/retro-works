@@ -8,6 +8,7 @@ from email.header import Header
 from uuid import uuid4 as uuidgen
 
 class MailUserRobotAI(MailUserRobot):
+    SAVE_FILE_MARKER='# MailUserRobotAI V1'
     CHARSET_ALIAS:ClassVar[dict]={
         'cn-gb':'gb2312'
     }
@@ -62,14 +63,6 @@ class MailUserRobotAI(MailUserRobot):
         res.reverse()
         return res
 
-    def __save_result(self,content):
-        now=datetime.now()
-        date_str=now.strftime("%Y%m%d_%H%M%S")
-        filename=f"{self.__class__.__name__}_{date_str}_{now.microsecond}.json"
-        path=f"{self._params['storage_dir']}{os.sep}{filename}"
-        with open(path,"w") as fp:
-            fp.write(content)
-
     @staticmethod
     def __msg_apply_reply(text,textOrig):
         marker='> '
@@ -78,15 +71,31 @@ class MailUserRobotAI(MailUserRobot):
             res+=f"\n{marker}{line.rstrip()}"
         return res.replace('\r','').replace('\n','\r\n')
 
-    async def apiHandler(self,conversation):
-        raise NotImplementedError('apiHandler must be implemented for calling external API.');
+    def __save_result(self,conversation,reply):
+        try:
+            now=datetime.now()
+            date_str=now.strftime("%Y%m%d_%H%M%S")
+            filename=f"{self.__class__.__name__}_{date_str}_{now.microsecond}.md"
+            path=f"{self._params['storage_dir']}{os.sep}{filename}"
+            with open(path,"w") as fp:
+                fp.write(self.__class__.SAVE_FILE_MARKER+'\n')
+                for idx,text in enumerate(conversation):
+                    fp.write(text.rstrip('\n\r')+'\n')
+                    if idx&1:
+                        fp.write('='*50+'\n')
+                    else:
+                        fp.write('-'*50+'\n')
+                fp.write(reply.rstrip('\n\r')+'\n')
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
 
     async def __taskMain(self,userFrom,msg):
         msg=email.message_from_bytes(msg)
         subject,content=self.__class__.__msg_get_data(msg)
         conversation=self.__class__.__parse_content(content)
-        content=self.__class__.__msg_apply_reply(await self.apiHandler(conversation), content)
-        self.__save_result(content)
+        reply=await self.apiHandler(conversation)
+        self.__save_result(conversation,reply)
+        content=self.__class__.__msg_apply_reply(reply, content)
         reply_charset='HZ-GB-2312'
         msg_reply = Message()
         msg_reply['From']=self._user
@@ -96,7 +105,8 @@ class MailUserRobotAI(MailUserRobot):
         else:
             msg_reply['Subject']=Header("Re: "+subject, reply_charset)
         content_gb2312=content.encode('gb2312','replace')
-        msg_reply.set_payload(content_gb2312.decode('gb2312'), charset=reply_charset)
+        msg_reply.set_payload(content_gb2312.decode('gb2312',errors='ignore'),
+                              charset=reply_charset)
         msg_reply_data=msg_reply.as_bytes().replace(b'\n',b'\r\n')
         await self.send(userFrom,msg_reply_data)
     
@@ -127,6 +137,10 @@ class MailUserRobotAI(MailUserRobot):
     async def append(self,userFrom,msg):
         taskId=str(uuidgen())
         self.__tasks[taskId]=asyncio.create_task(self.__task(taskId,userFrom,msg))
+
+    async def apiHandler(self,conversation):
+        raise NotImplementedError('apiHandler must be implemented for calling external API.');
+
 
 class MailUserRobotDeepseek(MailUserRobotAI):
     async def apiHandler(self,content):
