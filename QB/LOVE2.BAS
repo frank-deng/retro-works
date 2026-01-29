@@ -50,8 +50,8 @@ END TYPE
 CONST WAVHeaderSize=45
 
 DIM SHARED ASM(100)
-COMMON SB AS SBType,PWAV AS PLAYWAVType
-WAVPLAY=1
+COMMON SHARED SB AS SBType,PWAV AS PLAYWAVType,PG,PI#
+PG=-1
 
 DEF SEG=VARSEG(ASM(0))
 BLOAD "UTIL.BIN",VARPTR(ASM(0))
@@ -63,35 +63,23 @@ DEF SEG
 
 PI#=3.141592654#
 OPEN "LPT3" FOR OUTPUT AS #1
+TX("M10CU1,0KB1,0CL0")
 
 CALL InitSoundCard(SB)
 CALL LoadWAV(PWAV,SB,"LOVE2.WAV")
 
-FONTSIZE=98:X0=10:Y0=40:HEARTX=320:HEARTY=10:HEARTW=50:HEARTH=150
-TX ("M10CU1,0KB1,0CL0CO7B0,0,640,480RE0,0,LOVE2.PCX${%1=3@"+n$(FONTSIZE)+","+n$(FONTSIZE)+"}")
-FOR DY=-1 TO 1: FOR DX=-1 TO 1
-  IF DX<>0 OR DY<>0 THEN
-    TX ("{(3|"+n$(DY+Y0)+"-"+n$(DX+X0)+"石头-"+n$(DX+638-X0-FONTSIZE*2)+"春婷}")
-  END IF
-NEXT DX: NEXT DY
-TX ("{(11|"+n$(Y0)+"-"+n$(X0)+"石头-"+n$(638-X0-FONTSIZE*2)+"春婷}")
-X$=n$(HEARTX-HEARTW): Y$=n$(HEARTY+HEARTW): R$=n$(HEARTW)
-TX("CO13E"+X$+","+Y$+",0,180,"+R$+","+R$+",2")
-TX("CO5E"+X$+","+Y$+",0,180,"+R$+","+R$+",0")
-X$=n$(HEARTX+HEARTW)
-TX("CO13E"+X$+","+Y$+",0,180,"+R$+","+R$+",2")
-TX("CO5E"+X$+","+Y$+",0,180,"+R$+","+R$+",0")
-FOR Y0=1 TO HEARTH
-  X=INT(HEARTW*2*COS(PI#*Y0/2/HEARTH)+.5)
-  X$=n$(HEARTX-X): X2$=n$(HEARTX+X): Y$=n$(HEARTY+HEARTW+Y0)
-  TX("CO13L"+X$+","+Y$+","+X2$+","+Y$)
-  CALL PlayWAVTask(PWAV,SB)
-  TX("CO5D"+X$+","+Y$+"D"+X2$+","+Y$)
-  CALL PlayWAVTask(PWAV,SB)
-NEXT Y0
+CALL LoadHeart
 
-WHILE INKEY$="":
+RUNNING=1:WHILE RUNNING=1:K$=INKEY$
   CALL PlayWAVTask(PWAV,SB)
+  SELECT CASE K$
+    CASE CHR$(27)
+      RUNNING=0
+    CASE CHR$(0)+";"
+      CALL LoadPoem
+    CASE " "
+      CALL LoadPoem
+  END SELECT
 WEND
 
 CALL ResetDSP(SB)
@@ -105,6 +93,49 @@ END FUNCTION
 
 SUB TX (s AS STRING)
 PRINT #1, CHR$(14); "["; s; "]";
+END SUB
+
+SUB LoadHeart()
+  IF PG=0 THEN EXIT SUB
+  FONTSIZE=98:X0=10:Y0=40:HEARTX=320:HEARTY=10:HEARTW=50:HEARTH=150
+  TX("CO7B0,0,640,480RE0,0,LOVE2.PCX${%1=3@"+n$(FONTSIZE)+","+n$(FONTSIZE)+"}")
+  FOR DY=-1 TO 1: FOR DX=-1 TO 1
+    IF DX<>0 OR DY<>0 THEN
+      TX ("{(3|"+n$(DY+Y0)+"-"+n$(DX+X0)+"石头-"+n$(DX+638-X0-FONTSIZE*2)+"春婷}")
+    END IF
+  NEXT DX: NEXT DY
+  TX ("{(11|"+n$(Y0)+"-"+n$(X0)+"石头-"+n$(638-X0-FONTSIZE*2)+"春婷}")
+  X$=n$(HEARTX-HEARTW): Y$=n$(HEARTY+HEARTW): R$=n$(HEARTW)
+  TX("CO13E"+X$+","+Y$+",0,180,"+R$+","+R$+",2")
+  TX("CO5E"+X$+","+Y$+",0,180,"+R$+","+R$+",0")
+  X$=n$(HEARTX+HEARTW)
+  TX("CO13E"+X$+","+Y$+",0,180,"+R$+","+R$+",2")
+  TX("CO5E"+X$+","+Y$+",0,180,"+R$+","+R$+",0")
+  FOR Y0=1 TO HEARTH
+    X=INT(HEARTW*2*COS(PI#*Y0/2/HEARTH)+.5)
+    X$=n$(HEARTX-X): X2$=n$(HEARTX+X): Y$=n$(HEARTY+HEARTW+Y0)
+    TX("CO13L"+X$+","+Y$+","+X2$+","+Y$)
+    CALL PlayWAVTask(PWAV,SB)
+    TX("CO5D"+X$+","+Y$+"D"+X2$+","+Y$)
+    CALL PlayWAVTask(PWAV,SB)
+  NEXT Y0
+  PG=0
+END SUB
+
+SUB LoadPoem()
+  IF PG=1 THEN EXIT SUB
+  FONTSIZE=38
+  TX("{%1=1@"+n$(FONTSIZE)+","+n$(FONTSIZE)+"}")
+  X0=(640-FONTSIZE*16)/2+FONTSIZE/4:Y0=8
+  CALL LoadPoemPart(X0,478-Y0-FONTSIZE*2,"邓门才略开泰元，磊落襟怀海纳川。")
+  CALL LoadPoemPart(X0,478-Y0-FONTSIZE,"春和景秀小竹清，婷韵锦美共婵娟。")
+  PG=1
+END SUB
+
+SUB LoadPoemPart(X AS INTEGER,Y AS INTEGER,ST$)
+  TX("{(15|"+n$(Y-1)+"-"+n$(X-1)+ST$+"}")
+  TX("{(0|"+n$(Y+1)+"-"+n$(X+1)+ST$+"}")
+  TX("{(12|"+n$(Y)+"-"+n$(X)+ST$+"}")
 END SUB
 
 SUB LoadWAV(PWAV AS PLAYWAVType,SB AS SBType,WAVFILE AS STRING)
