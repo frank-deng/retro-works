@@ -130,18 +130,17 @@ class HZGB2312:
 WEI_CNT=94
 COLS=20
 ROWS=math.ceil(WEI_CNT/COLS)
-QU_GRP=10
+QU_GRP=9
 
 def draw_chars_grp(font16,font,qu_start):
     idx=int((qu_start-0xb0)/QU_GRP)
-    surface=cairo.ImageSurface(cairo.FORMAT_A1,COLS*(48+16),ROWS*48*QU_GRP)
+    qu_cnt=min(QU_GRP,(1+0xf7-qu_start))
+    surface=cairo.ImageSurface(cairo.FORMAT_A1,COLS*(48+16),ROWS*48*qu_cnt)
     ctx=cairo.Context(surface)
     ctx.set_source_rgba(1,1,1,1)
-    for i in range(QU_GRP):
+    for i in range(qu_cnt):
         for wei in range(0xa1,0xff):
             qu=qu_start+i
-            if qu>0xf7:
-                break
             x=((wei-0xa1)%COLS)*64
             y=(i*ROWS+int((wei-0xa1)/COLS))*48
             draw_hzk16(ctx,x,y,font16.get_data(qu,wei))
@@ -152,7 +151,7 @@ def draw_chars_grp(font16,font,qu_start):
 
 def main():
     with UCFontHZK16('fnt/HZK16') as font16:
-        with UCFontHZ(0,'fnt') as font:
+        with UCFontHZ(8,'fnt') as font:
             for qu in range(0xb0,0xf7+1,QU_GRP):
                 draw_chars_grp(font16,font,qu)
 
