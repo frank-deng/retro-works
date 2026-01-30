@@ -34,8 +34,8 @@ class DataReader:
         d0=self.__read()
         d1=self.__read()
         d2=self.__read()
-        res0=((d0<<2)|(d1>>2))&0x3f
-        res1=((d1<<4)|d2)&0x3f
+        res0=((d0<<2)&0x3c)|(d1>>2)
+        res1=((d1<<4)&0x30)|d2
         if res0 & 0x20:
             res0=-(res0&0x1f)
         if res1 & 0x20:
@@ -137,6 +137,7 @@ class UCFontCharProc:
     def parse(self):
         while not self.__data.is_end:
             self.__cmd[self.__data.readcmd()]()
+        self.__path.on_end()
 
 
 class Path:
@@ -187,6 +188,9 @@ class Path:
     def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
         self._x+=x2
         self._y+=y2
+
+    def on_end(self):
+        pass
 
 
 class UCFont:
