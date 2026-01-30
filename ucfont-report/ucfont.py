@@ -194,6 +194,7 @@ class Path:
 
 
 class UCFont:
+    BASE_SIZE=256
     def __init__(self,fpath):
         if not os.path.isfile(fpath):
             raise FileNotFoundError(f'File not exist {fpath}')
@@ -240,6 +241,7 @@ class UCFont:
 
 
 class UCFontHZ(UCFont):
+    BASE_SIZE=170
     FONT_LIST=(
         (0,'宋体简','HZKPSSTJ'),
         (1,'仿宋简','HZKPSFSJ'),
@@ -287,6 +289,7 @@ class UCFontHZ(UCFont):
 
 
 class UCFontHZGBK(UCFont):
+    BASE_SIZE=170
     def __init__(self,font_file):
         super().__init__(font_file)
         self.font_name='宋体GBK'
