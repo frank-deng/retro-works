@@ -307,3 +307,9 @@ class UCFontHZGBK(UCFont):
             idx=(qu-0xa1)*94+(wei-0xa1)
         return super().get_glyph(path_obj,idx)
 
+
+class UCFontHZK16(UCFont):
+    def get_data(self,qu:int,wei:int):
+        offset=((qu-0xa1)*94+(wei-0xa1))*32
+        return self._mm[offset:offset+32]
+

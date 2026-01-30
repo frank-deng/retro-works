@@ -36,7 +36,7 @@ class PathChecker(Path):
 class HZGB2312:
     def __init__(self):
         self.__qu=0xb0
-        self.__wei=0xa1
+        self.__wei=0xa0
 
     def __iter__(self):
         return self
@@ -54,7 +54,7 @@ class HZGB2312:
 class HZGBK:
     def __init__(self):
         self.__qu=0x81
-        self.__wei=0x40
+        self.__wei=0x39
 
     def __iter__(self):
         return self

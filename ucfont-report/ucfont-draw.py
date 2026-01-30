@@ -1,5 +1,7 @@
 import argparse
 import cairo
+import math
+from ucfont import UCFontHZK16
 from ucfont import UCFontHZ
 from ucfont import UCFontHZGBK
 from ucfont import Path
@@ -96,15 +98,63 @@ class PathCairo(Path):
         self._ctx.fill_preserve()
 
 
-def main():
-    surface=cairo.ImageSurface(cairo.FORMAT_A1,48,48)
+def draw_hzk16(ctx,x0,y0,data):
+    for y in range(16):
+        for i in range(8):
+            mask=1<<(7-i)
+            if data[y*2]&mask:
+                ctx.rectangle(x0+i,y0+y,1,1)
+            if data[y*2+1]&mask:
+                ctx.rectangle(x0+i+8,y0+y,1,1)
+    ctx.fill()
+
+
+class HZGB2312:
+    def __init__(self):
+        self.__qu=0xb0
+        self.__wei=0xa0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self.__wei+=1
+        if (self.__qu==0xd7 and self.__wei>=0xfa) or self.__wei>0xfe:
+            self.__wei=0xa1
+            self.__qu+=1
+            if self.__qu>0xf7:
+                raise StopIteration
+        return self.__qu,self.__wei,bytes((self.__qu,self.__wei)).decode('gbk')
+
+
+WEI_CNT=94
+COLS=20
+ROWS=math.ceil(WEI_CNT/COLS)
+QU_GRP=10
+
+def draw_chars_grp(font16,font,qu_start):
+    idx=int((qu_start-0xb0)/QU_GRP)
+    surface=cairo.ImageSurface(cairo.FORMAT_A1,COLS*(48+16),ROWS*48*QU_GRP)
     ctx=cairo.Context(surface)
     ctx.set_source_rgba(1,1,1,1)
-    with UCFontHZ(0,'fnt') as font:
-        path=PathCairo(ctx,0,0,48/font.BASE_SIZE,48/font.BASE_SIZE)
-        res=font.get_glyph(path,0xb0,0xa1)
-    surface.write_to_png("1.png")
+    for i in range(QU_GRP):
+        for wei in range(0xa1,0xff):
+            qu=qu_start+i
+            if qu>0xf7:
+                break
+            x=((wei-0xa1)%COLS)*64
+            y=(i*ROWS+int((wei-0xa1)/COLS))*48
+            draw_hzk16(ctx,x,y,font16.get_data(qu,wei))
+            path=PathCairo(ctx,x+16,y,48/font.BASE_SIZE,48/font.BASE_SIZE)
+            res=font.get_glyph(path,qu,wei)
+    surface.write_to_png(f"{idx}.png")
     surface.finish()
+
+def main():
+    with UCFontHZK16('fnt/HZK16') as font16:
+        with UCFontHZ(0,'fnt') as font:
+            for qu in range(0xb0,0xf7+1,QU_GRP):
+                draw_chars_grp(font16,font,qu)
 
 if __name__=='__main__':
     main()
