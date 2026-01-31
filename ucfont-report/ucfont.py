@@ -1,6 +1,102 @@
 import os
 import struct
 import mmap
+import cairo
+
+
+class BinLoader:
+    def __init__(self,fpath):
+        if not os.path.isfile(fpath):
+            raise FileNotFoundError(f'File not exist {fpath}')
+        self._file=open(fpath,'rb')
+        self._mm=mmap.mmap(self._file.fileno(),0,access=mmap.ACCESS_READ)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self,exc_type,exc_val,exc_tb):
+        self.close()
+        return False
+
+    def __del__(self):
+        self.close()
+
+    def close(self):
+        if hasattr(self, '_mm') and self._mm:
+            try:
+                self._mm.close()
+            except:
+                pass
+            self._mm=None
+        if hasattr(self, '_file') and self._file:
+            try:
+                self._file.close()
+            except:
+                pass
+            self._file=None
+
+
+class UCFontHZK16(BinLoader):
+    def get_data(self,qu:int,wei:int):
+        offset=((qu-0xa1)*94+(wei-0xa1))*32
+        data=self._mm[offset:offset+32]
+        if all(n==0 for n in data):
+            return None
+        return data
+
+
+class Path:
+    def __init__(self):
+        self._x=0
+        self._y=0
+
+    def on_read(self,x,y):
+        pass
+
+    def on_rect(self,x0,y0,x1,y1):
+        pass
+
+    def on_move(self,x,y):
+        self._x,self._y=x,y
+
+    def on_hor(self,x):
+        self._x=x
+
+    def on_ver(self,y):
+        self._y=y
+
+    def on_line(self,x,y):
+        self._x,self._y=x,y
+
+    def on_qcurve(self,x0,y0,x1,y1):
+        self._x,self._y=x1,y1
+
+    def on_ccurve(self,x0,y0,x1,y1,x2,y2):
+        self._x,self._y=x2,y2
+
+    def on_line_rx(self,rx,y):
+        self._x+=rx
+        self._y=y
+
+    def on_line_ry(self,x,ry):
+        self._x=x
+        self._y+=ry
+
+    def on_line_rel(self,rx,ry):
+        self._x+=rx
+        self._y+=ry
+
+    def on_qcurve_rel(self,x0,y0,x1,y1):
+        self._x+=x1
+        self._y+=y1
+
+    def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
+        self._x+=x2
+        self._y+=y2
+
+    def on_end(self):
+        pass
+
 
 class DataReader:
     def __init__(self,data):
@@ -140,90 +236,11 @@ class UCFontCharProc:
         self.__path.on_end()
 
 
-class Path:
-    def __init__(self):
-        self._x=0
-        self._y=0
-
-    def on_read(self,x,y):
-        pass
-
-    def on_rect(self,x0,y0,x1,y1):
-        pass
-
-    def on_move(self,x,y):
-        self._x,self._y=x,y
-
-    def on_hor(self,x):
-        self._x=x
-
-    def on_ver(self,y):
-        self._y=y
-
-    def on_line(self,x,y):
-        self._x,self._y=x,y
-
-    def on_qcurve(self,x0,y0,x1,y1):
-        self._x,self._y=x1,y1
-
-    def on_ccurve(self,x0,y0,x1,y1,x2,y2):
-        self._x,self._y=x2,y2
-
-    def on_line_rx(self,rx,y):
-        self._x+=rx
-        self._y=y
-
-    def on_line_ry(self,x,ry):
-        self._x=x
-        self._y+=ry
-
-    def on_line_rel(self,rx,ry):
-        self._x+=rx
-        self._y+=ry
-
-    def on_qcurve_rel(self,x0,y0,x1,y1):
-        self._x+=x1
-        self._y+=y1
-
-    def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
-        self._x+=x2
-        self._y+=y2
-
-    def on_end(self):
-        pass
-
-
-class UCFont:
-    BASE_SIZE=256
-    def __init__(self,fpath):
-        if not os.path.isfile(fpath):
-            raise FileNotFoundError(f'File not exist {fpath}')
-        self._file=open(fpath,'rb')
-        self._mm=mmap.mmap(self._file.fileno(),0,access=mmap.ACCESS_READ)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self,exc_type,exc_val,exc_tb):
-        self.close()
-        return False
-
-    def __del__(self):
-        self.close()
-
-    def close(self):
-        if hasattr(self, '_mm') and self._mm:
-            try:
-                self._mm.close()
-            except:
-                pass
-            self._mm=None
-        if hasattr(self, '_file') and self._file:
-            try:
-                self._file.close()
-            except:
-                pass
-            self._file=None
+class UCFont(BinLoader):
+    BASE_SIZE=167
+    def __init__(self,font_file):
+        super().__init__(font_file)
+        self.font_name=os.path.basename(font_file)
 
     def get_glyph(self,path_obj,idx:int):
         offset,datalen=struct.unpack('IH',self._mm[idx*6:(idx+1)*6])
@@ -241,16 +258,15 @@ class UCFont:
 
 
 class UCFontT(UCFont):
-    BASE_SIZE=170
     def __init__(self,font_file='HZKPST'):
         super().__init__(font_file)
+        self.font_name='符号字库'
 
     def get_glyph(self,path_obj,qu:int,wei:int):
         return super().get_glyph(path_obj,(qu-0xa1)*94+(wei-0xa1))
 
 
 class UCFontHZ(UCFont):
-    BASE_SIZE=170
     FONT_LIST=(
         (0,'宋体简','HZKPSSTJ'),
         (1,'仿宋简','HZKPSFSJ'),
@@ -286,10 +302,10 @@ class UCFontHZ(UCFont):
         font_file_sel=None
         for idx,font_name,font_file in self.__class__.FONT_LIST:
             if idx==idx_in:
+                super().__init__(os.path.join(font_path,font_file))
                 font_file_sel=font_file
                 self.font_idx=idx
                 self.font_name=font_name
-                super().__init__(os.path.join(font_path,font_file))
         if font_file_sel is None:
             raise IndexError(f'Font id {idx_in} not exist')
 
@@ -297,8 +313,7 @@ class UCFontHZ(UCFont):
         return super().get_glyph(path_obj,(qu-0xb0)*94+(wei-0xa1))
 
 
-class UCFontHZGBK(UCFont):
-    BASE_SIZE=170
+class UCFontGBK(UCFont):
     def __init__(self,font_file='HZKPSST.GBK'):
         super().__init__(font_file)
         self.font_name='宋体GBK'
@@ -317,8 +332,285 @@ class UCFontHZGBK(UCFont):
         return super().get_glyph(path_obj,idx)
 
 
-class UCFontHZK16(UCFont):
-    def get_data(self,qu:int,wei:int):
-        offset=((qu-0xa1)*94+(wei-0xa1))*32
-        return self._mm[offset:offset+32]
+class PathChecker(Path):
+    def __init__(self):
+        self._l=None
+        self._r=None
+        self._t=None
+        self._b=None
+
+    def __update_bounding_rect(self,x,y):
+        if self._l is None or self._l>x:
+            self._l=x
+        if self._r is None or self._r<x:
+            self._r=x
+        if self._t is None or self._t>y:
+            self._t=y
+        if self._b is None or self._b<y:
+            self._b=y
+
+    def __check_pos(self):
+        if self._x<0 or self._x>255:
+            raise ValueError(f'X pos out of range: {self._x}')
+        if self._y<0 or self._y>255:
+            raise ValueError(f'Y pos out of range: {self._y}')
+        self.__update_bounding_rect(self._x,self._y)
+
+    def on_rect(self,x0,y0,x1,y1):
+        super().on_rect(self,x0,y0,x1,y1)
+        self.__update_bounding_rect(x0,y0)
+        self.__update_bounding_rect(x1,y1)
+
+    def on_move(self,x,y):
+        super().on_move(x,y)
+        self.__update_bounding_rect(self._x,self._y)
+
+    def on_hor(self,x):
+        super().on_hor(x)
+        self.__update_bounding_rect(self._x,self._y)
+
+    def on_ver(self,y):
+        super().on_ver(y)
+        self.__update_bounding_rect(self._x,self._y)
+
+    def on_line(self,x,y):
+        super().on_line(x,y)
+        self.__update_bounding_rect(self._x,self._y)
+
+    def on_line_rx(self,rx,y):
+        super().on_line_rx(rx,y)
+        self.__check_pos()
+
+    def on_line_ry(self,x,ry):
+        super().on_line_ry(x,ry)
+        self.__check_pos()
+
+    def on_line_rel(self,rx,ry):
+        super().on_line_rel(rx,ry)
+        self.__check_pos()
+
+    def on_qcurve_rel(self,x0,y0,x1,y1):
+        super().on_qcurve_rel(x0,y0,x1,y1)
+        self.__check_pos()
+
+    def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
+        super().on_ccurve_rel(x0,y0,x1,y1,x2,y2)
+        self.__check_pos()
+
+    def bounding_rect(self):
+        return self._l,self._r,self._t,self._b
+
+
+class PathCairo(PathChecker):
+    def _qcurve_to(self,cx,cy,x,y):
+        x0,y0=self._ctx.get_current_point()
+        cx0,cy0=x0+(2.0/3.0)*(cx-x0),y0+(2.0/3.0)*(cy-y0)
+        cx1,cy1=x+(2.0/3.0)*(cx-x),y+(2.0/3.0)*(cy-y)
+        self._ctx.curve_to(cx0,cy0,cx1,cy1,x,y)
+
+    def _get_xy(self,x,y):
+        return int(self._xorig+x*self._sx), int(self._yorig+y*self._sy)
+
+    def __init__(self,ctx,x0,y0,sx,sy):
+        super().__init__()
+        self._ctx=ctx
+        self._ctx.set_fill_rule(cairo.FILL_RULE_WINDING)
+        self._ctx.set_line_width(0.5)
+        self._ctx.new_path()
+        self._xorig,self._yorig=x0,y0
+        self._sx,self._sy=sx,sy
+
+    def on_rect(self,x0,y0,x1,y1):
+        super().on_rect(x0,y0,x1,y1)
+        x0,y0=self._get_xy(x0,y0)
+        x1,y1=self._get_xy(x1,y1)
+        self._ctx.rectangle(x0,y0,x1-x0,y1-y0)
+        self._ctx.fill_preserve()
+
+    def on_move(self,x,y):
+        super().on_move(x,y)
+        x,y=self._get_xy(self._x,self._y)
+        self._ctx.move_to(x,y)
+
+    def on_hor(self,x):
+        super().on_hor(x)
+        x,y=self._get_xy(self._x,self._y)
+        self._ctx.line_to(x,y)
+
+    def on_ver(self,y):
+        super().on_ver(y)
+        x,y=self._get_xy(self._x,self._y)
+        self._ctx.line_to(x,y)
+
+    def on_line(self,x,y):
+        super().on_line(x,y)
+        x,y=self._get_xy(self._x,self._y)
+        self._ctx.line_to(x,y)
+
+    def on_qcurve(self,x0,y0,x1,y1):
+        cx,cy=self._get_xy(x0,y0)
+        x,y=self._get_xy(x1,y1)
+        self._qcurve_to(cx,cy,x,y)
+        super().on_qcurve(x0,y0,x1,y1)
+
+    def on_ccurve(self,x0,y0,x1,y1,x2,y2):
+        cx0,cy0=self._get_xy(x0,y0)
+        cx1,cy1=self._get_xy(x1,y1)
+        x,y=self._get_xy(x2,y2)
+        self._ctx.curve_to(cx0,cy0,cx1,cy1,x,y)
+        super().on_ccurve(x0,y0,x1,y1,x2,y2)
+
+    def on_line_rx(self,rx,y):
+        super().on_line_rx(rx,y)
+        x,y=self._get_xy(self._x,self._y)
+        self._ctx.line_to(x,y)
+
+    def on_line_ry(self,x,ry):
+        super().on_line_ry(x,ry)
+        x,y=self._get_xy(self._x,self._y)
+        self._ctx.line_to(x,y)
+
+    def on_line_rel(self,rx,ry):
+        super().on_line_rel(rx,ry)
+        x,y=self._get_xy(self._x,self._y)
+        self._ctx.line_to(x,y)
+
+    def on_qcurve_rel(self,x0,y0,x1,y1):
+        cx,cy=self._get_xy(self._x+x0,self._y+y0)
+        x,y=self._get_xy(self._x+x1,self._y+y1)
+        self._qcurve_to(cx,cy,x,y)
+        super().on_qcurve_rel(x0,y0,x1,y1)
+
+    def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
+        cx0,cy0=self._get_xy(self._x+x0,self._y+y0)
+        cx1,cy1=self._get_xy(self._x+x1,self._y+y1)
+        x,y=self._get_xy(self._x+x2,self._y+y2)
+        self._ctx.curve_to(cx0,cy0,cx1,cy1,x,y)
+        super().on_ccurve_rel(x0,y0,x1,y1,x2,y2)
+
+    def on_end(self):
+        self._ctx.close_path()
+        self._ctx.fill_preserve()
+        self._ctx.stroke()
+
+
+class FontReport:
+    WEI_CNT=94
+    COLS=20
+    ROWS=5
+    QU_GRP=9
+    @staticmethod
+    def bounding_rect_info():
+        path=PathChecker()
+        with UCFontT('fnt/HZKPST') as font:
+            for wei in range(0xa1,0xff):
+                font.get_glyph(path,0xa9,wei)
+        l,r,t,b=path.bounding_rect()
+        print(f'字符基准尺寸：{r}x{b}，基准偏移：({l},{t})')
+
+    @staticmethod
+    def _draw_hzk16(ctx,x0,y0,data):
+        for y in range(16):
+            for i in range(8):
+                mask=1<<(7-i)
+                if data[y*2]&mask:
+                    ctx.rectangle(x0+i,y0+y,1,1)
+                if data[y*2+1]&mask:
+                    ctx.rectangle(x0+i+8,y0+y,1,1)
+        ctx.fill()
+
+    def __init__(self,hzk16,font):
+        self._hzk16=hzk16
+        self._font=font
+        self._missing=[]
+        self._readfail=[]
+        self._corrupt=[]
+
+    def _draw_char(self,ctx,x,y,qu,wei):
+        try:
+            char=bytes((qu,wei)).decode('gbk')
+            hzk16data=self._hzk16.get_data(qu,wei)
+            if hzk16data is None:
+                return
+            self.__class__._draw_hzk16(ctx,x,y,hzk16data)
+            path=PathCairo(ctx,x+16,y,48/self._font.BASE_SIZE,48/self._font.BASE_SIZE)
+            res=self._font.get_glyph(path,qu,wei)
+            if res is None:
+                self._missing.append(char)
+        except UnicodeDecodeError:
+            pass
+        except ValueError as e:
+            self._readfail.append(char)
+        except IndexError as e:
+            self._corrupt.append(char)
+
+    def _draw_group(self,qu_start,idx=None):
+        qu_cnt=min(self.QU_GRP,(1+0xf7-qu_start))
+        surface=cairo.ImageSurface(cairo.FORMAT_A1,self.COLS*(48+16),self.ROWS*48*qu_cnt)
+        ctx=cairo.Context(surface)
+        ctx.set_source_rgba(1,1,1,1)
+        for i in range(qu_cnt):
+            for wei in range(0xa1,0xff):
+                qu=qu_start+i
+                x=((wei-0xa1)%self.COLS)*64
+                y=(i*self.ROWS+int((wei-0xa1)/self.COLS))*48
+                self._draw_char(ctx,x,y,qu,wei)
+        font_idx,png_idx='',''
+        if isinstance(self._font,UCFontHZ):
+            font_idx=f'{self._font.font_idx:02d}'
+        if idx is not None:
+            png_idx=f"_{idx}"
+        surface.write_to_png(f"{font_idx}{self._font.font_name}{png_idx}.png")
+        surface.finish()
+
+    def run(self):
+        if isinstance(self._font,UCFontT):
+            self._draw_group(0xa1)
+        elif isinstance(self._font,UCFontHZ):
+            for qu in range(0xb0,0xf7+1,self.QU_GRP):
+                self._draw_group(qu,int((qu-0xb0)/self.QU_GRP))
+
+    def __str__(self):
+        res=f'{self._font.font_name}：'
+        if hasattr(self._font,'font_idx'):
+            res=f'{self._font.font_idx:02d}#{self._font.font_name}：'
+        report=[]
+        if len(self._missing):
+            report.append(f'缺字{len(self._missing)}个')
+        if len(self._readfail):
+            report.append(f'读取失败{len(self._readfail)}个')
+        if len(self._corrupt):
+            report.append(f'数据损坏{len(self._corrupt)}个')
+        if len(report)==0:
+            res+='正常'
+        else:
+            res+='，'.join(report)
+        return res
+
+
+def main():
+    with UCFontHZK16('fnt/HZK16') as hzk16:
+        try:
+            with UCFontT('fnt/HZKPST') as font:
+                report=FontReport(hzk16,font)
+                report.run()
+                print(str(report))
+            FontReport.bounding_rect_info()
+        except FileNotFoundError as e:
+            print(f'符号字库文件不存在')
+        for font_id,font_name,font_file in UCFontHZ.FONT_LIST:
+            try:
+                with UCFontHZ(font_id,'fnt') as font:
+                    report=FontReport(hzk16,font)
+                    report.run()
+                    print(str(report))
+            except FileNotFoundError as e:
+                print(f'{font_id:02d}#{font_name}：字库文件不存在')
+    return 0
+
+if __name__=='__main__':
+    try:
+        exit(main())
+    except KeyboardInterrupt:
+        exit(1)
 
