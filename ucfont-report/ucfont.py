@@ -524,6 +524,36 @@ class PathCairo(PathChecker):
         self._ctx.stroke()
 
 
+class IterHZGBK:
+    def __init__(self):
+        self.__qu=0x81
+        self.__wei=0x39
+
+    def __iter__(self):
+        return self
+
+    def __next_wei(self):
+        self.__wei+=1
+        if self.__wei==0x7f:
+            self.__wei+=1
+        if self.__wei>0xfe:
+            self.__wei=0x40
+            self.__qu+=1
+            if self.__qu>0xf7:
+                raise StopIteration
+
+    def __next__(self):
+        char=None
+        while self.__qu<=0xf7:
+            try:
+                self.__next_wei()
+                char=bytes((self.__qu,self.__wei)).decode('gbk')
+                break
+            except UnicodeDecodeError:
+                pass
+        return self.__qu,self.__wei,char
+
+
 class FontReport:
     WEI_CNT=94
     COLS=20
@@ -563,8 +593,7 @@ class FontReport:
                 return
             self.__class__._draw_hzk16(ctx,x,y,hzk16data)
             path=PathCairo(ctx,x+16,y,48/self._font.BASE_SIZE,48/self._font.BASE_SIZE)
-            res=self._font.get_glyph(path,qu,wei)
-            if res is None:
+            if self._font.get_glyph(path,qu,wei) is None:
                 self._missing.append(char)
         except UnicodeDecodeError:
             pass
@@ -592,12 +621,26 @@ class FontReport:
         surface.write_to_png(f"{font_idx}{self._font.font_name}{png_idx}.png")
         surface.finish()
 
+    def _check_font_gbk(self):
+        for qu,wei,char in IterHZGBK():
+            try:
+                path=PathChecker()
+                if self._font.get_glyph(path,qu,wei) is None:
+                    self._missing.append(char)
+            except ValueError as e:
+                self._readfail.append(char)
+            except IndexError as e:
+                self._corrupt.append(char)
+
+
     def run(self):
         if isinstance(self._font,UCFontT):
             self._draw_group(0xa1)
         elif isinstance(self._font,UCFontHZ):
             for qu in range(0xb0,0xf7+1,self.QU_GRP):
                 self._draw_group(qu,int((qu-0xb0)/self.QU_GRP))
+        elif isinstance(self._font,UCFontGBK):
+            self._check_font_gbk()
 
     def __str__(self):
         res=f'{self._font.font_name}：'
@@ -619,6 +662,14 @@ class FontReport:
 
 def do_report(logger,hzk16):
     try:
+        with UCFontGBK('fnt/HZKPSST.GBK') as font:
+            report=FontReport(hzk16,font)
+            report.run()
+            logger.write(str(report))
+    except FileNotFoundError as e:
+        logger.write(f'字库文件HZKPSST.GBK不存在')
+
+    try:
         with UCFontT('fnt/HZKPST') as font:
             report=FontReport(hzk16,font)
             report.run()
@@ -626,7 +677,8 @@ def do_report(logger,hzk16):
         l,r,t,b=FontReport.bounding_rect_info()
         logger.write(f'字符基准尺寸：{r}x{b}，基准偏移：({l},{t})')
     except FileNotFoundError as e:
-        logger.write(f'符号字库文件不存在')
+        logger.write(f'符号字库文件HZKPST不存在')
+
     for font_id,font_name,font_file in UCFontHZ.FONT_LIST:
         try:
             with UCFontHZ(font_id,'fnt') as font:
