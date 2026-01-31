@@ -3,6 +3,7 @@ import cairo
 import math
 from ucfont import UCFontHZK16
 from ucfont import UCFontHZ
+from ucfont import UCFontT
 from ucfont import UCFontHZGBK
 from ucfont import Path
 
@@ -21,6 +22,7 @@ class PathCairo(Path):
         super().__init__()
         self._ctx=ctx
         self._ctx.set_fill_rule(cairo.FILL_RULE_WINDING)
+        self._ctx.set_line_width(0.5)
         self._ctx.new_path()
         self._xorig,self._yorig=x0,y0
         self._sx,self._sy=sx,sy
@@ -96,6 +98,7 @@ class PathCairo(Path):
     def on_end(self):
         self._ctx.close_path()
         self._ctx.fill_preserve()
+        self._ctx.stroke()
 
 
 def draw_hzk16(ctx,x0,y0,data):
@@ -109,28 +112,30 @@ def draw_hzk16(ctx,x0,y0,data):
     ctx.fill()
 
 
-class HZGB2312:
-    def __init__(self):
-        self.__qu=0xb0
-        self.__wei=0xa0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        self.__wei+=1
-        if (self.__qu==0xd7 and self.__wei>=0xfa) or self.__wei>0xfe:
-            self.__wei=0xa1
-            self.__qu+=1
-            if self.__qu>0xf7:
-                raise StopIteration
-        return self.__qu,self.__wei,bytes((self.__qu,self.__wei)).decode('gbk')
-
-
 WEI_CNT=94
 COLS=20
 ROWS=math.ceil(WEI_CNT/COLS)
 QU_GRP=9
+
+
+def draw_chars_symbols(font16,font):
+    qu_cnt=0xa9-0xa1+1
+    surface=cairo.ImageSurface(cairo.FORMAT_A1,COLS*(48+16),ROWS*48*qu_cnt)
+    ctx=cairo.Context(surface)
+    ctx.set_source_rgba(1,1,1,1)
+    for qu in range(0xa1,0xa9+1):
+        for wei in range(0xa1,0xff):
+            x=((wei-0xa1)%COLS)*64
+            y=((qu-0xa1)*ROWS+int((wei-0xa1)/COLS))*48
+            draw_hzk16(ctx,x,y,font16.get_data(qu,wei))
+            path=PathCairo(ctx,x+16,y,48/font.BASE_SIZE,48/font.BASE_SIZE)
+            try:
+                res=font.get_glyph(path,qu,wei)
+            except (ValueError,IndexError) as e:
+                pass
+    surface.write_to_png(f"HZKPST.png")
+    surface.finish()
+
 
 def draw_chars_grp(font16,font,qu_start):
     idx=int((qu_start-0xb0)/QU_GRP)
@@ -154,6 +159,8 @@ def draw_chars_grp(font16,font,qu_start):
 
 def main():
     with UCFontHZK16('fnt/HZK16') as font16:
+        with UCFontT('fnt/HZKPST') as font:
+            draw_chars_symbols(font16,font)
         for font_id,font_name,font_file in UCFontHZ.FONT_LIST:
             try:
                 with UCFontHZ(font_id,'fnt') as font:
@@ -163,4 +170,7 @@ def main():
                 print(f'{font_id}#{font_name}：字库文件不存在')
 
 if __name__=='__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

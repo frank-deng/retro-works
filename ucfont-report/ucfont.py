@@ -240,6 +240,15 @@ class UCFont:
         return path_obj
 
 
+class UCFontT(UCFont):
+    BASE_SIZE=170
+    def __init__(self,font_file='HZKPST'):
+        super().__init__(font_file)
+
+    def get_glyph(self,path_obj,qu:int,wei:int):
+        return super().get_glyph(path_obj,(qu-0xa1)*94+(wei-0xa1))
+
+
 class UCFontHZ(UCFont):
     BASE_SIZE=170
     FONT_LIST=(
@@ -290,7 +299,7 @@ class UCFontHZ(UCFont):
 
 class UCFontHZGBK(UCFont):
     BASE_SIZE=170
-    def __init__(self,font_file):
+    def __init__(self,font_file='HZKPSST.GBK'):
         super().__init__(font_file)
         self.font_name='宋体GBK'
 
