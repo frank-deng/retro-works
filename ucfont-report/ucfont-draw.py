@@ -145,15 +145,22 @@ def draw_chars_grp(font16,font,qu_start):
             y=(i*ROWS+int((wei-0xa1)/COLS))*48
             draw_hzk16(ctx,x,y,font16.get_data(qu,wei))
             path=PathCairo(ctx,x+16,y,48/font.BASE_SIZE,48/font.BASE_SIZE)
-            res=font.get_glyph(path,qu,wei)
-    surface.write_to_png(f"{idx}.png")
+            try:
+                res=font.get_glyph(path,qu,wei)
+            except (ValueError,IndexError) as e:
+                pass
+    surface.write_to_png(f"{font.font_name}_{idx}.png")
     surface.finish()
 
 def main():
     with UCFontHZK16('fnt/HZK16') as font16:
-        with UCFontHZ(8,'fnt') as font:
-            for qu in range(0xb0,0xf7+1,QU_GRP):
-                draw_chars_grp(font16,font,qu)
+        for font_id,font_name,font_file in UCFontHZ.FONT_LIST:
+            try:
+                with UCFontHZ(font_id,'fnt') as font:
+                    for qu in range(0xb0,0xf7+1,QU_GRP):
+                        draw_chars_grp(font16,font,qu)
+            except FileNotFoundError as e:
+                print(f'{font_id}#{font_name}：字库文件不存在')
 
 if __name__=='__main__':
     main()
