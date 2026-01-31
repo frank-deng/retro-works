@@ -4,6 +4,36 @@ import mmap
 import cairo
 
 
+class Logger:
+    def __init__(self,fpath='ucfont.log'):
+        with open(fpath,'w') as fp:
+            fp.write('')
+        self.__fp=open(fpath,'a')
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self,exc_type,exc_val,exc_tb):
+        self.close()
+        return False
+
+    def __del__(self):
+        self.close()
+
+    def close(self):
+        if hasattr(self, '__fp') and self.__fp:
+            try:
+                self.__fp.close()
+            except:
+                pass
+            self.__fp=None
+
+    def write(self,_str):
+        print(_str)
+        self.__fp.write(_str+'\n')
+        self.__fp.flush()
+
+
 class BinLoader:
     def __init__(self,fpath):
         if not os.path.isfile(fpath):
@@ -505,8 +535,7 @@ class FontReport:
         with UCFontT('fnt/HZKPST') as font:
             for wei in range(0xa1,0xff):
                 font.get_glyph(path,0xa9,wei)
-        l,r,t,b=path.bounding_rect()
-        print(f'字符基准尺寸：{r}x{b}，基准偏移：({l},{t})')
+        return path.bounding_rect()
 
     @staticmethod
     def _draw_hzk16(ctx,x0,y0,data):
@@ -588,24 +617,30 @@ class FontReport:
         return res
 
 
-def main():
-    with UCFontHZK16('fnt/HZK16') as hzk16:
+def do_report(logger,hzk16):
+    try:
+        with UCFontT('fnt/HZKPST') as font:
+            report=FontReport(hzk16,font)
+            report.run()
+            logger.write(str(report))
+        l,r,t,b=FontReport.bounding_rect_info()
+        logger.write(f'字符基准尺寸：{r}x{b}，基准偏移：({l},{t})')
+    except FileNotFoundError as e:
+        logger.write(f'符号字库文件不存在')
+    for font_id,font_name,font_file in UCFontHZ.FONT_LIST:
         try:
-            with UCFontT('fnt/HZKPST') as font:
+            with UCFontHZ(font_id,'fnt') as font:
                 report=FontReport(hzk16,font)
                 report.run()
-                print(str(report))
-            FontReport.bounding_rect_info()
+                logger.write(str(report))
         except FileNotFoundError as e:
-            print(f'符号字库文件不存在')
-        for font_id,font_name,font_file in UCFontHZ.FONT_LIST:
-            try:
-                with UCFontHZ(font_id,'fnt') as font:
-                    report=FontReport(hzk16,font)
-                    report.run()
-                    print(str(report))
-            except FileNotFoundError as e:
-                print(f'{font_id:02d}#{font_name}：字库文件不存在')
+            logger.write(f'{font_id:02d}#{font_name}：字库文件不存在')
+
+
+def main():
+    with Logger() as logger:
+        with UCFontHZK16('fnt/HZK16') as hzk16:
+            do_report(logger,hzk16)
     return 0
 
 if __name__=='__main__':
