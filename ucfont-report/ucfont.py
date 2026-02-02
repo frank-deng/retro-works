@@ -76,10 +76,6 @@ class UCFontHZK16(BinLoader):
 
 
 class Path:
-    def __init__(self):
-        self._x=0
-        self._y=0
-
     def on_read(self,x,y):
         pass
 
@@ -87,42 +83,16 @@ class Path:
         pass
 
     def on_move(self,x,y):
-        self._x,self._y=x,y
-
-    def on_hor(self,x):
-        self._x=x
-
-    def on_ver(self,y):
-        self._y=y
+        pass
 
     def on_line(self,x,y):
-        self._x,self._y=x,y
+        pass
 
     def on_qcurve(self,x0,y0,x1,y1):
-        self._x,self._y=x1,y1
+        pass
 
     def on_ccurve(self,x0,y0,x1,y1,x2,y2):
-        self._x,self._y=x2,y2
-
-    def on_line_rx(self,rx,y):
-        self._x+=rx
-        self._y=y
-
-    def on_line_ry(self,x,ry):
-        self._x=x
-        self._y+=ry
-
-    def on_line_rel(self,rx,ry):
-        self._x+=rx
-        self._y+=ry
-
-    def on_qcurve_rel(self,x0,y0,x1,y1):
-        self._x+=x1
-        self._y+=y1
-
-    def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
-        self._x+=x2
-        self._y+=y2
+        pass
 
     def on_end(self):
         pass
@@ -195,67 +165,98 @@ class UCFontCharProc:
             14:self.__ccurve_r6,
             15:self.__read,
         }
+        self.__x,self.__y=0,0
 
     def __move_to(self):
-        x=self.__data.read8()
-        y=self.__data.read8()
-        self.__path.on_move(x,y)
+        self.__x=self.__data.read8()
+        self.__y=self.__data.read8()
+        self.__path.on_move(self.__x,self.__y)
 
     def __hor(self):
-        self.__path.on_hor(self.__data.read8())
+        self.__x=self.__data.read8()
+        self.__path.on_line(self.__x,self.__y)
 
     def __ver(self):
-        self.__path.on_ver(self.__data.read8())
+        self.__y=self.__data.read8()
+        self.__path.on_line(self.__x,self.__y)
 
     def __line(self):
-        self.__path.on_line(self.__data.read8(),self.__data.read8())
+        self.__x=self.__data.read8()
+        self.__y=self.__data.read8()
+        self.__path.on_line(self.__x,self.__y)
 
     def __qcurve(self):
-        n=[self.__data.read8() for i in range(4)]
-        self.__path.on_qcurve(*n)
+        cx=self.__data.read8()
+        cy=self.__data.read8()
+        self.__x=self.__data.read8()
+        self.__y=self.__data.read8()
+        self.__path.on_qcurve(cx,cy,self.__x,self.__y)
 
     def __ccurve(self):
-        n=[self.__data.read8() for i in range(6)]
-        self.__path.on_ccurve(*n)
+        cx0=self.__data.read8()
+        cy0=self.__data.read8()
+        cx1=self.__data.read8()
+        cy1=self.__data.read8()
+        self.__x=self.__data.read8()
+        self.__y=self.__data.read8()
+        self.__path.on_ccurve(cx0,cy0,cx1,cy1,self.__x,self.__y)
 
     def __rect(self):
         n=[self.__data.read8() for i in range(4)]
         self.__path.on_rect(*n)
 
     def __line_rx(self):
-        self.__path.on_line_rx(self.__data.read4(),self.__data.read8())
+        self.__x+=self.__data.read4()
+        self.__y=self.__data.read8()
+        self.__path.on_line(self.__x,self.__y)
 
     def __line_ry(self):
-        self.__path.on_line_ry(self.__data.read8(),self.__data.read4())
+        self.__x=self.__data.read8()
+        self.__y+=self.__data.read4()
+        self.__path.on_line(self.__x,self.__y)
 
     def __line_r4(self):
-        self.__path.on_line_rel(self.__data.read4(),self.__data.read4())
+        self.__x+=self.__data.read4()
+        self.__y+=self.__data.read4()
+        self.__path.on_line(self.__x,self.__y)
 
     def __line_r6(self):
         x,y=self.__data.read6()
-        self.__path.on_line_rel(x,y)
+        self.__x+=x
+        self.__y+=y
+        self.__path.on_line(self.__x,self.__y)
 
     def __qcurve_r4(self):
         x0,y0=self.__data.read4(),self.__data.read4()
         x1,y1=self.__data.read4(),self.__data.read4()
-        self.__path.on_qcurve_rel(x0,y0,x0+x1,y0+y1)
+        self.__path.on_qcurve(self.__x+x0,self.__y+y0,self.__x+x0+x1,self.__y+y0+y1)
+        self.__x+=x0+x1
+        self.__y+=y0+y1
 
     def __qcurve_r6(self):
         x0,y0=self.__data.read6()
         x1,y1=self.__data.read6()
-        self.__path.on_qcurve_rel(x0,y0,x0+x1,y0+y1)
+        self.__path.on_qcurve(self.__x+x0,self.__y+y0,self.__x+x0+x1,self.__y+y0+y1)
+        self.__x+=x0+x1
+        self.__y+=y0+y1
 
     def __ccurve_r4(self):
         x0,y0=self.__data.read4(),self.__data.read4()
         x1,y1=self.__data.read4(),self.__data.read4()
         x2,y2=self.__data.read4(),self.__data.read4()
-        self.__path.on_ccurve_rel(x0,y0,x0+x1,y0+y1,x0+x1+x2,y0+y1+y2)
+        self.__path.on_ccurve(self.__x+x0,self.__y+y0,self.__x+x0+x1,self.__y+y0+y1,
+                              self.__x+x0+x1+x2,self.__y+y0+y1+y2)
+        self.__x+=x0+x1+x2
+        self.__y+=y0+y1+y2
 
     def __ccurve_r6(self):
         x0,y0=self.__data.read6()
         x1,y1=self.__data.read6()
         x2,y2=self.__data.read6()
-        self.__path.on_ccurve_rel(x0,y0,x0+x1,y0+y1,x0+x1+x2,y0+y1+y2)
+        self.__path.on_ccurve(self.__x+x0,self.__y+y0,self.__x+x0+x1,self.__y+y0+y1,
+                              self.__x+x0+x1+x2,self.__y+y0+y1+y2)
+        self.__x+=x0+x1+x2
+        self.__y+=y0+y1+y2
 
     def __read(self):
         self.__path.on_read(self.__data.read8(),self.__data.read8())
@@ -369,7 +370,11 @@ class PathChecker(Path):
         self._t=None
         self._b=None
 
-    def __update_bounding_rect(self,x,y):
+    def __check_pos(self,x,y):
+        if x<0 or x>255:
+            raise ValueError(f'X pos out of range: {x}')
+        if y<0 or y>255:
+            raise ValueError(f'Y pos out of range: {y}')
         if self._l is None or self._l>x:
             self._l=x
         if self._r is None or self._r<x:
@@ -379,53 +384,21 @@ class PathChecker(Path):
         if self._b is None or self._b<y:
             self._b=y
 
-    def __check_pos(self):
-        if self._x<0 or self._x>255:
-            raise ValueError(f'X pos out of range: {self._x}')
-        if self._y<0 or self._y>255:
-            raise ValueError(f'Y pos out of range: {self._y}')
-        self.__update_bounding_rect(self._x,self._y)
-
     def on_rect(self,x0,y0,x1,y1):
-        super().on_rect(self,x0,y0,x1,y1)
-        self.__update_bounding_rect(x0,y0)
-        self.__update_bounding_rect(x1,y1)
+        self.__check_pos(x0,y0)
+        self.__check_pos(x1,y1)
 
     def on_move(self,x,y):
-        super().on_move(x,y)
-        self.__update_bounding_rect(self._x,self._y)
-
-    def on_hor(self,x):
-        super().on_hor(x)
-        self.__update_bounding_rect(self._x,self._y)
-
-    def on_ver(self,y):
-        super().on_ver(y)
-        self.__update_bounding_rect(self._x,self._y)
+        self.__check_pos(x,y)
 
     def on_line(self,x,y):
-        super().on_line(x,y)
-        self.__update_bounding_rect(self._x,self._y)
+        self.__check_pos(x,y)
 
-    def on_line_rx(self,rx,y):
-        super().on_line_rx(rx,y)
-        self.__check_pos()
+    def on_qcurve(self,x0,y0,x1,y1):
+        self.__check_pos(x1,y1)
 
-    def on_line_ry(self,x,ry):
-        super().on_line_ry(x,ry)
-        self.__check_pos()
-
-    def on_line_rel(self,rx,ry):
-        super().on_line_rel(rx,ry)
-        self.__check_pos()
-
-    def on_qcurve_rel(self,x0,y0,x1,y1):
-        super().on_qcurve_rel(x0,y0,x1,y1)
-        self.__check_pos()
-
-    def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
-        super().on_ccurve_rel(x0,y0,x1,y1,x2,y2)
-        self.__check_pos()
+    def on_ccurve(self,x0,y0,x1,y1,x2,y2):
+        self.__check_pos(x2,y2)
 
     def bounding_rect(self):
         return self._l,self._r,self._t,self._b
@@ -459,64 +432,26 @@ class PathCairo(PathChecker):
 
     def on_move(self,x,y):
         super().on_move(x,y)
-        x,y=self._get_xy(self._x,self._y)
+        x,y=self._get_xy(x,y)
         self._ctx.move_to(x,y)
-
-    def on_hor(self,x):
-        super().on_hor(x)
-        x,y=self._get_xy(self._x,self._y)
-        self._ctx.line_to(x,y)
-
-    def on_ver(self,y):
-        super().on_ver(y)
-        x,y=self._get_xy(self._x,self._y)
-        self._ctx.line_to(x,y)
 
     def on_line(self,x,y):
         super().on_line(x,y)
-        x,y=self._get_xy(self._x,self._y)
+        x,y=self._get_xy(x,y)
         self._ctx.line_to(x,y)
 
     def on_qcurve(self,x0,y0,x1,y1):
+        super().on_qcurve(x0,y0,x1,y1)
         cx,cy=self._get_xy(x0,y0)
         x,y=self._get_xy(x1,y1)
         self._qcurve_to(cx,cy,x,y)
-        super().on_qcurve(x0,y0,x1,y1)
 
     def on_ccurve(self,x0,y0,x1,y1,x2,y2):
+        super().on_ccurve(x0,y0,x1,y1,x2,y2)
         cx0,cy0=self._get_xy(x0,y0)
         cx1,cy1=self._get_xy(x1,y1)
         x,y=self._get_xy(x2,y2)
         self._ctx.curve_to(cx0,cy0,cx1,cy1,x,y)
-        super().on_ccurve(x0,y0,x1,y1,x2,y2)
-
-    def on_line_rx(self,rx,y):
-        super().on_line_rx(rx,y)
-        x,y=self._get_xy(self._x,self._y)
-        self._ctx.line_to(x,y)
-
-    def on_line_ry(self,x,ry):
-        super().on_line_ry(x,ry)
-        x,y=self._get_xy(self._x,self._y)
-        self._ctx.line_to(x,y)
-
-    def on_line_rel(self,rx,ry):
-        super().on_line_rel(rx,ry)
-        x,y=self._get_xy(self._x,self._y)
-        self._ctx.line_to(x,y)
-
-    def on_qcurve_rel(self,x0,y0,x1,y1):
-        cx,cy=self._get_xy(self._x+x0,self._y+y0)
-        x,y=self._get_xy(self._x+x1,self._y+y1)
-        self._qcurve_to(cx,cy,x,y)
-        super().on_qcurve_rel(x0,y0,x1,y1)
-
-    def on_ccurve_rel(self,x0,y0,x1,y1,x2,y2):
-        cx0,cy0=self._get_xy(self._x+x0,self._y+y0)
-        cx1,cy1=self._get_xy(self._x+x1,self._y+y1)
-        x,y=self._get_xy(self._x+x2,self._y+y2)
-        self._ctx.curve_to(cx0,cy0,cx1,cy1,x,y)
-        super().on_ccurve_rel(x0,y0,x1,y1,x2,y2)
 
     def on_end(self):
         self._ctx.close_path()
