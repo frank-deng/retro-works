@@ -4,11 +4,11 @@ Retro Programming Works 怀旧编程作品
 1995s PC
 --------
 
-多媒体互联网全能电脑，串口互联互通。
+多媒体互联网全能电脑，串口通天下。
 
 ### 配置 Configuration
 
-* Pentium 75 CPU
+* 486 DX2-66MHz CPU
 * 8M RAM
 * 512M HDD
 * S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持640x480高彩色）
@@ -59,7 +59,7 @@ Windows 3.2下推荐安装以下软件：
 
 #### Microsoft Office 4.2安装说明
 
-Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、实用价值低等问题，推荐安装的组件如下：
+Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、稳定性差、实用价值低等问题，推荐安装的组件如下：
 
 * Word除本体外，只安装“联机帮助、示例”中的“Word帮助”、“示例”
 * Excel除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”
@@ -74,7 +74,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * QBASIC调用汇编代码的场景，TASM格式的汇编代码可以用DOS自带的`debug`工具的`a`命令输入，此时涉及跳转地址的地方需要手工计算相关地址。
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
-* 不建议用于对速度、稳定性要求非常高的任务，此类任务请使用现代系统。
+* 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 
 
 1990s PC
