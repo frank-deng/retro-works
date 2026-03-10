@@ -1,0 +1,5 @@
+aiohttp
+aiohttp_jinja2
+click
+lxml
+pillow
