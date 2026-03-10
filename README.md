@@ -47,7 +47,7 @@ Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
 
 Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
 
-Windows 3.2下推荐安装以下软件：
+Windows 3.2推荐安装以下软件：
 
 * Internet Explorer 3.0（包括PPP拨号软件、浏览器、邮件客户端）
 * ACDSee 2.2 16位版本
@@ -159,4 +159,51 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 
 * 对于640k RAM的机器，同时加载CCDOS、拼音输入法、五笔字形输入法后，用WPS编辑文章时，单个文件大小控制在2.4k左右，超过此大小容易死机。
 * GW-BASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量，开发前需仔细评估程序复杂度以决定是否移植到GW-BASIC上，开发时需严格控制`GOTO`的使用以保证一定程度的可维护性。
+
+1999s GEEK PC
+-------------
+
+饱经磨难的极客神机，串口通天下，远程工作使用。
+
+### 配置 Configuration
+
+* 486 DX2-66MHz CPU
+* 8M RAM
+* 512M HDD（炸过MBR）
+* S3 Graphics Adapter with 512k VRAM（Windows 3.2下支持640x480 256色）
+* 3.5 Inch Floppy Drive x1
+* Mouse
+* 56k Modem
+* CD-ROM（毁于光盘爆炸）
+* Sound Blaster 16（没用多久就炸了）
+
+### 主要用途 Main Usage
+
+* 拨号上网
+* 连接远端UNIX机器
+
+### 安装说明
+
+DOS下推荐安装以下软件：
+
+* UCDOS 98b（不安装任何打印字库）
+* TELIX（通过串口拨号连接远程主机）
+
+Windows 3.2安装时，推荐安装方案如下：
+
+* 安装所有自述文件，除打印机自述文件外
+* 游戏、屏幕保护程序、壁纸等杂项不安装
+* 附件只安装以下组件及其对应帮助文件：终端仿真程序、记事本、计算器、时钟、字符映射表
+
+Windows 3.2推荐安装以下软件：
+
+* Internet Explorer 3.0（包括PPP拨号软件、浏览器、邮件客户端）
+* 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
+* EWAN（通过TELNET连接远端站点）
+* WinZip
+
+### 补充说明
+
+* 远程UNIX主机同时支持拨号和Telnet连接方式。
+* DOSBox-X模拟器存在Bug，只能使用一个串口。86Box使用`hlt`指令不能降低主机负载。
 
