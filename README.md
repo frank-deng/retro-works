@@ -176,7 +176,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * Mouse
 * 56k Modem
 * CD-ROM（毁于光盘爆炸）
-* Sound Blaster 16（没用多久就炸了）
+* Sound Blaster 16（后来炸了）
 
 ### 主要用途 Main Usage
 
@@ -197,13 +197,13 @@ Windows 3.2安装时，推荐安装方案如下：
 Windows 3.2推荐安装以下软件：
 
 * Internet Explorer 3.0（包括PPP拨号软件、浏览器、邮件客户端）
-* 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
-* EWAN（通过TELNET连接远端站点）
+* Tera Term/SimpTerm/Mocha Telnet/EWAN（通过TELNET连接远端站点）
 * WS FTP16LE（FTP客户端）
-* Programmer's File Editor
+* 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
 * WinZip
 
 ### 补充说明
 
 * DOSBox-X模拟器存在Bug，只能使用一个串口。86Box使用`hlt`指令不能降低主机负载。
+* Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 
