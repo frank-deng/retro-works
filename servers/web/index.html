@@ -13,7 +13,7 @@
     <tr>
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
         <td bgcolor='#ffff33' bordercolor='#ff0000' rowspan='2' height='40px' nowrap>
-            <img src='/static/CONTBULL.GIF'/><font size='5' face='黑体' color='#000080'><b>欢迎光临我的信息港</b>&nbsp;</font><img src='static/CONTBULL.GIF'/></td>
+            <img src='/static/CONTBULL.GIF' alt=' '/><font size='5' face='黑体' color='#000080'><b>欢迎光临我的信息港</b>&nbsp;</font><img src='static/CONTBULL.GIF' alt=' '/></td>
 	<td bgcolor='#ffff33' bordercolor='#ff0000' nowrap align='right'>{% if weather %}{{weather['location_str']}}&nbsp;{{weather['now']['text']}}&nbsp;<font face='Arial'>{{weather['now']['temp']}}</font>℃&nbsp;<font face='Arial'>AQI</font>：<font face='Arial'>{{weather['air']['aqi']}}</font>&nbsp;{{weather['air']['category']}}{% else %}没有天气信息 <font size=2>[<a href='select_city.asp'>选择城市</a>]</font>&nbsp;{% endif %}</td>
         <td bgcolor='#ffff33' width='10px' rowspan='2'></td>
     </tr>
@@ -32,7 +32,7 @@
 <table width='100%'>
     <tr>
         <td colspan=2 height='24px' valign='middle'>
-            <img src='/static/BULL1A.GIF'/>
+            <img src='/static/BULL1A.GIF' alt='★&nbsp;'/>
             <b>今日新闻</b>　<a href='news.asp'><font size='2'>更多&gt;&gt;</font>
         </td>
     </tr>
@@ -40,16 +40,16 @@
     {% for item in news %}
     <tr>
         <td width='10px'></td>
-	<td><img src='/static/BULLET3.GIF'/> <a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></td>
+	<td><img src='/static/BULLET3.GIF' alt='*'/> <a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></td>
     </tr>
     {% endfor %}
-</table><p align='center'><img src='/static/CONTLINE.GIF'></p>
+</table><p align='center'><img src='/static/CONTLINE.GIF' alt=' '></p>
 {% endif %}
 {% if blog %}
 <table width='100%'>
     <tr>
         <td colspan=2 height='24px' valign='middle'>
-            <img src='/static/BULL1A.GIF'/>
+            <img src='/static/BULL1A.GIF' alt='★&nbsp;'/>
             <b>我的博客</b>　<a href='blog/index.htm'><font size='2'>更多&gt;&gt;</font></a>
         </td>
     </tr>
@@ -57,10 +57,10 @@
     {% for item in blog %}
     <tr>
         <td width='10px'></td>
-	<td><img src='/static/BULLET3.GIF'/> <a href='blog/{{item['link']}}'>{{item['title']}}</a></td>
+	<td><img src='/static/BULLET3.GIF' alt='*'/> <a href='blog/{{item['link']}}'>{{item['title']}}</a></td>
     </tr>
     {% endfor %}
-</table><p align='center'><img src='/static/CONTLINE.GIF'></p>
+</table><p align='center'><img src='/static/CONTLINE.GIF' alt=' '></p>
 {% endif %}
 </td></tr>
 <tr><td height='10px'></td></tr>
