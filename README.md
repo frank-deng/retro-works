@@ -216,3 +216,34 @@ Windows 3.2推荐安装以下软件：
 * Windows 3.2的终端仿真程序可用于排查Modem、自制ISP（PPP服务器）相关问题。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 
+1999s GEEK 386
+--------------
+
+古老的386极客神机，串口通天下，远程工作使用。
+
+### 配置 Configuration
+
+* 386 SX-33MHz CPU
+* 2M RAM
+* 64M HDD
+* VESA-compatible SVGA with 256k VRAM（支持640x480 16色或320x200 256色）
+* 3.5 Inch Floppy Drive x1
+* 5.25 Inch Floppy Drive x1
+* 56k Modem
+
+### 主要用途 Main Usage
+
+* 拨号连接远端UNIX机器
+
+### 386端安装说明
+
+DOS下推荐安装以下软件：
+
+* UCDOS 98b（不安装任何附加字库）
+* Telix（通过串口拨号连接远程主机）
+* MS-DOS Kermit（Kermit协议上传、下载文件）
+
+### 补充说明
+
+* 使用UCDOS+Telix时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成大量“哪哪哪哪哪”。
+
