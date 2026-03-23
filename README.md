@@ -4,7 +4,7 @@ Retro Programming Works 怀旧编程作品
 1998s PC
 --------
 
-家用多媒体电脑。
+家用多媒体互联网电脑，大憨憨和小憨憨共用。
 
 ### 配置
 
@@ -16,20 +16,22 @@ Retro Programming Works 怀旧编程作品
 * CD-ROM
 * Sound Blaster 16
 * Mouse
+* 56k Modem
 
 ### 主要用途
 
 | 用途           | 大憨憨 | 小憨憨 |
 |:---------------|:------:|:------:|
 | BASIC编程      |        | Y      |
+| 小游戏         |        | Y      |
 | 英汉字典       | Y      | Y      |
 | 文字处理       | Y      | Y      |
 | 电子表格       | Y      | Y      |
 | 图片浏览       | Y      | Y      |
 | 听CD、MIDI     |        | Y      |
 | 多媒体光盘浏览 |        | Y      |
-| 上网看新闻     | Y      | 禁止   |
-| 收发邮件       | Y      | 禁止   |
+| 上网看新闻     | Y      | 受监督 |
+| 收发邮件       | Y      | 受监督 |
 
 ### 安装说明
 
@@ -38,7 +40,7 @@ DOS下推荐安装以下软件：
 * UCDOS 98b+宋体简、仿宋简、黑体简、楷体简轮廓字库
 * SEA（看图软件，支持高彩色、真彩色，可灵活切换分辨率和色深）
 
-Windows 3.2安装时，以下组件不推荐安装：
+Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
 
 * 对象包装程序及其帮助
 * 记录器及其帮助
@@ -57,6 +59,7 @@ Windows 3.2推荐安装以下软件：
 * WinZip
 * LView Pro（简单图片处理，可添加文字）
 * 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
+* Tetris For Windows
 * Microsoft Scenes中的所有JPG图片
 * Microsoft Musical Instruments（多媒体光盘）
 * 震撼——古典音乐鉴赏（多媒体光盘）
@@ -88,7 +91,6 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用；终端仿真程序可用于排查Modem相关问题。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
-* 使用西文软件处理中文内容时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成大量“哪哪哪哪哪”。
 * 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 
 
@@ -162,22 +164,21 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * 对于640k RAM的机器，同时加载CCDOS、拼音输入法、五笔字形输入法后，用WPS编辑文章时，单个文件大小控制在2.4k左右，超过此大小容易死机。
 * GW-BASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量，开发前需仔细评估程序复杂度以决定是否移植到GW-BASIC上，开发时需严格控制`GOTO`的使用以保证一定程度的可维护性。
 
-1999s GEEK PC
--------------
+1999s GEEK Laptop
+-----------------
 
-饱经磨难的极客神机，串口通天下，远程工作使用。
+极客神本，曾经的壕本，串口通天下，远程工作使用。
 
 ### 配置 Configuration
 
-* 486 DX2-66MHz CPU
+* 486 SX-33MHz CPU
 * 8M RAM
-* 512M HDD（炸过MBR）
+* 128M HDD
 * S3 Graphics Adapter with 512k VRAM（Windows 3.2下支持640x480 256色）
-* 3.5 Inch Floppy Drive x1
-* Mouse
-* 56k Modem
-* CD-ROM（毁于光盘爆炸）
-* Sound Blaster 16（后来炸了）
+* External 3.5 Inch Floppy Drive x1
+* TouchPad as mouse
+* PCMCIA 56k Modem at COM1
+* 640x480 TFT Screen
 
 ### 主要用途 Main Usage
 
