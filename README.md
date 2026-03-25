@@ -20,18 +20,19 @@ Retro Programming Works 怀旧编程作品
 
 ### 主要用途
 
-| 用途           | 大憨憨 | 小憨憨 |
-|:---------------|:------:|:------:|
-| BASIC编程      |        | Y      |
-| 小游戏         |        | Y      |
-| 英汉字典       | Y      | Y      |
-| 文字处理       | Y      | Y      |
-| 电子表格       | Y      | Y      |
-| 图片浏览       | Y      | Y      |
-| 听CD、MIDI     |        | Y      |
-| 多媒体光盘浏览 |        | Y      |
-| 上网看新闻     | Y      | 受监督 |
-| 收发邮件       | Y      | 受监督 |
+| 用途             | 大憨憨 | 小憨憨 |
+|:-----------------|:------:|:------:|
+| BASIC编程        |        | Y      |
+| 小游戏           |        | Y      |
+| 英汉字典         | Y      | Y      |
+| 文字处理         | Y      | Y      |
+| 电子表格         | Y      | Y      |
+| 图片浏览         | Y      | Y      |
+| 听CD、MIDI       |        | Y      |
+| 多媒体光盘浏览   |        | Y      |
+| 上网看新闻       | Y      | 受监督 |
+| 收发邮件         | Y      | 受监督 |
+| 拨号连接远程终端 | Y      | 禁止   |
 
 ### 安装说明
 
@@ -39,6 +40,9 @@ DOS下推荐安装以下软件：
 
 * UCDOS 98b+宋体简、仿宋简、黑体简、楷体简轮廓字库
 * SEA（看图软件，支持高彩色、真彩色，可灵活切换分辨率和色深）
+* MS-DOS Kermit（拨号连接远程终端，使用Kermit协议上传、下载文件）
+
+MS-DOS Kermit需要在主程序所在目录放上本仓`misc`目录下的`MSKERMIT.INI`，以保证其正常工作。
 
 Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
 
@@ -90,6 +94,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用；终端仿真程序可用于排查Modem相关问题。
+* 使用UCDOS+MS-DOS Kermit终端时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 * 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 
@@ -216,44 +221,4 @@ Windows 3.2推荐安装以下软件：
 * DOSBox-X模拟器存在Bug，只能使用一个串口。86Box使用`hlt`指令不能降低主机负载。
 * Windows 3.2的终端仿真程序可用于排查Modem、自制ISP（PPP服务器）相关问题。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
-
-GEEK 386
---------
-
-低配386极客神机，串口通天下，远程工作使用。
-
-### 配置 Configuration
-
-* 386 SX-33MHz CPU
-* 2M RAM
-* VGA-compatible video card with 256k VRAM（支持640x480 16色或320x200 256色）
-* 3.5 Inch Floppy Drive x1
-* 5.25 Inch Floppy Drive x1
-* 56k Modem
-
-### 主要用途 Main Usage
-
-* 拨号连接远端UNIX终端
-
-### 386端安装说明
-
-A盘推荐放入以下内容：
-
-* MS-DOS 5.0自带的`HIMEM.SYS`、`EMM386.EXE`、`RAMDRIVE.SYS`、`DOSKEY.COM`、`IDLE.COM`
-* UCDOS 98b（不安装任何附加字库，拼音输入法选择`PY.IMD`）
-* MS-DOS Kermit（拨号连接远程终端，使用Kermit协议上传、下载文件）
-
-MS-DOS Kermit需要在主程序所在目录放上本仓`misc`目录下的`MSKERMIT.INI`，以保证其正常工作。
-
-MS-DOS 5.0需要加载`RAMDRIVE.SYS`并开辟512k空间在XMS内存中作为内存盘，以保证Kermit传输正常工作。
-
-### Linux端安装说明
-
-* 可使用tcpser实现虚拟modem
-* 需要部署telnet服务器
-* `ckermit`不可由GNU Screen拉起，否则Kermit协议不工作
-
-### 补充说明
-
-* 使用UCDOS+MS-DOS Kermit终端时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成大量“哪哪哪哪哪”。
 
