@@ -32,7 +32,6 @@ Retro Programming Works 怀旧编程作品
 | 多媒体光盘浏览   |        | Y      |
 | 上网看新闻       | Y      | 受监督 |
 | 收发邮件         | Y      | 受监督 |
-| 拨号连接远程终端 | Y      | 禁止   |
 
 ### 安装说明
 
@@ -40,9 +39,6 @@ DOS下推荐安装以下软件：
 
 * UCDOS 98b+宋体简、仿宋简、黑体简、楷体简轮廓字库
 * SEA（看图软件，支持高彩色、真彩色，可灵活切换分辨率和色深）
-* MS-DOS Kermit（拨号连接远程终端，使用Kermit协议上传、下载文件）
-
-MS-DOS Kermit需要在主程序所在目录放上本仓`misc`目录下的`MSKERMIT.INI`，以保证其正常工作。
 
 Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
 
@@ -94,9 +90,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用；终端仿真程序可用于排查Modem相关问题。
-* 使用UCDOS+MS-DOS Kermit终端时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
-* 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 
 
 1990s PC
@@ -172,27 +166,32 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 1999s GEEK Laptop
 -----------------
 
-极客神本，曾经的壕本，串口通天下，远程工作使用。
+极客神本，曾经的壕本。串口通天下，远程工作使用。
 
 ### 配置 Configuration
 
-* 486 SX-33MHz CPU
+* 486 DX-33MHz CPU
 * 8M RAM
-* 128M HDD
+* 512M HDD
 * S3 Graphics Adapter with 512k VRAM（Windows 3.2下支持640x480 256色）
 * External 3.5 Inch Floppy Drive x1
 * TouchPad as mouse
-* PCMCIA 56k Modem at COM1
+* PCMCIA 56k Modem work as COM1
 * 640x480 TFT Screen
 
 ### 主要用途 Main Usage
 
 * 拨号上网
-* 连接远端UNIX机器
+* 连接远端UNIX机器（TEK4010绘图指令支持）
 
 ### 486端安装说明
 
-不安装任何DOS下的软件。
+DOS下推荐安装以下软件：
+
+* UCDOS 98b（不安装任何附加字库）
+* MS-DOS Kermit（拨号连接远程终端，使用Kermit协议上传、下载文件）
+
+MS-DOS Kermit需要在主程序所在目录放上本仓`misc`目录下的`MSKERMIT.INI`，以保证其正常工作。
 
 Windows 3.2安装时，推荐安装方案如下：
 
@@ -218,7 +217,11 @@ Windows 3.2推荐安装以下软件：
 
 ### 补充说明
 
+* Windows 3.2适合多任务并发处理，但不适合处理高负载任务。高负载任务（比如TEK图形绘制）需退出Windows 3.2，在纯DOS模式中处理。
+* 使用UCDOS+MS-DOS Kermit终端时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * DOSBox-X模拟器存在Bug，只能使用一个串口。86Box使用`hlt`指令不能降低主机负载。
 * Windows 3.2的终端仿真程序可用于排查Modem、自制ISP（PPP服务器）相关问题。
+* 不建议使用Windows 3.2 Tera Term的TEK绘图功能，极易导致系统卡死。建议使用DOS下的MS-DOS Kermit的TEK绘图功能。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
+* 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 
