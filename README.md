@@ -222,6 +222,7 @@ Windows 3.2推荐安装以下软件：
 * DOSBox-X模拟器存在Bug，只能使用一个串口。86Box使用`hlt`指令不能降低主机负载。
 * Windows 3.2的终端仿真程序可用于排查Modem、自制ISP（PPP服务器）相关问题。
 * 不建议使用Windows 3.2 Tera Term的TEK绘图功能，极易导致系统卡死。建议使用DOS下的MS-DOS Kermit的TEK绘图功能。
+* TEK40xx绘图功能，基准分辨率为1024x780，Y轴方向为从下往上，与一般屏幕Y轴方向相反。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 
