@@ -89,6 +89,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * QBASIC调用汇编代码的场景，TASM格式的汇编代码可以用DOS自带的`debug`工具的`a`命令输入，此时涉及跳转地址的地方需要手工计算相关地址。
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
+* UCDOS配合西文软件（比如QBasic、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用；终端仿真程序可用于排查Modem相关问题。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 
@@ -218,7 +219,6 @@ Windows 3.2推荐安装以下软件：
 ### 补充说明
 
 * Windows 3.2适合多任务并发处理，但不适合处理高负载任务。高负载任务（比如TEK图形绘制）需退出Windows 3.2，在纯DOS模式中处理。
-* 使用UCDOS+MS-DOS Kermit终端时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * DOSBox-X模拟器存在Bug，只能使用一个串口。86Box使用`hlt`指令不能降低主机负载。
 * Windows 3.2的终端仿真程序可用于排查Modem、自制ISP（PPP服务器）相关问题。
 * 不建议使用Windows 3.2 Tera Term的TEK绘图功能，极易导致系统卡死。建议使用DOS下的MS-DOS Kermit的TEK绘图功能。
