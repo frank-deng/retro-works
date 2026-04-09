@@ -105,7 +105,7 @@ async def weather(req:Request):
     locid=req.url.query.get('location',req.cookies.get('location',None))
     logger.debug(f'locid:{locid}')
     if locid is None:
-        return Response(headers={'Location':'select_city.asp'})
+        return Response(headers={'Location':'select_city.asp'},status=302)
     weatherData=WeatherData(config['web']['weather_api'],
         config['web']['weather_key'])
     weather=await weatherData.fetch_weather(locid)
