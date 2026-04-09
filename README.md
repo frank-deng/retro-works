@@ -65,6 +65,8 @@ Windows 3.2推荐安装以下软件：
 * 震撼——古典音乐鉴赏（多媒体光盘）
 * Internet Explorer 3.0（包括PPP拨号软件、浏览器、邮件客户端）
 
+Linux端ISP服务器配置可参考[pppd.md](pppd.md)。
+
 #### Microsoft Office 4.2安装说明
 
 Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、稳定性差、实用价值低等问题，推荐安装的组件如下：
@@ -209,7 +211,6 @@ Windows 3.2推荐安装以下软件：
 
 ### 补充说明
 
-* Windows 3.2适合多任务并发处理，但不适合处理高负载任务。高负载任务（比如TEK图形绘制）需退出Windows 3.2，在纯DOS模式中处理。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 

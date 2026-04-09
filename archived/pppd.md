@@ -84,8 +84,8 @@ TinyCore Linux需要在`/opt/.filetool.lst`中添加以下路径：
 将上述`iptables`命令添加到`/opt/bootlocal.sh`中，紧跟`sysctl`。
 
 
-配置PPP服务器
--------------
+配置PPP服务器自启动
+-------------------
 
 ### Alpine Linux
 
