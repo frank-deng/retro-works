@@ -168,7 +168,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 1999s GEEK Laptop
 -----------------
 
-极客神本，曾经的壕本。串口通天下，远程工作使用。
+极客神本，曾经的壕本。网卡高速通天下，远程工作使用。
 
 ### 配置
 
@@ -178,51 +178,38 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * S3 Graphics Adapter with 512k VRAM（Windows 3.2下支持640x480 256色）
 * External 3.5 Inch Floppy Drive x1
 * TouchPad as mouse
-* PCMCIA 56k Modem work as COM1
+* PCMCIA NE2000 Compatible Ethernet Adapter
 * 640x480 TFT Screen
 
 ### 主要用途
 
-* 拨号上网
-* 连接远端UNIX机器（TEK4010绘图指令支持）
+* 上网看新闻
+* 连接远端UNIX机器
 
 ### 486端安装说明
 
-DOS下推荐安装以下软件：
+需要在`AUTOEXEC.BAT`中加载NE2000驱动和WINPKT驱动，以保证Windows 3.x下的Trumpet Winsock能正常使用NE2000网卡。
 
-* UCDOS 98b（不安装任何附加字库）
-* MS-DOS Kermit（拨号连接远程终端，使用Kermit协议上传、下载文件）
-
-MS-DOS Kermit需要在主程序所在目录放上本仓`misc`目录下的`MSKERMIT.INI`，以保证其正常工作。
+可以在`AUTOEXEC.BAT`末尾添加`WIN`命令，以实现开机直接进Windows 3.x。
 
 Windows 3.2安装时，推荐安装方案如下：
 
 * 安装所有自述文件，除打印机自述文件外
 * 游戏、屏幕保护程序、壁纸等杂项不安装
-* 附件只安装以下组件及其对应帮助文件：终端仿真程序、画笔、记事本、计算器、字符映射表
+* 附件只安装以下组件及其对应帮助文件：画笔、记事本、计算器、字符映射表
 
 Windows 3.2推荐安装以下软件：
 
-* Internet Explorer 3.0（包括PPP拨号软件、浏览器、邮件客户端）
-* Tera Term/SimpTerm/Mocha Telnet/EWAN（通过TELNET连接远端站点）
+* Trumpet Winsock
+* Internet Explorer 3.0（仅安装浏览器）
+* Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
 * WS FTP16LE（FTP客户端）
 * 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
 * WinZip
 
-### Linux端安装说明
-
-* 可使用tcpser实现虚拟modem
-* 需要部署PPP服务器和telnet服务器
-* 电子表格可使用`sc-im`+`gnuplot`实现
-* FTP服务端可使用`vsftpd`
-
 ### 补充说明
 
 * Windows 3.2适合多任务并发处理，但不适合处理高负载任务。高负载任务（比如TEK图形绘制）需退出Windows 3.2，在纯DOS模式中处理。
-* DOSBox-X模拟器存在Bug，只能使用一个串口。86Box使用`hlt`指令不能降低主机负载。
-* Windows 3.2的终端仿真程序可用于排查Modem、自制ISP（PPP服务器）相关问题。
-* 不建议使用Windows 3.2 Tera Term的TEK绘图功能，极易导致系统卡死。建议使用DOS下的MS-DOS Kermit的TEK绘图功能。
-* TEK40xx绘图功能，基准分辨率为1024x780，Y轴方向为从下往上，与一般屏幕Y轴方向相反。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
 
