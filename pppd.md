@@ -47,7 +47,7 @@ TinyCore Linux配置
 	iptables -t nat -A PREROUTING -d 10.0.2.2 -p tcp --dport 25 -j DNAT --to-destination :8025
 	iptables -t nat -A OUTPUT -d 10.0.2.2 -p tcp --dport 25 -j REDIRECT --to-port 8025
 	iptables -t nat -A PREROUTING -d 10.0.2.2 -p tcp --dport 110 -j DNAT --to-destination :8110
-	iptables -t nat -A OUTPUT -d 10.0.2.2 -p tcp --dport 25 -j REDIRECT --to-port 8110
+	iptables -t nat -A OUTPUT -d 10.0.2.2 -p tcp --dport 110 -j REDIRECT --to-port 8110
 	
 	# 保存转发规则
 	iptables-save > /opt/iptables-rules
@@ -78,14 +78,20 @@ TinyCore Linux配置
 以上安装步骤中，`10.0.2.15`为网卡IP地址（一般通过DHCP获取到），`10.0.2.2`为虚拟路由器地址，部署时需根据实际情况调整。
 
 
-虚拟机NAT网络配置端口转发
--------------------------
+QEMU启动命令
+------------
 
-如果虚拟机网卡连接的是NAT网络，则需要为虚拟机添加端口转发规则，以使得主机上的应用能访问虚拟机里的服务。
+	qemu-system-i386 \
+		-pidfile $PREFIX/tmp/tinycore.pid \
+		-machine type=q35,hpet=off -cpu max,vendor=GenuineIntel -smp 1 -m 128 \
+		-accel kvm \
+		-netdev user,id=network0,hostfwd=tcp:127.0.0.1:2345-:2345,dns=8.8.8.8 \
+		-device virtio-net,netdev=network0 \
+		-drive file=$HOME/tinycore.qcow2,format=qcow2 \
+		-display none -no-reboot -daemonize -boot d \
+		-serial unix:$HOME/tinycore-serial.sock,server,nowait
 
-* 协议选TCP。
-* 主机端口可任意指定一个主机上未使用的端口，连接此端口可访问虚拟机里的服务。
-* 子系统端口为PPP服务器在虚拟机中使用的端口，比如2345。
+以上命令中已包含端口转发相关设置，其它虚拟机（比如VirtualBox）可参考进行配置。
 
 
 DOSBox串口配置

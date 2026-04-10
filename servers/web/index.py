@@ -35,7 +35,7 @@ async def get_news(newsManager):
     logger=logging.getLogger(__name__)
     res=None
     try:
-        res=(await newsManager.newsList())[:10]
+        res=(await newsManager.newsList())[:20]
     except Exception as e:
         logger.error(f'Failed to load news {e}',exc_info=True)
     return res
