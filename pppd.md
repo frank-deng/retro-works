@@ -1,14 +1,9 @@
-Title:PPP上网配置
-Tags:PPP,Linux
----
+ISP服务器配置
+=============
 
-使用PPP服务器，Windows 3.x/95虚拟机里的浏览器可通过PPP协议访问部署在服务端的HTML站点。
-
-PPP服务器需要在Linux环境（如Debian、Ubuntu、TinyCore）中运行。
+PPP服务器需要在Linux环境（如Debian、Ubuntu、TinyCore）中运行。推荐在单独的TinyCore Linux虚拟机上部署PPP服务器。
 
 **！！！严禁将PPP服务器部署到生产环境或含有敏感数据的环境！！！**
-
-推荐在单独的TinyCore Linux虚拟机上部署PPP服务器。
 
 **TinyCore Linux中，任何文件修改后都需要执行`sudo filetool.sh -b`命令保存修改，否则重启后修改会丢失！！！**
 
@@ -55,7 +50,7 @@ TinyCore Linux配置
 	iptables -t nat -A OUTPUT -d 10.0.2.2 -p tcp --dport 25 -j REDIRECT --to-port 8110
 	
 	# 保存转发规则
-    iptables-save > /opt/iptables-rules
+	iptables-save > /opt/iptables-rules
 
 新建或覆盖`/etc/dnsmasq.conf`，内容如下：
 
