@@ -64,6 +64,7 @@ TinyCore Linux配置
 
 将以下命令添加到`/opt/bootlocal.sh`中：
 
+	while true; do /sbin/getty 115200 ttyS0; done &
 	sysctl -w net.ipv4.ip_forward=1
 	iptables-restore < /opt/iptables-rules
 	while ! ifconfig -a|grep -q "inet addr:10.0.2.15"; do sleep 1; done;
