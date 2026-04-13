@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-
-import logging
-import argparse
 import asyncio
-import signal
 import os
 import sys
 import pwd
@@ -81,7 +76,7 @@ async def login(reader,writer):
     password=await readline(reader,writer,echo=False)
     if password is None:
         return None,None
-    return username.decode(),password.decode()
+    return username,password
 
 
 class ProcessHandler(Logger):
@@ -188,61 +183,4 @@ class ProcessHandler(Logger):
     async def create_subprocess_exec(self,slave_fd):
         pass
 
-
-class UserShellHandler(ProcessHandler):
-    def __init__(self,reader,writer,username,*,buf_size=4096):
-        super().__init__(reader,writer,buf_size=buf_size)
-        self.__username=username
-        #self.__userinfo=pwd.getpwnam(username)
-        self.__shell='/bin/bash'
-
-    async def create_subprocess_exec(self,master_fd,slave_fd):
-        env={
-            'USER':self.__username,
-            'SHELL':self.__shell,
-            'TERM':'ansi',
-        }
-        fcntl.ioctl(slave_fd,termios.TIOCSWINSZ,struct.pack('HHHH',24,80,0,0))
-        pid=os.fork()
-        if pid==0:
-            os.close(master_fd)
-            os.setsid()
-            os.close(os.open(os.ttyname(slave_fd),os.O_RDWR))
-            os.dup2(slave_fd,0)
-            os.dup2(slave_fd,1)
-            os.dup2(slave_fd,2)
-            os.close(slave_fd)
-            #pamela.open_session(self.__userinfo.pw_name)
-            #os.setgid(self.__userinfo.pw_gid)
-            #os.setuid(self.__userinfo.pw_uid)
-            for key,value in env.items():
-                os.environ[key]=value
-            #os.chdir(self.__userinfo.pw_dir)
-            os.execl(self.__shell,self.__shell)
-            os._exit(1)
-
-
-class TelnetServer(TCPServer):
-    def __init__(self,config):
-        telnet_config=config['TelnetServer']
-        super().__init__(telnet_config['port'],host=telnet_config['host'],
-                         max_conn=telnet_config.get('max_connection'))
-
-    async def handler(self,reader,writer):
-        login_failed_count=0
-        writer.write(b'\xFF\xFD\x22\xFF\xFB\x01\xFF\xFB\x00\xFF\xFD\x00\r\n')
-        await writer.drain()
-        self.logger.debug('go')
-        while login_failed_count<3:
-            username,password=await login(reader,writer)
-            if username is None or password is None:
-                break
-#           if not p.authenticate(username,password):
-#               login_failed_count+=1
-#               writer.write(b'Login Failed.\r\n')
-#               await asyncio.gather(writer.drain(),asyncio.sleep(1))
-#               continue
-            login_failed_count=0
-            async with UserShellHandler(reader,writer,username):
-                pass
 

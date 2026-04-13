@@ -1,28 +1,35 @@
 log_file="telnetd.log"
-log_level="DEBUG"
-pid_file="/data/data/com.termux/files/home/telnetd.pid"
+log_level="INFO"
+pid_file=""telnetd.pid"
 detach=true
 watchdog_timeout=10
 modules=[
-	"telnetserver:TelnetServer"
+"telnet.termux:TelnetServerTermux",
+"telnet.termux:TelnetServerPAM",
+"telnet.termux:TelnetServerSSH"
 ]
 
-[TelnetServer]
+[TelnetServerTermux]
 host="127.0.0.1"
 port=8023
 max_connection=10
+buf_size=4096
+username="username"
+password="sha256_hash"
+shell="/bin/bash"
+term="ansi"
 
-[[TelnetServer.users]]
-match="xxx"
-module="telnetserver.termux.TermuxHandler"
-password="xxx"
+[TelnetServerPAM]
+host="127.0.0.1"
+port=8024
+max_connection=10
+buf_size=4096
 
-[[TelnetServer.users]]
-match="xxx"
-module="telnetserver.termux.SSHHandler"
-username="xxx"
-
-[[TelnetServer.users]]
-match=".*"
-module="telnetserver.termux.PAMHandler"
+[TelnetServerSSH]
+host="127.0.0.1"
+port=8025
+max_connection=10
+buf_size=4096
+ssh_host="127.0.0.1"
+ssh_port=8023
 
