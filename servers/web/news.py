@@ -9,6 +9,7 @@ from urllib.parse import urlparse,urlunparse
 import hashlib
 import base64
 import random
+import math
 
 from lxml import html
 from aiohttp.web import Request
@@ -134,7 +135,6 @@ class NewsManager(Logger):
         async with self.__newsLinksLock:
             for item in res:
                 self.__newsLinks[item['id']]=item
-
         return sorted(res,key=cmp_to_key(self.__class__.__newsListSort))
 
     async def newsDetail(self,newsid):
@@ -182,6 +182,7 @@ async def news_detail(req:Request):
     context={
         'header':'今日新闻',
         'title':f'{news["title"]} - 今日新闻',
+        'inline_image':config.get('inline_image',False),
         'news_title':fontProcesor.apply_font(news['title'],singleLine=True),
         'news_date':fontProcesor.apply_font(f'{year}年{month}月{day}日',singleLine=True),
         'news_content':news_content
@@ -198,10 +199,26 @@ async def news_handler(req:Request):
     if 'id' in req.url.query:
         return await news_detail(req)
     config=req.app['config']
+    page_size=config['web'].get('news_page_size',30)
+    news_list=await req.app['newsManager'].newsList()
+
+    page=req.url.query.get('page','1')
+    try:
+        page=int(page)
+    except ValueError:
+        page=1
+    max_pages=math.ceil(len(news_list)/page_size)
+    if page<1:
+        page=1
+    elif page>max_pages:
+        page=max_pages
+
     context={
         'header':'今日新闻',
         'title':'今日新闻',
-        'news':await req.app['newsManager'].newsList()
+        'news':news_list[page_size*(page-1):page_size*page],
+        'page':page,
+        'max_pages':max_pages,
     }
     encoding=config['web']['encoding']
     return Response(

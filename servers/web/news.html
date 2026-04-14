@@ -2,8 +2,13 @@
 <h3 align='center'>{{news_title|safe}}</h3>
 <div align='center'><font size='1' color='#808080'>{{news_date|safe}}</font></div>{% for line in news_content %}
 {% if line['type']=='image' %}
-<!--p align='center'><img src='news_images/{{line['key']}}.jpg' alt=' '></p-->
-<p align='center'><a href='news_images/{{line['key']}}.jpg' target="_blank">[附图]</a></p>
+<p align='center'>
+{% if inline_image %}
+<img src='news_images/{{line['key']}}.jpg'>
+{% else %}
+<a href='news_images/{{line['key']}}.jpg' target="_blank">[附图]</a>
+{% endif %}
+</p>
 {% elif line['type']=='text' %}
 <p>　　{{line['content']|safe}}</p>
 {% endif %}

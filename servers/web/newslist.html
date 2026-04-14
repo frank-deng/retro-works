@@ -1,8 +1,13 @@
 {% extends "base.html" %}{% block content %}
-<ul>
+<div><ul>
 {% for item in news %}
 <li><a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></li>
 {% endfor %}
-</ul>
+</ul></div>
+<p align='center'>
+{%if page>1%}<a href='news.asp?page={{page-1}}'>&lt;上一页</a>{%else%}&lt;上一页{%endif%}
+ <font face='Times New Roman'>{{page}}/{{max_pages}}</font>
+{%if page<max_pages%}<a href='news.asp?page={{page+1}}'>下一页&gt;</a>{%else%}下一页&gt;{%endif%}
+</p>
 <p align='center'><img src='/static/PROFLINE.GIF' alt=' '/></p>
 {% endblock %}
