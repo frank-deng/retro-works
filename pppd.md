@@ -81,9 +81,9 @@ TinyCore Linux配置
 QEMU启动命令
 ------------
 
-	qemu-system-i386 \
-		-pidfile $PREFIX/tmp/tinycore.pid \
-		-machine type=q35,hpet=off -cpu max,vendor=GenuineIntel -smp 1 -m 128 \
+	taskset -c 1 qemu-system-i386 \
+		-pidfile /tmp/tinycore.pid \
+		-machine type=q35,hpet=off -cpu max,vendor=GenuineIntel -smp 1 -m 256 \
 		-accel kvm \
 		-netdev user,id=network0,hostfwd=tcp:127.0.0.1:2345-:2345,dns=8.8.8.8 \
 		-device virtio-net,netdev=network0 \
