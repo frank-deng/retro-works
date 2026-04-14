@@ -24,6 +24,7 @@ host="127.0.0.1"
 port=8024
 max_connection=10
 buf_size=4096
+term="ansi"
 
 [TelnetServerSSH]
 host="127.0.0.1"
