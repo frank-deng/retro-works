@@ -30,36 +30,15 @@
 <!--News Module-->
 {% if news %}
 <table width='100%'>
-    <tr>
-        <td colspan=2 height='24px' valign='middle'>
-            <img src='/static/BULL1A.GIF' alt='★&nbsp;'/>
-            <b>今日新闻</b>　<a href='news.asp'><font size='2'>更多&gt;&gt;</font>
-        </td>
-    </tr>
-    <tr><td colspan=2 height='6px'></td></tr>
+    <tr><td height='24px' valign='middle'>
+        <img src='/static/BULL1A.GIF' alt='★&nbsp;'/>
+        <b>今日新闻</b>　<a href='news.asp'><font size='2'>更多&gt;&gt;</font>
+    </td></tr>
+    <tr><td><ul>
     {% for item in news %}
-    <tr>
-        <td width='10px'></td>
-	<td><img src='/static/BULLET3.GIF' alt='*'/> <a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></td>
-    </tr>
+    <li><a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></li>
     {% endfor %}
-</table><p align='center'><img src='/static/CONTLINE.GIF' alt=' '></p>
-{% endif %}
-{% if blog %}
-<table width='100%'>
-    <tr>
-        <td colspan=2 height='24px' valign='middle'>
-            <img src='/static/BULL1A.GIF' alt='★&nbsp;'/>
-            <b>我的博客</b>　<a href='blog/index.htm'><font size='2'>更多&gt;&gt;</font></a>
-        </td>
-    </tr>
-    <tr><td colspan=2 height='6px'></td></tr>
-    {% for item in blog %}
-    <tr>
-        <td width='10px'></td>
-	<td><img src='/static/BULLET3.GIF' alt='*'/> <a href='blog/{{item['link']}}'>{{item['title']}}</a></td>
-    </tr>
-    {% endfor %}
+    </ul></td></tr>
 </table><p align='center'><img src='/static/CONTLINE.GIF' alt=' '></p>
 {% endif %}
 </td></tr>

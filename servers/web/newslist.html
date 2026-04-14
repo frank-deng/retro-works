@@ -1,8 +1,8 @@
 {% extends "base.html" %}{% block content %}
-<table width='100%'>
+<ul>
 {% for item in news %}
-<tr><td><img src='/static/BULLET3.GIF' alt='*'/> <a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></td></tr>
+<li><a href='news.asp?id={{item['id']}}'>{{item['title']|safe}}</a></li>
 {% endfor %}
-<tr><td height='20px' width='100%' align='center' valign='middle'><img src='/static/PROFLINE.GIF' alt=' '/></td></tr>
-</table>
+</ul>
+<p align='center'><img src='/static/PROFLINE.GIF' alt=' '/></p>
 {% endblock %}

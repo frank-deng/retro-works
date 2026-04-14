@@ -1,8 +1,9 @@
 {% extends "base.html" %}{% block content %}
 <h3 align='center'>{{news_title|safe}}</h3>
-<p align='center'><font size='1' color='#808080'>{{news_date|safe}}</font></p>{% for line in news_content %}
+<div align='center'><font size='1' color='#808080'>{{news_date|safe}}</font></div>{% for line in news_content %}
 {% if line['type']=='image' %}
-<p align='center'><img src='news_images/{{line['key']}}.jpg' alt=' '></p>
+<!--p align='center'><img src='news_images/{{line['key']}}.jpg' alt=' '></p-->
+<p align='center'><a href='news_images/{{line['key']}}.jpg' target="_blank">[附图]</a></p>
 {% elif line['type']=='text' %}
 <p>　　{{line['content']|safe}}</p>
 {% endif %}
