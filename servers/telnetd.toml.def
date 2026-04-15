@@ -5,8 +5,8 @@ detach=true
 watchdog_timeout=10
 modules=[
 "telnet.termux:TelnetServerTermux",
-"telnet.termux:TelnetServerPAM",
-"telnet.termux:TelnetServerSSH"
+"telnet.pam:TelnetServerPAM",
+"telnet.ssh:TelnetServerSSH"
 ]
 
 [TelnetServerTermux]
@@ -33,4 +33,5 @@ max_connection=10
 buf_size=4096
 ssh_host="127.0.0.1"
 ssh_port=8023
+term="ansi"
 

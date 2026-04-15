@@ -24,7 +24,7 @@ class SSHHandler(Logger):
         try:
             self.__conn = await asyncssh.connect(
                 host=self.__config['ssh_host'],
-                port=self.__config.get('ssh_port',23),
+                port=self.__config.get('ssh_port',22),
                 username=self.__username,
                 password=self.__password,
                 known_hosts=None
@@ -32,10 +32,11 @@ class SSHHandler(Logger):
             self.__password=None
             self.__channel,self.__session=await self.__conn.create_session(
                 asyncssh.SSHClientSession,
-                term_type=self.__config.get('term',None),
+                term_type=self.__config.get('term','ansi'),
                 term_size=(80,24),
                 encoding=None
             )
+            self.__session.data_received=self.__ssh_read
             self.__tasks=(
                 asyncio.create_task(self.__ssh_to_tcp()),
                 asyncio.create_task(self.__tcp_to_ssh())
@@ -79,7 +80,6 @@ class SSHHandler(Logger):
             self.__queue.put_nowait(b"")
 
     async def __ssh_to_tcp(self):
-        self.__session.data_received=self.__ssh_read
         try:
             while True:
                 data=await self.__queue.get()
@@ -134,12 +134,12 @@ class TelnetServerSSH(TCPServer):
             if not username:
                 continue
             try:
-                async with SSHHandler(reader,writer,self.__config,
+                async with SSHHandler(reader,writer,self._config,
                                       username,password):
                     login_failed_count=0
                     pass
             except asyncssh.misc.PermissionDenied:
                 login_failed_count+=1
-                self.__writer.write(b'Login Failed.\r\n')
+                writer.write(b'Login Failed.\r\n')
                 await asyncio.gather(writer.drain(),asyncio.sleep(1))
 
