@@ -23,7 +23,6 @@ class TCPServer(Logger):
         return self
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
-        await self.__wait_close.wait()
         self.__server.close()
         wait_tasks=[self.__server.wait_closed()]
         async with self.__lock:
@@ -62,9 +61,6 @@ class TCPServer(Logger):
             self.logger.error(e,exc_info=True)
         finally:
             await self.__close_conn(writer)
-
-    def close(self):
-        self.__wait_close.set()
 
     async def handler(self,reader,writer):
         pass
