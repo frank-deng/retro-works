@@ -26,12 +26,21 @@ max_connection=10
 buf_size=4096
 term="ansi"
 
-[TelnetServerSSH]
+[[TelnetServerSSH.servers]]
 host="127.0.0.1"
 port=8025
 max_connection=10
 buf_size=4096
-ssh_host="127.0.0.1"
-ssh_port=8023
+ssh_host="host1"
+ssh_port=22
+term="ansi"
+
+[[TelnetServerSSH.servers]]
+host="127.0.0.1"
+port=8026
+max_connection=10
+buf_size=4096
+ssh_host="host2"
+ssh_port=8022
 term="ansi"
 
