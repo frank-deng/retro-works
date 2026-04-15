@@ -108,9 +108,13 @@ class ProcessHandler(Logger):
         return self
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
-        if self.__tasks is not None:
-            await asyncio.wait(self.__tasks,return_when=asyncio.FIRST_COMPLETED)
-        await self.__cleanup()
+        try:
+            if self.__tasks is not None:
+                await asyncio.wait(self.__tasks,return_when=asyncio.FIRST_COMPLETED)
+        except asyncio.CancelledError:
+            pass
+        finally:
+            await self.__cleanup()
 
     def __fd_ready(self):
         try:
@@ -182,5 +186,4 @@ class ProcessHandler(Logger):
 
     async def create_subprocess_exec(self,slave_fd):
         pass
-
 

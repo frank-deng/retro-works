@@ -56,6 +56,14 @@ class TelnetServerPAM(TCPServer):
                          max_conn=self._config.get('max_connection'))
 
     async def handler(self,reader,writer):
+        writer.write(b'\xFF\xFD\x22\xFF\xFB\x01\xFF\xFB\x00\xFF\xFD\x00\r\n')
+        await writer.drain()
+        try:
+            while True:
+                dt=await asyncio.wait_for(reader.read(1000),timeout=0.1)
+                self.logger.debug(dt)
+        except asyncio.TimeoutError:
+            pass
         login_failed_count=0
         while login_failed_count<3:
             username,password=await login(reader,writer)
