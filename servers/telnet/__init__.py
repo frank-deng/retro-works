@@ -6,6 +6,7 @@ import pty
 import fcntl
 import termios
 import struct
+import codecs
 from util import Logger
 from util.tcpserver import TCPServer
 
@@ -79,6 +80,26 @@ async def login(reader,writer):
     return username,password
 
 
+class IConvFilter(Logger):
+    def __init__(self,clientEnc,serverEnc='utf-8',enabled=True):
+        self.__enabled=True
+        self.__clientEnc,self.__serverEnc=clientEnc,serverEnc
+        self.__decoderSC=codecs.getincrementaldecoder(serverEnc)(errors='backslashreplace')
+        self.__decoderCS=codecs.getincrementaldecoder(clientEnc)(errors='backslashreplace')
+
+    def sc(self,chunk):
+        if not self.__enabled:
+            return chunk
+        text=self.__decoderSC.decode(chunk,final=False)
+        return text.encode(self.__clientEnc,errors='ignore')
+    
+    def cs(self,chunk):
+        if not self.__enabled:
+            return chunk
+        text=self.__decoderCS.decode(chunk,final=False)
+        return text.encode(self.__serverEnc,errors='ignore')
+
+
 class ProcessHandler(Logger):
     __buf_size=4096
     __proc=None
@@ -91,6 +112,7 @@ class ProcessHandler(Logger):
         self.__buf_size=buf_size
         self.__loop=asyncio.get_running_loop()
         self.__queue=asyncio.Queue()
+        self.__iconv=IConvFilter('gbk')
 
     async def __aenter__(self):
         try:
@@ -133,7 +155,7 @@ class ProcessHandler(Logger):
                 data=await self.__queue.get()
                 if not data:
                     break
-                self.__writer.write(data)
+                self.__writer.write(self.__iconv.sc(data))
                 await self.__writer.drain()
         except (ConnectionResetError,asyncio.CancelledError):
             pass
@@ -158,7 +180,7 @@ class ProcessHandler(Logger):
                 data=await self.__reader.read(self.__buf_size)
                 if not data:
                     break
-                await self.__write_fd(data)
+                await self.__write_fd(self.__iconv.cs(data))
         except (ConnectionResetError,OSError,asyncio.CancelledError):
             pass
         except Exception as e:
