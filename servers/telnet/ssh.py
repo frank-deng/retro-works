@@ -2,23 +2,25 @@ import asyncio
 import asyncssh
 from util import Logger
 from util.tcpserver import TCPServer
+from telnet import IConvFilter
 from telnet import login
 
 
 class SSHHandler(Logger):
-    __password=None
-    __conn=None
-    __session=None
-    __channel=None
-    __tasks=None
     def __init__(self,reader,writer,config,username,password):
+        self.__conn=None
+        self.__session=None
+        self.__channel=None
+        self.__tasks=None
         self.__loop=asyncio.get_running_loop()
         self.__queue=asyncio.Queue()
         self.__reader,self.__writer=reader,writer
         self.__config=config
         self.__username=username.decode()
         self.__password=password.decode()
-        self.__buf_size=self.__config.get('buf_size',4096)
+        self.__buf_size=config.get('buf_size',4096)
+        self.__iconv=IConvFilter(config.get('client_encoding',None),
+                                 config.get('server_encoding','utf-8'))
 
     async def __aenter__(self):
         try:
@@ -33,7 +35,8 @@ class SSHHandler(Logger):
             self.__channel,self.__session=await self.__conn.create_session(
                 asyncssh.SSHClientSession,
                 term_type=self.__config.get('term','ansi'),
-                term_size=(80,24),
+                term_size=(self.__config.get('columns',80),
+                           self.__config.get('rows',24)),
                 encoding=None
             )
             self.__session.data_received=self.__ssh_read
@@ -85,7 +88,7 @@ class SSHHandler(Logger):
                 data=await self.__queue.get()
                 if not data:
                     break
-                self.__writer.write(data)
+                self.__writer.write(self.__iconv.sc(data))
                 await self.__writer.drain()
         except (ConnectionResetError,asyncio.CancelledError):
             pass
@@ -98,7 +101,7 @@ class SSHHandler(Logger):
                 data=await self.__reader.read(self.__buf_size)
                 if not data:
                     break
-                self.__channel.write(data)
+                self.__channel.write(self.__iconv.cs(data))
         except (ConnectionResetError,asyncio.CancelledError):
             pass
         except Exception as e:

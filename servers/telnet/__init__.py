@@ -82,37 +82,41 @@ async def login(reader,writer):
 
 class IConvFilter(Logger):
     def __init__(self,clientEnc,serverEnc='utf-8',enabled=True):
-        self.__enabled=True
+        self.__available=clientEnc is not None and \
+                serverEnc is not None and clientEnc!=serverEnc
+        if not self.__available:
+            return
+        self.__enabled=enabled
         self.__clientEnc,self.__serverEnc=clientEnc,serverEnc
-        self.__decoderSC=codecs.getincrementaldecoder(serverEnc)(errors='backslashreplace')
-        self.__decoderCS=codecs.getincrementaldecoder(clientEnc)(errors='backslashreplace')
+        self.__decoderSC=codecs.getincrementaldecoder(serverEnc)(errors='surrogateescape')
+        self.__decoderCS=codecs.getincrementaldecoder(clientEnc)(errors='surrogateescape')
 
     def sc(self,chunk):
-        if not self.__enabled:
+        if not self.__available or not self.__enabled:
             return chunk
         text=self.__decoderSC.decode(chunk,final=False)
-        return text.encode(self.__clientEnc,errors='ignore')
+        return text.encode(self.__clientEnc,errors='surrogateescape')
     
     def cs(self,chunk):
-        if not self.__enabled:
+        if not self.__available or not self.__enabled:
             return chunk
         text=self.__decoderCS.decode(chunk,final=False)
-        return text.encode(self.__serverEnc,errors='ignore')
+        return text.encode(self.__serverEnc,errors='surrogateescape')
 
 
 class ProcessHandler(Logger):
-    __buf_size=4096
-    __proc=None
-    __master_fd=None
-    __slave_fd=None
-    __pty_reader=None
-    __tasks=None
-    def __init__(self,reader,writer,*,buf_size=4096):
+    def __init__(self,reader,writer,*,buf_size=4096,clientEnc=None,serverEnc='utf-8'):
+        self.__proc=None
+        self.__master_fd=None
+        self.__slave_fd=None
+        self.__pty_reader=None
+        self.__tasks=None
+        self.__buf_size=buf_size
         self.__reader,self.__writer=reader,writer
         self.__buf_size=buf_size
         self.__loop=asyncio.get_running_loop()
         self.__queue=asyncio.Queue()
-        self.__iconv=IConvFilter('gbk')
+        self.__iconv=IConvFilter(clientEnc,serverEnc)
 
     async def __aenter__(self):
         try:

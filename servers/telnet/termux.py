@@ -13,12 +13,15 @@ from telnet import ProcessHandler
 
 
 class TermuxHandler(ProcessHandler):
-    def __init__(self,reader,writer,username,*,buf_size=4096,shell='/bin/bash',
-                 term='ansi'):
-        super().__init__(reader,writer,buf_size=buf_size)
-        self.__username=username
-        self.__shell=shell
-        self.__term=term
+    def __init__(self,reader,writer,config):
+        super().__init__(reader,writer,buf_size=config.get('buf_size',4096),
+                         clientEnc=config.get('client_encoding',None),
+                         serverEnc=config.get('server_encoding','utf-8'))
+        self.__username=config['username']
+        self.__shell=config.get('shell','bash')
+        self.__term=config.get('term','ansi')
+        self.__rows=config.get('rows',24)
+        self.__columns=config.get('columns',80)
 
     async def create_subprocess_exec(self,master_fd,slave_fd):
         env={
@@ -26,7 +29,8 @@ class TermuxHandler(ProcessHandler):
             'SHELL':self.__shell,
             'TERM':self.__term,
         }
-        fcntl.ioctl(slave_fd,termios.TIOCSWINSZ,struct.pack('HHHH',24,80,0,0))
+        fcntl.ioctl(slave_fd,termios.TIOCSWINSZ,struct.pack('HHHH',
+                    self.__rows,self.__columns,0,0))
         pid=os.fork()
         if pid==0:
             os.close(master_fd)
@@ -75,9 +79,6 @@ class TelnetServerTermux(TCPServer):
                 await asyncio.gather(writer.drain(),asyncio.sleep(1))
                 continue
             login_failed_count=0
-            async with TermuxHandler(reader,writer,self._config['username'],
-                buf_size=self._config.get('buf_size',4096),
-                shell=self._config.get('shell','/bin/bash'),
-                term=self._config.get('term','ansi')):
+            async with TermuxHandler(reader,writer,self._config):
                 pass
 
