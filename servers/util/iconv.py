@@ -20,7 +20,7 @@ class IConvStreamReader(ReaderWrapper):
             if not data or not self._state.enabled:
                 return data
             text = self._decoder.decode(data, final=False)
-        raw = text.encode(self.__serverEnc, errors='surrogateescape')
+        raw = text.encode(self.__serverEnc, errors='ignore')
         return raw
 
 class IConvStreamWriter(WriterWrapper):
@@ -34,7 +34,7 @@ class IConvStreamWriter(WriterWrapper):
             super().write(chunk)
             return
         text=self._decoder.decode(chunk, final=False)
-        raw=text.encode(self.__clientEnc,errors='surrogateescape')
+        raw=text.encode(self.__clientEnc,errors='ignore')
         super().write(raw)
 
 
