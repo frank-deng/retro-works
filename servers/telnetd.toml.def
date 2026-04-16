@@ -30,6 +30,8 @@ ssh_port=22
 term="ansi"
 rows=24
 columns=80
+client_encoding="gbk"
+server_encoding="utf-8"
 
 [[TelnetServerSSH.servers]]
 host="127.0.0.1"

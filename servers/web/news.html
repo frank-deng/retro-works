@@ -6,7 +6,7 @@
 {% if inline_image %}
 <img src='news_images/{{line['key']}}.jpg'>
 {% else %}
-<a href='news_images/{{line['key']}}.jpg' target="_blank">[附图]</a>
+【<a href='news_images/{{line['key']}}.jpg' target="_blank">点击查看图片</a>】
 {% endif %}
 </p>
 {% elif line['type']=='text' %}
