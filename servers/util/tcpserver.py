@@ -3,6 +3,28 @@ import sys
 from util import Logger
 
 
+class ReaderWrapper(Logger):
+    def __init__(self,reader):
+        self.reader=reader
+
+    async def read(self,n=-1):
+        return await self.reader.read(n)
+
+
+class WriterWrapper(Logger):
+    def __init__(self,writer):
+        self.writer=writer
+
+    def write(self,chunk):
+        self.writer.write(chunk)
+
+    async def drain(self):
+        await self.writer.drain()
+
+    def close(self):
+        self.writer.close()
+
+
 class TCPServer(Logger):
     __server=None
     def __init__(self,port,*,host='0.0.0.0',max_conn=None):

@@ -8,15 +8,14 @@ import termios
 import struct
 import hashlib
 from util.tcpserver import TCPServer
+from util.iconv import IConvWrapper
 from telnet import login
 from telnet import ProcessHandler
 
 
 class TermuxHandler(ProcessHandler):
     def __init__(self,reader,writer,config):
-        super().__init__(reader,writer,buf_size=config.get('buf_size',4096),
-                         clientEnc=config.get('client_encoding',None),
-                         serverEnc=config.get('server_encoding','utf-8'))
+        super().__init__(reader,writer,buf_size=config.get('buf_size',4096))
         self.__username=config['username']
         self.__shell=config.get('shell','bash')
         self.__term=config.get('term','ansi')
@@ -57,6 +56,9 @@ class TelnetServerTermux(TCPServer):
                          max_conn=self._config.get('max_connection'))
 
     async def handler(self,reader,writer):
+        readerIconv,writerIconv=IConvWrapper(reader,writer,
+            self._config.get('client_encoding',None),
+            self._config.get('server_encoding','utf-8'))
         writer.write(b'\xFF\xFD\x22\xFF\xFB\x01\xFF\xFB\x00\xFF\xFD\x00\r\n')
         await writer.drain()
         try:
@@ -79,6 +81,6 @@ class TelnetServerTermux(TCPServer):
                 await asyncio.gather(writer.drain(),asyncio.sleep(1))
                 continue
             login_failed_count=0
-            async with TermuxHandler(reader,writer,self._config):
+            async with TermuxHandler(readerIconv,writerIconv,self._config):
                 pass
 

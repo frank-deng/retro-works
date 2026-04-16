@@ -2,7 +2,7 @@ import asyncio
 import asyncssh
 from util import Logger
 from util.tcpserver import TCPServer
-from telnet import IConvFilter
+from util.iconv import IConvWrapper
 from telnet import login
 
 
@@ -19,8 +19,6 @@ class SSHHandler(Logger):
         self.__username=username.decode()
         self.__password=password.decode()
         self.__buf_size=config.get('buf_size',4096)
-        self.__iconv=IConvFilter(config.get('client_encoding',None),
-                                 config.get('server_encoding','utf-8'))
 
     async def __aenter__(self):
         try:
@@ -88,7 +86,7 @@ class SSHHandler(Logger):
                 data=await self.__queue.get()
                 if not data:
                     break
-                self.__writer.write(self.__iconv.sc(data))
+                self.__writer.write(data)
                 await self.__writer.drain()
         except (ConnectionResetError,asyncio.CancelledError):
             pass
@@ -101,7 +99,7 @@ class SSHHandler(Logger):
                 data=await self.__reader.read(self.__buf_size)
                 if not data:
                     break
-                self.__channel.write(self.__iconv.cs(data))
+                self.__channel.write(data)
         except (ConnectionResetError,asyncio.CancelledError):
             pass
         except Exception as e:
@@ -137,7 +135,10 @@ class TelnetServerSSHInstance(TCPServer):
             if not username:
                 continue
             try:
-                async with SSHHandler(reader,writer,self._config,
+                readerIconv,writerIconv=IConvWrapper(reader,writer,
+                    self._config.get('client_encoding',None),
+                    self._config.get('server_encoding','utf-8'))
+                async with SSHHandler(readerIconv,writerIconv,self._config,
                                       username,password):
                     login_failed_count=0
                     pass
