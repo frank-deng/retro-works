@@ -1,5 +1,4 @@
 import re
-import glob
 from lxml import etree,html
 
 class FontProcessor:

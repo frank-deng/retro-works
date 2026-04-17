@@ -1,7 +1,5 @@
 import asyncio
 import os
-import sys
-import pwd
 import pty
 import fcntl
 import termios

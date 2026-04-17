@@ -1,5 +1,4 @@
 import codecs
-import logging
 from util.tcpserver import ReaderWrapper,WriterWrapper
 
 
