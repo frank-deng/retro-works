@@ -4,6 +4,7 @@ from util import Logger
 from util.tcpserver import TCPServer
 from util.iconv import IConvWrapper
 from telnet import login
+from telnet import TelnetWrapper
 
 
 class SSHHandler(Logger):
@@ -119,23 +120,16 @@ class TelnetServerSSHInstance(TCPServer):
         self.__login_timeout=config.get('login_timeout',None)
 
     async def handler(self,reader,writer):
-        writer.write(b'\xFF\xFD\x22\xFF\xFB\x01\xFF\xFB\x00\xFF\xFD\x00\r\n')
-        await writer.drain()
-        try:
-            while True:
-                dt=await asyncio.wait_for(reader.read(1000),timeout=0.1)
-                self.logger.debug(dt)
-        except asyncio.TimeoutError:
-            pass
+        readerTelnet,writerTelnet=await TelnetWrapper(reader,writer)
         login_failed_count=0
         while login_failed_count<3:
-            username,password=await login(reader,writer)
+            username,password=await login(readerTelnet,writerTelnet)
             if username is None or password is None:
                 break
             if not username:
                 continue
             try:
-                readerIconv,writerIconv=IConvWrapper(reader,writer,
+                readerIconv,writerIconv=IConvWrapper(readerTelnet,writerTelnet,
                     self._config.get('client_encoding',None),
                     self._config.get('server_encoding','utf-8'))
                 async with SSHHandler(readerIconv,writerIconv,self._config,

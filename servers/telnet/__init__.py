@@ -7,7 +7,7 @@ import fcntl
 import termios
 import struct
 from util import Logger
-from util.tcpserver import TCPServer
+from util.tcpserver import ReaderWrapper,WriterWrapper
 
 
 async def readline(reader,writer,*,timeout=120,size=70,echo=True):
@@ -79,111 +79,103 @@ async def login(reader,writer):
     return username,password
 
 
-class ProcessHandler(Logger):
-    def __init__(self,reader,writer,*,buf_size=4096):
-        self.__proc=None
-        self.__master_fd=None
-        self.__slave_fd=None
-        self.__pty_reader=None
-        self.__tasks=None
-        self.__buf_size=buf_size
-        self.__reader,self.__writer=reader,writer
-        self.__buf_size=buf_size
-        self.__loop=asyncio.get_running_loop()
-        self.__queue=asyncio.Queue()
+class TelnetWriterWrapper(WriterWrapper):
+    def write(self,chunk):
+        super().write(chunk.replace(b'\xff',b'\xff\xff'))
 
-    async def __aenter__(self):
-        try:
-            self.__master_fd,self.__slave_fd=pty.openpty()
-            await self.create_subprocess_exec(self.__master_fd,self.__slave_fd)
-            os.close(self.__slave_fd)
-            os.set_blocking(self.__master_fd,False)
-            self.__tasks=(
-                asyncio.create_task(self.__pty_to_tcp()),
-                asyncio.create_task(self.__tcp_to_pty())
-            )
-        except Exception as e:
-            await self.__cleanup()
-            raise
-        return self
 
-    async def __aexit__(self,exc_type,exc_val,exc_tb):
-        try:
-            if self.__tasks is not None:
-                await asyncio.wait(self.__tasks,return_when=asyncio.FIRST_COMPLETED)
-        except asyncio.CancelledError:
-            pass
-        finally:
-            await self.__cleanup()
+class TelnetReaderWrapper(ReaderWrapper):
+    ST_DATA=0
+    ST_IAC=1
+    ST_SB=2
+    ST_SB_IAC=3
+    BYTE_IAC=0xff
+    def __init__(self,reader):
+        super().__init__(reader)
+        self.__stat_func={
+            self.ST_DATA:self.__proc_data,
+            self.ST_IAC:self.__proc_iac,
+            self.ST_SB:self.__proc_sb,
+            self.ST_SB_IAC:self.__proc_data,
+        }
+        self.__stat=self.ST_DATA
+        self.__res=bytearray()
+        self.__buf=bytearray()
+        self.__idx=0
+        self.__buflen=0
+        self.__running=True
 
-    def __fd_ready(self):
-        try:
-            data=os.read(self.__master_fd,self.__buf_size)
+    def __proc_data(self):
+        iac_pos=self.__buf.find(self.BYTE_IAC,self.__idx)
+        if iac_pos<0:
+            self.__res.extend(self.__buf[self.__idx:])
+            self.__idx=self.__buflen
+        else:
+            self.__res.extend(self.__buf[self.__idx:iac_pos])
+            self.__idx=iac_pos+1
+            self.__stat=self.ST_IAC
+
+    def __proc_iac(self):
+        b=self.__buf[self.__idx]
+        if b==self.BYTE_IAC:
+            self.__res.append(self.BYTE_IAC)
+            self.__stat=self.ST_DATA
+            self.__idx+=1
+        elif b==0xFA:
+            self.__stat=self.ST_SB
+            self.__idx+=1
+        elif b in (0xFB,0xFC,0xFD,0xFE):
+            if self.__idx+1>=self.__buflen:
+                return 1
+            self.__idx+=2
+            self.__stat=self.ST_DATA
+        else:
+            self.__idx+=1
+            self.__stat=self.ST_DATA
+
+    def __proc_sb(self):
+        iac_pos=self.__buf.find(self.BYTE_IAC,self.__idx)
+        if iac_pos==-1:
+            self.__idx=self.__buflen
+        else:
+            self.__idx+=1
+            self.__stat=self.ST_SB_IAC
+
+    def __proc_sb_iac(self):
+        b=self.__buf[self.__idx]
+        if b==0xF0:
+            self.__stat=self.ST_DATA
+        else:
+            self.__stat=self.ST_SB
+        self.__idx+=1
+
+    def __feed(self,data):
+        self.__running=True
+        self.__buf.extend(data)
+        self.__idx,self.__buflen,res=0,len(self.__buf),bytearray()
+        while self.__idx<self.__buflen:
+            if self.__stat_func[self.__stat]() is not None:
+                break
+        if self.__idx>=self.__buflen:
+            self.__buf.clear()
+        else:
+            del self.__buf[:self.__idx]
+        res=bytes(self.__res)
+        self.__res.clear()
+        return res
+
+    async def read(self,n=-1):
+        res=b''
+        while not res:
+            data=await super().read(n)
             if not data:
-                self.__loop.call_soon(self.__queue.put_nowait,b"")
-                return
-            self.__queue.put_nowait(data)
-        except (OSError,asyncio.CancelledError):
-            self.__queue.put_nowait(b"")
+                return data
+            res=self.__feed(data)
+        return res
 
-    async def __pty_to_tcp(self):
-        self.__loop.add_reader(self.__master_fd,self.__fd_ready)
-        try:
-            while True:
-                data=await self.__queue.get()
-                if not data:
-                    break
-                self.__writer.write(data)
-                await self.__writer.drain()
-        except (ConnectionResetError,asyncio.CancelledError):
-            pass
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
-        finally:
-            self.__loop.remove_reader(self.__master_fd)
 
-    async def __write_fd(self,data):
-        n=None
-        while data:
-            try:
-                n=os.write(self.__master_fd,data)
-                data=data[n:]
-            except BlockingIOError:
-                self.logger.debug(f'Partial data written {n}/{len(data)}')
-                await asyncio.sleep(0.01)
-
-    async def __tcp_to_pty(self):
-        try:
-            while True:
-                data=await self.__reader.read(self.__buf_size)
-                if not data:
-                    break
-                await self.__write_fd(data)
-        except (ConnectionResetError,OSError,asyncio.CancelledError):
-            pass
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
-
-    async def __cleanup(self):
-        try:
-            if self.__tasks is not None:
-                for task in self.__tasks:
-                    if not task.done():
-                        task.cancel()
-                await asyncio.gather(*self.__tasks)
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
-        finally:
-            self.__close_fd(self.__master_fd)
-            self.__master_fd=None
-
-    def __close_fd(self,fd):
-        try:
-            if fd is not None:
-                os.close(fd)
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
-
-    async def create_subprocess_exec(self,slave_fd):
-        pass
+async def TelnetWrapper(reader,writer):
+    writer.write(b'\xFF\xFD\x22\xFF\xFB\x01\xFF\xFB\x00\xFF\xFD\x00\r\n')
+    await writer.drain()
+    return TelnetReaderWrapper(reader),TelnetWriterWrapper(writer)
 
