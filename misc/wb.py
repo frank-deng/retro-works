@@ -9,7 +9,7 @@ Sort=1
 [TEXT]
 """
 
-import argparse
+import argparse,re
 
 def loadmb(fpath):
     mb_single=[]
@@ -22,6 +22,7 @@ def loadmb(fpath):
             items=line.split()
             code=items[0]
             for hz in items[1:]:
+                hz=re.sub(r'[\x00-\x7f]','',hz)
                 if len(hz)>1:
                     continue
                 mb_single.append((hz,code))
