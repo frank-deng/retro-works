@@ -4,7 +4,7 @@ Retro Programming Works 怀旧编程作品
 1998s PC
 --------
 
-家用多媒体互联网电脑，大憨憨和小憨憨共用。
+中国90年代后期典型家用多媒体电脑。
 
 ### 配置
 
@@ -20,18 +20,14 @@ Retro Programming Works 怀旧编程作品
 
 ### 主要用途
 
-| 用途             | 大憨憨 | 小憨憨 |
-|:-----------------|:------:|:------:|
-| BASIC编程        |        | Y      |
-| 小游戏           |        | Y      |
-| 英汉字典         | Y      | Y      |
-| 文字处理         | Y      | Y      |
-| 电子表格         | Y      | Y      |
-| 图片浏览         | Y      | Y      |
-| 听CD、MIDI       |        | Y      |
-| 多媒体光盘浏览   |        | Y      |
-| 上网看新闻       | Y      | 受监督 |
-| 收发邮件         | Y      | 受监督 |
+* BASIC编程
+* 小游戏（2048、俄罗斯方块、纸牌、扫雷、DOS Mario）
+* 英汉字典
+* 文字处理
+* 电子表格
+* 图片浏览
+* 听CD、MIDI
+* 多媒体光盘浏览
 
 ### 安装说明
 
@@ -63,9 +59,6 @@ Windows 3.2推荐安装以下软件：
 * Microsoft Scenes中的所有JPG图片
 * Microsoft Musical Instruments（多媒体光盘）
 * 震撼——古典音乐鉴赏（多媒体光盘）
-* Internet Explorer 3.0（包括PPP拨号软件、浏览器、邮件客户端）
-
-Linux端ISP服务器配置可参考[pppd.md](pppd.md)。
 
 #### Microsoft Office 4.2安装说明
 
@@ -92,8 +85,9 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * UCDOS配合西文软件（比如QBasic、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
-* Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用；终端仿真程序可用于排查Modem相关问题。
+* Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
+* Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
 
 
 1990s PC
@@ -177,11 +171,11 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * 486 DX-33MHz CPU
 * 8M RAM
 * 512M HDD
-* S3 Graphics Adapter with 512k VRAM（Windows 3.2下支持640x480 256色）
+* S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持800x600高彩色）
 * External 3.5 Inch Floppy Drive x1
 * TouchPad as mouse
 * PCMCIA NE2000 Compatible Ethernet Adapter
-* 640x480 TFT Screen
+* 800x600 TFT Screen
 
 ### 主要用途
 

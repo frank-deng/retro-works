@@ -110,9 +110,15 @@ DOSBox串口配置
 Windows 3.x/95客户端使用方法
 ----------------------------
 
+Windows 3.2版Internet Explorer 3.0中文版需要单独安装，包括浏览器、邮件客户端、PPP拨号器+TCP/IP协议栈。
+
+Windows 95自带Internet Explorer和PPP拨号器+TCP/IP协议栈。
+
 设置新的PPP连接的电话号码为`12345`，IP和DNS地址设置成自动获取，用户名和密码为`ppp/ppp`或`ppp2/ppp2`。
 
 Windows 95需要检查“使用远程网上的默认网关”选项是否被选中，否则将无法连接目标服务器。
 
 **注意：**必须保证所有PPP连接使用单独的用户名，否则将导致PPP服务器异常。
+
+Windows 3.2上可使用附件中的“终端仿真程序”排查Modem相关故障。
 
