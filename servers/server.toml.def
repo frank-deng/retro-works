@@ -17,7 +17,7 @@ links=[
 ]
 news_page_size=30
 image_max_size=[360,960]
-inline_image=false
+inline_image=true
 news_api="xxx"
 weather_api="xxx"
 weather_key="xxx"

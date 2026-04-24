@@ -1,4 +1,4 @@
-拨号上网、ISP服务器配置
+拨号上网用PPP服务器配置
 =======================
 
 PPP服务器需要在Linux环境（如Debian、Ubuntu、TinyCore）中运行。推荐在单独的TinyCore Linux虚拟机上部署PPP服务器。
