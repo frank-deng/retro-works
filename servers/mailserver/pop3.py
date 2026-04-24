@@ -146,7 +146,9 @@ class POP3Handler(Logger):
             try:
                 line=await asyncio.wait_for(self.__reader.readuntil(b'\n'), timeout=self.__timeout)
             except asyncio.exceptions.IncompleteReadError:
-                continue
+                self.logger.debug(f'Unexpected EOF')
+                break
+            self.logger.debug(f'>{line}')
             cmd=self.__getCmd(line)
             if cmd is None:
                 break
@@ -174,6 +176,7 @@ class POP3Server(TCPServer):
             max_conn=server_config.get('max_connection',None))
 
     async def handler(self,reader,writer):
+        self.logger.debug('New POP3')
         pop3handler=POP3Handler(self.__mailCenter,
                                 reader,writer,timeout=self.__timeout)
         await pop3handler.run()

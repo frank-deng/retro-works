@@ -110,7 +110,7 @@ class MailCenter(Logger):
         try:
             await self.__user[userTo].append(userFrom,msg)
         except Exception as e:
-            logger.error(e,exc_info=True)
+            self.logger.error(e,exc_info=True)
 
 
 class MailServer(MailCenter):
@@ -122,21 +122,20 @@ class MailServer(MailCenter):
 
     async def __aenter__(self):
         await super().__aenter__()
-        await asyncio.gather(
-            self.__pop3Server.__aenter__(),
-            self.__smtpServer.__aenter__(),
-            return_exceptions=True)
+        try:
+            await asyncio.gather(
+                self.__pop3Server.__aenter__(),
+                self.__smtpServer.__aenter__())
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
         try:
             await asyncio.gather(
                 self.__pop3Server.__aexit__(exc_type,exc_val,exc_tb),
-                self.__smtpServer.__aexit__(exc_type,exc_val,exc_tb),
-                return_exceptions=True)
+                self.__smtpServer.__aexit__(exc_type,exc_val,exc_tb))
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
         finally:
             await super().__aexit__(exc_type,exc_val,exc_tb)
-
-    def close(self):
-        self.__pop3Server.close()
-        self.__smtpServer.close()
 

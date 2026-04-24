@@ -22,7 +22,7 @@ columns=80
 
 [[TelnetServerSSH.servers]]
 host="127.0.0.1"
-port=8025
+port=8123
 max_connection=10
 buf_size=4096
 ssh_host="host1"
@@ -35,7 +35,7 @@ server_encoding="utf-8"
 
 [[TelnetServerSSH.servers]]
 host="127.0.0.1"
-port=8026
+port=8223
 max_connection=10
 buf_size=4096
 ssh_host="host2"

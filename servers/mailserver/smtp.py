@@ -93,7 +93,8 @@ class SMTPHandler(Logger):
             try:
                 line=await asyncio.wait_for(self.__reader.readuntil(b'\n'), timeout=self.__timeout)
             except asyncio.exceptions.IncompleteReadError:
-                continue
+                self.logger.error(f'Unexpected EOF')
+                break
             cmd=self.__getCmd(line)
             if cmd is None:
                 break
@@ -121,8 +122,10 @@ class SMTPServer(TCPServer):
         super().__init__(server_config['port'],
             host=server_config.get('host','0,0,0,0'),
             max_conn=server_config.get('max_connection',None))
+        self.logger.debug(f'SMTP server at {server_config['port']}')
 
     async def handler(self,reader,writer):
+        self.logger.debug('New SMTP')
         smtphandler=SMTPHandler(self.__mailCenter,
                                 reader,writer,timeout=self.__timeout,
                                 greeting_host=self.__greeting_host)

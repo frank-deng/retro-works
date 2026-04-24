@@ -26,7 +26,7 @@ class MailUserRobotAI(MailUserRobot):
         else:
             charset=msg.get_content_charset()
             payload=msg.get_payload(decode=True)
-        charset=MailUserRobotAI.CHARSET_ALIAS.get(charset,charset)
+        charset=self.CHARSET_ALIAS.get(charset,charset)
         subject,subjectCharset=email.header.decode_header(msg['Subject'])[0]
         if subjectCharset is None:
             subjectCharset=charset
@@ -40,7 +40,7 @@ class MailUserRobotAI(MailUserRobot):
         return subject,payload
 
     @staticmethod
-    def __parse_content(remain):
+    def __parse_content(remain,subject):
         def __parse_content_part(text):
             cur=''
             remainder=''
@@ -61,6 +61,8 @@ class MailUserRobotAI(MailUserRobot):
             if not remain:
                 break
         res.reverse()
+        if len(res)==1:
+            res[-1]=f'{subject}\n\n{res[-1]}'
         return res
 
     @staticmethod
@@ -92,7 +94,7 @@ class MailUserRobotAI(MailUserRobot):
     async def __taskMain(self,userFrom,msg):
         msg=email.message_from_bytes(msg)
         subject,content=self.__class__.__msg_get_data(msg)
-        conversation=self.__class__.__parse_content(content)
+        conversation=self.__class__.__parse_content(content,subject)
         reply=await self.apiHandler(conversation)
         self.__save_result(conversation,reply)
         content=self.__class__.__msg_apply_reply(reply, content)
