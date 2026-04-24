@@ -14,7 +14,7 @@ import math
 from lxml import html
 from aiohttp.web import Request
 from aiohttp.web import Response
-from aiohttp_jinja2 import render_string
+from aiohttp_jinja2 import template
 from PIL import Image
 from io import BytesIO
 
@@ -164,6 +164,7 @@ class NewsManager(Logger):
         async with self.__imageLinksLock:
             return self.__imageLinks.get(key,None)
 
+@template("news.html")
 async def news_detail(req:Request):
     config=req.app['config']
     news=await req.app['newsManager'].newsDetail(req.url.query['id'])
@@ -179,7 +180,7 @@ async def news_detail(req:Request):
             news_content.append({
                 'type':'text','content':fontProcesor.apply_font(item['content'],singleLine=True)
             })
-    context={
+    return {
         'header':'今日新闻',
         'title':f'{news["title"]} - 今日新闻',
         'inline_image':config['web'].get('inline_image',False),
@@ -187,14 +188,9 @@ async def news_detail(req:Request):
         'news_date':fontProcesor.apply_font(f'{year}年{month}月{day}日',singleLine=True),
         'news_content':news_content
     }
-    encoding=config['web']['encoding']
-    return Response(
-        body=render_string("news.html",req,context).encode(encoding,errors='replace'),
-        headers={
-            'content-type':f"text/html; charset={encoding}"
-        }
-    )
 
+
+@template('newslist.html')
 async def news_handler(req:Request):
     if 'id' in req.url.query:
         return await news_detail(req)
@@ -213,20 +209,14 @@ async def news_handler(req:Request):
     elif page>max_pages:
         page=max_pages
 
-    context={
+    return {
         'header':'今日新闻',
         'title':'今日新闻',
         'news':news_list[page_size*(page-1):page_size*page],
         'page':page,
         'max_pages':max_pages,
     }
-    encoding=config['web']['encoding']
-    return Response(
-        body=render_string("newslist.html",req,context).encode(encoding,errors='replace'),
-        headers={
-            'content-type':f"text/html; charset={encoding}"
-        }
-    )
+
 
 def downscale_image(img_data,max_size,quality=80):
     with Image.open(BytesIO(img_data)) as img:
@@ -249,6 +239,7 @@ def downscale_image(img_data,max_size,quality=80):
         img_new.save(outbuf,format='JPEG',quality=quality)
         return outbuf.getvalue()
 
+
 async def news_image_handler(req:Request):
     logger=logging.getLogger(__name__)
     config=req.app['config']
@@ -268,5 +259,10 @@ async def news_image_handler(req:Request):
         raise aiohttp.web.HTTPNotFound()
     image_max_size=tuple(config['web'].get('image_max_size',[360,960]))
     image_data=await asyncio.to_thread(downscale_image,image_data,image_max_size)
-    return Response(body=image_data)
+    return Response(
+        body=image_data,
+        headers={
+            'content-type':"image/jpeg"
+        }
+    )
 

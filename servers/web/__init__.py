@@ -1,11 +1,11 @@
-import aiohttp_jinja2
+import logging
 import os
+import aiohttp_jinja2
 import inspect
 from jinja2 import FileSystemLoader
 from aiohttp import web
 from util import Logger
 from util import load_module
-
 from web.news import NewsManager
 
 class StaticWithIndex(Logger):
@@ -28,13 +28,31 @@ class StaticWithIndex(Logger):
                 return web.FileResponse(index_path)
         raise web.HTTPNotFound()
 
+
+@web.middleware
+async def iconv_middleware(request,handler):
+    logger=logging.getLogger(__name__)
+    try:
+        config=request.app['config']
+        encoding=config['web'].get('encoding')
+        response=await handler(request)
+        content_type=response.content_type.lower()
+        if content_type=='text/html' and encoding is not None:
+            body_str=response.body.decode('utf-8',errors='ignore')
+            response.body=body_str.encode(encoding,errors='replace')
+            response.headers['content-type']=f"text/html; charset={encoding}"
+        return response
+    except Exception as e:
+        logger.error(e,exc_info=True)
+
+
 class WebServer(Logger):
     __runner=None
     __site=None
     def __init__(self,config):
         self.__host=config['web']['host']
         self.__port=config['web']['port']
-        self.__app=web.Application()
+        self.__app=web.Application(middlewares=[iconv_middleware])
         self.__app['config']=config
         self.__app['newsManager']=NewsManager(config['web']['news_api'])
         aiohttp_jinja2.setup(self.__app,
