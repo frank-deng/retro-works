@@ -120,7 +120,7 @@ async def weather(req:Request):
         'location_str':location_str,
     }
     context.update(weather)
-    #logger.debug(pformat(context))
+    logger.debug(pformat(context))
     output_encoding=config['web']['encoding']
     resp=render_template("weather.html",req,context)
     resp.headers['Set-Cookie']=f'location={locid}; expires=Mon, 17-Jan-2038 23:59:59 GMT; path=/'

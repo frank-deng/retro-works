@@ -7,7 +7,6 @@ from aiohttp.web import Response
 from aiohttp_jinja2 import template
 from datetime import datetime
 from web.weather import WeatherData
-from util.fonttool import FontProcessor
 
 async def get_weather(config,locid):
     logger=logging.getLogger(__name__)
@@ -49,11 +48,6 @@ async def index(req:Request):
         get_weather(config,req.cookies.get('location',None)),
         get_news(req.app['newsManager'])
     )
-    if weather and weather['warning']:
-        fontProcesor=FontProcessor('Times New Roman','宋体')
-        for item in weather['warning']:
-            item['text']=fontProcesor.apply_font(item['text'])
-
     return {
         'dateStr':datetime.now().strftime('%Y年%m月%d日'),
         'links':links,
