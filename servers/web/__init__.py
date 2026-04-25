@@ -47,6 +47,7 @@ async def iconv_middleware(request,handler):
 
 
 class WebServer(Logger):
+    MODULES=['web.news', 'web.weather', 'web.index']
     BASE_DIR='web'
     STATIC_PATH='/static'
     STATIC_DIR='web/static'
@@ -85,37 +86,15 @@ class WebServer(Logger):
             loader=FileSystemLoader(self.BASE_DIR),
             autoescape=True)
         self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
-        modules=[
-            'web.news',
-            'web.weather',
-            'web.index',
-        ]
-        for item in modules:
-            load_module(item)
+        for item in self.MODULES:
+            try:
+                load_module(item)
+            except Exception as e:
+                self.logger.error(f'Failed to load route:{e}',exc_info=True)
         for _class in self._pre_init:
             _class(self.__app,config)
         self.__app.add_routes(self._routes)
         self.__app['links']=self._links
-        #for route in config['web']['routes']:
-        #    self.__load_route(route['path'],route)
-
-    def __load_route(self,path,route):
-        try:
-            if isinstance(path,list):
-                for subpath in path:
-                    self.__load_route(subpath,route)
-                return
-            if 'static' in route:
-                self.__app.router.add_static(path,route['static'])
-                return
-            methods=route.get('method','GET')
-            module=load_module(route['module'])
-            if inspect.isclass(module):
-                self.__app.router.add_route(methods,path,module(route))
-            else:
-                self.__app.router.add_route(methods,path,module)
-        except Exception as e:
-            self.logger.error(f'Failed to load route:{e}',exc_info=True)
 
     async def __aenter__(self):
         self.__runner=web.AppRunner(self.__app,access_log=None)
