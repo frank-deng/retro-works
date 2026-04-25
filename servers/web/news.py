@@ -22,6 +22,10 @@ from util import Logger
 from util.robot import RobotChecker
 from util.fonttool import FontProcessor
 
+from . import WebServer
+
+
+@WebServer.pre_init
 class NewsManager(Logger):
     __robotChecker=None
     __timeout=5
@@ -95,8 +99,9 @@ class NewsManager(Logger):
             self.__imageLinks[key]=imgurl
         return key
 
-    def __init__(self,host):
-        self.__host=host
+    def __init__(self,app,config):
+        app['newsManager']=self
+        self.__host=config['web']['news_api']
         self.__newsLinks={}
         self.__newsLinksLock=asyncio.Lock()
         self.__imageLinks={}
@@ -164,6 +169,7 @@ class NewsManager(Logger):
         async with self.__imageLinksLock:
             return self.__imageLinks.get(key,None)
 
+
 @template("news.html")
 async def news_detail(req:Request):
     config=req.app['config']
@@ -190,6 +196,7 @@ async def news_detail(req:Request):
     }
 
 
+@WebServer.get("/news.asp")
 @template('newslist.html')
 async def news_handler(req:Request):
     if 'id' in req.url.query:
@@ -240,13 +247,14 @@ def downscale_image(img_data,max_size,quality=80):
         return outbuf.getvalue()
 
 
+@WebServer.get("/news_images/{image_key}.jpg")
 async def news_image_handler(req:Request):
     logger=logging.getLogger(__name__)
     config=req.app['config']
     image_url=await req.app['newsManager'].newsImage(req.match_info['image_key'])
     if image_url is None:
         raise aiohttp.web.HTTPNotFound()
-    if not await NewsManager.can_fetch(image_url):
+    if not await req.app['newsManager'].can_fetch(image_url):
         raise aiohttp.web.HTTPForbidden()
     image_data=None
     async with aiohttp.ClientSession() as session:

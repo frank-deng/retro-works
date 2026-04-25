@@ -6,7 +6,7 @@ from jinja2 import FileSystemLoader
 from aiohttp import web
 from util import Logger
 from util import load_module
-from web.news import NewsManager
+
 
 class StaticWithIndex(Logger):
     def __init__(self,route_param):
@@ -47,19 +47,57 @@ async def iconv_middleware(request,handler):
 
 
 class WebServer(Logger):
-    __runner=None
-    __site=None
+    BASE_DIR='web'
+    STATIC_PATH='/static'
+    STATIC_DIR='web/static'
+    _routes = web.RouteTableDef()
+    _pre_init=[]
+    _links=[]
+
+    @staticmethod
+    def get(path, **kwargs):
+        return WebServer._routes.get(path, **kwargs)
+
+    @staticmethod
+    def post(path, **kwargs):
+        return WebServer._routes.post(path, **kwargs)
+
+    @staticmethod
+    def pre_init(func):
+        WebServer._pre_init.append(func)
+        return func
+
+    @staticmethod
+    def index_link(label,href):
+        WebServer._links.append({'label':label,'href':href})
+        def _index_link(func):
+            return func
+        return _index_link
+
     def __init__(self,config):
+        self.__runner=None
+        self.__site=None
         self.__host=config['web']['host']
         self.__port=config['web']['port']
         self.__app=web.Application(middlewares=[iconv_middleware])
         self.__app['config']=config
-        self.__app['newsManager']=NewsManager(config['web']['news_api'])
         aiohttp_jinja2.setup(self.__app,
-            loader=FileSystemLoader(config['web']['template_dir']),
+            loader=FileSystemLoader(self.BASE_DIR),
             autoescape=True)
-        for route in config['web']['routes']:
-            self.__load_route(route['path'],route)
+        self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
+        modules=[
+            'web.news',
+            'web.weather',
+            'web.index',
+        ]
+        for item in modules:
+            load_module(item)
+        for _class in self._pre_init:
+            _class(self.__app,config)
+        self.__app.add_routes(self._routes)
+        self.__app['links']=self._links
+        #for route in config['web']['routes']:
+        #    self.__load_route(route['path'],route)
 
     def __load_route(self,path,route):
         try:

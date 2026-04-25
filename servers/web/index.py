@@ -6,7 +6,9 @@ from aiohttp.web import Request
 from aiohttp.web import Response
 from aiohttp_jinja2 import template
 from datetime import datetime
-from web.weather import WeatherData
+from .api import WeatherData
+
+from . import WebServer
 
 async def get_weather(config,locid):
     logger=logging.getLogger(__name__)
@@ -40,10 +42,12 @@ async def get_news(newsManager):
     return res
 
 
+@WebServer.get('/')
+@WebServer.get('/index.asp')
 @template('index.html')
 async def index(req:Request):
     config=req.app['config']
-    links=config['web']['links']
+    links=req.app['links']
     weather,news=await asyncio.gather(
         get_weather(config,req.cookies.get('location',None)),
         get_news(req.app['newsManager'])
