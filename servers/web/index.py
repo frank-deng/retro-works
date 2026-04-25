@@ -6,9 +6,9 @@ from aiohttp.web import Request
 from aiohttp.web import Response
 from aiohttp_jinja2 import template
 from datetime import datetime
-from .api import WeatherData
-
 from . import WebServer
+from .api import WeatherData
+from .api import NewsAPI
 
 async def get_weather(config,locid):
     logger=logging.getLogger(__name__)
@@ -32,11 +32,11 @@ async def get_weather(config,locid):
         logger.error(e,exc_info=True)
         return None
 
-async def get_news(newsManager):
+async def get_news(app):
     logger=logging.getLogger(__name__)
     res=None
     try:
-        res=(await newsManager.newsList())[:20]
+        res=(await NewsAPI(app).newsList())[:20]
     except Exception as e:
         logger.error(f'Failed to load news {e}',exc_info=True)
     return res
@@ -47,10 +47,10 @@ async def get_news(newsManager):
 @template('index.html')
 async def index(req:Request):
     config=req.app['config']
-    links=req.app['links']
+    links=config['web']['links']
     weather,news=await asyncio.gather(
         get_weather(config,req.cookies.get('location',None)),
-        get_news(req.app['newsManager'])
+        get_news(req.app)
     )
     return {
         'dateStr':datetime.now().strftime('%Y年%m月%d日'),

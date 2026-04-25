@@ -11,6 +11,7 @@ modules=[
 host="127.0.0.1"
 port=8080
 encoding="gbk"
+links=[{label="天气预报",href="/weather.asp"}]
 news_page_size=30
 image_max_size=[360,960]
 inline_image=true

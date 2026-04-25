@@ -52,8 +52,6 @@ class WebServer(Logger):
     STATIC_PATH='/static'
     STATIC_DIR='web/static'
     _routes = web.RouteTableDef()
-    _pre_init=[]
-    _links=[]
 
     @staticmethod
     def get(path, **kwargs):
@@ -62,18 +60,6 @@ class WebServer(Logger):
     @staticmethod
     def post(path, **kwargs):
         return WebServer._routes.post(path, **kwargs)
-
-    @staticmethod
-    def pre_init(func):
-        WebServer._pre_init.append(func)
-        return func
-
-    @staticmethod
-    def index_link(label,href):
-        WebServer._links.append({'label':label,'href':href})
-        def _index_link(func):
-            return func
-        return _index_link
 
     def __init__(self,config):
         self.__runner=None
@@ -91,10 +77,7 @@ class WebServer(Logger):
                 load_module(item)
             except Exception as e:
                 self.logger.error(f'Failed to load route:{e}',exc_info=True)
-        for _class in self._pre_init:
-            _class(self.__app,config)
         self.__app.add_routes(self._routes)
-        self.__app['links']=self._links
 
     async def __aenter__(self):
         self.__runner=web.AppRunner(self.__app,access_log=None)

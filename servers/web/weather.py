@@ -37,7 +37,6 @@ async def select_city(req:Request):
 
 
 @WebServer.get("/weather.asp")
-@WebServer.index_link('天气预报',"/weather.asp")
 async def weather(req:Request):
     logger=logging.getLogger(__name__)
     config=req.app['config']
