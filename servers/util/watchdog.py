@@ -9,13 +9,6 @@ from threading import Thread
 from util import Logger
 
 class WatchdogHandler(Thread,Logger):
-    __running=True
-    __flag=False
-    __task=None
-    __timeout=10
-    __feed_interval=0.1
-    __check_interval=0.5
-
     @staticmethod
     def __kill():
         pid=os.getpid()
@@ -28,6 +21,11 @@ class WatchdogHandler(Thread,Logger):
 
     def __init__(self,timeout:int=10):
         super().__init__()
+        self.__running=True
+        self.__flag=False
+        self.__task=None
+        self.__feed_interval=0.1
+        self.__check_interval=0.5
         self.__timeout=timeout
 
     async def __aenter__(self):
