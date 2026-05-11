@@ -1,4 +1,5 @@
 import asyncio
+import re
 import logging
 from aiohttp.web import Request
 from aiohttp.web import Response
@@ -48,10 +49,14 @@ async def mail_list(req:Request):
 @template('mail_detail.html')
 async def mail_detail(req:Request):
     email_id=req.url.query.get('email_id')
+    action=req.url.query.get('action')
     email_list=await MailCenter(req.app).mail_detail(req.uid,email_id)
+    email_top=email_list[0]
     return {
         'email_list':email_list,
-        'email_id':email_id
+        'email_id':email_id,
+        'allow_reply':req.uid!=email_top['from_uid'],
+        'action':action,
     }
 
 
@@ -59,6 +64,7 @@ async def mail_detail(req:Request):
 @WebServer.login_required()
 @template('mail_editor.html')
 async def mail_editor(req:Request):
+    _MailCenter=MailCenter(req.app)
     logger=logging.getLogger(__name__)
     email_id=req.url.query.get('email_id')
     action=req.url.query.get('action')
@@ -68,10 +74,13 @@ async def mail_editor(req:Request):
     email_list=None
     if email_id:
         email_list=await MailCenter(req.app).mail_detail(req.uid,email_id)
+        email_top=email_list[0]
+        subject=re.sub(r'^(Re|Fwd):\s*','',email_top['subject'],0,re.IGNORECASE)
         if action=='forward':
-            subject='Fwd: '+email_list[0]['subject']
+            subject='Fwd: '+subject
         elif action=='reply':
-            subject='Re: '+email_list[0]['subject']
+            subject='Re: '+subject
+            to=await _MailCenter.get_addr_from_uid(email_top['from_uid'])
     return {
         'email_id':email_id,
         'to':to,

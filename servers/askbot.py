@@ -45,9 +45,7 @@ class MailUserRobotDeepseek(MailUserRobot):
         conversation=self._get_conversation(email_detail)
         body=await self._api_handler(conversation)
         email=email_detail[0]
-        subject=email['subject']
-        if not re.match(r'^(Re:)',subject,re.IGNORECASE):
-            subject='Re: '+subject
+        subject='Re: '+re.sub(r'^(Re|Fwd):\s*','',email['subject'],1,re.IGNORECASE)
         await self._MailCenter.send(uid,[email['from_uid']],[],
                                     subject,body,email_id)
         await self._MailCenter.mark_read(uid,email_id)

@@ -2,8 +2,22 @@
 <head>
   <meta charset='GB2312'/>
 </head>
-<body bgcolor='#ffffff' topmargin='3' leftmargin='8' rightmargin='8' bottommargin='0'>
-	<p><a href='mail_editor.asp?action=forward&email_id={{email_id}}'>[转发]</a></p>
+<body bgcolor='#ffffff' topmargin='6' leftmargin='8' rightmargin='8' bottommargin='0'>
+{% if 'delete'==action %}
+<form method='POST' action='mail_delete.asp'>
+  <input type='hidden' name='email_id' value='{{email_id}}'/>
+  <b><font color='#ff0000'>邮件删除后无法恢复！是否继续删除？</font></b><br>
+  <input type='submit' value='删除邮件'/>
+  <a href='mail_detail.asp?email_id={{email_id}}'>[返回]</a>
+  <hr>
+</form>{% else %}
+<div>
+{% if allow_reply %}
+  <a href='mail_editor.asp?action=reply&email_id={{email_id}}'>[回复]</a>
+{% endif %}
+  <a href='mail_editor.asp?action=forward&email_id={{email_id}}'>[转发]</a>
+  <a href='mail_detail.asp?action=delete&email_id={{email_id}}'>[删除]</a>
+</div><hr>{% endif %}
 {% for mail in email_list %}
 <div><b>发件人：</b>{{mail['from_addr']}}</div>
 {% if mail['to_str'] %}<div><b>收件人：</b>{{mail['to_str']}}</div>{% endif %}
