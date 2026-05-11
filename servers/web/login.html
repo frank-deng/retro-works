@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<center>
+<form action="{{post_url}}" method="post">
+  <table>
+    <tr>
+      <td><label for="username">用户名：</label></td>
+      <td><input type="text" id="username" name="username" value='{{username}}' size="24"></td>
+    </tr>
+    <tr>
+      <td><label for="password">密码：</label></td>
+      <td><input type="password" id="password" name="password" size="24"></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center">
+        <input type="submit" value='登录'/>
+      </td>
+    </tr>
+  </table>
+  </div>
+{% if fail %}
+  <p align='center'><font color='#ff0000'>{{fail}}</font></p>
+{% endif %}
+</form>
+</center>
+{% endblock %}

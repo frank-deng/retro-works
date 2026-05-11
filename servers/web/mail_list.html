@@ -1,0 +1,16 @@
+<html>
+<head>
+  <meta charset='GB2312'/>
+</head>
+<body bgcolor='#ffffff' topmargin='3' leftmargin='8' rightmargin='8' bottommargin='0'>
+{% if total==0 %}
+没有邮件
+{% else %}
+<ul>
+{% for mail in email_list %}
+  <li><a href="/mail_detail.asp?email_id={{mail['id']}}">{{mail['subject'] or '[无标题]'}}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+</body>
+</html>

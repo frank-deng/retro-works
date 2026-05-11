@@ -6,9 +6,11 @@ from aiohttp.web import Request
 from aiohttp.web import Response
 from aiohttp_jinja2 import template
 from datetime import datetime
+from aiohttp_session import get_session, new_session
 from . import WebServer
 from .api import WeatherData
 from .api import NewsAPI
+from mailcenter import MailCenter
 
 async def get_weather(config,locid):
     logger=logging.getLogger(__name__)
@@ -58,4 +60,44 @@ async def index(req:Request):
         'weather':weather,
         'news':news
     }
+
+
+def login_ctx(username='',fail_info=None):
+    return {
+        'title':'登录',
+        'header':'用户登录',
+        'username':username,
+        'fail':fail_info,
+        'post_url':'/login.asp'
+    }
+
+
+@WebServer.get('/login.asp')
+@template('login.html')
+async def login(req:Request):
+    return login_ctx('',None)
+
+
+@WebServer.post('/login.asp')
+@template('login.html')
+async def do_login(req:Request):
+    form_data=await req.post()
+    username=form_data.get('username','')
+    password=form_data.get('password')
+    if not username or not password:
+        return login_ctx(username,'用户名和密码不能为空')
+    uid=await MailCenter(req.app).auth(username,password)
+    if uid is None:
+        return login_ctx(username,'登录失败')
+    session=await new_session(req)
+    session["uid"]=uid
+    return Response(headers={'Location':'/mail.asp'},status=303)
+
+
+@WebServer.get('/logout.asp')
+@WebServer.post('/logout.asp')
+async def logout(req:Request):
+    session = await get_session(req)
+    session.invalidate()
+    return Response(headers={'Location':'/'},status=303)
 

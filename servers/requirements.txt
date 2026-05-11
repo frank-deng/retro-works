@@ -1,5 +1,10 @@
 aiohttp
+aiohttp-session
 aiohttp_jinja2
+cryptography
 click
 lxml
 pillow
+aiosqlite
+aiosqlitepool
+

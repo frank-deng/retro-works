@@ -1,11 +1,19 @@
 import logging
 import os
+import functools
+from http.cookies import SimpleCookie
 import aiohttp_jinja2
-import inspect
+import aiohttp_session
+from aiohttp_session.cookie_storage import EncryptedCookieStorage
+from cryptography.fernet import Fernet
 from jinja2 import FileSystemLoader
 from aiohttp import web
+from aiohttp import web_exceptions
+from aiohttp.web import HTTPFound
+from aiohttp.web import HTTPForbidden
 from util import Logger
 from util import load_module
+import mailcenter
 
 
 class StaticWithIndex(Logger):
@@ -46,8 +54,33 @@ async def iconv_middleware(request,handler):
         logger.error(e,exc_info=True)
 
 
+@web.middleware
+async def session_middleware(request,handler):
+    logger=logging.getLogger(__name__)
+    session=await aiohttp_session.get_session(request)
+    request.uid=session.get('uid')
+    return await handler(request)
+
+
+class OldBrowserCookieStorage(EncryptedCookieStorage):
+    COOKIE_NAME='SESSION_ID'
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def load_cookie(self, request):
+        return request.cookies.get(self.COOKIE_NAME,None)
+
+    def save_cookie(self, response, cookie_data, max_age=None):
+        cookie_name=self.COOKIE_NAME
+        cookie = SimpleCookie()
+        cookie[cookie_name] = cookie_data
+        cookie[cookie_name]["path"] = "/"
+        cookie[cookie_name]["expires"] = 'Mon, 17-Jan-2038 23:59:59 GMT'
+        response.headers.add("Set-Cookie", cookie[cookie_name].OutputString())
+
+
 class WebServer(Logger):
-    MODULES=['web.news', 'web.weather', 'web.index']
+    MODULES=['web.news', 'web.weather', 'web.index', 'web.mail']
     BASE_DIR='web'
     STATIC_PATH='/static'
     STATIC_DIR='web/static'
@@ -61,6 +94,20 @@ class WebServer(Logger):
     def post(path, **kwargs):
         return WebServer._routes.post(path, **kwargs)
 
+    @staticmethod
+    def login_required(redirect=False):
+        def decorator(func):
+            @functools.wraps(func)
+            async def wrapper(request):
+                if hasattr(request,'uid') and request.uid:
+                    return await func(request)
+                elif redirect:
+                    return HTTPFound(f'/login.asp')
+                else:
+                    return HTTPForbidden(text="Please login first.")
+            return wrapper
+        return decorator
+
     def __init__(self,config):
         self.__runner=None
         self.__site=None
@@ -72,6 +119,10 @@ class WebServer(Logger):
             loader=FileSystemLoader(self.BASE_DIR),
             autoescape=True)
         self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
+        aiohttp_session.setup(self.__app,OldBrowserCookieStorage(Fernet(Fernet.generate_key())))
+        self.__app.middlewares.append(session_middleware)
+        self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
+        mailcenter.setup(self.__app)
         for item in self.MODULES:
             try:
                 load_module(item)

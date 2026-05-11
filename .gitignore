@@ -14,6 +14,7 @@ __test__
 .outside
 *.wav
 *.eml
+*.db*
 
 build
 dist
