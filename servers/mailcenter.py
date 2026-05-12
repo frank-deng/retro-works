@@ -219,17 +219,21 @@ CREATE TABLE IF NOT EXISTS recipient (
         async with self._pool.connection() as conn:
             cursor_total=await conn.execute('SELECT COUNT(id) as total\
                 FROM recipient WHERE status>=0 AND uid=?',(uid,))
+            cursor_unread=await conn.execute('SELECT COUNT(id) as unread\
+                FROM recipient WHERE status=0 AND uid=?',(uid,))
             cursor_data=await conn.execute('''
                 SELECT
                     email.id as id,
                     recipient.type as type,
-                    email.subject as subject
+                    email.subject as subject,
+                    recipient.status as status
                 FROM email INNER JOIN recipient ON recipient.email_id=email.id
                 WHERE recipient.status>=0 AND recipient.uid=?
                 ORDER BY recipient.id DESC LIMIT ? OFFSET ?''',
                 (uid,self.pagesize,self.pagesize*page))
             return await cursor_data.fetchall(),\
-                (await cursor_total.fetchone())['total']
+                (await cursor_total.fetchone())['total'],\
+                (await cursor_unread.fetchone())['unread']
 
     async def mail_sent(self,uid,page):
         async with self._pool.connection() as conn:

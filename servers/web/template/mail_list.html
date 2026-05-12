@@ -6,16 +6,14 @@
 {% if folder=="sent" %}
 <div><b>发件箱</b></div>
 {% else %}
-<div><b>收件箱</b></div>
+<div><b>收件箱</b> {% if unread>0 %}<font size='2' color='#000080'>您有<font face='Times New Roman'><b>{{unread}}</b></font>封未读邮件</font>{% endif %}</div>
 {% endif %}
 {% if total==0 %}
 没有邮件
 {% else %}
-<ul>
-{% for mail in email_list %}
-  <li><a href="/mail_detail.asp?email_id={{mail['id']}}">{{mail['subject'] or '[无标题]'}}</a></li>
-{% endfor %}
-</ul>
+<ul>{% for mail in email_list %}<li><a href="/mail_detail.asp?email_id={{mail['id']}}">{% if folder=="recv" and mail['status']==0 %}<b>{{mail['subject'] or '[无标题]'}}</b>
+{% else %}{{mail['subject'] or '[无标题]'}}{% endif %}
+</a></li>{% endfor %}</ul>
 {% if total_page>1 %}
 <p>
 {% if page<=1 %}<span>&lt;上一页</span>{% else %}<a href='mail_list.asp?folder={{folder}}&page={{page-1}}'>&lt;上一页</a>{% endif %}

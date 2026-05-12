@@ -30,24 +30,25 @@ async def mail_left(req:Request):
 @template('mail_list.html')
 async def mail_list(req:Request):
     logger=logging.getLogger(__name__)
-    folder=req.url.query.get('folder')
+    folder=req.url.query.get('folder','recv')
     page=1
     try:
         page=int(req.url.query.get('page','1'))
     except (TypeError,ValueError):
         pass
-    email_list,total=[],0
+    email_list,total,unread=[],0,0
     if folder=='sent':
         email_list,total=await MailCenter(req.app).mail_sent(req.uid,page-1)
     else:
-        email_list,total=await MailCenter(req.app).mail_recv(req.uid,page-1)
+        email_list,total,unread=await MailCenter(req.app).mail_recv(req.uid,page-1)
     total_page=ceil(total/MailCenter(req.app).pagesize)
     return {
         'email_list':email_list,
         'folder':folder,
         'total':total,
         'total_page':total_page,
-        'page':page
+        'page':page,
+        'unread':unread,
     }
 
 
