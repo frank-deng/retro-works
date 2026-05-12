@@ -23,7 +23,7 @@ weather_api="xxx"
 weather_key="xxx"
 
 [mail]
-pagesize=30
+pagesize=10
 host="mysite.com"
 
 [mail.db]

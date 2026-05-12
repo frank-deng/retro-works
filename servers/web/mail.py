@@ -1,6 +1,7 @@
 import asyncio
 import re
 import logging
+from math import ceil
 from aiohttp.web import Request
 from aiohttp.web import Response
 from aiohttp_jinja2 import template
@@ -30,16 +31,22 @@ async def mail_left(req:Request):
 async def mail_list(req:Request):
     logger=logging.getLogger(__name__)
     folder=req.url.query.get('folder')
-    page=req.url.query.get('page',0)
+    page=1
+    try:
+        page=int(req.url.query.get('page','1'))
+    except (TypeError,ValueError):
+        pass
     email_list,total=[],0
     if folder=='sent':
-        email_list,total=await MailCenter(req.app).mail_sent(req.uid)
+        email_list,total=await MailCenter(req.app).mail_sent(req.uid,page-1)
     else:
-        email_list,total=await MailCenter(req.app).mail_recv(req.uid)
+        email_list,total=await MailCenter(req.app).mail_recv(req.uid,page-1)
+    total_page=ceil(total/MailCenter(req.app).pagesize)
     return {
         'email_list':email_list,
         'folder':folder,
         'total':total,
+        'total_page':total_page,
         'page':page
     }
 

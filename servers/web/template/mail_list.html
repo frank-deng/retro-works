@@ -2,7 +2,12 @@
 <head>
   <meta charset='GB2312'/>
 </head>
-<body bgcolor='#ffffff' topmargin='3' leftmargin='8' rightmargin='8' bottommargin='0'>
+<body bgcolor='#ffffff' topmargin='6' leftmargin='6' rightmargin='8' bottommargin='3'>
+{% if folder=="sent" %}
+<div><b>发件箱</b></div>
+{% else %}
+<div><b>收件箱</b></div>
+{% endif %}
 {% if total==0 %}
 没有邮件
 {% else %}
@@ -11,6 +16,13 @@
   <li><a href="/mail_detail.asp?email_id={{mail['id']}}">{{mail['subject'] or '[无标题]'}}</a></li>
 {% endfor %}
 </ul>
+{% if total_page>1 %}
+<p>
+{% if page<=1 %}<span>&lt;上一页</span>{% else %}<a href='mail_list.asp?folder={{folder}}&page={{page-1}}'>&lt;上一页</a>{% endif %}
+&nbsp;{{page}}/{{total_page}}&nbsp;{% if page>=total_page %}<span>下一页&gt;</span>{% else %}<a href='mail_list.asp?folder={{folder}}&page={{page+1}}'>下一页&gt;</a>{% endif %}
+</p>
 {% endif %}
+{% endif %}
+<hr>
 </body>
 </html>
