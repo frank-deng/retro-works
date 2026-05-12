@@ -18,13 +18,6 @@
   <a href='mail_editor.asp?action=forward&email_id={{email_id}}'>[转发]</a>
   <a href='mail_detail.asp?action=delete&email_id={{email_id}}'>[删除]</a>
 </div><hr>{% endif %}
-{% for mail in email_list %}
-<div><b>发件人：</b>{{mail['from_addr']}}</div>
-{% if mail['to_str'] %}<div><b>收件人：</b>{{mail['to_str']}}</div>{% endif %}
-{% if mail['cc_str'] %}<div><b>抄送：</b>{{mail['cc_str']}}</div>{% endif %}
-<div><b>标题：</b>{{mail['subject']}}</div>
-{% if mail['body'] %}<pre>{{mail['body']}}</pre>{% endif %}
-<hr>
-{% endfor %}
+{% include "mail_content.html" %}
 </body>
 </html>

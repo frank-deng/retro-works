@@ -34,13 +34,6 @@
 {% if issues %}{% for item in issues %}
 <div><font color='#FF0000'>{{item}}</font></div>
 {% endfor %}<hr>{% endif %}
-{% if email_list %}{% for mail in email_list %}
-<div><b>发件人：</b>{{mail['from_addr']}}</div>
-{% if mail['to_str'] %}<div><b>收件人：</b>{{mail['to_str']}}</div>{% endif %}
-{% if mail['cc_str'] %}<div><b>抄送：</b>{{mail['cc_str']}}</div>{% endif %}
-<div><b>标题：</b>{{mail['subject']}}</div>
-{% if mail['body'] %}<pre>{{mail['body']}}</pre>{% endif %}
-<hr>
-{% endfor %}{% endif %}
+{% if email_list %}{% include "mail_content.html" %}{% endif %}
 </body></html>
 

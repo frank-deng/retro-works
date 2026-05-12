@@ -1,0 +1,12 @@
+{% for mail in email_list %}
+<table cellpadding=0 bgcolor="#dddddd" width='100%'>
+  <tr><th align='left' width='72px'>发件人：</th><td>{{mail['from_addr']}}</td></tr>
+{% if mail['to_str'] %}
+  <tr><th align='left'>收件人：</th><td>{{mail['to_str']}}</td></tr>
+{% endif %}
+{% if mail['cc_str'] %}
+  <tr><th align='left'>抄送：</th><td>{{mail['cc_str']}}</td></tr>
+{% endif %}
+  <tr><th align='left'>标题：</th><td>{{mail['subject']}}</td></tr>
+</table>{% if mail['body'] %}<p>{{mail['body']|multiline}}</p>{% endif %}<hr>
+{% endfor %}

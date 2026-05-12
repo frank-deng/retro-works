@@ -7,6 +7,7 @@ import aiohttp_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from cryptography.fernet import Fernet
 from jinja2 import FileSystemLoader
+from markupsafe import Markup, escape
 from aiohttp import web
 from aiohttp import web_exceptions
 from aiohttp.web import HTTPFound
@@ -14,27 +15,6 @@ from aiohttp.web import HTTPForbidden
 from util import Logger
 from util import load_module
 import mailcenter
-
-
-class StaticWithIndex(Logger):
-    def __init__(self,route_param):
-        self.__route_param=route_param
-
-    async def __call__(self,req):
-        config=req.app['config']
-        rootdir=os.path.abspath(self.__route_param['rootdir'])
-        path=req.match_info['path'].strip().strip('/')
-        path=os.path.abspath(os.path.join(rootdir,path))
-        self.logger.debug(f'{rootdir}\n{path}')
-        if not path.startswith(rootdir):
-            raise web.HTTPForbidden()
-        if os.path.isfile(path):
-            return web.FileResponse(path)
-        for index_file in self.__route_param.get('index',['index.html']):
-            index_path=os.path.join(path,index_file)
-            if os.path.isfile(index_path):
-                return web.FileResponse(index_path)
-        raise web.HTTPNotFound()
 
 
 @web.middleware
@@ -77,6 +57,14 @@ class OldBrowserCookieStorage(EncryptedCookieStorage):
         cookie[cookie_name]["path"] = "/"
         cookie[cookie_name]["expires"] = 'Mon, 17-Jan-2038 23:59:59 GMT'
         response.headers.add("Set-Cookie", cookie[cookie_name].OutputString())
+
+
+def multiline_filter(value):
+    if value is None:
+        return ""
+    escaped_value = escape(str(value))
+    result_with_br = escaped_value.replace('\n', Markup('<br>'))
+    return Markup(result_with_br)
 
 
 class WebServer(Logger):
@@ -129,6 +117,8 @@ class WebServer(Logger):
             except Exception as e:
                 self.logger.error(f'Failed to load route:{e}',exc_info=True)
         self.__app.add_routes(self._routes)
+        env=aiohttp_jinja2.get_env(self.__app)
+        env.filters['multiline'] = multiline_filter
 
     async def __aenter__(self):
         self.__runner=web.AppRunner(self.__app,access_log=None)
