@@ -62,29 +62,6 @@ class MailUserRobot(Logger):
     async def append(self,data):
         await self._queue.put(data)
 
-    async def _get_user_type(self,uid):
-        res='user'
-        if self._MailCenter.is_robot(uid):
-            res='assistant'
-        return res
-
-    def _get_conversation(self,email_list):
-        last_user_type=None
-        res=[]
-        for email in reversed(email_list):
-            uid,subject,body=email['from_uid'],email['subject'],email['body']
-            if re.match(r'^(Re:|Fwd:)',subject,re.IGNORECASE):
-                subject=''
-            else:
-                subject+='\n'
-            user_type=self._get_user_type(uid)
-            if last_user_type is None or user_type!=last_user_type:
-                last_user_type=user_type
-                res.append(f'{subject}{body}')
-            else:
-                res[-1]+='\n'+f'{subject}{body}'
-        return res
-
     async def _handler(self,email_id):
         pass
 

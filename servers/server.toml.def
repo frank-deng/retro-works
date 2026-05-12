@@ -43,3 +43,10 @@ username="deepseek"
 module="askbot:MailUserRobotDeepseek"
 deepseek_key="xxx"
 
+[[mail.users]]
+uid=2
+username="erine"
+module="askbot:MailUserRobotErine"
+client_id="xxx"
+client_secret="xxx"
+
