@@ -4,12 +4,14 @@
 </head>
 <body bgcolor='#ffffff' topmargin='6' leftmargin='8' rightmargin='8' bottommargin='0'>
 {% if 'delete'==action %}
-<form method='POST' action='mail_delete.asp'>
-  <input type='hidden' name='email_id' value='{{email_id}}'/>
+<form method='POST' action='/mail_delete.asp'>
   <b><font color='#ff0000'>邮件删除后无法恢复！是否继续删除？</font></b><br>
-  <input type='submit' value='删除邮件'/>
-  <a href='mail_detail.asp?email_id={{email_id}}'>[返回]</a>
-  <hr>
+  <input type='submit' name='delete_email' value='删除邮件'/>
+  <input type="hidden" name='email_id' value="{{email_id}}">
+{% if folder %}
+  <input type="hidden" name='folder' value="{{folder}}">
+{% endif %}
+  <a href='mail_detail.asp?email_id={{email_id}}'>[返回]</a><hr>
 </form>{% else %}
 <div>
 {% if allow_reply %}

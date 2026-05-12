@@ -322,6 +322,20 @@ CREATE TABLE IF NOT EXISTS recipient (
                 await conn.rollback()
                 raise
 
+    async def mail_delete(self,uid,email_id):
+        async with self._pool.connection() as conn:
+            try:
+                await conn.execute(
+                    'UPDATE recipient SET status=-1 WHERE uid=? and email_id=?',
+                    (uid,email_id))
+                await conn.execute(
+                    'UPDATE email SET status=-1 WHERE from_uid=? and id=?',
+                    (uid,email_id))
+                await conn.commit()
+            except Exception as e:
+                await conn.rollback()
+                raise
+
 
 def MailCenter(app):
     return app['mailCenter']

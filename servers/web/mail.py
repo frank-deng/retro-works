@@ -51,12 +51,17 @@ async def mail_detail(req:Request):
     email_id=req.url.query.get('email_id')
     action=req.url.query.get('action')
     email_list=await MailCenter(req.app).mail_detail(req.uid,email_id)
+    await MailCenter(req.app).mark_read(req.uid,email_id)
     email_top=email_list[0]
+    folder=None
+    if email_top['from_uid']==req.uid:
+        folder='sent'
     return {
         'email_list':email_list,
         'email_id':email_id,
         'allow_reply':req.uid!=email_top['from_uid'],
         'action':action,
+        'folder':folder,
     }
 
 
@@ -158,4 +163,23 @@ async def mail_editor_send(req:Request):
                            email_id)
     return Response(headers={'Location':'/mail_list.asp?folder=sent'},
                     status=303)
+
+
+@WebServer.post('/mail_delete.asp')
+@WebServer.login_required()
+async def mail_delete(req:Request):
+    logger=logging.getLogger(__name__)
+    _MailCenter=MailCenter(req.app)
+    form_data_raw=parse_qs(await req.read())
+    form_data={}
+    for key_raw in form_data_raw:
+        key=key_raw.decode('iso8859-1')
+        form_data[key]=form_data_raw[key_raw][0].decode('iso8859-1',errors='replace')
+    email_id=form_data.get('email_id',None)
+    if 'delete_email' in form_data and email_id is not None:
+        await MailCenter(req.app).mail_delete(req.uid,email_id)
+    url='/mail_list.asp'
+    if 'folder' in form_data:
+        url+=f'?folder={form_data['folder']}'
+    return Response(headers={'Location':url},status=303)
 

@@ -69,7 +69,7 @@ def multiline_filter(value):
 
 class WebServer(Logger):
     MODULES=['web.news', 'web.weather', 'web.index', 'web.mail']
-    BASE_DIR='web'
+    TEMPLATE_DIR='web/template'
     STATIC_PATH='/static'
     STATIC_DIR='web/static'
     _routes = web.RouteTableDef()
@@ -104,7 +104,7 @@ class WebServer(Logger):
         self.__app=web.Application(middlewares=[iconv_middleware])
         self.__app['config']=config
         aiohttp_jinja2.setup(self.__app,
-            loader=FileSystemLoader(self.BASE_DIR),
+            loader=FileSystemLoader(self.TEMPLATE_DIR),
             autoescape=True)
         self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
         aiohttp_session.setup(self.__app,OldBrowserCookieStorage(Fernet(Fernet.generate_key())))
