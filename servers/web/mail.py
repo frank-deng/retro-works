@@ -92,7 +92,8 @@ async def mail_editor(req:Request):
         'cc':cc,
         'subject':subject,
         'body':'',
-        'email_list':email_list
+        'email_list':email_list,
+        'action':action,
     }
 
 
@@ -121,6 +122,8 @@ async def mail_editor_send(req:Request):
     issues=[]
     if not subject:
         issues.append('标题不能为空')
+    if form_data.get('action','')=='reply' and not body:
+        issues.append('回复邮件正文不能为空')
     to_list=__get_recp_list(form_data.get('to',''))
     cc_list=__get_recp_list(form_data.get('cc',''))
     if (len(to_list)+len(cc_list))==0:
