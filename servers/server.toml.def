@@ -5,7 +5,8 @@ detach=true
 watchdog_timeout=10
 modules=[
 "web:WebServer",
-"ftp.sftp:FTP2SFTPBridgeServer"
+"ftp.sftp:FTP2SFTPBridgeServer",
+"ftp.ternux:FTPTermuxServer"
 ]
 
 [web]
@@ -35,8 +36,8 @@ idle_timeout=30
 
 [[mail.users]]
 uid=100
-username="frank"
-password="77646f5a4f3166637627abe998e7a1470fe72d8b430f067dafa86263f1f23f94"
+username="username"
+password="sha256_hash"
 
 [[mail.users]]
 uid=1
@@ -61,4 +62,15 @@ sftp_host="127.0.0.1"
 sftp_port=8022
 max_connections=10
 encoding="gbk"
+
+[FTPTermuxServer]
+host="127.0.0.1"
+port=8021
+pasv_addr="10.0.2.2"
+pasv_port_start=10000
+pasv_port_end=10010
+max_connections=10
+encoding="gbk"
+username="username"
+password="sha256_hash"
 
