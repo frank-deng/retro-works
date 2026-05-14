@@ -15,6 +15,7 @@ __test__
 *.wav
 *.eml
 *.db*
+*.pid
 
 build
 dist
