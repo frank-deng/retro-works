@@ -1,6 +1,7 @@
 import asyncio
 import asyncssh
 from util import Logger
+from util import ServerGroup
 from util.tcpserver import TCPServer
 from util.iconv import IConvWrapper
 from telnet import login
@@ -142,37 +143,8 @@ class TelnetServerSSHInstance(TCPServer):
                 await asyncio.gather(writer.drain(),asyncio.sleep(1))
 
 
-class TelnetServerSSH(Logger):
+class TelnetServerSSH(ServerGroup):
     def __init__(self,config):
-        self._config=config[self.__class__.__name__]
-        self.__instances=[TelnetServerSSHInstance(c) \
-            for c in self._config['servers']]
-
-    async def __aenter__(self):
-        tasks=await asyncio.gather(*[self.__instance_aenter(s) \
-                for s in self.__instances])
-        for i in range(len(tasks)-1,-1,-1):
-            _,e=tasks[i]
-            if e is not None:
-                del self.__instancess[i]
-        return self
-
-    async def __instance_aenter(self,instance):
-        try:
-            res=await instance.__aenter__()
-            return res,None
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
-            return None,e
-
-    async def __aexit__(self,exc_type,exc_val,exc_tb):
-        await asyncio.gather(
-                *[self.__instance_aexit(s,exc_type,exc_val,exc_tb) \
-                for s in self.__instances])
-
-    async def __instance_aexit(self,instance,exc_type,exc_val,exc_tb):
-        try:
-            await instance.__aexit__(exc_type,exc_val,exc_tb)
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
+        super().__init__(config[self.__class__.__name__],
+                         TelnetServerSSHInstance)
 

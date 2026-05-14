@@ -4,7 +4,8 @@ pid_file="server.pid"
 detach=true
 watchdog_timeout=10
 modules=[
-"web:WebServer"
+"web:WebServer",
+"ftp.sftp:FTP2SFTPBridgeServer"
 ]
 
 [web]
@@ -49,4 +50,15 @@ username="erine"
 module="askbot:MailUserRobotErine"
 client_id="xxx"
 client_secret="xxx"
+
+[[FTP2SFTPBridgeServer.servers]]
+host="127.0.0.1"
+port=8021
+pasv_addr="10.0.2.2"
+pasv_port_start=10000
+pasv_port_end=10010
+sftp_host="127.0.0.1"
+sftp_port=8022
+max_connections=10
+encoding="gbk"
 

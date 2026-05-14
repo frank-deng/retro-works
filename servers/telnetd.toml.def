@@ -19,6 +19,8 @@ shell="/bin/bash"
 term="ansi"
 rows=24
 columns=80
+client_encoding="gbk"
+server_encoding="utf-8"
 
 [[TelnetServerSSH.servers]]
 host="127.0.0.1"
@@ -43,4 +45,6 @@ ssh_port=8022
 term="ansi"
 rows=24
 columns=80
+client_encoding="gbk"
+server_encoding="utf-8"
 
