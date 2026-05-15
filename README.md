@@ -87,7 +87,6 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * UCDOS配合西文软件（比如QBasic、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
-* Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
 
 
 1990s PC
@@ -203,8 +202,37 @@ Windows 3.2推荐安装以下软件：
 * 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
 * WinZip
 
+### NE2000配置
+
+DOSBox-X需要在`dosbox-x.conf`中将NE2000的`backend`设置为`slirp`，然后在`[ethernet, slirp]`小节中进行以下设置：
+
+	mtu                   = 1500
+	mru                   = 1500
+	ipv4_network          = 10.0.2.0
+	ipv4_netmask          = 255.255.255.0
+	ipv4_host             = 10.0.2.2
+	ipv4_nameserver       = 8.8.8.8
+	ipv4_dhcp_start       = 10.0.2.15
+
+`AUTOEXEC.BAT`中添加以下命令：
+
+	LH NE2000.COM 0x60 3 0x300
+	LH WINPKT.COM 0x60
+
+Trumpet Winsock中进行以下设置：
+
+* 设置`IP address`为`10.0.2.15`
+* 设置`Netmask`为`255.255.255.0`
+* 设置`Default gateway`为`10.0.2.2`
+* 设置`Packet vector`为`60`
+* 设置`MTU`为`1500`
+* 设置`TCP RWIN`和`TCP RSS`为`1460`
+
+之后通过 `10.0.2.2`+端口号 即可访问DOSBox-X模拟器所在主机上的服务（主机上的服务可绑定`127.0.0.1`以限制仅本机可访问）。
+
 ### 补充说明
 
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
+* Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
 
