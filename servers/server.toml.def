@@ -44,13 +44,13 @@ password="sha256_hash"
 [[mail.users]]
 uid=1
 username="deepseek"
-module="askbot:MailUserRobotDeepseek"
+module="mailcenter.askbot:MailUserRobotDeepseek"
 deepseek_key="xxx"
 
 [[mail.users]]
 uid=2
 username="erine"
-module="askbot:MailUserRobotErine"
+module="mailcenter.askbot:MailUserRobotErine"
 client_id="xxx"
 client_secret="xxx"
 
