@@ -6,7 +6,9 @@ watchdog_timeout=10
 modules=[
 "web:WebServer",
 "ftp.sftp:FTP2SFTPBridgeServer",
-"ftp.ternux:FTPTermuxServer"
+"telnet.ssh:TelnetServerSSH"
+"ftp.termux:FTPTermuxServer",
+"telnet.termux:TelnetServerTermux",
 ]
 
 [web]
@@ -52,16 +54,43 @@ module="askbot:MailUserRobotErine"
 client_id="xxx"
 client_secret="xxx"
 
+[[TelnetServerSSH.servers]]
+host="127.0.0.1"
+port=8023
+max_connection=10
+buf_size=4096
+ssh_host="host1"
+ssh_port=22
+term="ansi"
+rows=24
+columns=80
+client_encoding="gbk"
+server_encoding="utf-8"
+
 [[FTP2SFTPBridgeServer.servers]]
 host="127.0.0.1"
 port=8021
 pasv_addr="10.0.2.2"
 pasv_port_start=10000
 pasv_port_end=10010
-sftp_host="127.0.0.1"
-sftp_port=8022
+sftp_host="host1"
+sftp_port=22
 max_connections=10
 encoding="gbk"
+
+[TelnetServerTermux]
+host="127.0.0.1"
+port=8023
+max_connection=10
+buf_size=4096
+username="username"
+password="sha256_hash"
+shell="/bin/bash"
+term="ansi"
+rows=24
+columns=80
+client_encoding="gbk"
+server_encoding="utf-8"
 
 [FTPTermuxServer]
 host="127.0.0.1"
