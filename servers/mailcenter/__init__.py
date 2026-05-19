@@ -98,6 +98,22 @@ CREATE TABLE IF NOT EXISTS recipient (
         self._load_users(config['mail']['users'])
         self._pool=SQLiteConnectionPool(connection_factory=self._create_conn)
 
+    async def __aenter__(self):
+        async with self._pool.connection() as conn:
+            await conn.executescript(self._setup_script)
+            await conn.commit()
+        await asyncio.gather(*[bot.__aenter__() \
+            for bot in self._robot.values()])
+        return self
+
+    async def __aexit__(self,exc_type,exc_val,exc_tb):
+        try:
+            await asyncio.gather(*[bot.__aexit__(*sys.exc_info()) \
+                for bot in self._robot.values()])
+        except Exception as e:
+            self.logger.error(e,exc_info=True)
+        await self._pool.close()
+
     def _load_users(self,users):
         self._users={}
         self._users_by_name={}
@@ -140,21 +156,6 @@ CREATE TABLE IF NOT EXISTS recipient (
         if user['password']!=password_hash:
             return None
         return user['uid']
-
-    async def start(self):
-        async with self._pool.connection() as conn:
-            await conn.executescript(self._setup_script)
-            await conn.commit()
-        await asyncio.gather(*[bot.__aenter__() \
-            for bot in self._robot.values()])
-
-    async def stop(self):
-        try:
-            await asyncio.gather(*[bot.__aexit__(*sys.exc_info()) \
-                for bot in self._robot.values()])
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
-        await self._pool.close()
 
     async def get_uid_from_addr(self,addr):
         items=addr.strip().split('@')
@@ -320,20 +321,26 @@ CREATE TABLE IF NOT EXISTS recipient (
                 raise
 
 
-def MailCenter(app):
-    return app['mailCenter']
+class MailCenter(Logger):
+    _instance=None
+    _inited=False
+    @classmethod
+    def get_instance(cls):
+        return cls._instance
 
+    def __init__(self,config):
+        if self.__class__._instance is None:
+            self.__class__._instance=MailCenterInstance(config)
+            self.logger.info('MailCenter inited')
 
-def setup(app):
-    async def __mailcenter_start(app):
-        await app['mailCenter'].start()
+    async def __aenter__(self):
+        if not self.__class__._inited:
+            await self.__class__._instance.__aenter__()
+            self.__class__._inited=True
+        return self
 
-    async def __mailcenter_stop(app):
-        await app['mailCenter'].stop()
-
-    if 'mailCenter' not in app:
-        app['mailCenter']=MailCenterInstance(app['config'])
-        app.on_startup.append(__mailcenter_start)
-        app.on_cleanup.append(__mailcenter_stop)
-    return app['mailCenter']
+    async def __aexit__(self,exc_type,exc_val,exc_tb):
+        if self.__class__._inited:
+            await self.__class__._instance.__aexit__(exc_type,exc_val,exc_tb)
+            self.__class__._inited=False
 

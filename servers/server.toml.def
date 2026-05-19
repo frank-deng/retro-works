@@ -4,6 +4,7 @@ pid_file="server.pid"
 detach=true
 watchdog_timeout=10
 modules=[
+"mailcenter:MailCenter",
 "web:WebServer",
 "ftp.sftp:FTP2SFTPBridgeServer",
 "telnet.ssh:TelnetServerSSH"

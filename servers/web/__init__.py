@@ -14,7 +14,7 @@ from aiohttp.web import HTTPFound
 from aiohttp.web import HTTPForbidden
 from util import Logger
 from util import load_module
-import mailcenter
+from mailcenter import MailCenter
 
 
 @web.middleware
@@ -103,6 +103,7 @@ class WebServer(Logger):
         self.__port=config['web']['port']
         self.__app=web.Application(middlewares=[iconv_middleware])
         self.__app['config']=config
+        self.__app['MailCenter']=MailCenter.get_instance()
         aiohttp_jinja2.setup(self.__app,
             loader=FileSystemLoader(self.TEMPLATE_DIR),
             autoescape=True)
@@ -110,7 +111,6 @@ class WebServer(Logger):
         aiohttp_session.setup(self.__app,OldBrowserCookieStorage(Fernet(Fernet.generate_key())))
         self.__app.middlewares.append(session_middleware)
         self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
-        mailcenter.setup(self.__app)
         for item in self.MODULES:
             try:
                 load_module(item)

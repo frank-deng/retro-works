@@ -86,7 +86,7 @@ async def do_login(req:Request):
     password=form_data.get('password')
     if not username or not password:
         return login_ctx(username,'用户名和密码不能为空')
-    uid=await MailCenter(req.app).auth(username,password)
+    uid=await req.app['MailCenter'].auth(username,password)
     if uid is None:
         return login_ctx(username,'登录失败')
     session=await new_session(req)

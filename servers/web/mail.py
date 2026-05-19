@@ -8,7 +8,6 @@ from aiohttp_jinja2 import template
 from aiohttp.web import HTTPFound
 from urllib.parse import parse_qs
 from . import WebServer
-from mailcenter import MailCenter
 
 
 @WebServer.get('/mail.asp')
@@ -38,10 +37,10 @@ async def mail_list(req:Request):
         pass
     email_list,total,unread=[],0,0
     if folder=='sent':
-        email_list,total=await MailCenter(req.app).mail_sent(req.uid,page-1)
+        email_list,total=await req.app['MailCenter'].mail_sent(req.uid,page-1)
     else:
-        email_list,total,unread=await MailCenter(req.app).mail_recv(req.uid,page-1)
-    total_page=ceil(total/MailCenter(req.app).pagesize)
+        email_list,total,unread=await req.app['MailCenter'].mail_recv(req.uid,page-1)
+    total_page=ceil(total/req.app['MailCenter'].pagesize)
     return {
         'email_list':email_list,
         'folder':folder,
@@ -58,8 +57,8 @@ async def mail_list(req:Request):
 async def mail_detail(req:Request):
     email_id=req.url.query.get('email_id')
     action=req.url.query.get('action')
-    email_list=await MailCenter(req.app).mail_detail(req.uid,email_id)
-    await MailCenter(req.app).mark_read(req.uid,email_id)
+    email_list=await req.app['MailCenter'].mail_detail(req.uid,email_id)
+    await req.app['MailCenter'].mark_read(req.uid,email_id)
     email_top=email_list[0]
     folder=None
     if email_top['from_uid']==req.uid:
@@ -77,7 +76,6 @@ async def mail_detail(req:Request):
 @WebServer.login_required()
 @template('mail_editor.html')
 async def mail_editor(req:Request):
-    _MailCenter=MailCenter(req.app)
     logger=logging.getLogger(__name__)
     email_id=req.url.query.get('email_id')
     action=req.url.query.get('action')
@@ -86,14 +84,14 @@ async def mail_editor(req:Request):
     subject=''
     email_list=None
     if email_id:
-        email_list=await MailCenter(req.app).mail_detail(req.uid,email_id)
+        email_list=await req.app['MailCenter'](req.app).mail_detail(req.uid,email_id)
         email_top=email_list[0]
         subject=re.sub(r'^(Re|Fwd):\s*','',email_top['subject'],0,re.IGNORECASE)
         if action=='forward':
             subject='Fwd: '+subject
         elif action=='reply':
             subject='Re: '+subject
-            to=await _MailCenter.get_addr_from_uid(email_top['from_uid'])
+            to=await req.app['MailCenter'].get_addr_from_uid(email_top['from_uid'])
     return {
         'email_id':email_id,
         'to':to,
@@ -115,7 +113,6 @@ def __get_recp_list(recp:str):
 @template('mail_editor.html')
 async def mail_editor_send(req:Request):
     logger=logging.getLogger(__name__)
-    _MailCenter=MailCenter(req.app)
     config=req.app['config']
     encoding=config['web'].get('encoding')
     form_data_raw=parse_qs(await req.read())
@@ -139,7 +136,7 @@ async def mail_editor_send(req:Request):
     else:
         to_dict=dict.fromkeys(to_list)
         for addr in to_list:
-            uid=await _MailCenter.get_uid_from_addr(addr)
+            uid=await req.app['MailCenter'].get_uid_from_addr(addr)
             if uid is None:
                 issues.append(f'收件人{addr}无效')
             elif uid==req.uid:
@@ -150,7 +147,7 @@ async def mail_editor_send(req:Request):
             if addr in to_dict:
                 issues.append(f'{addr}不能同时出现在收件人和抄送人中')
                 continue
-            uid=await _MailCenter.get_uid_from_addr(addr)
+            uid=await req.app['MailCenter'].get_uid_from_addr(addr)
             if uid is None:
                 issues.append(f'抄送人{addr}无效')
             elif uid==req.uid:
@@ -160,7 +157,7 @@ async def mail_editor_send(req:Request):
     if len(issues):
         email_list=None
         if email_id:
-            email_list=await MailCenter(req.app).mail_detail(req.uid,email_id)
+            email_list=await req.app['MailCenter'].mail_detail(req.uid,email_id)
         return{
             'email_id':email_id,
             'to':form_data.get('to',''),
@@ -170,7 +167,7 @@ async def mail_editor_send(req:Request):
             'issues':issues,
             'email_list':email_list,
         }
-    await _MailCenter.send(req.uid,to_uid.keys(),cc_uid.keys(),subject,body,
+    await req.app['MailCenter'].send(req.uid,to_uid.keys(),cc_uid.keys(),subject,body,
                            email_id)
     return Response(headers={'Location':'/mail_list.asp?folder=sent'},
                     status=303)
@@ -180,7 +177,6 @@ async def mail_editor_send(req:Request):
 @WebServer.login_required()
 async def mail_delete(req:Request):
     logger=logging.getLogger(__name__)
-    _MailCenter=MailCenter(req.app)
     form_data_raw=parse_qs(await req.read())
     form_data={}
     for key_raw in form_data_raw:
@@ -188,7 +184,7 @@ async def mail_delete(req:Request):
         form_data[key]=form_data_raw[key_raw][0].decode('iso8859-1',errors='replace')
     email_id=form_data.get('email_id',None)
     if 'delete_email' in form_data and email_id is not None:
-        await MailCenter(req.app).mail_delete(req.uid,email_id)
+        await req.app['MailCenter'].mail_delete(req.uid,email_id)
     url='/mail_list.asp'
     if 'folder' in form_data:
         url+=f'?folder={form_data['folder']}'
