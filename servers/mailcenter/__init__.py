@@ -4,6 +4,7 @@ import re
 import hashlib
 import aiosqlite
 import time
+from datetime import datetime
 import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
 from util import Logger
@@ -64,6 +65,18 @@ class MailUserRobot(Logger):
 
     async def _handler(self,email_id):
         pass
+
+
+def timestamp2str(timestamp):
+    if not timestamp:
+        return None
+    dt = datetime.fromtimestamp(timestamp)
+    hour=dt.hour
+    am_pm = "上午" if hour < 12 else "下午"
+    hour12 = hour % 12
+    if hour12 == 0:
+        hour12 = 12
+    return f"{dt.year}年{dt.month}月{dt.day}日 {am_pm}{hour12}:{dt.minute}:{dt.second}"
 
 
 class MailCenterInstance(Logger):
@@ -284,6 +297,7 @@ CREATE TABLE IF NOT EXISTS recipient (
                 'subject':email['subject'],
                 'body':email['body'],
                 'sent_time':email['sent_time'],
+                'sent_time_str':timestamp2str(email['sent_time']),
             } for email in await cursor.fetchall()]
             to,cc=await self._get_recipient(conn,
                 [item['id'] for item in email_list])
