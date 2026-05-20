@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS recipient (
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
         try:
-            await asyncio.gather(*[bot.__aexit__(*sys.exc_info()) \
+            await asyncio.gather(*[bot.__aexit__(exc_type,exc_val,exc_tb) \
                 for bot in self._robot.values()])
         except Exception as e:
             self.logger.error(e,exc_info=True)

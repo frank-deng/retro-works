@@ -11,6 +11,7 @@ from markupsafe import Markup, escape
 from aiohttp import web
 from aiohttp import web_exceptions
 from aiohttp.web import HTTPFound
+from aiohttp.web import HTTPNotFound
 from aiohttp.web import HTTPForbidden
 from util import Logger
 from util import load_module
@@ -19,19 +20,15 @@ from mailcenter import MailCenter
 
 @web.middleware
 async def iconv_middleware(request,handler):
-    logger=logging.getLogger(__name__)
-    try:
-        config=request.app['config']
-        encoding=config['web'].get('encoding')
-        response=await handler(request)
-        content_type=response.content_type.lower()
-        if content_type=='text/html' and encoding is not None:
-            body_str=response.body.decode('utf-8',errors='ignore')
-            response.body=body_str.encode(encoding,errors='replace')
-            response.headers['content-type']=f"text/html; charset={encoding}"
-        return response
-    except Exception as e:
-        logger.error(e,exc_info=True)
+    config=request.app['config']
+    encoding=config['web'].get('encoding')
+    response=await handler(request)
+    content_type=response.content_type.lower()
+    if content_type=='text/html' and encoding is not None:
+        body_str=response.body.decode('utf-8',errors='ignore')
+        response.body=body_str.encode(encoding,errors='replace')
+        response.headers['content-type']=f"text/html; charset={encoding}"
+    return response
 
 
 @web.middleware

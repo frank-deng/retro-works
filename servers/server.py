@@ -42,35 +42,23 @@ class ServiceManager(Logger):
         return server_instance
 
     async def __aenter__(self):
-        tasks=await asyncio.gather(*[self.__module_aenter(s) \
-                for s in self.__modules])
-        for i in range(len(tasks)-1,-1,-1):
-            _,e=tasks[i]
-            if e is not None:
-                del self.__modules[i]
+        for i,module in enumerate(self.__modules):
+            try:
+                await module.__aenter__()
+            except Exception as e:
+                self.logger.error(e,exc_info=True)
+                self.__modules[i]=None
         return self
-
-    async def __module_aenter(self,server):
-        try:
-            res=await server.__aenter__()
-            return res,None
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
-            return None,e
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
         await self.__wait_close.wait()
-        for server in self.__modules:
-            if hasattr(server,'close'):
-                server.close()
-        await asyncio.gather(*[self.__module_aexit(s,exc_type,exc_val,exc_tb) \
-                for s in self.__modules])
-
-    async def __module_aexit(self,server,exc_type,exc_val,exc_tb):
-        try:
-            await server.__aexit__(exc_type,exc_val,exc_tb)
-        except Exception as e:
-            self.logger.error(e,exc_info=True)
+        for server in reversed(self.__modules):
+            try:
+                if server is None:
+                    continue
+                await server.__aexit__(exc_type,exc_val,exc_tb)
+            except Exception as e:
+                self.logger.error(e,exc_info=True)
 
     def close(self,*args):
         self.__wait_close.set()
