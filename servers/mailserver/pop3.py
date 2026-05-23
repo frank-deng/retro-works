@@ -6,6 +6,7 @@ from email.header import Header
 from email.utils import formatdate, format_datetime, localtime
 from util import Logger
 from util.tcpserver import TCPServer
+from mailcenter import MailCenter
 
 
 class POP3Error(Exception):
@@ -90,12 +91,12 @@ class POP3HandlerBase(Logger):
 
     async def _handleRetr(self,idx=None):
         mail_id,msg=self._getMail(idx)
-        return b'\r\n'+msg+b'.'
+        return b'\r\n'+msg+b'\r\n.'
     
     async def _handleDel(self,idx=None):
         mail_id,msg=self._getMail(idx)
         self._delSet.add(mail_id)
-        return b'\r\n'+msg+b'.'
+        return b'\r\n'+msg+b'\r\n.'
 
     async def _handleUidl(self,idx=None):
         mail_id,msg=self._getMail(idx)
@@ -117,10 +118,10 @@ class POP3HandlerBase(Logger):
             mail_id,msg=self._getMail(idx)
             return f'{idx} {len(msg)}'
 
-    async def _handleNoop(self,line):
+    async def _handleNoop(self):
         pass
 
-    async def _handleQuit(self,line):
+    async def _handleQuit(self):
         self._running=False
         
     async def run(self):
@@ -162,7 +163,7 @@ class POP3HandlerBase(Logger):
 
 class POP3Handler(POP3HandlerBase):
     def __init__(self,mailCenter,reader,writer,*,timeout=60):
-        super().__init__(reader,writer,*,timeout):
+        super().__init__(reader,writer,timeout=timeout)
         self._mailCenter=mailCenter
         self._uid=None
 
@@ -178,16 +179,15 @@ class POP3Handler(POP3HandlerBase):
 
 
 class POP3Server(TCPServer):
-    def __init__(self,mailCenter,config):
-        server_config=config['pop3']
-        self._mailCenter=mailCenter
+    def __init__(self,config):
+        server_config=config['mail']['pop3']
         self._timeout=server_config.get('timeout',60)
         super().__init__(server_config['port'],
             host=server_config.get('host','127.0.0.1'),
             max_conn=server_config.get('max_connection',None))
 
     async def handler(self,reader,writer):
-        pop3handler=POP3Handler(self._mailCenter,
+        pop3handler=POP3Handler(MailCenter.get_instance(),
                                 reader,writer,timeout=self._timeout)
         await pop3handler.run()
 
