@@ -369,6 +369,18 @@ CREATE TABLE IF NOT EXISTS recipient (
                     for rel_id in email_table[email_id]]
             return email_table
 
+    async def mail_pop3_delete(self,uid,email_list):
+        async with self._pool.connection() as conn:
+            try:
+                placeholders = ','.join('?' * len(email_list))
+                await conn.execute(f'UPDATE recipient SET status=-1\
+                    WHERE uid=? and email_id in ({placeholders})',
+                    [uid]+email_list)
+                await conn.commit()
+            except Exception as e:
+                await conn.rollback()
+                raise
+
 
 class MailCenter(Logger):
     _instance=None

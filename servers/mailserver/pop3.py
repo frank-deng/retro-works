@@ -210,7 +210,7 @@ class POP3Handler(POP3HandlerBase):
                 for email_id in email_data]
 
     async def mail_delete(self,del_set):
-        pass
+        await self._mailCenter.mail_pop3_delete(self._uid,list(del_set))
 
 
 class POP3Server(TCPServer):
