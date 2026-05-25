@@ -1,10 +1,9 @@
 import asyncio
 import re
-import email
 import quopri
+import email
 from email.message import Message
 from email.header import Header
-from email.utils import formatdate, format_datetime, localtime
 from util import Logger
 from util.tcpserver import TCPServer
 from mailcenter import MailCenter
@@ -97,15 +96,12 @@ class POP3HandlerBase(Logger):
     async def _handleDel(self,idx=None):
         mail_id,msg=self._getMail(idx)
         self._delSet.add(mail_id)
-        return b'\r\n'+msg+b'\r\n.'
 
     async def _handleUidl(self,idx=None):
         mail_id,msg=self._getMail(idx)
         return str(mail_id)
 
     async def _handleList(self,idx=None):
-        content=line.decode('iso8859-1','ignore').strip()
-        match=re.search(r'^[^\s]+\s+([^\s]+)',content)
         if idx is None:
             mail_count=len(self._mailList)
             totalSize=sum([len(msg) for mail_id,msg in self._mailList])
@@ -169,47 +165,30 @@ class POP3Handler(POP3HandlerBase):
         self._encoding=encoding
         self._uid=None
 
+    def _process_email_content(self,email_data):
+        content=email_data[0]['body']+'\n'
+        for email in email_data[1:]:
+            to_addr,cc_addr,subject=\
+                email['to_addr'],email['cc_addr'],email['subject']
+            content+=f'{'-'*70}\n'\
+                         f'From:    {email['from_addr']}\n'
+            if to_addr:
+                content+=f'To:      {'; '.join(to_addr)}\n'
+            if cc_addr:
+                content+=f'Cc:      {'; '.join(cc_addr)}\n'
+            if subject:
+                content+=f'Subject: {subject}\n'
+            content+=f'\n{email['body']}\n'
+        return content.replace('\n','\r\n')
+
     async def auth(self,username,password):
         self._uid=await self._mailCenter.auth(username,password)
         return self._uid is not None
 
-    async def mail_recv(self):
-        email_data=await MailCenter.get_instance().mail_pop3_recv(uid)
-        mail_all=[]
-        for email_id in email_data:
-            mail_all.append((email_id,self._process_email(email_data[email_id])))
-        return mail_all
-
-    async def mail_delete(self,del_set):
-        pass
-
-    async def testrecv(self,uid):
-        self._uid=uid
-        logging.getLogger(__name__).info(await self.mail_recv())
-
-
-class POP3Test(Logger):
-    def __init__(self):
-        self._mailCenter=MailCenter.get_instance()
-        self._encoding='gbk'
-        self._uid=100
-
-    def _process_email_content(self,email_data):
-        content=email_data[0]['body']+'\n'
-        for email in email_data[1:]:
-            content+=f'''{'-'*70}
-From:    {email['from_addr']}
-To:      {'; '.join(email['to_addr'])}
-Cc:      {'; '.join(email['cc_addr'])}
-Subject: {email['subject']}
-
-{email['body']}
-'''
-        return content
-
     async def _process_email(self,email_data):
         first_email=email_data[0]
         msg = Message()
+        msg['Date']=email.utils.formatdate(first_email['sent_time'], localtime=True)
         msg['From']=await self._mailCenter.get_addr_from_uid(first_email['from_uid'])
         msg['To']=await self._mailCenter.get_addr_from_uid(self._uid)
         msg['Reply-To']=await self._mailCenter.get_addr_from_uid(first_email['from_uid'],str(first_email['id']))
@@ -219,8 +198,7 @@ Subject: {email['subject']}
         subject_data=quopri.encodestring(
                 subject.encode(self._encoding,errors='replace'))\
                 .replace(b'=\n',b'').decode('ascii',errors='ignore')
-        msg['Subject']=f'=?gb2312?Q?{subject_data}?='
-        self.logger.info(self._process_email_content(email_data))
+        msg['Subject']=f'=?{self._encoding}?Q?{subject_data}?='
         content=self._process_email_content(email_data)\
                 .encode(self._encoding,errors='replace')
         msg.set_payload(content.decode(self._encoding),charset=self._encoding)
@@ -228,13 +206,11 @@ Subject: {email['subject']}
 
     async def mail_recv(self):
         email_data=await self._mailCenter.mail_pop3_recv(self._uid)
-        mail_all=[]
-        for email_id in email_data:
-            mail_all.append((email_id,await self._process_email(email_data[email_id])))
-        return mail_all
+        return [(email_id,await self._process_email(email_data[email_id]))\
+                for email_id in email_data]
 
-    async def test(self):
-        self.logger.info(await self.mail_recv())
+    async def mail_delete(self,del_set):
+        pass
 
 
 class POP3Server(TCPServer):
@@ -248,7 +224,6 @@ class POP3Server(TCPServer):
 
     async def __aenter__(self):
         await super().__aenter__()
-        await POP3Test().test()
         return self
 
     async def handler(self,reader,writer):

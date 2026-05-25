@@ -332,7 +332,7 @@ CREATE TABLE IF NOT EXISTS recipient (
                 FROM recipient LEFT JOIN email_rel
                 ON recipient.email_id=email_rel.email_id
                 WHERE recipient.status>=0 AND recipient.uid=?
-                ORDER BY email_rel.email_id_rel DESC''',
+                ORDER BY recipient.email_id DESC,email_rel.email_id_rel DESC''',
                 (uid,))
             email_table={}
             email_id_all={}
