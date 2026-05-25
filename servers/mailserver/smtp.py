@@ -158,6 +158,8 @@ class SMTPHandler(SMTPHandlerBase):
         self._do_reset()
 
     def _parse_header(self,header):
+        if header is None:
+            return ''
         if isinstance(header,str):
             return header
         parts=[]
