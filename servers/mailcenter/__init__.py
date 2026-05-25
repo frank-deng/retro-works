@@ -331,7 +331,8 @@ CREATE TABLE IF NOT EXISTS recipient (
                        email_rel.email_id_rel as email_id_rel
                 FROM recipient LEFT JOIN email_rel
                 ON recipient.email_id=email_rel.email_id
-                WHERE recipient.status>=0 AND recipient.uid=?''',
+                WHERE recipient.status>=0 AND recipient.uid=?
+                ORDER BY email_rel.email_id_rel DESC''',
                 (uid,))
             email_table={}
             email_id_all={}
@@ -344,15 +345,28 @@ CREATE TABLE IF NOT EXISTS recipient (
                     email_table[email_id].append(email_id_rel)
                     email_id_all[email_id_rel]=email_id_rel
             email_id_list=tuple(email_id_all.keys())
+            to,cc=await self._get_recipient(conn,email_id_list)
             email_frag_table={}
             placeholders = ','.join('?' * len(email_id_list))
             cursor=await conn.execute(f'SELECT * FROM email\
                 WHERE id in ({placeholders})',email_id_list)
-            for row in await cursor.fetchall():
-                email_frag_table[row['id']]=row
-            to,cc=await self._get_recipient(conn,email_id_list)
+            for email in await cursor.fetchall():
+                email_id=email['id']
+                email_frag_table[email_id]={
+                    'id':email_id,
+                    'from_uid':email['from_uid'],
+                    'from_addr':await self.get_addr_from_uid(email['from_uid']),
+                    'subject':email['subject'],
+                    'body':email['body'],
+                    'sent_time':email['sent_time'],
+                    'to_uid':to[email_id].keys(),
+                    'to_addr':to[email_id].values(),
+                    'cc_uid':cc[email_id].keys(),
+                    'cc_addr':cc[email_id].values(),
+                }
             for email_id in email_table:
-                email_table[email_id]=[email_frag_table[rel_id] for rel_id in email_table[email_id]]
+                email_table[email_id]=[email_frag_table[rel_id]\
+                    for rel_id in email_table[email_id]]
             return email_table
 
 

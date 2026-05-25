@@ -194,6 +194,19 @@ class POP3Test(Logger):
         self._encoding='gbk'
         self._uid=100
 
+    def _process_email_content(self,email_data):
+        content=email_data[0]['body']+'\n'
+        for email in email_data[1:]:
+            content+=f'''{'-'*70}
+From:    {email['from_addr']}
+To:      {'; '.join(email['to_addr'])}
+Cc:      {'; '.join(email['cc_addr'])}
+Subject: {email['subject']}
+
+{email['body']}
+'''
+        return content
+
     async def _process_email(self,email_data):
         first_email=email_data[0]
         msg = Message()
@@ -201,15 +214,15 @@ class POP3Test(Logger):
         msg['To']=await self._mailCenter.get_addr_from_uid(self._uid)
         msg['Reply-To']=await self._mailCenter.get_addr_from_uid(first_email['from_uid'],str(first_email['id']))
         subject=first_email['subject']
-        self.logger.info(first_email['subject'])
         if not re.match(r'Re:\s+', subject):
             subject=f'Re: {subject}'
         subject_data=quopri.encodestring(
                 subject.encode(self._encoding,errors='replace'))\
                 .replace(b'=\n',b'').decode('ascii',errors='ignore')
-        self.logger.info(subject_data)
         msg['Subject']=f'=?gb2312?Q?{subject_data}?='
-        content=first_email['body'].encode(self._encoding,errors='replace')
+        self.logger.info(self._process_email_content(email_data))
+        content=self._process_email_content(email_data)\
+                .encode(self._encoding,errors='replace')
         msg.set_payload(content.decode(self._encoding),charset=self._encoding)
         return msg.as_bytes().replace(b'\n',b'\r\n')
 
