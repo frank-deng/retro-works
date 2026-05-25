@@ -142,7 +142,7 @@ class POP3HandlerBase(Logger):
                     res=f' {res}'.encode('iso8859-1')
                 self._writer.write(b'+OK'+res+b'\r\n')
             except POP3Error as e:
-                self._writer.write(f'-ERR {e.message}\r\n'.encode('iso8859-1'))
+                self._writer.write(f'-ERR {e}\r\n'.encode('iso8859-1'))
             finally:
                 await self._writer.drain()
         await self.mail_delete(self._delSet)

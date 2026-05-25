@@ -160,10 +160,10 @@ CREATE TABLE IF NOT EXISTS recipient (
     async def get_uid_from_addr(self,addr):
         match=re.search(r'^([a-zA-Z0-9._%-]+)(\+([a-zA-Z0-9._%-]+))?@([a-zA-Z0-9.-]+)$',addr)
         if match is None:
-            return None
+            return None,None
         user,extra_data,host = match[1],match[3],match[4]
         if host!=self._host or user not in self._users_by_name:
-            return None
+            return None,None
         return self._users_by_name[user]['uid'],extra_data
 
     async def get_addr_from_uid(self,uid,extra_data=None):

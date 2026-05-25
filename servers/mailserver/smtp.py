@@ -1,8 +1,12 @@
+from typing import ClassVar
 import asyncio
 import re
+import email
 from util import Logger
 from util.tcpserver import TCPServer
 from mailcenter import MailCenter
+from email.header import decode_header
+from email.utils import getaddresses
 
 
 class SMTPError(Exception):
@@ -118,53 +122,149 @@ class SMTPHandlerBase(Logger):
 
 
 class SMTPHandler(SMTPHandlerBase):
-    def __init__(self,mailCenter,reader,writer,*,timeout=60,
+    CHARSET_ALIAS:ClassVar[dict]={
+        'cn-gb':'gb2312'
+    }
+
+    @staticmethod
+    def _parse_content(remain):
+        def __parse_content_part(text):
+            cur=''
+            remainder=''
+            isReply=True
+            for line in text.split('\n'):
+                line=line.rstrip()
+                if re.match(r'^([\-]{8,}|At.*, you wrote:.*)$',line,re.IGNORECASE):
+                    isReply=False
+                elif isReply:
+                    cur+=line+'\n'
+                else:
+                    remainder+=re.sub(r'^[\:\|\>]\s?','',line,count=1)+'\n'
+            return cur,remainder
+        res=[]
+        while True:
+            text,remain=__parse_content_part(remain)
+            res.append(text)
+            if not remain:
+                break
+        res.reverse()
+        return res
+
+    def __init__(self,mailCenter,encoding,reader,writer,*,timeout=60,
                  greeting_host=''):
         super().__init__(reader,writer,timeout=timeout,greeting_host=greeting_host)
+        self._encoding=encoding
         self._mailCenter=mailCenter
         self._do_reset()
+
+    def _parse_header(self,header):
+        if isinstance(header,str):
+            return header
+        parts=[]
+        for part,encoding in decode_header(header):
+            if isinstance(part,bytes):
+                try:
+                    parts.append(part.decode(encoding,errors='ignore'))
+                except LookupError:
+                    parts.append(part.decode(self._encoding,errors='ignore'))
+            else:
+                parts.append(part)
+        return ''.join(parts)
+
+    def _msg_get_data(self,msg):
+        charset=None
+        payload=None
+        if msg.is_multipart():
+            for part in msg.walk():
+                if part.get_content_type() in {'text/plain','text/html'}:
+                    charset=part.get_content_charset()
+                    payload=part.get_payload(decode=True)
+                    break
+        else:
+            charset=msg.get_content_charset()
+            payload=msg.get_payload(decode=True)
+        charset=__class__.CHARSET_ALIAS.get(charset,charset)
+        subject,subjectCharset=email.header.decode_header(msg['Subject'])[0]
+        if subjectCharset is None:
+            subjectCharset=charset
+        subjectCharset=__class__.CHARSET_ALIAS.get(subjectCharset,self._encoding)
+        if isinstance(subject,bytes):
+            try:
+                subject=subject.decode(subjectCharset)
+            except LookupError:
+                subject=subject.decode(self._encoding,errors='replace')
+        elif 'hz-gb-2312'==charset:
+            subject=subject.encode('ascii',errors='ignore').decode(subjectCharset)
+        subject=subject.strip()
+        try:
+            payload=payload.decode(charset,errors='ignore')
+        except LookupError:
+            payload=payload.decode(self._encoding,errors='ignore')
+        return subject,payload
 
     def _do_reset(self):
         self._mailFrom=None
         self._prevMail=None
-        self._rcpt=set()
+        self._rcpt={}
 
     async def on_reset(self):
         self._do_reset()
 
     async def set_src(self,src_addr):
-        uid=await self._mailCenter.get_uid_from_addr(src_addr)
+        uid,_=await self._mailCenter.get_uid_from_addr(src_addr)
         if uid is None:
             return False
         self._mailFrom=uid
         return True
 
     async def add_rcpt(self,addr):
-        uid=await self._mailCenter.get_uid_from_addr(addr)
+        uid,_=await self._mailCenter.get_uid_from_addr(addr)
         if uid is None:
             return False
-        self._rcpt.add(uid)
+        if uid not in self._rcpt:
+            self._rcpt[uid]=addr
         return True
 
     async def on_data(self,msg):
-        self.logger.error(self._mailFrom)
-        self.logger.error(self._rcpt)
-        self.logger.error(msg)
+        msg=email.message_from_bytes(msg)
+        _,prev_email_id=await self._mailCenter.get_uid_from_addr(msg['Reply-To'])
+        subject,content=self._msg_get_data(msg)
+        to_dict,cc_dict={},{}
+        for name,addr in getaddresses([self._parse_header(msg['To'])]):
+            uid,_=await self._mailCenter.get_uid_from_addr(addr)
+            if uid is None:
+                continue
+            to_dict[uid]=True
+        for name,addr in getaddresses([self._parse_header(msg['Cc'])]):
+            uid,_=await self._mailCenter.get_uid_from_addr(addr)
+            if uid is None:
+                continue
+            cc_dict[uid]=True
+        to,cc=[],[]
+        for uid in self._rcpt:
+            if uid in to_dict:
+                to.append(uid)
+            elif uid in cc_dict:
+                cc.append(uid)
+            else:
+                to.append(uid)
+        content=(__class__._parse_content(content))[-1]
+        await self._mailCenter.send(self._mailFrom,to,cc,subject,content,prev_email_id)
 
 
 class SMTPServer(TCPServer):
     def __init__(self,config):
         server_config=config['mail']['smtp']
-        self.__mailCenter=MailCenter.get_instance()
-        self.__timeout=server_config.get('timeout',60)
-        self.__greeting_host=config.get('greeting_host','')
+        self._timeout=server_config.get('timeout',60)
+        self._encoding=server_config.get('encoding','gbk')
+        self._greeting_host=config['mail'].get('host','')
         super().__init__(server_config['port'],
             host=server_config.get('host','127.0.0.1'),
             max_conn=server_config.get('max_connection',None))
 
     async def handler(self,reader,writer):
-        smtphandler=SMTPHandler(MailCenter.get_instance(),
-                                reader,writer,timeout=self.__timeout,
-                                greeting_host=self.__greeting_host)
+        smtphandler=SMTPHandler(MailCenter.get_instance(),self._encoding,
+                                reader,writer,timeout=self._timeout,
+                                greeting_host=self._greeting_host)
         await smtphandler.run()
 
