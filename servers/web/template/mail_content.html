@@ -3,15 +3,13 @@
 {% if mail['from_addr'] %}
   <tr><th align='left' valign='top'>发件人：</th><td>{{mail['from_addr']}}</td></tr>
 {% endif %}
-{% if mail['to_str'] %}
-  <tr><th align='left' valign='top'>收件人：</th><td>{{mail['to_str']}}</td></tr>
+{% if mail['to_addr'] %}
+  <tr><th align='left' valign='top'>收件人：</th><td>{{mail['to_addr']|join('; ')}}</td></tr>
 {% endif %}
-{% if mail['cc_str'] %}
-  <tr><th align='left' valign='top'>抄送：</th><td>{{mail['cc_str']}}</td></tr>
+{% if mail['cc_addr'] %}
+  <tr><th align='left' valign='top'>抄送：</th><td>{{mail['cc_addr']|join('; ')}}</td></tr>
 {% endif %}
-{% if mail['sent_time_str'] %}
-  <tr><th align='left' valign='top'>发送时间：</th><td>{{mail['sent_time_str']}}</td></tr>
-{% endif %}
+  <tr><th align='left' valign='top'>发送时间：</th><td>{{mail['sent_time']|to_datetime}}</td></tr>
   <tr><th align='left' valign='top' width='90px'>标题：</th><td>{{mail['subject'] or '【无标题】'}}</td></tr>
 </table>{% if mail['body'] %}<p>{{mail['body']|multiline}}</p>{% endif %}<hr>
 {% endfor %}

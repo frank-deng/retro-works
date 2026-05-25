@@ -4,7 +4,6 @@ import re
 import hashlib
 import aiosqlite
 import time
-from datetime import datetime
 import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
 from util import Logger
@@ -65,18 +64,6 @@ class MailUserRobot(Logger):
 
     async def _handler(self,email_id):
         pass
-
-
-def timestamp2str(timestamp):
-    if not timestamp:
-        return None
-    dt = datetime.fromtimestamp(timestamp)
-    hour=dt.hour
-    am_pm = "上午" if hour < 12 else "下午"
-    hour12 = hour % 12
-    if hour12 == 0:
-        hour12 = 12
-    return f"{dt.year}年{dt.month}月{dt.day}日 {am_pm}{hour12}:{dt.minute}:{dt.second}"
 
 
 class MailCenterInstance(Logger):
@@ -301,16 +288,15 @@ CREATE TABLE IF NOT EXISTS recipient (
                 'subject':email['subject'],
                 'body':email['body'],
                 'sent_time':email['sent_time'],
-                'sent_time_str':timestamp2str(email['sent_time']),
             } for email in await cursor.fetchall()]
             to,cc=await self._get_recipient(conn,
                 [item['id'] for item in email_list])
             for email in email_list:
                 email_id=email['id']
-                email['to']=to[email_id]
-                email['to_str']='; '.join(to[email_id].values())
-                email['cc']=cc[email_id]
-                email['cc_str']='; '.join(cc[email_id].values())
+                email['to_uid']=to[email_id].keys()
+                email['to_addr']=to[email_id].values()
+                email['cc_uid']=cc[email_id].keys()
+                email['cc_addr']=cc[email_id].values()
             return email_list
 
     async def mark_read(self,uid,email_id):
@@ -364,6 +350,7 @@ CREATE TABLE IF NOT EXISTS recipient (
                 WHERE id in ({placeholders})',email_id_list)
             for row in await cursor.fetchall():
                 email_frag_table[row['id']]=row
+            to,cc=await self._get_recipient(conn,email_id_list)
             for email_id in email_table:
                 email_table[email_id]=[email_frag_table[rel_id] for rel_id in email_table[email_id]]
             return email_table

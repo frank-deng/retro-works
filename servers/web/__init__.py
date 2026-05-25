@@ -1,6 +1,7 @@
 import logging
 import os
 import functools
+from datetime import datetime
 from http.cookies import SimpleCookie
 import aiohttp_jinja2
 import aiohttp_session
@@ -64,6 +65,18 @@ def multiline_filter(value):
     return Markup(result_with_br)
 
 
+def to_datetime_filter(timestamp):
+    if not timestamp:
+        return None
+    dt = datetime.fromtimestamp(timestamp)
+    hour=dt.hour
+    am_pm = "上午" if hour < 12 else "下午"
+    hour12 = hour % 12
+    if hour12 == 0:
+        hour12 = 12
+    return f"{dt.year}年{dt.month}月{dt.day}日 {am_pm}{hour12}:{dt.minute}:{dt.second}"
+
+
 class WebServer(Logger):
     MODULES=['web.news', 'web.weather', 'web.index', 'web.mail']
     TEMPLATE_DIR='web/template'
@@ -116,6 +129,7 @@ class WebServer(Logger):
         self.__app.add_routes(self._routes)
         env=aiohttp_jinja2.get_env(self.__app)
         env.filters['multiline'] = multiline_filter
+        env.filters['to_datetime'] = to_datetime_filter
 
     async def __aenter__(self):
         self.__runner=web.AppRunner(self.__app,access_log=None)
