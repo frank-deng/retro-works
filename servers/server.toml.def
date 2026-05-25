@@ -37,6 +37,16 @@ maxsize=10
 minsize=2
 idle_timeout=30
 
+[mail.pop3]
+host="127.0.0.1"
+port=8110
+encoding="gbk"
+
+[mail.smtp]
+host="127.0.0.1"
+port=8025
+encoding="gbk"
+
 [[mail.users]]
 uid=100
 username="username"
