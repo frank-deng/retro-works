@@ -170,7 +170,8 @@ class POP3Handler(POP3HandlerBase):
         for email in email_data[1:]:
             to_addr,cc_addr,subject=\
                 email['to_addr'],email['cc_addr'],email['subject']
-            content+=f'{'-'*70}\n'\
+            body=email['body'].rstrip()
+            content+=f'{'='*70}\n'\
                          f'From:    {email['from_addr']}\n'
             if to_addr:
                 content+=f'To:      {'; '.join(to_addr)}\n'
@@ -178,7 +179,8 @@ class POP3Handler(POP3HandlerBase):
                 content+=f'Cc:      {'; '.join(cc_addr)}\n'
             if subject:
                 content+=f'Subject: {subject}\n'
-            content+=f'\n{email['body']}\n'
+            if body:
+                content+=f'\n{body}\n'
         return content.replace('\n','\r\n')
 
     async def auth(self,username,password):

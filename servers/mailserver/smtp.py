@@ -122,10 +122,6 @@ class SMTPHandlerBase(Logger):
 
 
 class SMTPHandler(SMTPHandlerBase):
-    CHARSET_ALIAS:ClassVar[dict]={
-        'cn-gb':'gb2312'
-    }
-
     @staticmethod
     def _parse_content(remain):
         def __parse_content_part(text):
@@ -164,13 +160,16 @@ class SMTPHandler(SMTPHandlerBase):
             return header
         parts=[]
         for part,encoding in decode_header(header):
-            if isinstance(part,bytes):
-                try:
-                    parts.append(part.decode(encoding,errors='ignore'))
-                except LookupError:
-                    parts.append(part.decode(self._encoding,errors='ignore'))
-            else:
+            if not isinstance(part,bytes):
                 parts.append(part)
+                continue
+            try:
+                encoding=encoding.lower()
+                if 'hz-gb-2312'==encoding:
+                    part=part.encode('ascii',errors='ignore')
+                parts.append(part.decode(encoding,errors='ignore'))
+            except LookupError:
+                parts.append(part.decode(self._encoding,errors='ignore'))
         return ''.join(parts)
 
     def _msg_get_data(self,msg):
@@ -185,19 +184,7 @@ class SMTPHandler(SMTPHandlerBase):
         else:
             charset=msg.get_content_charset()
             payload=msg.get_payload(decode=True)
-        charset=__class__.CHARSET_ALIAS.get(charset,charset)
-        subject,subjectCharset=email.header.decode_header(msg['Subject'])[0]
-        if subjectCharset is None:
-            subjectCharset=charset
-        subjectCharset=__class__.CHARSET_ALIAS.get(subjectCharset,self._encoding)
-        if isinstance(subject,bytes):
-            try:
-                subject=subject.decode(subjectCharset)
-            except LookupError:
-                subject=subject.decode(self._encoding,errors='replace')
-        elif 'hz-gb-2312'==charset:
-            subject=subject.encode('ascii',errors='ignore').decode(subjectCharset)
-        subject=subject.strip()
+        subject=self._parse_header(msg['Subject']).strip()
         try:
             payload=payload.decode(charset,errors='ignore')
         except LookupError:
