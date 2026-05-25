@@ -136,7 +136,7 @@ async def mail_editor_send(req:Request):
     else:
         to_dict=dict.fromkeys(to_list)
         for addr in to_list:
-            uid=await req.app['MailCenter'].get_uid_from_addr(addr)
+            uid,_=await req.app['MailCenter'].get_uid_from_addr(addr)
             if uid is None:
                 issues.append(f'收件人{addr}无效')
             elif uid==req.uid:
@@ -147,7 +147,7 @@ async def mail_editor_send(req:Request):
             if addr in to_dict:
                 issues.append(f'{addr}不能同时出现在收件人和抄送人中')
                 continue
-            uid=await req.app['MailCenter'].get_uid_from_addr(addr)
+            uid,_=await req.app['MailCenter'].get_uid_from_addr(addr)
             if uid is None:
                 issues.append(f'抄送人{addr}无效')
             elif uid==req.uid:

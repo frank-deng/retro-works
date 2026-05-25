@@ -1,6 +1,7 @@
 import asyncio
 import re
 import email
+import quopri
 from email.message import Message
 from email.header import Header
 from email.utils import formatdate, format_datetime, localtime
@@ -162,9 +163,10 @@ class POP3HandlerBase(Logger):
 
 
 class POP3Handler(POP3HandlerBase):
-    def __init__(self,mailCenter,reader,writer,*,timeout=60):
+    def __init__(self,mailCenter,encoding,reader,writer,*,timeout=60):
         super().__init__(reader,writer,timeout=timeout)
         self._mailCenter=mailCenter
+        self._encoding=encoding
         self._uid=None
 
     async def auth(self,username,password):
@@ -172,22 +174,72 @@ class POP3Handler(POP3HandlerBase):
         return self._uid is not None
 
     async def mail_recv(self):
-        return []
+        email_data=await MailCenter.get_instance().mail_pop3_recv(uid)
+        mail_all=[]
+        for email_id in email_data:
+            mail_all.append((email_id,self._process_email(email_data[email_id])))
+        return mail_all
 
     async def mail_delete(self,del_set):
         pass
+
+    async def testrecv(self,uid):
+        self._uid=uid
+        logging.getLogger(__name__).info(await self.mail_recv())
+
+
+class POP3Test(Logger):
+    def __init__(self):
+        self._mailCenter=MailCenter.get_instance()
+        self._encoding='gbk'
+        self._uid=100
+
+    async def _process_email(self,email_data):
+        first_email=email_data[0]
+        msg = Message()
+        msg['From']=await self._mailCenter.get_addr_from_uid(first_email['from_uid'])
+        msg['To']=await self._mailCenter.get_addr_from_uid(self._uid)
+        msg['Reply-To']=await self._mailCenter.get_addr_from_uid(first_email['from_uid'],str(first_email['id']))
+        subject=first_email['subject']
+        self.logger.info(first_email['subject'])
+        if not re.match(r'Re:\s+', subject):
+            subject=f'Re: {subject}'
+        subject_data=quopri.encodestring(
+                subject.encode(self._encoding,errors='replace'))\
+                .replace(b'=\n',b'').decode('ascii',errors='ignore')
+        self.logger.info(subject_data)
+        msg['Subject']=f'=?gb2312?Q?{subject_data}?='
+        content=first_email['body'].encode(self._encoding,errors='replace')
+        msg.set_payload(content.decode(self._encoding),charset=self._encoding)
+        return msg.as_bytes().replace(b'\n',b'\r\n')
+
+    async def mail_recv(self):
+        email_data=await self._mailCenter.mail_pop3_recv(self._uid)
+        mail_all=[]
+        for email_id in email_data:
+            mail_all.append((email_id,await self._process_email(email_data[email_id])))
+        return mail_all
+
+    async def test(self):
+        self.logger.info(await self.mail_recv())
 
 
 class POP3Server(TCPServer):
     def __init__(self,config):
         server_config=config['mail']['pop3']
         self._timeout=server_config.get('timeout',60)
+        self._encoding=server_config.get('encoding','gbk')
         super().__init__(server_config['port'],
             host=server_config.get('host','127.0.0.1'),
             max_conn=server_config.get('max_connection',None))
 
+    async def __aenter__(self):
+        await super().__aenter__()
+        await POP3Test().test()
+        return self
+
     async def handler(self,reader,writer):
-        pop3handler=POP3Handler(MailCenter.get_instance(),
+        pop3handler=POP3Handler(MailCenter.get_instance(),self._encoding,
                                 reader,writer,timeout=self._timeout)
         await pop3handler.run()
 

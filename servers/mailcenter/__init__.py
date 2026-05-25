@@ -171,18 +171,22 @@ CREATE TABLE IF NOT EXISTS recipient (
         return user['uid']
 
     async def get_uid_from_addr(self,addr):
-        items=addr.strip().split('@')
-        if len(items)!=2:
+        match=re.search(r'^([a-zA-Z0-9._%-]+)(\+([a-zA-Z0-9._%-]+))?@([a-zA-Z0-9.-]+)$',addr)
+        if match is None:
             return None
-        user,host=items[0],items[1]
+        user,extra_data,host = match[1],match[3],match[4]
         if host!=self._host or user not in self._users_by_name:
             return None
-        return self._users_by_name[user]['uid']
+        return self._users_by_name[user]['uid'],extra_data
 
-    async def get_addr_from_uid(self,uid):
+    async def get_addr_from_uid(self,uid,extra_data=None):
         if uid not in self._users:
             return None
-        return self._users[uid]['username']+'@'+self._host
+        res=self._users[uid]['username']
+        if extra_data is not None:
+            res+='+'+extra_data
+        res+='@'+self._host
+        return res
 
     async def send(self,from_uid,to_list,cc_list,subject,body,
                    prev_email_id=None):
@@ -333,6 +337,36 @@ CREATE TABLE IF NOT EXISTS recipient (
             except Exception as e:
                 await conn.rollback()
                 raise
+
+    async def mail_pop3_recv(self,uid):
+        async with self._pool.connection() as conn:
+            cursor=await conn.execute('''
+                SELECT recipient.email_id as email_id,
+                       email_rel.email_id_rel as email_id_rel
+                FROM recipient LEFT JOIN email_rel
+                ON recipient.email_id=email_rel.email_id
+                WHERE recipient.status>=0 AND recipient.uid=?''',
+                (uid,))
+            email_table={}
+            email_id_all={}
+            for row in await cursor.fetchall():
+                email_id,email_id_rel=row['email_id'],row['email_id_rel']
+                email_id_all[email_id]=email_id
+                if email_id not in email_table:
+                    email_table[email_id]=[email_id]
+                if email_id_rel is not None:
+                    email_table[email_id].append(email_id_rel)
+                    email_id_all[email_id_rel]=email_id_rel
+            email_id_list=tuple(email_id_all.keys())
+            email_frag_table={}
+            placeholders = ','.join('?' * len(email_id_list))
+            cursor=await conn.execute(f'SELECT * FROM email\
+                WHERE id in ({placeholders})',email_id_list)
+            for row in await cursor.fetchall():
+                email_frag_table[row['id']]=row
+            for email_id in email_table:
+                email_table[email_id]=[email_frag_table[rel_id] for rel_id in email_table[email_id]]
+            return email_table
 
 
 class MailCenter(Logger):
