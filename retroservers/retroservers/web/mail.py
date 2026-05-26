@@ -84,7 +84,7 @@ async def mail_editor(req:Request):
     subject=''
     email_list=None
     if email_id:
-        email_list=await req.app['MailCenter'](req.app).mail_detail(req.uid,email_id)
+        email_list=await req.app['MailCenter'].mail_detail(req.uid,email_id)
         email_top=email_list[0]
         subject=re.sub(r'^(Re|Fwd):\s*','',email_top['subject'],0,re.IGNORECASE)
         if action=='forward':
