@@ -4,9 +4,9 @@ import quopri
 import email
 from email.message import Message
 from email.header import Header
-from util import Logger
-from util.tcpserver import TCPServer
-from mailcenter import MailCenter
+from retroservers.util import Logger
+from retroservers.util.tcpserver import TCPServer
+from retroservers.mailcenter import MailCenter
 
 
 class POP3Error(Exception):

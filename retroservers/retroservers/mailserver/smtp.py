@@ -2,11 +2,11 @@ from typing import ClassVar
 import asyncio
 import re
 import email
-from util import Logger
-from util.tcpserver import TCPServer
-from mailcenter import MailCenter
 from email.header import decode_header
 from email.utils import getaddresses
+from retroservers.util import Logger
+from retroservers.util.tcpserver import TCPServer
+from retroservers.mailcenter import MailCenter
 
 
 class SMTPError(Exception):

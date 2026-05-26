@@ -6,7 +6,7 @@ import ctypes
 import signal   
 import functools
 from threading import Thread
-from util import Logger
+from retroservers.util import Logger
 
 class WatchdogHandler(Thread,Logger):
     @staticmethod

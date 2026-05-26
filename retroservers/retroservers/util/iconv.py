@@ -1,5 +1,5 @@
 import codecs
-from util.tcpserver import ReaderWrapper,WriterWrapper
+from retroservers.util.tcpserver import ReaderWrapper,WriterWrapper
 
 
 class IConvState:

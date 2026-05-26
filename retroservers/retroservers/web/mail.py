@@ -7,7 +7,7 @@ from aiohttp.web import Response
 from aiohttp_jinja2 import template
 from aiohttp.web import HTTPFound
 from urllib.parse import parse_qs
-from . import WebServer
+from retroservers.web import WebServer
 
 
 @WebServer.get('/mail.asp')

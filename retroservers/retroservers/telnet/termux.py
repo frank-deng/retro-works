@@ -5,11 +5,11 @@ import fcntl
 import termios
 import struct
 import hashlib
-from util import Logger
-from util.tcpserver import TCPServer
-from util.iconv import IConvWrapper
-from telnet import login
-from telnet import TelnetWrapper
+from retroservers.util import Logger
+from retroservers.util.tcpserver import TCPServer
+from retroservers.util.iconv import IConvWrapper
+from retroservers.telnet import login
+from retroservers.telnet import TelnetWrapper
 
 
 class ProcessHandler(Logger):

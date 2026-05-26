@@ -1,6 +1,6 @@
 import asyncio
 import sys
-from util import Logger
+from retroservers.util import Logger
 
 
 class ReaderWrapper(Logger):

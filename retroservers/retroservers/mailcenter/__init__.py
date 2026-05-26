@@ -1,13 +1,13 @@
 import asyncio
 import sys
+import os
 import re
 import hashlib
 import aiosqlite
 import time
 import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
-from util import Logger
-from util import load_module
+from retroservers.util import Logger,load_module
 
 
 async def sql_insert_single(conn,table,data:dict):
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS recipient (
 
     async def _create_conn(self)->aiosqlite.Connection:
         config_db=self._config['mail']['db']
-        conn=await aiosqlite.connect(config_db['db_file'])
+        conn=await aiosqlite.connect(os.path.expanduser(config_db['db_file']))
         conn.row_factory=aiosqlite.Row
         busy_timeout=config_db.get('busy_timeout',5000)
         if not isinstance(busy_timeout,int):

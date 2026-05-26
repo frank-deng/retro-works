@@ -4,7 +4,7 @@ import aioftp
 import asyncssh
 from pathlib import PurePosixPath
 from typing import Union, List, AsyncIterable, Any
-from util import ServerGroup
+from retroservers.util import ServerGroup
 
 
 class SFTPStat:

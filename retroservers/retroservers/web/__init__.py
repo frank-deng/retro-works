@@ -1,22 +1,22 @@
 import logging
 import os
 import functools
+from importlib.resources import files
 from datetime import datetime
 from http.cookies import SimpleCookie
 import aiohttp_jinja2
 import aiohttp_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from cryptography.fernet import Fernet
-from jinja2 import FileSystemLoader
+from jinja2 import PackageLoader
 from markupsafe import Markup, escape
 from aiohttp import web
 from aiohttp import web_exceptions
 from aiohttp.web import HTTPFound
 from aiohttp.web import HTTPNotFound
 from aiohttp.web import HTTPForbidden
-from util import Logger
-from util import load_module
-from mailcenter import MailCenter
+from retroservers.util import Logger,load_module
+from retroservers.mailcenter import MailCenter
 
 
 @web.middleware
@@ -78,10 +78,13 @@ def to_datetime_filter(timestamp):
 
 
 class WebServer(Logger):
-    MODULES=['web.news', 'web.weather', 'web.index', 'web.mail']
+    MODULES=['retroservers.web.news',
+             'retroservers.web.weather',
+             'retroservers.web.index',
+             'retroservers.web.mail']
     TEMPLATE_DIR='web/template'
     STATIC_PATH='/static'
-    STATIC_DIR='web/static'
+    STATIC_DIR=files('retroservers')/'web/static'
     _routes = web.RouteTableDef()
 
     @staticmethod
@@ -115,7 +118,7 @@ class WebServer(Logger):
         self.__app['config']=config
         self.__app['MailCenter']=MailCenter.get_instance()
         aiohttp_jinja2.setup(self.__app,
-            loader=FileSystemLoader(self.TEMPLATE_DIR),
+            loader=PackageLoader('retroservers',self.TEMPLATE_DIR),
             autoescape=True)
         self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
         aiohttp_session.setup(self.__app,OldBrowserCookieStorage(Fernet(Fernet.generate_key())))

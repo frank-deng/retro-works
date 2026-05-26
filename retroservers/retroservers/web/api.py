@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 from functools import cmp_to_key
 from urllib.parse import urlparse,urlunparse
 from lxml import html
-from util import Logger
-from util.robot import RobotChecker
+from retroservers.util import Logger
+from retroservers.util.robot import RobotChecker
 
 
 class NewsManager(Logger):

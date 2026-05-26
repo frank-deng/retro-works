@@ -25,7 +25,7 @@ class PIDFileManager:
     __pidfile=None
     __fp=None
     def __init__(self,pidfile:str=None):
-        self.__pidfile=pidfile
+        self.__pidfile=os.path.expanduser(pidfile)
 
     def __atexit(self):
         if self.__fp is not None:
@@ -99,6 +99,7 @@ def daemonize(key_pidfile:str,key_detach:str):
     return decorator
 
 def stop_daemon(pid_file:str):
+    pid_file=os.path.expanduser(pid_file)
     pidman=PIDFileManager(pid_file)
     if not pidman.is_running():
         if os.path.isfile(pid_file):

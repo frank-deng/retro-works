@@ -1,15 +1,17 @@
-log_file="server.log"
+log_file="~/.retroservers.log"
 log_level="INFO"
-pid_file="server.pid"
+pid_file="~/.retroservers.pid"
 detach=true
 watchdog_timeout=10
 modules=[
-"mailcenter:MailCenter",
-"web:WebServer",
-"ftp.sftp:FTP2SFTPBridgeServer",
-"telnet.ssh:TelnetServerSSH"
-"ftp.termux:FTPTermuxServer",
-"telnet.termux:TelnetServerTermux",
+"retroservers.mailcenter:MailCenter",
+"retroservers.web:WebServer",
+"retroservers.mailserver.pop3:POP3Server",
+"retroservers.mailserver.smtp:SMTPServer",
+"retroservers.ftp.sftp:FTP2SFTPBridgeServer",
+"retroservers.telnet.ssh:TelnetServerSSH"
+"retroservers.ftp.termux:FTPTermuxServer",
+"retroservers.telnet.termux:TelnetServerTermux",
 ]
 
 [web]
@@ -55,13 +57,13 @@ password="sha256_hash"
 [[mail.users]]
 uid=1
 username="deepseek"
-module="mailcenter.askbot:MailUserRobotDeepseek"
+module="retroservers.mailcenter.askbot:MailUserRobotDeepseek"
 deepseek_key="xxx"
 
 [[mail.users]]
 uid=2
 username="erine"
-module="mailcenter.askbot:MailUserRobotErine"
+module="retroservers.mailcenter.askbot:MailUserRobotErine"
 client_id="xxx"
 client_secret="xxx"
 

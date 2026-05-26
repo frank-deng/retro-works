@@ -8,14 +8,14 @@ import signal
 import click
 import os
 import platform
-from util import Logger
-from util import load_module
-from util.watchdog import watchdog
-from util.daemon import daemonize
-from util.daemon import stop_daemon
-from util.daemon import DaemonIsRunningError
-from util.daemon import DaemonNotRunningError
-from util.daemon import DaemonAbnormalExitError
+from .util import Logger
+from .util import load_module
+from .util.watchdog import watchdog
+from .util.daemon import daemonize
+from .util.daemon import stop_daemon
+from .util.daemon import DaemonIsRunningError
+from .util.daemon import DaemonNotRunningError
+from .util.daemon import DaemonAbnormalExitError
 
 
 class ServiceManager(Logger):
@@ -87,7 +87,7 @@ def register_close_signal(func):
 def server_main(config):
     logging.basicConfig(
         format='[%(asctime)s][%(levelname)s]%(message)s',
-        filename=config.get('log_file','server.log'),
+        filename=os.path.expanduser(config.get('log_file','~/.retroservers.log')),
         level=getattr(logging,config.get('log_level','INFO'),logging.INFO)
     )
     try:
@@ -98,11 +98,12 @@ def server_main(config):
 
 
 @click.group(invoke_without_command=True)
-@click.option('--config_file','-c',default='server.toml',
+@click.option('--config_file','-c',
+              default=os.path.expanduser('~/.retroservers.toml'),
               help='Specify TOML config file.')
 @click.pass_context
 def cli(ctx,config_file):
-    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+    #sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
     config=None
     try:
         with open(config_file, 'rb') as f:
@@ -144,3 +145,4 @@ def stop(ctx):
 
 if '__main__'==__name__:
     cli()
+

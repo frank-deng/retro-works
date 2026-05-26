@@ -2,7 +2,7 @@ import asyncio
 import re
 import json
 import aiohttp
-from mailcenter import MailUserRobot
+from retroservers.mailcenter import MailUserRobot
 
 
 class MailUserRobotAI(MailUserRobot):
