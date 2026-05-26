@@ -216,7 +216,9 @@ class SMTPHandler(SMTPHandlerBase):
 
     async def on_data(self,msg):
         msg=email.message_from_bytes(msg)
-        _,prev_email_id=await self._mailCenter.get_uid_from_addr(msg['Reply-To'])
+        reply_to,prev_email_id=msg['Reply-To'],None
+        if reply_to is not None:
+            _,prev_email_id=await self._mailCenter.get_uid_from_addr(reply_to)
         subject,content=self._msg_get_data(msg)
         to_dict,cc_dict={},{}
         for name,addr in getaddresses([self._parse_header(msg['To'])]):
