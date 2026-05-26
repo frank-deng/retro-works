@@ -16,14 +16,7 @@ __test__
 *.eml
 *.db*
 *.pid
-
-build
-dist
-posts
 *.egg-info
-
-*.toml
-/servers/answer/
 /ucfont-report/fnt/
-
 sudoku
+

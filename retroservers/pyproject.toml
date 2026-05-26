@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "retroservers"
+version = "0.1.0"
+description = "Retro network servers for Windows 3.2"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+dependencies = [
+  "click",
+  "aiohttp",
+  "aiohttp-session",
+  "aiohttp_jinja2",
+  "cryptography",
+  "lxml",
+  "aiosqlite",
+  "aiosqlitepool",
+  "pillow",
+  "aioftp",
+  "asyncssh",
+]
+
+[project.scripts]
+retroservers = "retroservers.__main__:cli"
+
+[tool.setuptools.packages.find]
+include = ["retroservers*"]
+
+[tool.setuptools.package-data]
+retroservers = ["web/template/*", "web/static/*"]
