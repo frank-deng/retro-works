@@ -36,9 +36,6 @@ class IConvStreamWriter(WriterWrapper):
         raw=text.encode(self.__clientEnc,errors='ignore')
         super().write(raw)
 
-    def get_extra_info(self,*args):
-        return self.writer.get_extra_info(*args)
-
 
 def IConvWrapper(reader,writer,clientEnc,serverEnc='utf-8',enabled=True):
     if clientEnc is None or serverEnc is None or clientEnc==serverEnc:

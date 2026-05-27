@@ -7,6 +7,9 @@ class ReaderWrapper(Logger):
     def __init__(self,reader):
         self.reader=reader
 
+    def __getattr__(self,name):
+        return getattr(self.reader,name)
+
     async def read(self,n=-1):
         return await self.reader.read(n)
 
@@ -14,6 +17,9 @@ class ReaderWrapper(Logger):
 class WriterWrapper(Logger):
     def __init__(self,writer):
         self.writer=writer
+
+    def __getattr__(self,name):
+        return getattr(self.writer,name)
 
     def write(self,chunk):
         self.writer.write(chunk)
