@@ -1,9 +1,8 @@
 import asyncio
 import asyncssh
-from retroservers.util import Logger
-from retroservers.util import ServerGroup
-from retroservers.util.tcpserver import TCPServer
-from retroservers.util.iconv import IConvWrapper
+from ..util import Logger,ServerGroup
+from ..util.tcpserver import TCPServer
+from ..util.iconv import IConvWrapper
 from .util import login
 from .util import TelnetWrapper
 

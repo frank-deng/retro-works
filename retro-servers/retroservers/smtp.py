@@ -4,8 +4,8 @@ import re
 import email
 from email.header import decode_header
 from email.utils import getaddresses
-from retroservers.util import Logger
-from retroservers.util.tcpserver import TCPServer
+from .util import Logger
+from .util.tcpserver import TCPServer
 from . import MailCenter
 
 

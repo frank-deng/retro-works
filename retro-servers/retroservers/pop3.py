@@ -4,8 +4,8 @@ import quopri
 import email
 from email.message import Message
 from email.header import Header
-from retroservers.util import Logger
-from retroservers.util.tcpserver import TCPServer
+from .util import Logger
+from .util.tcpserver import TCPServer
 from . import MailCenter
 
 

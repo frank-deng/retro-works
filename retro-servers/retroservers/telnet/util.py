@@ -1,5 +1,5 @@
 import asyncio
-from retroservers.util.tcpserver import ReaderWrapper,WriterWrapper
+from ..util.tcpserver import ReaderWrapper,WriterWrapper
 
 
 async def readline(reader,writer,*,timeout=120,size=70,echo=True):

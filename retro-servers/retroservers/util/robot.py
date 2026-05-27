@@ -3,7 +3,7 @@ import aiohttp
 from urllib.parse import urlparse,urlunparse
 from urllib.robotparser import RobotFileParser
 from datetime import datetime, timedelta
-from retroservers.util import Logger
+from . import Logger
 
 class RobotCheckerSite(Logger):
     def __init__(self,host,timeout_refresh=3600,timeout_failed=120):

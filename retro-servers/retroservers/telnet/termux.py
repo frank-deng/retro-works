@@ -5,9 +5,9 @@ import fcntl
 import termios
 import struct
 import hashlib
-from retroservers.util import Logger
-from retroservers.util.tcpserver import TCPServer
-from retroservers.util.iconv import IConvWrapper
+from ..util import Logger
+from ..util.tcpserver import TCPServer
+from ..util.iconv import IConvWrapper
 from .util import login
 from .util import TelnetWrapper
 
