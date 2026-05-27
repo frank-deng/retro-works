@@ -19,6 +19,8 @@ dependencies = [
   "aiosqlitepool",
   "pillow",
   "aioftp",
+  "aiosmtpd",
+  "telnetlib3",
   "asyncssh",
 ]
 
@@ -30,3 +32,4 @@ include = ["retroservers*"]
 
 [tool.setuptools.package-data]
 retroservers = ["web/template/*", "web/static/*"]
+
