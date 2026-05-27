@@ -22,13 +22,9 @@ class TermuxHandler(Logger):
 
     async def __aenter__(self):
         try:
-            term_type = writer.get_extra_info('term', 'ansi')
-            term_rows = writer.get_extra_info('rows', 24)
-            term_cols = writer.get_extra_info('cols', 80)
             self._reader_s,self._writer_s=await pty_shell(
-                self._reader,self._writer,program=self._shell,
-                args=None,raw_mode=False,
-                term=term_type,rows=term_rows,cols=term_cols)
+                self._reader.reader,self._writer.writer,program=self._shell,
+                args=None,raw_mode=False)
             self._tasks=(
                 asyncio.create_task(self._task_cs()),
                 asyncio.create_task(self._task_sc())
@@ -93,15 +89,21 @@ class TelnetServerTermux(Logger):
         self._term=config.get('term','ansi')
         self._rows=config.get('rows',24)
         self._columns=config.get('columns',80)
+        self._conn_counter=None
+        max_conn=config.get('max_connection',None)
+        if max_conn is not None:
+            self._conn_counter=telnetlib3.guard_shells.ConnectionCounter(max_conn)
 
-    def __aenter__(self):
+    async def __aenter__(self):
         self._server=await telnetlib3.create_server(
             host=self._host,
             port=self._port,
             term=self._term,
-            cols=self._cols,
+            cols=self._columns,
             rows=self._rows,
-            shell=self.handler
+            shell=self.handler,
+            force_binary=True,
+            encoding=None
         )
         return self
 
@@ -110,6 +112,11 @@ class TelnetServerTermux(Logger):
             self._server.close()
 
     async def handler(self,reader,writer):
+        reader.force_binary=True
+        writer.force_binary=True
+        if self._conn_counter is not None and not self._conn_counter.try_acquire():
+            writer.close()
+            return
         login_failed_count=0
         while login_failed_count<3:
             username,password=await login(reader,writer)
@@ -129,4 +136,6 @@ class TelnetServerTermux(Logger):
                 self._config.get('server_encoding','utf-8'))
             async with TermuxHandler(readerIconv,writerIconv,self._config):
                 pass
+        if self._conn_counter is not None:
+            self._conn_counter.release()
 

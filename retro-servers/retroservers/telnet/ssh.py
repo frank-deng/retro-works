@@ -1,10 +1,9 @@
 import asyncio
 import asyncssh
+import telnetlib3
 from ..util import Logger,ServerGroup
-from ..util.tcpserver import TCPServer
 from ..util.iconv import IConvWrapper
 from .util import login
-from .util import TelnetWrapper
 
 
 class SSHHandler(Logger):
@@ -101,7 +100,7 @@ class SSHHandler(Logger):
                 if not data:
                     break
                 self.__channel.write(data)
-        except (ConnectionResetError,asyncio.CancelledError):
+        except (ConnectionResetError,asyncio.CancelledError,BrokenPipeError):
             pass
         except Exception as e:
             self.logger.error(e,exc_info=True)
@@ -110,26 +109,47 @@ class SSHHandler(Logger):
             await self.__channel.wait_closed()
 
 
-class TelnetServerSSHInstance(TCPServer):
+class TelnetServerSSHInstance(Logger):
     def __init__(self,config):
         self._config=config
-        super().__init__(self._config['port'],
-            host=config.get('host','127.0.0.1'),
-            max_conn=config.get('max_connection'))
-        self.__login_retry=config.get('login_retry',None)
-        self.__login_timeout=config.get('login_timeout',None)
+        self._host=self._config.get('host','127.0.0.1')
+        self._port=self._config['port']
+        self._login_retry=config.get('login_retry',None)
+        self._login_timeout=config.get('login_timeout',None)
+        self._term=config.get('term','ansi')
+        self._rows=config.get('rows',24)
+        self._columns=config.get('columns',80)
+        self._conn_counter=None
+        max_conn=config.get('max_connection',None)
+        if max_conn is not None:
+            self._conn_counter=telnetlib3.guard_shells.ConnectionCounter(max_conn)
+
+    async def __aenter__(self):
+        self._server=await telnetlib3.create_server(
+            host=self._host,
+            port=self._port,
+            term=self._term,
+            cols=self._columns,
+            rows=self._rows,
+            shell=self.handler,
+            force_binary=True,
+            encoding=None
+        )
+        return self
 
     async def handler(self,reader,writer):
-        readerTelnet,writerTelnet=await TelnetWrapper(reader,writer)
+        if self._conn_counter is not None and not self._conn_counter.try_acquire():
+            writer.close()
+            return
         login_failed_count=0
         while login_failed_count<3:
-            username,password=await login(readerTelnet,writerTelnet)
+            username,password=await login(reader,writer)
             if username is None or password is None:
                 break
             if not username:
                 continue
             try:
-                readerIconv,writerIconv=IConvWrapper(readerTelnet,writerTelnet,
+                readerIconv,writerIconv=IConvWrapper(reader,writer,
                     self._config.get('client_encoding',None),
                     self._config.get('server_encoding','utf-8'))
                 async with SSHHandler(readerIconv,writerIconv,self._config,
@@ -140,6 +160,8 @@ class TelnetServerSSHInstance(TCPServer):
                 login_failed_count+=1
                 writer.write(b'Login Failed.\r\n')
                 await asyncio.gather(writer.drain(),asyncio.sleep(1))
+        if self._conn_counter is not None:
+            self._conn_counter.release()
 
 
 class TelnetServerSSH(ServerGroup):

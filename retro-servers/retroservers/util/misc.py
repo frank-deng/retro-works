@@ -35,7 +35,7 @@ class ServerGroup(Logger):
         for i in range(len(tasks)-1,-1,-1):
             _,e=tasks[i]
             if e is not None:
-                del self._instancess[i]
+                del self._instances[i]
         return self
 
     async def _instance_aenter(self,instance):
