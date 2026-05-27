@@ -16,7 +16,7 @@ from aiohttp.web import HTTPFound
 from aiohttp.web import HTTPNotFound
 from aiohttp.web import HTTPForbidden
 from retroservers.util import Logger,load_module
-from retroservers.mailcenter import MailCenter
+from retroservers import MailCenter
 
 
 @web.middleware

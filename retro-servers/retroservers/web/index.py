@@ -9,7 +9,6 @@ from datetime import datetime
 from aiohttp_session import get_session, new_session
 from retroservers.web import WebServer
 from retroservers.web.api import WeatherData,NewsAPI
-from retroservers.mailcenter import MailCenter
 
 async def get_weather(config,locid):
     logger=logging.getLogger(__name__)

@@ -6,7 +6,7 @@ from email.message import Message
 from email.header import Header
 from retroservers.util import Logger
 from retroservers.util.tcpserver import TCPServer
-from retroservers.mailcenter import MailCenter
+from . import MailCenter
 
 
 class POP3Error(Exception):

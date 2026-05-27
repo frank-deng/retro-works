@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.scripts]
-retroservers = "retroservers.__main__:cli"
+retro-servers = "retroservers.__main__:cli"
 
 [tool.setuptools.packages.find]
 include = ["retroservers*"]

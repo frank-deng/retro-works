@@ -1,17 +1,17 @@
-log_file="~/.retroservers.log"
+log_file="~/.retro-servers.log"
 log_level="INFO"
-pid_file="~/.retroservers.pid"
+pid_file="~/.retro-servers.pid"
 detach=true
 watchdog_timeout=10
 modules=[
-"retroservers.mailcenter:MailCenter",
+"retroservers:MailCenter",
 "retroservers.web:WebServer",
-"retroservers.mailserver.pop3:POP3Server",
-"retroservers.mailserver.smtp:SMTPServer",
-"retroservers.ftp.sftp:FTP2SFTPBridgeServer",
-"retroservers.telnet.ssh:TelnetServerSSH"
-"retroservers.ftp.termux:FTPTermuxServer",
-"retroservers.telnet.termux:TelnetServerTermux",
+"retroservers:POP3Server",
+"retroservers:SMTPServer",
+"retroservers:FTP2SFTPBridgeServer",
+"retroservers:TelnetServerSSH"
+"retroservers:FTPTermuxServer",
+"retroservers:TelnetServerTermux",
 ]
 
 [web]
@@ -34,7 +34,7 @@ pagesize=10
 host="mysite.com"
 
 [mail.db]
-db_file='mail.db'
+db_file='~/.mail.db'
 maxsize=10
 minsize=2
 idle_timeout=30

@@ -4,8 +4,8 @@ from retroservers.util import Logger
 from retroservers.util import ServerGroup
 from retroservers.util.tcpserver import TCPServer
 from retroservers.util.iconv import IConvWrapper
-from retroservers.telnet import login
-from retroservers.telnet import TelnetWrapper
+from .util import login
+from .util import TelnetWrapper
 
 
 class SSHHandler(Logger):

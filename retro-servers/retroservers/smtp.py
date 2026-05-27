@@ -6,7 +6,7 @@ from email.header import decode_header
 from email.utils import getaddresses
 from retroservers.util import Logger
 from retroservers.util.tcpserver import TCPServer
-from retroservers.mailcenter import MailCenter
+from . import MailCenter
 
 
 class SMTPError(Exception):

@@ -99,7 +99,7 @@ def server_main(config):
 
 @click.group(invoke_without_command=True)
 @click.option('--config_file','-c',
-              default=os.path.expanduser('~/.retroservers.toml'),
+              default=os.path.expanduser('~/.retro-servers.toml'),
               help='Specify TOML config file.')
 @click.pass_context
 def cli(ctx,config_file):
