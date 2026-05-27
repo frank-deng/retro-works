@@ -7,10 +7,9 @@ from aiohttp.web import Response
 from aiohttp_jinja2 import template
 from aiohttp_jinja2 import render_template
 from pprint import pformat
-from retroservers.util import Logger
 from retroservers.util.fonttool import FontProcessor
-from retroservers.web import WebServer
-from retroservers.web.api import WeatherData
+from ..webserver import WebServer
+from ..api import WeatherData
 
 
 @WebServer.get("/select_city.asp")

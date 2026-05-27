@@ -5,4 +5,5 @@ from .ftp2sftp import FTP2SFTPBridgeServer
 from .telnet.ssh import TelnetServerSSH
 from .ftptermux import FTPTermuxServer
 from .telnet.termux import TelnetServerTermux
+from .web import WebServer
 

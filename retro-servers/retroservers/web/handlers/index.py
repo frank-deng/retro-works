@@ -7,8 +7,8 @@ from aiohttp.web import Response
 from aiohttp_jinja2 import template
 from datetime import datetime
 from aiohttp_session import get_session, new_session
-from retroservers.web import WebServer
-from retroservers.web.api import WeatherData,NewsAPI
+from ..webserver import WebServer
+from ..api import WeatherData,NewsAPI
 
 async def get_weather(config,locid):
     logger=logging.getLogger(__name__)

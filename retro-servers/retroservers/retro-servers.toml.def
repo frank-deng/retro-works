@@ -5,7 +5,7 @@ detach=true
 watchdog_timeout=10
 modules=[
 "retroservers:MailCenter",
-"retroservers.web:WebServer",
+"retroservers:WebServer",
 "retroservers:POP3Server",
 "retroservers:SMTPServer",
 "retroservers:FTP2SFTPBridgeServer",
@@ -57,13 +57,13 @@ password="sha256_hash"
 [[mail.users]]
 uid=1
 username="deepseek"
-module="retroservers.mailcenter.askbot:MailUserRobotDeepseek"
+module="retroservers.mailcenter:MailUserRobotDeepseek"
 deepseek_key="xxx"
 
 [[mail.users]]
 uid=2
 username="erine"
-module="retroservers.mailcenter.askbot:MailUserRobotErine"
+module="retroservers.mailcenter:MailUserRobotErine"
 client_id="xxx"
 client_secret="xxx"
 

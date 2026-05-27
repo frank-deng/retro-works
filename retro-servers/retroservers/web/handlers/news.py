@@ -9,8 +9,8 @@ from PIL import Image
 from io import BytesIO
 from retroservers.util import Logger
 from retroservers.util.fonttool import FontProcessor
-from retroservers.web import WebServer
-from retroservers.web.api import NewsAPI
+from ..webserver import WebServer
+from ..api import NewsAPI
 
 
 @template("news.html")
