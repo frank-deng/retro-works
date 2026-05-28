@@ -12,103 +12,103 @@ from .util import TelnetServer
 
 class ProcessHandler(Logger):
     def __init__(self,reader,writer,*,buf_size=4096):
-        self.__proc=None
-        self.__master_fd=None
-        self.__slave_fd=None
-        self.__pty_reader=None
-        self.__tasks=None
-        self.__buf_size=buf_size
-        self.__reader,self.__writer=reader,writer
-        self.__buf_size=buf_size
-        self.__loop=asyncio.get_running_loop()
-        self.__queue=asyncio.Queue()
+        self._proc=None
+        self._master_fd=None
+        self._slave_fd=None
+        self._pty_reader=None
+        self._tasks=None
+        self._buf_size=buf_size
+        self._reader,self._writer=reader,writer
+        self._buf_size=buf_size
+        self._loop=asyncio.get_running_loop()
+        self._queue=asyncio.Queue()
 
     async def __aenter__(self):
         try:
-            self.__master_fd,self.__slave_fd=pty.openpty()
-            await self.create_subprocess_exec(self.__master_fd,self.__slave_fd)
-            os.close(self.__slave_fd)
-            os.set_blocking(self.__master_fd,False)
-            self.__tasks=(
-                asyncio.create_task(self.__pty_to_tcp()),
-                asyncio.create_task(self.__tcp_to_pty())
+            self._master_fd,self._slave_fd=pty.openpty()
+            await self.create_subprocess_exec(self._master_fd,self._slave_fd)
+            os.close(self._slave_fd)
+            os.set_blocking(self._master_fd,False)
+            self._tasks=(
+                asyncio.create_task(self._pty_to_tcp()),
+                asyncio.create_task(self._tcp_to_pty())
             )
         except Exception as e:
-            await self.__cleanup()
+            await self._cleanup()
             raise
         return self
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
         try:
-            if self.__tasks is not None:
-                await asyncio.wait(self.__tasks,return_when=asyncio.FIRST_COMPLETED)
+            if self._tasks is not None:
+                await asyncio.wait(self._tasks,return_when=asyncio.FIRST_COMPLETED)
         except asyncio.CancelledError:
             pass
         finally:
-            await self.__cleanup()
+            await self._cleanup()
 
-    def __fd_ready(self):
+    def _fd_ready(self):
         try:
-            data=os.read(self.__master_fd,self.__buf_size)
+            data=os.read(self._master_fd,self._buf_size)
             if not data:
-                self.__loop.call_soon(self.__queue.put_nowait,b"")
+                self._loop.call_soon(self._queue.put_nowait,b"")
                 return
-            self.__queue.put_nowait(data)
+            self._queue.put_nowait(data)
         except (OSError,asyncio.CancelledError):
-            self.__queue.put_nowait(b"")
+            self._queue.put_nowait(b"")
 
-    async def __pty_to_tcp(self):
-        self.__loop.add_reader(self.__master_fd,self.__fd_ready)
+    async def _pty_to_tcp(self):
+        self._loop.add_reader(self._master_fd,self._fd_ready)
         try:
             while True:
-                data=await self.__queue.get()
+                data=await self._queue.get()
                 if not data:
                     break
-                self.__writer.write(data)
-                await self.__writer.drain()
+                self._writer.write(data)
+                await self._writer.drain()
         except (ConnectionResetError,asyncio.CancelledError):
             pass
         except Exception as e:
             self.logger.error(e,exc_info=True)
         finally:
-            self.__loop.remove_reader(self.__master_fd)
+            self._loop.remove_reader(self._master_fd)
 
-    async def __write_fd(self,data):
+    async def _write_fd(self,data):
         n=None
         while data:
             try:
-                n=os.write(self.__master_fd,data)
+                n=os.write(self._master_fd,data)
                 data=data[n:]
             except BlockingIOError:
                 self.logger.debug(f'Partial data written {n}/{len(data)}')
                 await asyncio.sleep(0.01)
 
-    async def __tcp_to_pty(self):
+    async def _tcp_to_pty(self):
         try:
             while True:
-                data=await self.__reader.read(self.__buf_size)
+                data=await self._reader.read(self._buf_size)
                 if not data:
                     break
-                await self.__write_fd(data)
+                await self._write_fd(data)
         except (ConnectionResetError,OSError,asyncio.CancelledError):
             pass
         except Exception as e:
             self.logger.error(e,exc_info=True)
 
-    async def __cleanup(self):
+    async def _cleanup(self):
         try:
-            if self.__tasks is not None:
-                for task in self.__tasks:
+            if self._tasks is not None:
+                for task in self._tasks:
                     if not task.done():
                         task.cancel()
-                await asyncio.gather(*self.__tasks)
+                await asyncio.gather(*self._tasks)
         except Exception as e:
             self.logger.error(e,exc_info=True)
         finally:
-            self.__close_fd(self.__master_fd)
-            self.__master_fd=None
+            self._close_fd(self._master_fd)
+            self._master_fd=None
 
-    def __close_fd(self,fd):
+    def _close_fd(self,fd):
         try:
             if fd is not None:
                 os.close(fd)
@@ -122,20 +122,20 @@ class ProcessHandler(Logger):
 class TermuxHandler(ProcessHandler):
     def __init__(self,reader,writer,config):
         super().__init__(reader,writer,buf_size=config.get('buf_size',4096))
-        self.__username=config['username']
-        self.__shell=config.get('shell','bash')
-        self.__term=config.get('term','ansi')
-        self.__rows=config.get('rows',24)
-        self.__columns=config.get('columns',80)
+        self._username=config['username']
+        self._shell=config.get('shell','bash')
+        self._term=config.get('term','ansi')
+        self._rows=config.get('rows',24)
+        self._columns=config.get('columns',80)
 
     async def create_subprocess_exec(self,master_fd,slave_fd):
         env={
-            'USER':self.__username,
-            'SHELL':self.__shell,
-            'TERM':self.__term,
+            'USER':self._username,
+            'SHELL':self._shell,
+            'TERM':self._term,
         }
         fcntl.ioctl(slave_fd,termios.TIOCSWINSZ,struct.pack('HHHH',
-                    self.__rows,self.__columns,0,0))
+                    self._rows,self._columns,0,0))
         pid=os.fork()
         if pid==0:
             os.close(master_fd)
@@ -150,7 +150,7 @@ class TermuxHandler(ProcessHandler):
             cwd=os.environ.get('HOME',None)
             if cwd is not None:
                 os.chdir(cwd)
-            os.execl(self.__shell,self.__shell)
+            os.execl(self._shell,self._shell)
             os._exit(1)
 
 
