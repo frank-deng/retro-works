@@ -107,6 +107,7 @@ class TelnetServer(Logger):
     async def __aexit__(self,exc_type,exc_val,exc_tb):
         if self._server is not None:
             self._server.close()
+            await self._server.wait_closed()
 
     async def _handler(self,reader,writer):
         try:
