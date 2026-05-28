@@ -16,7 +16,6 @@ Retro Programming Works 怀旧编程作品
 * CD-ROM
 * Sound Blaster 16
 * Mouse
-* 56k Modem
 
 ### 主要用途
 
@@ -170,16 +169,18 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * 486 DX-33MHz CPU
 * 8M RAM
 * 512M HDD
-* S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持800x600高彩色）
+* S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持640x480高彩色）
 * External 3.5 Inch Floppy Drive x1
 * TouchPad as mouse
 * PCMCIA NE2000 Compatible Ethernet Adapter
-* 800x600 TFT Screen
+* 640x480 TFT Screen
 
 ### 主要用途
 
 * 上网看新闻
+* 收发邮件
 * 连接远端UNIX机器
+* FTP上传下载文件
 
 ### 486端安装说明
 
@@ -197,6 +198,7 @@ Windows 3.2推荐安装以下软件：
 
 * Trumpet Winsock
 * Internet Explorer 3.0（仅安装浏览器）
+* FoxMail（邮件客户端）
 * Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
 * WS FTP16LE（FTP客户端）
 * 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）

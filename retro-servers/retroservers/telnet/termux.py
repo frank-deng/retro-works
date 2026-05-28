@@ -5,10 +5,9 @@ import fcntl
 import termios
 import struct
 import hashlib
-import telnetlib3
 from ..util import Logger
 from ..util.iconv import IConvWrapper
-from .util import login
+from .util import TelnetServer
 
 
 class ProcessHandler(Logger):
@@ -155,60 +154,19 @@ class TermuxHandler(ProcessHandler):
             os._exit(1)
 
 
-class TelnetServerTermux(Logger):
+class TelnetServerTermux(TelnetServer):
     def __init__(self,config):
-        self._server=None
         self._config=config[self.__class__.__name__]
-        self._host=self._config.get('host','127.0.0.1')
-        self._port=self._config['port']
-        self._term=config.get('term','ansi')
-        self._rows=config.get('rows',24)
-        self._columns=config.get('columns',80)
-        self._conn_counter=None
-        max_conn=config.get('max_connection',None)
-        if max_conn is not None:
-            self._conn_counter=telnetlib3.guard_shells.ConnectionCounter(max_conn)
+        super().__init__(self._config)
 
-    async def __aenter__(self):
-        self._server=await telnetlib3.create_server(
-            host=self._host,
-            port=self._port,
-            term=self._term,
-            cols=self._columns,
-            rows=self._rows,
-            shell=self.handler,
-            force_binary=True,
-            encoding=None
-        )
-        return self
-
-    async def __aexit__(self,exc_type,exc_val,exc_tb):
-        if self._server is not None:
-            self._server.close()
-
-    async def handler(self,reader,writer):
-        if self._conn_counter is not None and not self._conn_counter.try_acquire():
-            writer.close()
-            return
-        login_failed_count=0
-        while login_failed_count<3:
-            username,password=await login(reader,writer)
-            if username is None or password is None:
-                break
-            if not username:
-                continue
-            if username.decode('ascii')!=self._config['username'] or \
-                hashlib.sha256(password).hexdigest()!=self._config['password']:
-                login_failed_count+=1
-                writer.write(b'Login Failed.\r\n')
-                await asyncio.gather(writer.drain(),asyncio.sleep(1))
-                continue
-            login_failed_count=0
-            readerIconv,writerIconv=IConvWrapper(reader,writer,
-                self._config.get('client_encoding',None),
-                self._config.get('server_encoding','utf-8'))
-            async with TermuxHandler(readerIconv,writerIconv,self._config):
-                pass
-        if self._conn_counter is not None:
-            self._conn_counter.release()
+    async def handler(self,reader,writer,username,password):
+        if username!=self._config['username'] or \
+            hashlib.sha256(password.encode()).hexdigest()!=self._config['password']:
+            return False
+        readerIconv,writerIconv=IConvWrapper(reader,writer,
+            self._config.get('client_encoding',None),
+            self._config.get('server_encoding','utf-8'))
+        async with TermuxHandler(readerIconv,writerIconv,self._config):
+            pass
+        return True
 
