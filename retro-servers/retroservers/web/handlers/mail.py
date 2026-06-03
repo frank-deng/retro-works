@@ -103,7 +103,7 @@ async def mail_editor(req:Request):
     }
 
 
-def __get_recp_list(recp:str):
+def _get_recp_list(recp:str):
     recp_list=[s.strip() for s in recp.split(';')]
     return [s for s in list(dict.fromkeys(recp_list)) if s]
 
@@ -129,8 +129,8 @@ async def mail_editor_send(req:Request):
         issues.append('标题不能为空')
     if form_data.get('action','')=='reply' and not body:
         issues.append('回复邮件正文不能为空')
-    to_list=__get_recp_list(form_data.get('to',''))
-    cc_list=__get_recp_list(form_data.get('cc',''))
+    to_list=_get_recp_list(form_data.get('to',''))
+    cc_list=_get_recp_list(form_data.get('cc',''))
     if (len(to_list)+len(cc_list))==0:
         issues.append('收件人或抄送人必须存在')
     else:

@@ -106,34 +106,34 @@ class WebServer(Logger):
         return decorator
 
     def __init__(self,config):
-        self.__runner=None
-        self.__site=None
-        self.__host=config['web']['host']
-        self.__port=config['web']['port']
-        self.__app=web.Application(middlewares=[iconv_middleware])
-        self.__app['config']=config
-        self.__app['MailCenter']=MailCenter.get_instance()
-        aiohttp_jinja2.setup(self.__app,
+        self._runner=None
+        self._site=None
+        self._host=config['web']['host']
+        self._port=config['web']['port']
+        self._app=web.Application(middlewares=[iconv_middleware])
+        self._app['config']=config
+        self._app['MailCenter']=MailCenter.get_instance()
+        aiohttp_jinja2.setup(self._app,
             loader=PackageLoader('retroservers',self.TEMPLATE_DIR),
             autoescape=True)
-        self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
-        aiohttp_session.setup(self.__app,OldBrowserCookieStorage(Fernet(Fernet.generate_key())))
-        self.__app.middlewares.append(session_middleware)
-        self.__app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
-        self.__app.add_routes(self._routes)
-        env=aiohttp_jinja2.get_env(self.__app)
+        self._app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
+        aiohttp_session.setup(self._app,OldBrowserCookieStorage(Fernet(Fernet.generate_key())))
+        self._app.middlewares.append(session_middleware)
+        self._app.router.add_static(self.STATIC_PATH,self.STATIC_DIR)
+        self._app.add_routes(self._routes)
+        env=aiohttp_jinja2.get_env(self._app)
         env.filters['multiline'] = multiline_filter
         env.filters['to_datetime'] = to_datetime_filter
 
     async def __aenter__(self):
-        self.__runner=web.AppRunner(self.__app,access_log=None)
-        await self.__runner.setup()
-        self.__site=web.TCPSite(self.__runner,self.__host,self.__port)
-        await self.__site.start()
+        self._runner=web.AppRunner(self._app,access_log=None)
+        await self._runner.setup()
+        self._site=web.TCPSite(self._runner,self._host,self._port)
+        await self._site.start()
 
     async def __aexit__(self,exc_type,exc_val,exc_tb):
-        if self.__site is not None:
-            await self.__site.stop()
-        if self.__runner is not None:
-            await self.__runner.cleanup()
+        if self._site is not None:
+            await self._site.stop()
+        if self._runner is not None:
+            await self._runner.cleanup()
 

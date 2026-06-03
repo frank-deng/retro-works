@@ -22,23 +22,22 @@ class DaemonAbnormalExitError(RuntimeError):
     pass
 
 class PIDFileManager:
-    __pidfile=None
-    __fp=None
     def __init__(self,pidfile:str=None):
-        self.__pidfile=os.path.expanduser(pidfile)
+        self._pidfile=os.path.expanduser(pidfile)
+        self._fp=None
 
     def __atexit(self):
-        if self.__fp is not None:
-            self.__fp.close()
-        if self.__pidfile is not None:
-            os.remove(self.__pidfile)
-            self.__pidfile=None
+        if self._fp is not None:
+            self._fp.close()
+        if self._pidfile is not None:
+            os.remove(self._pidfile)
+            self._pidfile=None
         atexit.unregister(self.__atexit)
 
     def is_running(self):
-        if self.__pidfile is None or not os.path.isfile(self.__pidfile):
+        if self._pidfile is None or not os.path.isfile(self._pidfile):
             return False
-        with open(self.__pidfile,'r') as f:
+        with open(self._pidfile,'r') as f:
             try:
                 fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
                 return False
@@ -48,24 +47,24 @@ class PIDFileManager:
                 return True
 
     def start(self):
-        if self.__pidfile is None:
+        if self._pidfile is None:
             return
         if self.is_running():
             raise DaemonIsRunningError
-        self.__fp=open(self.__pidfile,'w')
-        fcntl.flock(self.__fp,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        self.__fp.write(str(os.getpid()))
-        self.__fp.flush()
+        self._fp=open(self._pidfile,'w')
+        fcntl.flock(self._fp,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        self._fp.write(str(os.getpid()))
+        self._fp.flush()
         atexit.register(self.__atexit)
 
     def start_windows(self):
-        if self.__pidfile is None:
+        if self._pidfile is None:
             return
-        self.__fp=win32event.CreateMutex(None,True,self.__pidfile)
+        self._fp=win32event.CreateMutex(None,True,self._pidfile)
         if win32api.GetLastError()==winerror.ERROR_ALREADY_EXISTS:
             raise DaemonIsRunningError
 
-def __do_detach():
+def _do_detach():
     if os.fork():
         return False
     os.setsid()
@@ -92,7 +91,7 @@ def daemonize(key_pidfile:str,key_detach:str):
                 func(config,*args,**kwargs)
             elif pidman.is_running():
                 raise DaemonIsRunningError
-            elif not detach or __do_detach():
+            elif not detach or _do_detach():
                 pidman.start()
                 func(config,*args,**kwargs)
         return wrapper

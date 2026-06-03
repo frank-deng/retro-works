@@ -63,7 +63,7 @@ class SMTPHandler(Logger):
 
     @staticmethod
     def _parse_content(remain):
-        def __parse_content_part(text):
+        def _parse_content_part(text):
             cur=''
             remainder=''
             isReply=True
@@ -78,7 +78,7 @@ class SMTPHandler(Logger):
             return cur,remainder
         res=[]
         while True:
-            text,remain=__parse_content_part(remain)
+            text,remain=_parse_content_part(remain)
             res.append(text)
             if not remain:
                 break

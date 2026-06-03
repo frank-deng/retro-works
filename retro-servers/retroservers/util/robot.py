@@ -7,72 +7,72 @@ from . import Logger
 
 class RobotCheckerSite(Logger):
     def __init__(self,host,timeout_refresh=3600,timeout_failed=120):
-        self.__host=host
-        self.__timeout_refresh=timeout_refresh
-        self.__timeout_failed=timeout_failed
-        self.__timeout_fetch=7
-        self.__last_load=None
-        self.__rp=RobotFileParser()
-        self.__load_succ=False
-        self.__allow_all=False
+        self._host=host
+        self._timeout_refresh=timeout_refresh
+        self._timeout_failed=timeout_failed
+        self._timeout_fetch=7
+        self._last_load=None
+        self._rp=RobotFileParser()
+        self._load_succ=False
+        self._allow_all=False
 
-    def __check_load_timeout(self):
+    def _check_load_timeout(self):
         now=datetime.now().date()
-        if self.__last_load is None:
-            self.__last_load=now
+        if self._last_load is None:
+            self._last_load=now
             return True
-        delta=now-self.__last_load
+        delta=now-self._last_load
         tm=int(delta.total_seconds())
-        if not self.__load_succ and tm<self.__timeout_failed:
+        if not self._load_succ and tm<self._timeout_failed:
             return False
-        elif self.__load_succ and tm<self.__timeout_refresh:
+        elif self._load_succ and tm<self._timeout_refresh:
             return False
         else:
             return True
 
-    async def __load(self):
-        self.__allow_all=False
+    async def _load(self):
+        self._allow_all=False
         try:
-            self.logger.info(f'Load robot.txt for {self.__host}')
-            url=f'https://{self.__host}/robots.txt'
+            self.logger.info(f'Load robot.txt for {self._host}')
+            url=f'https://{self._host}/robots.txt'
             res=None
             async with aiohttp.ClientSession() as session:
-                async with session.get(url,timeout=self.__timeout_fetch) as response:
+                async with session.get(url,timeout=self._timeout_fetch) as response:
                     if response.status==404:
-                        self.__allow_all=True
+                        self._allow_all=True
                         return True
                     response.raise_for_status()
                     res=await response.text()
             if res is None:
                 return False
-            self.__rp.parse(res.splitlines())
+            self._rp.parse(res.splitlines())
             return True
         except Exception as e:
             self.logger.error(e,exc_info=True)
             return False
 
     async def can_fetch(self,ua,url):
-        if self.__check_load_timeout():
-            self.__load_succ=await self.__load()
-        if not self.__load_succ:
+        if self._check_load_timeout():
+            self._load_succ=await self._load()
+        if not self._load_succ:
             return False
-        if self.__allow_all:
+        if self._allow_all:
             return True
-        return self.__rp.can_fetch(ua,url)
+        return self._rp.can_fetch(ua,url)
 
 
 class RobotChecker(Logger):
     def __init__(self,timeout_refresh=3600,timeout_failed=120):
-        self.__timeout_refresh=timeout_refresh
-        self.__timeout_failed=timeout_failed
-        self.__site={}
+        self._timeout_refresh=timeout_refresh
+        self._timeout_failed=timeout_failed
+        self._site={}
 
     async def can_fetch(self,ua,url):
         parsed=urlparse(url)
         urlinfo=urlparse(url)
         host=urlinfo.netloc
-        if host not in self.__site:
-            self.__site[host]=RobotCheckerSite(host,self.__timeout_refresh,
-                self.__timeout_failed)
-        return await self.__site[host].can_fetch(ua,url)
+        if host not in self._site:
+            self._site[host]=RobotCheckerSite(host,self._timeout_refresh,
+                self._timeout_failed)
+        return await self._site[host].can_fetch(ua,url)
 
