@@ -6,4 +6,5 @@ from .telnet.ssh import TelnetServerSSH
 from .ftptermux import FTPTermuxServer
 from .telnet.termux import TelnetServerTermux
 from .web import WebServer
+from .httpfileserver import HTTPFileServer
 
