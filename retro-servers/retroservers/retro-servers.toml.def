@@ -12,6 +12,7 @@ modules=[
 "retroservers:TelnetServerSSH"
 "retroservers:FTPTermuxServer",
 "retroservers:TelnetServerTermux",
+"retroservers:HTTPFileServer"
 ]
 
 [web]
@@ -28,6 +29,12 @@ inline_image=true
 news_api="xxx"
 weather_api="xxx"
 weather_key="xxx"
+
+[HTTPFileServer]
+host="127.0.0.1"
+port=8081
+rootdir="/sdcard/devel"
+index=["index.html","index.htm"]
 
 [mail]
 pagesize=10
