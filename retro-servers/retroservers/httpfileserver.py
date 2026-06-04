@@ -2,6 +2,8 @@ import asyncio
 import os
 import base64
 import hashlib
+import math
+from urllib.parse import quote,unquote
 from pathlib import Path
 from aiohttp import web
 from aiohttp import web_exceptions
@@ -21,7 +23,7 @@ def _get_page(req,total,pagesize):
         page=1
     elif page>max_pages:
         page=max_pages
-    return page
+    return page,max_pages
 
 
 def _listdir(path,path_req,show_hidden=False):
@@ -47,16 +49,35 @@ def _listdir(path,path_req,show_hidden=False):
                 'is_dir': entry.is_dir(),
                 'size': entry.stat().st_size if entry.is_file() else 0,
                 'mtime': entry.stat().st_mtime,
-                'href': os.path.join(path_req,name),
+                'href': quote(os.path.join(path_req,name),encoding='utf-8'),
             })
     entries.sort(key=lambda e: (not e['is_dir'], e['name'].lower()))
     return entries
 
 
+def _mkpager(page,max_pages,href_prefix):
+    if max_pages<2:
+        return ''
+    prev_html,next_html='&lt; Prev','Next &gt;'
+    if page==2:
+        prev_html=f'<a href="{href_prefix}">{prev_html}</a>'
+    elif page>2:
+        prev_html=f'<a href="{href_prefix}?page={page-1}">{prev_html}</a>'
+    if page<max_pages:
+        next_html=f'<a href="{href_prefix}?page={page+1}">{next_html}</a>'
+    return f'''<p><form method="GET" action="{href_prefix}">
+<table border='0' cellspacing='0' cellpadding='0'><tr><td valign='middle'>
+<font face="Times New Roman">
+{prev_html}&nbsp;{next_html}&nbsp;
+<input type="text" name="page" value='{page}' size="{len(str(max_pages))}"> / {max_pages}
+<input type="submit" value='Go'/>
+</font></td></tr></table></form></p>'''
+
+
 async def _handler(req):
     config=req.app['config']
     rootdir=os.path.abspath(config['rootdir'])
-    path_req=req.match_info['path'].strip().strip('/')
+    path_req=unquote(req.match_info['path'].strip()).strip('/')
     path=os.path.abspath(os.path.join(rootdir,path_req))
     path_req='/'+path_req
     if not path.startswith(rootdir):
@@ -71,12 +92,17 @@ async def _handler(req):
             return web.FileResponse(index_path)
 
     flist=_listdir(path,path_req,config.get('show_hidden',False))
-    flist_html=''.join([f'<div><a href="{a['href']}">{a['name']}</a></div>' for a in flist])
+    pagesize=config.get('pagesize',50)
+    page,max_pages=_get_page(req,len(flist),pagesize)
+
+    flist_html=''.join([f'<div><a href="{a['href']}">{a['name']}</a></div>'\
+                        for a in flist[(page-1)*pagesize:page*pagesize]])
+    pager=_mkpager(page,max_pages,f'{path_req}')
     encoding=config.get('encoding','utf-8')
-    title=f'Index of {path_req}'
     html=f'''<html>
-<head><meta charset='{encoding}'/><title>{title}</title></head>
-<body><h1>{title}</h1><hr>{flist_html}</body></html>'''
+<head><meta charset='{encoding}'/><title>Index of {path_req}</title></head><body>
+<h1><font face="Times New Roman">Index of </font>{path_req}</h1><hr>
+{flist_html}{pager}</body></html>'''
     return web.Response(
         headers={'content-type':f"text/html; charset={encoding}"},
         body=html.encode(encoding,errors='replace')
