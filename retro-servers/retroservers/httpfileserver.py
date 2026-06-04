@@ -97,7 +97,7 @@ async def _handler(req):
 
     flist_html=''.join([f'<div><a href="{a['href']}">{a['name']}</a></div>'\
                         for a in flist[(page-1)*pagesize:page*pagesize]])
-    pager=_mkpager(page,max_pages,f'{path_req}')
+    pager=_mkpager(page,max_pages,quote(path_req))
     encoding=config.get('encoding','utf-8')
     html=f'''<html>
 <head><meta charset='{encoding}'/><title>Index of {path_req}</title></head><body>
