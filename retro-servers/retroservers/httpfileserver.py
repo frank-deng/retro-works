@@ -2,6 +2,7 @@ import asyncio
 import os
 import base64
 import hashlib
+from pathlib import Path
 from aiohttp import web
 from aiohttp import web_exceptions
 from aiohttp.web import HTTPFound
@@ -9,20 +10,77 @@ from aiohttp.web import HTTPForbidden
 from .util import Logger
 
 
+def _get_page(req,total,pagesize):
+    page=req.url.query.get('page','1')
+    try:
+        page=int(page)
+    except ValueError:
+        page=1
+    max_pages=math.ceil(total/pagesize)
+    if page<1:
+        page=1
+    elif page>max_pages:
+        page=max_pages
+    return page
+
+
+def _listdir(path,path_req,show_hidden=False):
+    entries = []
+    path_proc=Path(path_req)
+    parent=path_proc.parent
+    if parent != path_proc:
+        entries.append({
+            'name':'../',
+            'is_dir': True,
+            'size': 0,
+            'href': str(parent),
+        })
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.name in ('.','..'):
+                continue
+            if not show_hidden and entry.name.startswith('.'):
+                continue
+            name=f'{entry.name}/' if entry.is_dir() else entry.name
+            entries.append({
+                'name': name,
+                'is_dir': entry.is_dir(),
+                'size': entry.stat().st_size if entry.is_file() else 0,
+                'mtime': entry.stat().st_mtime,
+                'href': os.path.join(path_req,name),
+            })
+    entries.sort(key=lambda e: (not e['is_dir'], e['name'].lower()))
+    return entries
+
+
 async def _handler(req):
     config=req.app['config']
     rootdir=os.path.abspath(config['rootdir'])
-    path=req.match_info['path'].strip().strip('/')
-    path=os.path.abspath(os.path.join(rootdir,path))
+    path_req=req.match_info['path'].strip().strip('/')
+    path=os.path.abspath(os.path.join(rootdir,path_req))
+    path_req='/'+path_req
     if not path.startswith(rootdir):
         raise web.HTTPForbidden()
     if os.path.isfile(path):
         return web.FileResponse(path)
+    if not os.path.isdir(path):
+        raise web.HTTPNotFound()
     for index_file in config.get('index',['index.html']):
         index_path=os.path.join(path,index_file)
         if os.path.isfile(index_path):
             return web.FileResponse(index_path)
-    raise web.HTTPNotFound()
+
+    flist=_listdir(path,path_req,config.get('show_hidden',False))
+    flist_html=''.join([f'<div><a href="{a['href']}">{a['name']}</a></div>' for a in flist])
+    encoding=config.get('encoding','utf-8')
+    title=f'Index of {path_req}'
+    html=f'''<html>
+<head><meta charset='{encoding}'/><title>{title}</title></head>
+<body><h1>{title}</h1><hr>{flist_html}</body></html>'''
+    return web.Response(
+        headers={'content-type':f"text/html; charset={encoding}"},
+        body=html.encode(encoding,errors='replace')
+    )
 
 
 async def basic_auth_proc(req:web.Request):

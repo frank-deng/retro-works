@@ -33,11 +33,13 @@ weather_key="xxx"
 [HTTPFileServer]
 host="127.0.0.1"
 port=8081
+encoding="gbk"
+pagesize=40
 rootdir="/sdcard/devel"
 index=["index.html","index.htm"]
 
 [mail]
-pagesize=10
+pagesize=40
 host="mysite.com"
 
 [mail.db]
