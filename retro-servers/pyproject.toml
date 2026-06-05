@@ -28,7 +28,7 @@ dependencies = [
 retro-servers = "retroservers.__main__:cli"
 
 [tool.setuptools.packages.find]
-include = ["retroservers*"]
+where = ["src"]
 
 [tool.setuptools.package-data]
 retroservers = ["web/template/*", "web/static/*"]
