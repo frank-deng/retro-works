@@ -4,7 +4,7 @@ Retro Programming Works 怀旧编程作品
 1998s PC
 --------
 
-中国90年代后期典型家用多媒体电脑。
+中国90年代后期典型家用多媒体电脑。后期添加网卡高速通天下，远程工作使用。
 
 ### 配置
 
@@ -16,8 +16,11 @@ Retro Programming Works 怀旧编程作品
 * CD-ROM
 * Sound Blaster 16
 * Mouse
+* NE2000（后期加装）
 
 ### 主要用途
+
+#### 单机
 
 * BASIC编程
 * 小游戏（2048、俄罗斯方块、纸牌、扫雷、DOS Mario）
@@ -27,6 +30,13 @@ Retro Programming Works 怀旧编程作品
 * 图片浏览
 * 听CD、MIDI
 * 多媒体光盘浏览
+
+#### 连网
+
+* 上网看新闻
+* 收发邮件
+* 连接远端UNIX机器
+* FTP上传下载文件
 
 ### 安装说明
 
@@ -59,6 +69,14 @@ Windows 3.2推荐安装以下软件：
 * Microsoft Musical Instruments（多媒体光盘）
 * 震撼——古典音乐鉴赏（多媒体光盘）
 
+Windows 3.2连网场景推荐安装以下软件：
+
+* Trumpet Winsock
+* Internet Explorer 3.0（仅安装浏览器）
+* FoxMail（邮件客户端）
+* Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
+* WS FTP16LE（FTP客户端）
+
 #### Microsoft Office 4.2安装说明
 
 Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、稳定性差、实用价值低等问题，推荐安装的组件如下：
@@ -77,6 +95,37 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 
 **注意**：码表总条目数不能超过**16384**个，超过部分无法打出。默认五笔码表文件`misc/WB.TXT`仅提供单字支持，常用词语需自行添加。
 
+### NE2000配置
+
+需要准备DOS下的NE2000驱动和WINPKT驱动，以保证Windows 3.x下的Trumpet Winsock能正常使用NE2000网卡。
+
+DOSBox-X需要在`dosbox-x.conf`中将NE2000的`backend`设置为`slirp`，然后在`[ethernet, slirp]`小节中进行以下设置：
+
+	mtu                   = 1500
+	mru                   = 1500
+	ipv4_network          = 10.0.2.0
+	ipv4_netmask          = 255.255.255.0
+	ipv4_host             = 10.0.2.2
+	ipv4_nameserver       = 8.8.8.8
+	ipv4_dhcp_start       = 10.0.2.15
+
+`AUTOEXEC.BAT`中添加以下命令：
+
+	LH NE2000.COM 0x60 3 0x300
+	LH WINPKT.COM 0x60
+
+Trumpet Winsock中进行以下设置：
+
+* 设置`IP address`为`10.0.2.15`
+* 设置`Netmask`为`255.255.255.0`
+* 设置`Default gateway`为`10.0.2.2`
+* 设置`Packet vector`为`60`
+* 设置`MTU`为`1500`
+* 设置`TCP RWIN`和`TCP RSS`为`1460`
+
+之后通过 `10.0.2.2`+端口号 即可访问DOSBox-X模拟器所在主机上的服务（主机上的服务可绑定`127.0.0.1`以限制仅本机可访问）。
+
+
 ### 补充说明
 
 * 为保证可维护性，DOS自带的QBASIC建议将代码规模控制在600行以内，用DEBUG的a命令输入QBASIC程序配套的汇编例程时，建议将指令数控制在200条以内。
@@ -86,6 +135,8 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * UCDOS配合西文软件（比如QBasic、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
+* Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
+* Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
 
 
 1990s PC
@@ -157,84 +208,4 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 
 * 对于640k RAM的机器，同时加载CCDOS、拼音输入法、五笔字形输入法后，用WPS编辑文章时，单个文件大小控制在2.4k左右，超过此大小容易死机。
 * GW-BASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量，开发前需仔细评估程序复杂度以决定是否移植到GW-BASIC上，开发时需严格控制`GOTO`的使用以保证一定程度的可维护性。
-
-
-1999s GEEK Laptop
------------------
-
-极客神本，曾经的壕本。网卡高速通天下，远程工作使用。
-
-### 配置
-
-* 486 DX-33MHz CPU
-* 8M RAM
-* 512M HDD
-* S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持640x480高彩色）
-* External 3.5 Inch Floppy Drive x1
-* TouchPad as mouse
-* PCMCIA NE2000 Compatible Ethernet Adapter
-* 640x480 TFT Screen
-
-### 主要用途
-
-* 上网看新闻
-* 收发邮件
-* 连接远端UNIX机器
-* FTP上传下载文件
-
-### 486端安装说明
-
-需要在`AUTOEXEC.BAT`中加载NE2000驱动和WINPKT驱动，以保证Windows 3.x下的Trumpet Winsock能正常使用NE2000网卡。
-
-可以在`AUTOEXEC.BAT`末尾添加`WIN`命令，以实现开机直接进Windows 3.x。
-
-Windows 3.2安装时，推荐安装方案如下：
-
-* 安装所有自述文件，除打印机自述文件外
-* 游戏、屏幕保护程序、壁纸等杂项不安装
-* 附件只安装以下组件及其对应帮助文件：画笔、记事本、计算器、字符映射表
-
-Windows 3.2推荐安装以下软件：
-
-* Trumpet Winsock
-* Internet Explorer 3.0（仅安装浏览器）
-* FoxMail（邮件客户端）
-* Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
-* WS FTP16LE（FTP客户端）
-* 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
-* WinZip
-
-### NE2000配置
-
-DOSBox-X需要在`dosbox-x.conf`中将NE2000的`backend`设置为`slirp`，然后在`[ethernet, slirp]`小节中进行以下设置：
-
-	mtu                   = 1500
-	mru                   = 1500
-	ipv4_network          = 10.0.2.0
-	ipv4_netmask          = 255.255.255.0
-	ipv4_host             = 10.0.2.2
-	ipv4_nameserver       = 8.8.8.8
-	ipv4_dhcp_start       = 10.0.2.15
-
-`AUTOEXEC.BAT`中添加以下命令：
-
-	LH NE2000.COM 0x60 3 0x300
-	LH WINPKT.COM 0x60
-
-Trumpet Winsock中进行以下设置：
-
-* 设置`IP address`为`10.0.2.15`
-* 设置`Netmask`为`255.255.255.0`
-* 设置`Default gateway`为`10.0.2.2`
-* 设置`Packet vector`为`60`
-* 设置`MTU`为`1500`
-* 设置`TCP RWIN`和`TCP RSS`为`1460`
-
-之后通过 `10.0.2.2`+端口号 即可访问DOSBox-X模拟器所在主机上的服务（主机上的服务可绑定`127.0.0.1`以限制仅本机可访问）。
-
-### 补充说明
-
-* Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
-* 不建议用于对速度、稳定性要求高的任务，此类任务请使用现代系统。
-* Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
 
