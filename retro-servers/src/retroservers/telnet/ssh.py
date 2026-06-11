@@ -122,7 +122,7 @@ class TelnetServerSSHInstance(TelnetServer):
                                   username,password):
                 pass
             return True
-        except (asyncssh.misc.PermissionDenied,ConnectionRefusedError):
+        except (asyncssh.misc.PermissionDenied,ConnectionRefusedError,OSError):
             return False
 
 
