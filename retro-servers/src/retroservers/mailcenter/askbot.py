@@ -12,21 +12,25 @@ class MailUserRobotAI(MailUserRobot):
             res='assistant'
         return res
 
-    def _get_conversation(self,email_list):
+    async def _get_conversation(self,email_list):
         last_user_type=None
         res=[]
         for email in reversed(email_list):
-            uid,subject,body=email['from_uid'],email['subject'],email['body']
+            uid,subject,body,extra=email['from_uid'],email['subject'],email['body'],email.get('extra')
             if re.match(r'^(Re:|Fwd:)',subject,re.IGNORECASE):
                 subject=''
             else:
                 subject+='\n'
-            user_type=self._get_user_type(uid)
+            user_type=await self._get_user_type(uid)
             if last_user_type is None or user_type!=last_user_type:
                 last_user_type=user_type
-                res.append(f'{subject}{body}')
+                res.append({
+                    'role':user_type,
+                    'content':f'{subject}{body}',
+                    'extra':extra
+                })
             else:
-                res[-1]+='\n'+f'{subject}{body}'
+                res[-1]['content']+='\n'+f'{subject}{body}'
         return res
 
     async def _handler(self,email_id):
@@ -34,12 +38,15 @@ class MailUserRobotAI(MailUserRobot):
         email_detail=await self._MailCenter.mail_detail(uid,email_id)
         if not email_detail:
             return
-        conversation=self._get_conversation(email_detail)
-        body=await self._api_handler(conversation)
+        conversation=await self._get_conversation(email_detail)
+        body,extra=await self._api_handler(conversation)
+        if body is None:
+            self.logger.error(f'Empty response for email {email_id}')
+            return
         email=email_detail[0]
         subject='Re: '+re.sub(r'^(Re|Fwd):\s*','',email['subject'],1,re.IGNORECASE)
         await self._MailCenter.send(uid,[email['from_uid']],[],
-                                    subject,body,email_id)
+                                    subject,body,email_id,extra=extra)
         await self._MailCenter.mark_read(uid,email_id)
 
 
@@ -50,16 +57,15 @@ class MailUserRobotDeepseek(MailUserRobotAI):
             'Accept': 'application/json',
             'Authorization': 'Bearer '+self._config['deepseek_key']
         }
-        messages=[]
-        for i in range(len(content)):
-            if ((i % 1) == 0):
-                messages.append({'role':'user','content':content[i]})
-            else:
-                messages.append({'role':'assistant','content':content[i]})
+        messages=[{
+            'role':a['role'],
+            'content':a['content'],
+            'reasoning_content':a.get('extra'),
+        } for a in content]
         jsonData={
-            "model": "deepseek-chat",
+            "model": "deepseek-v4-pro",
+            "thinking": {"type": "enabled"},
             "stream": False,
-            "temperature": 0,
             "messages": messages,
         }
         async with aiohttp.ClientSession() as session:
@@ -67,8 +73,9 @@ class MailUserRobotDeepseek(MailUserRobotAI):
                     'https://api.deepseek.com/chat/completions',
                     headers=headers,json=jsonData) as response:
                 res=json.loads(await response.text())
-                return res['choices'][0]['message']['content']
-        return None
+                msg=res['choices'][0]['message']
+                return msg['content'],msg['reasoning_content']
+        return None,None
 
 
 class MailUserRobotErine(MailUserRobotAI):
@@ -93,12 +100,7 @@ class MailUserRobotErine(MailUserRobotAI):
         if access_token is None:
             return None
         url=f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token={access_token}"
-        messages=[]
-        for i in range(len(content)):
-            if ((i % 1) == 0):
-                messages.append({'role':'user','content':content[i]})
-            else:
-                messages.append({'role':'assistant','content':content[i]})
+        messages=[{'role':a['role'],'content':a['content']} for a in content]
         jsonData={
             'messages':messages,
             'temperature':0.01,
@@ -107,6 +109,6 @@ class MailUserRobotErine(MailUserRobotAI):
         async with aiohttp.ClientSession() as session:
             async with session.post(url,json=jsonData) as response:
                 res=json.loads(await response.text())
-                return res.get('result',None)
-        return None
+                return res.get('result',None),None
+        return None,None
 

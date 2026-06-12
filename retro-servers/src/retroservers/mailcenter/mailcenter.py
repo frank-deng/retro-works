@@ -80,7 +80,8 @@ CREATE TABLE IF NOT EXISTS email (
     sent_time INTEGER,
     subject TEXT,
     body TEXT,
-    status INTEGER NOT NULL
+    status INTEGER NOT NULL,
+    extra TEXT
 ) STRICT;
 
 CREATE TABLE IF NOT EXISTS recipient (
@@ -176,7 +177,7 @@ CREATE TABLE IF NOT EXISTS recipient (
         return res
 
     async def send(self,from_uid,to_list,cc_list,subject,body,
-                   prev_email_id=None):
+                   prev_email_id=None,*,extra=None):
         email_id=None
         async with self._pool.connection() as conn:
             try:
@@ -193,6 +194,7 @@ CREATE TABLE IF NOT EXISTS recipient (
                     'subject':subject,
                     'body':body,
                     'status':0,
+                    'extra':extra
                 })).lastrowid
                 if len(email_list):
                     await conn.executemany(
@@ -288,6 +290,7 @@ CREATE TABLE IF NOT EXISTS recipient (
                 'subject':email['subject'],
                 'body':email['body'],
                 'sent_time':email['sent_time'],
+                'extra':email['extra'],
             } for email in await cursor.fetchall()]
             to,cc=await self._get_recipient(conn,
                 [item['id'] for item in email_list])
