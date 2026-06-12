@@ -66,20 +66,21 @@ password="sha256_hash"
 [[mail.users]]
 uid=1
 username="deepseek"
-module="retroservers.mailcenter:MailUserRobotAI"
 url="https://api.deepseek.com/chat/completions"
 api_key="xxx"
 model="deepseek-v4-pro"
 thinking={type="enabled"}
+system_message="请不要使用任何emoji表情符号"
 
 [[mail.users]]
 uid=2
 username="erine"
-module="retroservers.mailcenter:MailUserRobotAI"
 url="https://qianfan.baidubce.com/v2/chat/completions"
 api_key="xxx"
 model="ernie-5.0"
 thinking={type="enabled"}
+web_search={enabled=true}
+system_message="请不要使用任何emoji表情符号"
 
 [[TelnetServerSSH.servers]]
 host="127.0.0.1"

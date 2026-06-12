@@ -8,6 +8,7 @@ import time
 import aiosqlite
 from aiosqlitepool import SQLiteConnectionPool
 from retroservers.util import Logger,load_module
+from .aibot import MailUserRobotAI
 
 
 async def sql_insert_single(conn,table,data:dict):
@@ -26,44 +27,6 @@ async def sql_insert_multi(conn,table,data:list):
     values=[tuple(item[col] for col in columns) for item in data]
     sql=f'INSERT INTO {table} ({cols_sql}) VALUES ({placeholders})'
     return await conn.executemany(sql,values)
-
-
-class MailUserRobot(Logger):
-    def __init__(self,mailCenter,config):
-        self._config=config
-        self._task=None
-        self._queue=asyncio.Queue()
-        self._MailCenter=mailCenter
-        self._uid=config['uid']
-
-    async def __aenter__(self):
-        self._task=asyncio.create_task(self._task_main())
-
-    async def __aexit__(self,exc_type,exc_val,exc_tb):
-        if self._task is not None:
-            self._task.cancel()
-            await self._task
-
-    async def _task_main(self):
-        while True:
-            try:
-                email_id=await self._queue.get()
-            except asyncio.CancelledError:
-                break
-            try:
-                await self._handler(email_id)
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                self.logger.error(e,exc_info=True)
-            finally:
-                self._queue.task_done()
-
-    async def append(self,data):
-        await self._queue.put(data)
-
-    async def _handler(self,email_id):
-        pass
 
 
 class MailCenterInstance(Logger):
@@ -128,6 +91,8 @@ CREATE TABLE IF NOT EXISTS recipient (
                 self._user_login[item['username']]=item
             elif 'module' in item:
                 self._robot[uid]=load_module(item['module'])(self,item)
+            else:
+                self._robot[uid]=MailUserRobotAI(self,item)
 
     async def _create_conn(self)->aiosqlite.Connection:
         config_db=self._config['mail']['db']

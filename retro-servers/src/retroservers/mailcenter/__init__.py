@@ -1,2 +1,0 @@
-from .askbot import MailUserRobotAI
-
