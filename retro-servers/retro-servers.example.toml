@@ -66,15 +66,20 @@ password="sha256_hash"
 [[mail.users]]
 uid=1
 username="deepseek"
-module="retroservers.mailcenter:MailUserRobotDeepseek"
-deepseek_key="xxx"
+module="retroservers.mailcenter:MailUserRobotAI"
+url="https://api.deepseek.com/chat/completions"
+api_key="xxx"
+model="deepseek-v4-pro"
+thinking={type="enabled"}
 
 [[mail.users]]
 uid=2
 username="erine"
-module="retroservers.mailcenter:MailUserRobotErine"
-client_id="xxx"
-client_secret="xxx"
+module="retroservers.mailcenter:MailUserRobotAI"
+url="https://qianfan.baidubce.com/v2/chat/completions"
+api_key="xxx"
+model="ernie-5.0"
+thinking={type="enabled"}
 
 [[TelnetServerSSH.servers]]
 host="127.0.0.1"

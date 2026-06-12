@@ -6,6 +6,23 @@ from .mailcenter import MailUserRobot
 
 
 class MailUserRobotAI(MailUserRobot):
+    def __init__(self,mailCenter,config):
+        super().__init__(mailCenter,config)
+        self._headers={
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer '+self._config['api_key']
+        }
+        if 'model' not in self._config:
+            raise ValueError('Model required')
+        self._jsonBase={
+            "stream":False,
+            **self._config
+        }
+        self._url=self._config['url']
+        for key in ('uid','username','module','url','api_key'):
+            self._jsonBase.pop(key,None)
+
     async def _get_user_type(self,uid):
         res='user'
         if self._MailCenter.is_robot(uid):
@@ -27,7 +44,7 @@ class MailUserRobotAI(MailUserRobot):
                 res.append({
                     'role':user_type,
                     'content':f'{subject}{body}',
-                    'extra':extra
+                    'reasoning_content':extra
                 })
             else:
                 res[-1]['content']+='\n'+f'{subject}{body}'
@@ -38,77 +55,21 @@ class MailUserRobotAI(MailUserRobot):
         email_detail=await self._MailCenter.mail_detail(uid,email_id)
         if not email_detail:
             return
-        conversation=await self._get_conversation(email_detail)
-        body,extra=await self._api_handler(conversation)
-        if body is None:
-            self.logger.error(f'Empty response for email {email_id}')
-            return
+        messages=await self._get_conversation(email_detail)
+        jsonData={
+            **self._jsonBase,
+            "messages": messages,
+        }
+        msg=None
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self._url,headers=self._headers,
+                                    json=jsonData) as response:
+                res=json.loads(await response.text())
+                msg=res['choices'][0]['message']
+        body,extra=msg['content'],msg['reasoning_content']
         email=email_detail[0]
         subject='Re: '+re.sub(r'^(Re|Fwd):\s*','',email['subject'],1,re.IGNORECASE)
         await self._MailCenter.send(uid,[email['from_uid']],[],
                                     subject,body,email_id,extra=extra)
         await self._MailCenter.mark_read(uid,email_id)
-
-
-class MailUserRobotDeepseek(MailUserRobotAI):
-    async def _api_handler(self,content):
-        headers={
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer '+self._config['deepseek_key']
-        }
-        messages=[{
-            'role':a['role'],
-            'content':a['content'],
-            'reasoning_content':a.get('extra'),
-        } for a in content]
-        jsonData={
-            "model": "deepseek-v4-pro",
-            "thinking": {"type": "enabled"},
-            "stream": False,
-            "messages": messages,
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                    'https://api.deepseek.com/chat/completions',
-                    headers=headers,json=jsonData) as response:
-                res=json.loads(await response.text())
-                msg=res['choices'][0]['message']
-                return msg['content'],msg['reasoning_content']
-        return None,None
-
-
-class MailUserRobotErine(MailUserRobotAI):
-    @staticmethod
-    async def __getAccessToken(client_id,client_secret):
-        url='https://aip.baidubce.com/oauth/2.0/token'
-        data={
-            'grant_type':'client_credentials',
-            'client_id':client_id,
-            'client_secret':client_secret
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url,data=data) as response:
-                res=json.loads(await response.text())
-                if res is not None and 'access_token' in res:
-                    return res['access_token']
-        return None
-    
-    async def _api_handler(self,content):
-        access_token=await self.__class__.__getAccessToken(
-            self._config['client_id'],self._config['client_secret'])
-        if access_token is None:
-            return None
-        url=f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token={access_token}"
-        messages=[{'role':a['role'],'content':a['content']} for a in content]
-        jsonData={
-            'messages':messages,
-            'temperature':0.01,
-            'top_p':0,
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url,json=jsonData) as response:
-                res=json.loads(await response.text())
-                return res.get('result',None),None
-        return None,None
 
