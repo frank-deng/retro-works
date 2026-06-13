@@ -20,6 +20,9 @@ class SMTPHandler(Logger):
         uid,_=await self._mailCenter.get_uid_from_addr(address)
         if uid is None:
             return '510 Invalid email address'
+        if hasattr(envelope,'rcpt_uid') and uid in getattr(envelope,'rcpt_uid'):
+            return '550 5.1.1 Sender cannot be the same as recipient'
+        envelope.from_uid=uid
         envelope.mail_from=address
         return '250 OK'
 
@@ -27,38 +30,40 @@ class SMTPHandler(Logger):
         uid,_=await self._mailCenter.get_uid_from_addr(address)
         if uid is None:
             return '510 Invalid email address'
+        if uid==getattr(envelope,'from_uid',None):
+            return '550 5.1.1 Recipient cannot be the same as sender'
+        if not hasattr(envelope,'rcpt_uid'):
+            envelope.rcpt_uid={}
+        envelope.rcpt_uid[uid]=True
         envelope.rcpt_tos.append(address)
         return '250 OK'
 
     async def handle_DATA(self,server,session,envelope):
-        mail_from,_=await self._mailCenter.get_uid_from_addr(envelope.mail_from)
         msg=email.message_from_bytes(envelope.original_content)
         reply_to,prev_email_id=msg['Reply-To'],None
         if reply_to is not None:
             _,prev_email_id=await self._mailCenter.get_uid_from_addr(reply_to)
-        subject,content=self._msg_get_data(msg)
-        to_dict,cc_dict={},{}
+        from_uid=getattr(envelope,'from_uid',None)
+        rcpt_uid=getattr(envelope,'rcpt_uid',{})
+        if from_uid is None:
+            return '550 5.1.0 Address rejected'
+        to,cc={},{}
         for name,addr in getaddresses([self._parse_header(msg['To'])]):
             uid,_=await self._mailCenter.get_uid_from_addr(addr)
-            if uid is None:
+            if uid is None or uid not in rcpt_uid:
                 continue
-            to_dict[uid]=True
+            to[uid]=True
         for name,addr in getaddresses([self._parse_header(msg['Cc'])]):
             uid,_=await self._mailCenter.get_uid_from_addr(addr)
-            if uid is None:
+            if uid is None or uid not in rcpt_uid or uid in to:
                 continue
-            cc_dict[uid]=True
-        to,cc=[],[]
-        for addr in envelope.rcpt_tos:
-            uid,_=await self._mailCenter.get_uid_from_addr(addr)
-            if uid in to_dict:
-                to.append(uid)
-            elif uid in cc_dict:
-                cc.append(uid)
-            else:
-                to.append(uid)
+            cc[uid]=True
+        to,cc=to.keys(),cc.keys()
+        if not to and not cc:
+            return '550 5.1.0 Address rejected'
+        subject,content=self._msg_get_data(msg)
         content=(__class__._parse_content(content))[-1]
-        await self._mailCenter.send(mail_from,to,cc,subject,content,prev_email_id)
+        await self._mailCenter.send(from_uid,to,cc,subject,content,prev_email_id)
         return '250 OK'
 
     @staticmethod
