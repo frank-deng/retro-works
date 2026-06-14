@@ -19,7 +19,7 @@ class SMTPHandler(Logger):
     async def handle_MAIL(self,server,session,envelope,address,mail_options):
         uid,_=await self._mailCenter.get_uid_from_addr(address)
         if uid is None:
-            return '510 Invalid email address'
+            return '550 5.1.1 User unknown'
         if hasattr(envelope,'rcpt_uid') and uid in getattr(envelope,'rcpt_uid'):
             return '550 5.1.1 Sender cannot be the same as recipient'
         envelope.from_uid=uid
@@ -29,7 +29,7 @@ class SMTPHandler(Logger):
     async def handle_RCPT(self,server,session,envelope,address,rcpt_options):
         uid,_=await self._mailCenter.get_uid_from_addr(address)
         if uid is None:
-            return '510 Invalid email address'
+            return '550 5.1.1 User unknown'
         if uid==getattr(envelope,'from_uid',None):
             return '550 5.1.1 Recipient cannot be the same as sender'
         if not hasattr(envelope,'rcpt_uid'):
