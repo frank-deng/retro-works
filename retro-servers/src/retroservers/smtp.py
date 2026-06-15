@@ -46,7 +46,7 @@ class SMTPHandler(Logger):
         from_uid=getattr(envelope,'from_uid',None)
         rcpt_uid=getattr(envelope,'rcpt_uid',{})
         if from_uid is None:
-            return '550 5.1.0 Address rejected'
+            return '550 5.1.0 Sender address required.'
         to,cc={},{}
         for name,addr in getaddresses([self._parse_header(msg['To'])]):
             uid,_=await self._mailCenter.get_uid_from_addr(addr)
@@ -60,9 +60,11 @@ class SMTPHandler(Logger):
             cc[uid]=True
         to,cc=to.keys(),cc.keys()
         if not to and not cc:
-            return '550 5.1.0 Address rejected'
+            return '550 5.1.0 Empty recipient.'
         subject,content=self._msg_get_data(msg)
         content=(__class__._parse_content(content))[-1]
+        if not subject:
+            return '550 5.5.2 Subject is required.'
         await self._mailCenter.send(from_uid,to,cc,subject,content,prev_email_id)
         return '250 OK'
 
