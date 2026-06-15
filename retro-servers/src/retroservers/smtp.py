@@ -32,7 +32,7 @@ class SMTPHandler(Logger):
             return '550 5.1.1 User unknown'
         if uid==getattr(envelope,'from_uid',None):
             return '550 5.1.1 Recipient cannot be the same as sender'
-        if not hasattr(envelope,'rcpt_uid'):
+        if getattr(envelope,'rcpt_uid',None) is None:
             envelope.rcpt_uid={}
         envelope.rcpt_uid[uid]=True
         envelope.rcpt_tos.append(address)

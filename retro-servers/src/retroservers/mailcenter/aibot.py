@@ -109,7 +109,11 @@ class MailUserRobotAI(MailUserRobot):
             async with session.post(self._url,headers=self._headers,
                                     json=jsonData) as response:
                 res=json.loads(await response.text())
-                msg=res['choices'][0]['message']
+                try:
+                    msg=res['choices'][0]['message']
+                except Exception as e:
+                    self.logger.error(res)
+                    raise
         body,extra=msg['content'],msg['reasoning_content']
         email=email_detail[0]
         subject='Re: '+re.sub(r'^(Re|Fwd):\s*','',email['subject'],1,re.IGNORECASE)
