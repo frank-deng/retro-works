@@ -53,11 +53,14 @@ class SMTPHandler(Logger):
             if uid is None or uid not in rcpt_uid:
                 continue
             to[uid]=True
+            rcpt_uid.pop(uid,None)
         for name,addr in getaddresses([self._parse_header(msg['Cc'])]):
             uid,_=await self._mailCenter.get_uid_from_addr(addr)
             if uid is None or uid not in rcpt_uid or uid in to:
                 continue
             cc[uid]=True
+            rcpt_uid.pop(uid,None)
+        to.update(rcpt_uid)
         to,cc=to.keys(),cc.keys()
         if not to and not cc:
             return '550 5.1.0 Empty recipient.'
