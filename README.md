@@ -51,6 +51,7 @@ Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装
 * 记录器及其帮助
 * 录音机及其帮助
 * 造字程序及其帮助
+* 终端仿真程序及其帮助
 
 Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
 
@@ -125,6 +126,17 @@ Trumpet Winsock中进行以下设置：
 
 之后通过 `10.0.2.2`+端口号 即可访问DOSBox-X模拟器所在主机上的服务（主机上的服务可绑定`127.0.0.1`以限制仅本机可访问）。
 
+### DNS配置
+
+Linux主机端DNSmasq可使用以下配置：
+
+	bind-interfaces
+	no-resolv
+	no-hosts
+	server=8.8.8.8
+	listen-address=10.0.2.15
+	address=/mysite.com/10.0.2.2
+	address=/www.mysite.com/10.0.2.2
 
 ### 补充说明
 
@@ -132,7 +144,7 @@ Trumpet Winsock中进行以下设置：
 * QBASIC调用汇编代码的场景，TASM格式的汇编代码可以用DOS自带的`debug`工具的`a`命令输入，此时涉及跳转地址的地方需要手工计算相关地址。
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
-* UCDOS配合西文软件（比如QBasic、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
+* UCDOS配合西文软件（比如QBasic、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。

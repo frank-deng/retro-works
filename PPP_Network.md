@@ -52,23 +52,12 @@ TinyCore Linux配置
 	# 保存转发规则
 	iptables-save > /opt/iptables-rules
 
-新建或覆盖`/etc/dnsmasq.conf`，内容如下：
-
-	bind-interfaces
-	no-resolv
-	no-hosts
-	server=8.8.8.8
-	listen-address=10.0.2.15
-	address=/mysite.com/10.0.2.2
-	address=/www.mysite.com/10.0.2.2
-
 将以下命令添加到`/opt/bootlocal.sh`中：
 
 	while true; do /sbin/getty 115200 ttyS0; done &
 	sysctl -w net.ipv4.ip_forward=1
 	iptables-restore < /opt/iptables-rules
 	while ! ifconfig -a|grep -q "inet addr:10.0.2.15"; do sleep 1; done;
-	dnsmasq
 	socat TCP-LISTEN:2345,reuseaddr,nodelay,fork system:'/usr/local/sbin/pppd "$SOCAT_PTY"',pty,stderr,setsid &
 
 执行`sudo filetool.sh -b`命令保存修改。
