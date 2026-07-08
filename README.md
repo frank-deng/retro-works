@@ -163,6 +163,7 @@ Linux主机端DNSmasq可使用以下配置：
 * Floppy Drive A: 5.25" 360k Double Side
 * Floppy Drive B: 5.25" 360k Double Side
 * Display: CGA with green monochrome monitor
+* ISA RTC
 
 ### 主要用途
 
@@ -180,6 +181,7 @@ Linux主机端DNSmasq可使用以下配置：
 系统盘中推荐放入以下文件：
 
 	ATTRIB.EXE
+	AUTOEXEC.BAT
 	CHKDSK.COM
 	DEBUG.COM
 	DISKCOMP.COM
@@ -196,28 +198,48 @@ Linux主机端DNSmasq可使用以下配置：
 	TREE.COM
 	XCOPY.EXE
 
+`AUTOEXEC.BAT`内容如下：
+
+	@ECHO OFF
+	PATH A:
+	ECHO.
+
+
 #### CCDOS软盘
 
 存放CCDOS汉字系统的基本程序和字库文件。
 
-依次输入`CHLIB`、`VDKEY`命令启动CCDOS汉字系统。
+放入以下文件：
 
-#### WPS软盘
+	CCDOS.BAT  （加载汉字系统的批处理文件）
+	CCLIBJ.DOT （CCDOS 16点阵字库）
+	CHLIB.COM  （CCDOS核心程序）
+	HELP.TXT   （CCDOS常用按键帮助）
+	QUIT.COM   （退出CCDOS）
+	VDKEY.COM  （CCDOS核心程序）
+	WBX.COM    （CCDOS五笔字形输入法）
 
-存放WPS、拼音输入法、五笔字形输入法、CCDOS退出程序。
+`CCDOS.BAT`内容如下：
 
-输入`PY`、`WBX`命令加载拼音/五笔字形输入法。
+	@ECHO OFF
+	CHLIB
+	VDKEY
+	WBX
 
-输入`QUIT`命令退出CCDOS。
 
-#### 数据盘
+#### 数据盘（常驻B驱动器）
 
-存放所有BASIC程序文件及其依赖数据、WPS文档，以及俄罗斯方块游戏`TETRIS.COM`。
+除存放所有BASIC程序文件及其依赖数据、WPS文档外，推荐放入以下文件：
 
-常驻B驱动器。
+	PY.COM     （CCDOS拼音、双拼输入法）
+	TETRIS.COM （俄罗斯方块游戏）
+	WPS.EXE    （WPS主程序）
+	WPS1.OVL   （WPS依赖文件）
+	WPS2.OVL   （WPS依赖文件）
+
 
 ### 补充说明
 
-* GW-BASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量，开发前需仔细评估程序复杂度以决定是否移植到GW-BASIC上，开发时需严格控制`GOTO`的使用以保证一定程度的可维护性。
-* WPS打开的文件如果包含GB2312不支持的字符，大概率出现死机。
+* GW-BASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量。因此开发前需仔细评估程序复杂度以决定是否移植到GW-BASIC上，开发时需严格控制`GOTO`的使用以保证一定程度的可维护性。
+* WPS打开的文件包含GB2312不支持的字符时，极易出现死机。
 
