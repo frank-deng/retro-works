@@ -4,7 +4,9 @@ Retro Programming Works 怀旧编程作品
 1998s PC
 --------
 
-中国90年代后期典型家用多媒体电脑。后期添加网卡高速通天下，远程工作使用。
+中国90年代后期典型家用多媒体电脑，后期添加网卡高速通天下。
+
+一台想紧跟时代的古董电脑。
 
 ### 配置
 
@@ -148,7 +150,12 @@ Linux主机端DNSmasq可使用以下配置：
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
+* `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Tera Term等软件对接。
 * Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
+
+### AI时代的新用法
+
+通过FoxMail的SMTP/POP3协议收发纯文本邮件，或使用`retro-servers`目录中提供的兼容Internet Explorer 3.0的纯HTML网页版邮件系统，可直接向现代大模型API问问题，并将大模型的回答以回复邮件的形式返回，可用于解答现实生活中的问题。
 
 
 1990s PC
