@@ -45,8 +45,8 @@ Retro Programming Works 怀旧编程作品
 DOS下推荐安装以下软件：
 
 * UCDOS 98b+宋体简、仿宋简、黑体简、楷体简轮廓字库
-* SEA（看图软件，支持高彩色、真彩色，可灵活切换分辨率和色深）
 * CCED（简单数值计算）
+* SEA（看图软件，支持高彩色、真彩色，可灵活切换分辨率和色深）
 
 Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
 
@@ -62,22 +62,31 @@ Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放�
 
 Windows 3.2推荐安装以下软件：
 
-* ACDSee 2.2 16位版本
-* WinZip
 * 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
 * Tetris For Windows
-* Microsoft Scenes中的所有JPG图片
 * Microsoft Musical Instruments（多媒体光盘）
 * 震撼——古典音乐鉴赏（多媒体光盘）
+* ACDSee 2.2 16位版本
+* Microsoft Scenes中的所有JPG图片
+* LView Pro 1.B（可用于转换图片格式）
+* WinZip（2037年之后不可用）
 * Microsoft Office 4.2（需要精选要安装的组件，详细见“Microsoft Office 4.2安装说明”）
 
 Windows 3.2连网场景推荐安装以下软件：
 
 * Trumpet Winsock
 * Internet Explorer 3.0（仅安装浏览器）
-* FoxMail（邮件客户端）
 * Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
 * WS FTP16LE（FTP客户端）
+* FoxMail（邮件客户端）
+
+#### 五笔字形输入法安装说明
+
+五笔字形输入法除了安装相关五笔输入法软件外，还可通过Windows 3.2自带的码表生成器实现。
+
+**安装**：打开码表生成器，加载并编译五笔码表文件（`misc/WB.TXT`），然后在控制面板中的输入法设置中安装“通用码表输入法”即可。
+
+**注意**：码表总条目数不能超过**16384**个，超过部分无法打出。默认五笔码表文件`misc/WB.TXT`仅提供单字支持，常用词语需自行添加。
 
 #### Microsoft Office 4.2安装说明
 
@@ -89,14 +98,6 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 * “转换程序、过滤程序和数据存取”中，安装所有文字转换程序和图形过滤程序，“数据存取”不安装
 * 工具中只安装“MS Info”
 * 可选装长城全真中文字体
-
-#### 五笔字形输入法安装说明
-
-五笔字形输入法除了安装相关五笔输入法软件外，还可通过Windows 3.2自带的码表生成器实现。
-
-**安装**：打开码表生成器，加载并编译五笔码表文件（`misc/WB.TXT`），然后在控制面板中的输入法设置中安装“通用码表输入法”即可。
-
-**注意**：码表总条目数不能超过**16384**个，超过部分无法打出。默认五笔码表文件`misc/WB.TXT`仅提供单字支持，常用词语需自行添加。
 
 ### NE2000配置
 
