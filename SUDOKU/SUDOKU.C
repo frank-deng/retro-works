@@ -34,9 +34,8 @@ typedef struct {
     u8 x;
     u8 y;
     u8 grp;
-    u8 last_num;
     u16 map;
-} stack_item_t;
+} table_item_t;
 
 static u8 group[9][9] = {
     {0,0,0,1,1,1,2,2,2},
@@ -62,8 +61,8 @@ static u8 board[9][9] = {
 };
 
 static u16 mapx[9],mapy[9],mapgrp[9];
-static stack_item_t stack[81];
-static u8 stack_len=0;
+static table_item_t table[81];
+static u8 table_len=0;
 
 static u8 trailing_zeros(u16 n)
 {
@@ -91,13 +90,20 @@ static u8 next_num(u16 map, u8 n)
     if(0==map){
         return 0;
     }
-    while(n<9){
-        n++;
-        if(map&(1<<n)){
-            return n;
-        }
+    map &= ~((((u16)1)<<(n+1))-1);
+    if(0==map){
+        return 0;
     }
-    return 0;
+    return trailing_zeros(map);
+}
+static u8 elem_cnt(u16 n)
+{
+    u8 res=0;
+    while(n){
+        n&=(n-1);
+        res++;
+    }
+    return res;
 }
 void printboard(int jigsaw){
     u8 x, y;
@@ -177,7 +183,6 @@ int read_sudoku(char *filename){
     u8 x=0, y=0, grp, n;
     u16 nmap, linenum=1;
     char buf[80],*p;
-    stack_item_t *sp=stack;
     int ret=E_OK;
     FILE *fp = fopen(filename, "r");
     if (NULL==fp){
@@ -201,14 +206,12 @@ int read_sudoku(char *filename){
 	    }
 	    grp=group[y][x];
 	    if(*p=='0' || *p=='.'){
-                sp->x = x;
-                sp->y = y;
-                sp->grp = grp;
-                sp++;
-                stack_len++;
+                table[table_len].x = x;
+                table[table_len].y = y;
+                table[table_len].grp = grp;
+                table_len++;
 	    }else{
 		n=*p-'0';
-		board[y][x]=n;
 		nmap=1;
 		nmap<<=n;
                 if((mapx[x] & nmap)||(mapy[y] & nmap)||(mapgrp[grp] & nmap)){
@@ -219,6 +222,7 @@ int read_sudoku(char *filename){
                 mapx[x] |= nmap;
                 mapy[y] |= nmap;
                 mapgrp[grp] |= nmap;
+		board[y][x]=n;
 	    }
 	    x++;
 	}
@@ -246,26 +250,25 @@ finally_exit:
     return ret;
 }
 int calc_sudoku_step1(){
-    u8 x, y, grp, n, i;
+    u8 x, y, grp, n, i, j;
     u16 nmap;
     int running=1;
-    stack_item_t *sp=stack, *sp0=stack;
     while(running){
         running=0;
-        sp=sp0=stack;
-        for (i = 0; i < stack_len; i++, sp++) {
-            x = sp->x;
-            y = sp->y;
-            grp = sp->grp;
+	j=0;
+        for (i = 0; i < table_len; i++) {
+            x = table[i].x;
+            y = table[i].y;
+            grp = table[i].grp;
             nmap = (~(mapx[x] | mapy[y] | mapgrp[grp])) & 0x3fe;
             if(0==nmap){
                 fprintf(stderr, NO_ANSWER_POS, x+1, y+1);
                 return E_INVAL;
             }else if(0 != (nmap&(nmap-1))){
-                sp0->x = x;
-                sp0->y = y;
-                sp0->grp = grp;
-                sp0++;
+		table[j].x = x;
+		table[j].y = y;
+		table[j].grp = grp;
+		j++;
             }else{
                 board[y][x] = trailing_zeros(nmap);
                 mapx[x] |= nmap;
@@ -274,83 +277,83 @@ int calc_sudoku_step1(){
                 running=1;
             }
         }
-        stack_len = sp0-stack;
+    	table_len=j;
     }
-    return ((stack_len==0) ? E_OK : E_AGAIN);
+    return ((table_len==0) ? E_OK : E_AGAIN);
 }
-void display_msg(int finish)
+static u8 get_min_cell()
 {
-    static time_t ts=0;
-    static u16 counter=0;
-    static int showmsg=0;
-    time_t tnow;
-    static char ch[]={'-','\\','|','/'};
-    if(ts==0){
-        ts=time(NULL);
+    u8 i,x,y,n,res=0,cnt=100;
+    u16 map;
+    for(i=0;i<table_len;i++){
+        x = table[i].x;
+        y = table[i].y;
+	n=board[y][x];
+	if(n!=0){
+	    continue;
+	}
+	map=table[i].map & ~(mapx[x]|mapy[y]|mapgrp[table[i].grp]);
+	if(!map){
+	    return 0xff;
+	}
+	n=elem_cnt(map);
+	if(n<cnt){
+	    cnt=n;
+	    res=i;
+	}
     }
-    if(showmsg && finish){
-	fprintf(stderr,END_CALC);
-	return;
-    }
-    if(counter<CYCLES_BEFORE_MSG){
-	counter++;
-	return;
-    }
-    counter=0;
-    tnow=time(NULL);
-    if(showmsg && tnow!=ts){
-	ts=tnow;
-	fprintf(stderr,CALC_PROC,ch[tnow&3]);
-    }else if(!showmsg && (tnow-ts)>=MSG_TIMEOUT){
-	ts=tnow;
-	showmsg=1;
-    }
+    return res;
 }
 int calc_sudoku_step2(){
-    u8 x, y, grp, n, i;
+    u8 i,x,y,grp,n;
     u16 map;
-    stack_item_t *sp=stack, *stack_tail=stack+stack_len;
-    for (i = 0; i < stack_len; i++, sp++) {
-        x = sp->x;
-        y = sp->y;
-        grp = sp->grp;
-        sp->last_num = 0;
-        sp->map = (~(mapx[x] | mapy[y] | mapgrp[grp])) & 0x3fe;
+    u8 stack[81];
+    u8 *stack_bottom=stack+table_len;
+    u8 *sp=stack_bottom;
+    for(i=0;i<table_len;i++){
+	x=table[i].x;
+        y=table[i].y;
+	grp=table[i].grp;
+	table[i].map=(~(mapx[x]|mapy[y]|mapgrp[grp]))&0x3fe;
     }
     memset(mapx, 0, sizeof(mapx));
     memset(mapy, 0, sizeof(mapy));
     memset(mapgrp, 0, sizeof(mapgrp));
-    
-    sp=stack;
-    while(sp<stack_tail){
-        x = sp->x;
-        y = sp->y;
-        grp = sp->grp;
-        n = sp->last_num;
-        if(n>0){
-            map = (~(1<<n));
-            mapx[x]&=map;
-            mapy[y]&=map;
-            mapgrp[grp]&=map;
-        }
-        map = sp->map & (~(mapx[x] | mapy[y] | mapgrp[grp])) & 0x3fe;
-        n = next_num(map, n);
-        sp->last_num = board[y][x] = n;
-        if(0==n){
-            if(sp==stack){
-                return E_INVAL;
-            }
-            sp--;
-        }else{
-            map = (1<<n);
-            mapx[x]|=map;
-            mapy[y]|=map;
-            mapgrp[grp]|=map;
-            sp++;
-        }
-	display_msg(0);
+    while(sp>stack){
+	i=get_min_cell();
+	if(i!=0xff){
+	    sp--;
+	    *sp=i;
+	}
+	n=0;
+	while(!n && sp<stack_bottom){
+	    i=*sp;
+	    x=table[i].x;
+            y=table[i].y;
+	    grp=table[i].grp;
+	    n=board[y][x];
+	    if(n){
+		map=~(((u16)1)<<n);
+		mapx[x]&=map;
+		mapy[y]&=map;
+		mapgrp[grp]&=map;
+	    }
+	    map=table[i].map & (~(mapx[x]|mapy[y]|mapgrp[grp]));
+	    n=next_num(map,n);
+            board[y][x]=n;
+	    if(!n){
+		sp++;
+	    }else{
+		map=(((u16)1)<<n);
+		mapx[x]|=map;
+		mapy[y]|=map;
+		mapgrp[grp]|=map;
+	    }
+	}
+	if(sp>=stack_bottom){
+            return E_FAIL;
+	}
     }
-    display_msg(1);
     return E_OK;
 }
 void print_help(const char *app_name)
