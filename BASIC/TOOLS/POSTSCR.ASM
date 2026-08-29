@@ -8,57 +8,57 @@ code segment
 org 100h
 start:
 push es
-mov dx,0xb800
-mov es,dx
-mov cx,4000
-mov bx,0
-mov dx,0x0700
-cls_loop:
-mov es:[bx],dx
-add bx,2
-loop cls_loop
+mov ax,0b800h
+mov es,ax
+xor di,di
+mov ax,0700h
+mov cx,2000
+cld
+rep stosw
 pop es
-
+xor si,si
 print_mem:
 mov ah,2
-mov dx,0
-mov bh,0
-int 0x10
-
-mov ax,word ptr [memtracked]
-mov bx,10
-mov cx,4
-getnum:
 xor dx,dx
+xor bh,bh
+int 10h
+mov al,'0'
+mov ah,0eh
+int 10h
+mov bx,100
+mov ax,si
 div bx
-add dl,'0'
-push dx
-loop getnum
-mov cx,4
-printnum:
-pop ax
-mov ah,0x0e
-int 0x10
-loop printnum
-mov ax,0x1301
+add al,'0'
+mov ah,0eh
+int 10h
+mov ax,dx
+aam
+mov bx,ax
+add bh,'0'
+add bl,'0'
+mov ah,0eh
+mov al,bh
+int 10h
+mov ah,0eh
+mov al,bl
+int 10h
+mov ax,01301h
 mov bx,7
 mov cx,offset memstrend-offset memstr
 mov dx,4
 mov bp,offset memstr
-int 0x10
-mov ax,1
+int 10h
+mov bx,1
 call sleep
-cmp word ptr [memtracked],640
+cmp si,640
 jge mem_finish
-add word ptr [memtracked],16
+add si,16
 jmp print_mem
-
 mem_finish:
-mov ax,8
+mov bx,8
 call sleep
-
-in al,0x61
-or al,0x3
+in al,061h
+or al,03h
 out 0x61,al
 mov al,0xb6
 out 0x43,al
@@ -66,44 +66,46 @@ mov al,0xf0
 out 0x42,al
 mov al,0x05
 out 0x42,al
-
-mov ax,2
+mov bx,2
 call sleep
-
 in al,0x61
-and al,0xFC
-out 0x61,al
-
+and al,0FCh
+out 061h,al
 mov ah,2
-mov dx,0x0200
-mov bh,0
-int 0x10
-
-mov ax,20
+mov dx,0100h
+xor bh,bh
+int 10h
+mov bx,20
 call sleep
-ret
-
+mov ah,2
+mov dx,0200h
+xor bh,bh
+int 10h
+mov ax, 4C00h
+int 21h
 sleep:
-mov word ptr[timer],ax
-mov ax,0
+push ax
+push cx
+push dx
+push si
+xor ax,ax
 int 1ah
-mov bx,dx
+mov si,dx
 waitloop:
 hlt
-mov ax,0
 int 1ah
-cmp dx,bx
+cmp dx,si
 je waitloop
-mov bx,dx
-dec word ptr[timer]
+mov si,dx
+dec bx
 jnz waitloop
+pop si
+pop dx
+pop cx
+pop ax
 ret
-
-memtracked dw 0
-timer dw 0
 memstr db "K OK"
 memstrend:
-
 code ends
 end start
 
