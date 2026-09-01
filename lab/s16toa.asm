@@ -47,13 +47,13 @@ s16toa proc
 
 positive:
     cmp  ax, 10
-    jl   emit_units            ; 0..9
+    jb   emit_units            ; 0..9
     cmp  ax, 100
-    jl   emit_tens             ; 10..99
+    jb   emit_tens             ; 10..99
     cmp  ax, 1000
-    jl   emit_hundreds         ; 100..999
+    jb   emit_hundreds         ; 100..999
     cmp  ax, 10000
-    jl   emit_thousands        ; 1000..9999
+    jb   emit_thousands        ; 1000..9999
 
     ; 10000..32767: ten-thousands digit
     xor  dx, dx                ; AX is non-negative here, so clear DX
