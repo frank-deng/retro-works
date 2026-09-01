@@ -1,4 +1,1 @@
-NAME 1.com
-FILE 1.obj
-FILE s16toa.obj
-SYSTEM DOS COM
+1.obj s16toa.obj, 1.com
