@@ -1,7 +1,7 @@
 .8086
 .model tiny
 include common.inc
-extrn s16toa:cPType
+extrn itoa:cPType
 .code
 org 100h
 start:
@@ -15,21 +15,21 @@ mov es,ax
 mov ds,ax
 mov ax,23456
 lea di,[bp-666]
-call s16toa
+call itoa
 mov ah,40h
 mov bx,1
 lea dx,[bp-666]
 int 21h
 mov ax,-1
 lea di,[bp-666]
-call s16toa
+call itoa
 mov ah,40h
 mov bx,1
 lea dx,[bp-666]
 int 21h
 mov ax,-32768
 lea di,[bp-666]
-call s16toa
+call itoa
 mov ah,40h
 mov bx,1
 lea dx,[bp-666]

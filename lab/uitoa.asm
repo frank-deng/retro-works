@@ -1,4 +1,4 @@
-; s16toa.asm -- segment-agnostic 16-bit signed integer to ASCII
+; uitoa.asm -- segment-agnostic 16-bit signed integer to ASCII
 ;
 ; Converts the 16-bit signed integer in AX to a decimal ASCII string
 ; into the buffer pointed to by ES:DI. The routine is model-independent:
@@ -20,7 +20,7 @@
 ; Preserves: SI, DI, and all other registers
 ;
 ; Assemble with any model, e.g.:
-;   tasm s16toa.asm        (uses the .model below, or override with
+;   tasm uitoa.asm        (uses the .model below, or override with
 ;                           -mt / -ms / -mm / -mc / -ml / -mh)
 
     .8086
@@ -29,9 +29,9 @@
 
     .code
 
-    public u16toa
+    public uitoa
 
-u16toa proc cPType
+uitoa proc cPType
     push ax
     push bx
     push dx
@@ -96,6 +96,6 @@ emit_units:                    ; 0..9
     pop  bx
     pop  ax
     ret
-u16toa endp
+uitoa endp
 
     end

@@ -1,1 +1,1 @@
-1.obj s16toa.obj u16toa.obj, 1.com
+1.obj itoa.obj uitoa.obj, 1.com
