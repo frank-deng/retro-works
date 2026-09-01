@@ -15,5 +15,16 @@ memset MACRO dstseg, off, val, count
     rep stosw
 ENDM
 
+; cPType —— 按当前内存模型选择代码指针距离(near/far)
+;   near: tiny/small/compact     far: medium/large/huge
+;   注意: 本文件必须在 .model 之后 include, 否则 @CodeSize 尚未定义
+ifdef @Model
+    ife @CodeSize-2
+        cPType  equ <far>
+    else
+        cPType  equ <near>
+    endif
+endif
+
 ENDIF
 

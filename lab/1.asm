@@ -1,7 +1,7 @@
-include common.inc
-.model tiny
 .8086
-extrn s16toa:near
+.model tiny
+include common.inc
+extrn s16toa:cPType
 .code
 org 100h
 start:

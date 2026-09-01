@@ -26,33 +26,76 @@
     .8086
     .model small            ; tiny/small/medium/compact/large/huge all fine
     include common.inc
-    extrn u16toa:cPType
 
     .code
-    public s16toa
 
-s16toa proc cPType
+    public u16toa
+
+u16toa proc cPType
     push ax
+    push bx
+    push dx
     push si
     push di
 
     mov  si, di                ; SI = buffer start, used for the length count
 
-    or   ax, ax
-    jns  positive              ; AX >= 0
-    neg  ax                    ; AX = |AX|
-    mov  byte ptr es:[di], '-' ; emit sign
+    cmp  ax, 10
+    jb   emit_units            ; 0..9
+    cmp  ax, 100
+    jb   emit_tens             ; 10..99
+    cmp  ax, 1000
+    jb   emit_hundreds         ; 100..999
+    cmp  ax, 10000
+    jb   emit_thousands        ; 1000..9999
+
+    ; 10000..32767: ten-thousands digit
+    xor  dx, dx                ; AX is non-negative here, so clear DX
+    mov  bx, 10000
+    div  bx
+    add  al, '0'
+    mov  byte ptr es:[di], al
     inc  di
-positive:
-    call u16toa
-    cmp si,di
-    je finish
-    inc cx
-finish:
-    pop di
-    pop si
-    pop ax
+    mov  ax, dx
+
+emit_thousands:                ; 1000..9999
+    xor  dx, dx
+    mov  bx, 1000
+    div  bx
+    add  al, '0'
+    mov  byte ptr es:[di], al
+    inc  di
+    mov  ax, dx
+
+emit_hundreds:                 ; 100..999
+    xor  dx, dx
+    mov  bx, 100
+    div  bx
+    add  al, '0'
+    mov  byte ptr es:[di], al
+    inc  di
+    mov  ax, dx
+
+emit_tens:                     ; 10..99
+    aam                        ; AH = AL/10 (tens), AL = AL%10 (units)
+    add  ah, '0'
+    mov  byte ptr es:[di], ah  ; tens digit
+    inc  di
+
+emit_units:                    ; 0..9
+    add  al, '0'
+    mov  byte ptr es:[di], al  ; units digit
+    inc  di
+
+    mov  cx, di
+    sub  cx, si                ; CX = characters written
+
+    pop  di
+    pop  si
+    pop  dx
+    pop  bx
+    pop  ax
     ret
-s16toa endp
+u16toa endp
 
     end
