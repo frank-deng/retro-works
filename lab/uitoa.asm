@@ -1,6 +1,6 @@
-; uitoa.asm -- segment-agnostic 16-bit signed integer to ASCII
+; uitoa.asm -- segment-agnostic 16-bit unsigned integer to ASCII
 ;
-; Converts the 16-bit signed integer in AX to a decimal ASCII string
+; Converts the 16-bit unsigned integer in AX to a decimal ASCII string
 ; into the buffer pointed to by ES:DI. The routine is model-independent:
 ; it never reads DS and never assumes the content of any segment
 ; register, so it assembles and runs correctly under tiny / small /
@@ -10,11 +10,11 @@
 ; passing a buffer address through ES plus a register offset.
 ;
 ; Entry:
-;   AX    = signed 16-bit value (-32768 .. 32767)
-;   ES:DI = output buffer (needs up to 6 bytes: sign + 5 digits)
+;   AX    = unsigned 16-bit value (0 .. 65535)
+;   ES:DI = output buffer (needs up to 5 bytes)
 ; Exit:
 ;   CX    = number of characters written (sign included)
-;   ES:DI = points one byte past the last written character
+;   ES:DI = unchanged (input value preserved)
 ;           (no terminating NUL / '$' is written -- caller's job)
 ; Clobbers: AX, BX, CX, DX
 ; Preserves: SI, DI, and all other registers
@@ -49,7 +49,7 @@ uitoa proc cPType
     cmp  ax, 10000
     jb   emit_thousands        ; 1000..9999
 
-    ; 10000..32767: ten-thousands digit
+    ; 10000..65535: ten-thousands digit
     xor  dx, dx                ; AX is non-negative here, so clear DX
     mov  bx, 10000
     div  bx

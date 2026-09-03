@@ -1,9 +1,8 @@
 @echo off
 del *.obj
-rem tasm uitoa.asm, uitoa.obj
-rem tasm itoa.asm, itoa.obj
-rem tlink /t @fntchk.lnk
-TASM 24STAT
-TLINK /t /x 24STAT
-REN 24STAT.COM 24STAT.BIN
+tasm uitoa.asm, uitoa.obj
+tasm itoa.asm, itoa.obj
+tasm atoui.asm, atoui.obj
+tasm 1.asm, 1.obj
+tlink /t @1.lnk
 

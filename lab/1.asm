@@ -2,6 +2,7 @@
 .model tiny
 include common.inc
 extrn itoa:cPType
+extrn atoui:cPType
 .code
 org 100h
 start:
@@ -35,9 +36,23 @@ mov bx,1
 lea dx,[bp-666]
 int 21h
 
+lea si,sample_num
+mov cx,sample_num_end-sample_num
+call atoui
+lea di,[bp-666]
+call itoa
+mov ah,40h
+mov bx,1
+lea dx,[bp-666]
+int 21h
+
 doexit:
 mov sp,bp
 pop bp
 mov ax, 4C00h
 int 21h
+
+sample_num db "666"
+sample_num_end:
 end start
+
