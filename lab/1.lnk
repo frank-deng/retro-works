@@ -1,2 +1,2 @@
-1.obj itoa.obj uitoa.obj atoui.obj atoi.obj, 1.com
+1.obj uitox.obj hextable.obj, 1.com
 
