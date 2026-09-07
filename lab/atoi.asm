@@ -13,7 +13,7 @@ call atoui
 jc atoi_error
 cmp ax,07fffh
 ja atoi_error
-cld
+clc
 jmp atoi_finish
 atoi_neg:
 inc si
@@ -23,14 +23,14 @@ jc atoi_error
 cmp ax,08000h
 ja atoi_error
 neg ax
-cld
+clc
 atoi_finish:
 pop si
 pop cx
 ret
 atoi_error:
 xor ax,ax
-std
+stc
 jmp atoi_finish
 atoi endp
 end

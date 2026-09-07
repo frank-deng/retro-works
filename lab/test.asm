@@ -1,5 +1,11 @@
 .8086
 .model tiny
+BUFLEN EQU 10
+TestCase STRUC
+  LEN DW ?
+  STR DB BUFLEN DUP(?)
+  VAL DW ?
+TestCase ENDS
 include common.inc
 extrn uitoa:cPType
 extrn itoa:cPType
@@ -8,77 +14,109 @@ extrn atoi:cPType
 .code
 org 100h
 start:
-call test_normal
-mov ax, 4C00h
-int 21h
-
-test_normal:
-push bp
-mov bp,sp
-sub sp,10
-push ax
-push bx
-push cx
-push dx
-push si
-push di
-push ds
-push es
-mov ax,ss
-mov ds,ax
-mov es,ax
-mov bx,1
-lea di,[bp-10]
+lea di,[buf]
 mov si,di
-mov word ptr[bp-2],0
+mov dx,di
+
+;Enumerate 0x0-0xffff
+xor bx,bx
 test_nums_cycle:
-mov ax,word ptr[bp-2]
-call itoa
-call atoi
-cmp ax,word ptr[bp-2]
-je test_s16_ok
-call test_normal_error
-test_s16_ok:
-mov ax,word ptr[bp-2]
+mov ax,bx
 call uitoa
 call atoui
-cmp ax,word ptr[bp-2]
-je test_u16_ok
-call test_normal_error
-je test_u16_ok
-test_u16_ok:
-inc word ptr[bp-2]
+jc test_failed
+cmp ax,bx
+jne test_failed
+call itoa
+call atoi
+jc test_failed
+cmp ax,bx
+jne test_failed
+inc bx
 jnz test_nums_cycle
-pop es
-pop ds
+
+;Test u16
+lea bx,[test_u16_list]
+test_u16_cycle:
+mov ax,[bx].VAL
+call uitoa
+cmp cx,[bx].LEN
+jne test_failed
+call atoui
+jc test_failed
+cmp ax,[bx].VAL
+jne test_failed
+call cmp_str
+jne test_failed
+add bx,SIZE TestCase
+cmp bx,offset test_u16_list_end
+jb test_u16_cycle
+
+;Test s16
+lea bx,[test_s16_list]
+test_s16_cycle:
+mov ax,[bx].VAL
+call itoa
+cmp cx,[bx].LEN
+jne test_failed
+call atoi
+jc test_failed
+cmp ax,[bx].VAL
+jne test_failed
+call cmp_str
+jne test_failed
+add bx,SIZE TestCase
+cmp bx,offset test_s16_list_end
+jb test_s16_cycle
+
+test_finish:
+mov ah,09h
+lea dx,[test_succeed_str]
+int 21h
+mov ax,4C00h
+int 21h
+
+test_failed:
+mov cx,BUFLEN
+lea dx,[buf]
+mov bx,1
+mov ah,40h
+int 21h
+
+cmp_str:
+push si
+push di
+lea si,[bx].STR
+cld
+repe cmpsb
 pop di
 pop si
-pop dx
-pop cx
-pop bx
-pop ax
-mov sp,bp
-pop bp
 ret
 
-test_normal_error:
-mov ah,40h
-mov dx,si
+mov ah,09h
+lea dx,[test_failed_str]
 int 21h
-mov ah,40h
-mov bx,1
-mov cx,2
-lea dx,newline
+mov ax,4C01h
 int 21h
-ret
 
-newline db 0dh,0ah
-test_0 dw 0,1
-       db "0"
-test_1 dw 1,1
-       db "1"
-test_32767 dw 32767,5
-       db "32767"
+test_failed_str db "Failed",0dh,0ah,"$"
+test_succeed_str db "Succeed",0dh,0ah,"$"
+test_u16_list:
+TestCase<1,"0",0>
+TestCase<1,"1",1>
+TestCase<5,"32767",32767>
+TestCase<5,"32768",32768>
+TestCase<5,"65535",65535>
+test_u16_list_end:
+test_s16_list:
+TestCase<1,"0",0>
+TestCase<1,"1",1>
+TestCase<5,"32767",32767>
+TestCase<2,"-1",-1>
+TestCase<6,"-32767",-32767>
+TestCase<6,"-32768",-32768>
+test_s16_list_end:
+buf db BUFLEN DUP(?)
 
 end start
 

@@ -23,12 +23,11 @@ cmp al,9
 ja atoui_error
 xchg bx,ax
 mul di
-test dx,dx
 jc atoui_error
 add ax,bx
 jc atoui_error
 loop atoui_loop
-cld
+clc
 atoui_finish:
 pop ds
 pop di
@@ -39,7 +38,7 @@ pop bx
 ret
 atoui_error:
 xor ax,ax
-std
+stc
 jmp atoui_finish
 atoui endp
 end
