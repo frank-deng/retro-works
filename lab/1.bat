@@ -3,7 +3,10 @@ del *.obj
 del 1.com
 tasm hextable.asm, hextable.obj
 tasm uitox.asm, uitox.obj
+tasm cmdline.asm, cmdline.obj
 tasm 1.asm, 1.obj
 tlink /t @1.lnk
-1.com
+1.com         12345       hahaha
+1.com a b
+
 
