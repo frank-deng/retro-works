@@ -1,11 +1,11 @@
 @echo off
 del *.obj
 del test.com
-tasm uitoa.asm, uitoa.obj
-tasm itoa.asm, itoa.obj
-tasm atoui.asm, atoui.obj
-tasm atoi.asm, atoi.obj
-tasm test.asm, test.obj
+tasm /iinclude lib\uitoa.asm, uitoa.obj
+tasm /iinclude lib\itoa.asm, itoa.obj
+tasm /iinclude lib\atoui.asm, atoui.obj
+tasm /iinclude lib\atoi.asm, atoi.obj
+tasm /iinclude test.asm, test.obj
 tlink /t @test.lnk
 test.com
 
