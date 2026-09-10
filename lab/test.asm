@@ -46,8 +46,6 @@ inc bx
 jnz test_nums_cycle
 
 ;Test U16
-;call test_u16
-;jc test_failed
 lea bx,[test_u16_list]
 test_u16_cycle:
 clc
@@ -57,6 +55,7 @@ call check_res
 jnc test_u16_uitoa_ok
 jmp test_failed
 test_u16_uitoa_ok:
+not ax
 call atoui
 call check_res
 jnc test_u16_atoui_ok
@@ -76,6 +75,7 @@ call check_res
 jnc test_s16_itoa_ok
 jmp test_failed
 test_s16_itoa_ok:
+not ax
 call atoi
 call check_res
 jnc test_s16_atoi_ok
@@ -92,9 +92,13 @@ clc
 mov cx,[bx].LEN
 lea si,[bx].NSTR
 call atoui
-jnc test_failed
+jc test_u16_abnormal_atoui_ok
+jmp test_failed
+test_u16_abnormal_atoui_ok:
 call atoi
-jnc test_failed
+jc test_u16_abnormal_atoi_ok
+jmp test_failed
+test_u16_abnormal_atoi_ok:
 add bx,SIZE TestCase
 cmp bx,offset test_u16_abnormal_end
 jb test_u16_abnormal_cycle
@@ -106,7 +110,9 @@ clc
 mov cx,[bx].LEN
 lea si,[bx].NSTR
 call atoi
-jnc test_failed
+jc test_s16_abnormal_atoi_ok
+jmp test_failed
+test_s16_abnormal_atoi_ok:
 add bx,SIZE TestCase
 cmp bx,offset test_s16_abnormal_end
 jb test_s16_abnormal_cycle
