@@ -15,7 +15,7 @@ xor bx,bx
 cld
 atoui_loop:
 xchg bx,ax
-db 26h,0ach ;es:lodsb
+lods byte ptr es:[si]
 sub al,'0'
 cmp al,9
 ja atoui_error
