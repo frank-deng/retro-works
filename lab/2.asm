@@ -52,19 +52,61 @@ mov cx,HASH_MAP_SIZE/2
 cld
 rep stosw
 
-call enum_perm_oper
+;Enumerate perm x24 and oper
+xor bx,bx
+loop_perm:
+xor dx,dx
+mov dl,byte ptr[bx+perm]
+mov si,dx
+shl si,1
+mov ax,word ptr [nums+si]
+push ax
+mov dl,byte ptr[bx+perm+1]
+mov si,dx
+shl si,1
+mov ax,word ptr [nums+si]
+push ax
+mov dl,byte ptr[bx+perm+2]
+mov si,dx
+shl si,1
+mov ax,word ptr [nums+si]
+push ax
+mov dl,byte ptr[bx+perm+3]
+mov si,dx
+shl si,1
+mov ax,word ptr [nums+si]
+push ax
+call proc_hash
+jc skip_perm
+mov cx,64
+loop_oper:
+mov dx,cx
+dec dx
+and dx,03fh
+mov ax,dx
+and ax,3
+push ax
+shr dx,1
+shr dx,1
+mov ax,dx
+and ax,3
+push ax
+shr dx,1
+shr dx,1
+mov ax,dx
+push ax
+call enum_expr
+jc do_exit
+loop loop_oper
+skip_perm:
+add sp,8
+add bx,4
+cmp bx,96
+jb loop_perm
 
-;mov cx,4
-;lea bx,[nums]
-;show_loop:
-;mov ax,[bx]
-;call show_num
-;inc bx
-;inc bx
-;loop show_loop
-;mov ax,[goal]
-;shr ax,1
-;call show_num
+mov ah,09h
+lea dx,[no_answer_str]
+int 21h
 
 do_exit:
 mov ax, 4C00h
@@ -171,74 +213,20 @@ mov sp,bp
 pop bp
 ret
 
-enum_perm_oper:
-push bp
-mov bp,sp
-push bx
-push cx
-push dx
-push si
-push di
-push ax
-xor bx,bx
-loop_perm:
-xor dx,dx
-mov dl,byte ptr[bx+perm]
-mov si,dx
-shl si,1
-mov ax,word ptr [nums+si]
-push ax
-mov dl,byte ptr[bx+perm+1]
-mov si,dx
-shl si,1
-mov ax,word ptr [nums+si]
-push ax
-mov dl,byte ptr[bx+perm+2]
-mov si,dx
-shl si,1
-mov ax,word ptr [nums+si]
-push ax
-mov dl,byte ptr[bx+perm+3]
-mov si,dx
-shl si,1
-mov ax,word ptr [nums+si]
-push ax
-call proc_hash
-jc skip_perm
-mov cx,64
-loop_oper:
-mov dx,cx
-dec dx
-and dx,03fh
-mov ax,dx
-and ax,3
-push ax
-shr dx,1
-shr dx,1
-mov ax,dx
-and ax,3
-push ax
-shr dx,1
-shr dx,1
-mov ax,dx
-push ax
-call enum_expr
-jc enum_perm_oper_end
-loop loop_oper
-skip_perm:
-add sp,8
-add bx,4
-cmp bx,96
-jb loop_perm
-enum_perm_oper_end:
-pop ax
-pop di
-pop si
-pop dx
-pop cx
-pop bx
-pop bp
-ret 8
+check_res:
+test bx,bx
+jz check_res_fail
+cwd
+idiv bx
+test dx,dx
+jnz check_res_fail
+cmp ax,[goal]
+jne check_res_fail
+stc
+ret
+check_res_fail:
+clc
+ret
 
 ;idx=+18 a=+16 b=+14 c=+12 d=+10 s0=+8 s1=+6 s2=+4
 enum_expr:
@@ -251,19 +239,19 @@ push dx
 push si
 push di
 call expr_abcdsss
-call write_res
+call write_abcdsss
 jc enum_expr_finish
 call expr_abcsdss
-call write_res
+call check_res
 jc enum_expr_finish
 call expr_abcssds
-call write_res
+call check_res
 jc enum_expr_finish
 call expr_abscsds
-call write_res
+call check_res
 jc enum_expr_finish
 call expr_abscdss
-call write_res
+call check_res
 enum_expr_finish:
 pop di
 pop si
@@ -274,28 +262,6 @@ pop ax
 mov sp,bp
 pop bp
 ret 6
-
-write_res:
-test bx,bx
-jz write_res_end
-cwd
-idiv bx
-test dx,dx
-jnz write_res_end
-cmp ax,[goal]
-jne write_res_end
-push ax
-push dx
-mov ah,09h
-lea dx,[has_answer]
-int 21h
-pop dx
-pop ax
-stc
-ret
-write_res_end:
-clc
-ret
 
 expr_abcdsss:
 mov ax,word ptr[bp+12]
@@ -316,6 +282,60 @@ mov ax,word ptr[bp+16]
 mov bx,1
 mov si,word ptr[bp+4]
 call frac_oper
+ret
+
+;a#(b#(c#d))
+write_abcdsss:
+call check_res
+jc continue_abcdsss
+ret
+continue_abcdsss:
+lea bx,[opers_str]
+lea di,[output_buf]
+mov dx,di
+mov ax,[bp+16]
+call num2str
+add di,cx
+mov ax,word ptr[bp+4]
+xlat
+mov byte ptr[di],al
+inc di
+mov byte ptr[di],'('
+inc di
+mov ax,[bp+14]
+call num2str
+add di,cx
+mov ax,word ptr[bp+6]
+xlat
+mov byte ptr[di],al
+inc di
+mov byte ptr[di],'('
+inc di
+mov ax,[bp+12]
+call num2str
+add di,cx
+mov ax,word ptr[bp+8]
+xlat
+mov byte ptr[di],al
+inc di
+mov ax,[bp+10]
+call num2str
+add di,cx
+mov byte ptr[di],')'
+inc di
+mov byte ptr[di],')'
+inc di
+mov byte ptr[di],'='
+inc di
+mov ax,[goal]
+call num2str
+add di,cx
+mov ah,40h
+mov bx,1
+mov cx,di
+sub cx,dx
+int 21h
+stc
 ret
 
 expr_abcsdss:
@@ -507,8 +527,9 @@ nums_end:
 goal dw 24
 help_info_str db "Usage: 24SOLVE a b c d [Goal]",0dh,0ah
 db "    Goal defaults to 24 if not provided",0dh,0ah,'$'
-has_answer db "ans$"
+no_answer_str db "No answer.",0dh,0ah,'$'
 new_line_str db 0dh,0ah,'$'
+opers_str db "+-*/"
 frac_oper_table dw frac_add,frac_sub,frac_mul,frac_div
 perm:
 db 0,1,2,3, 0,1,3,2, 0,2,1,3, 0,2,3,1, 0,3,1,2, 0,3,2,1
@@ -516,5 +537,6 @@ db 1,0,2,3, 1,0,3,2, 1,2,0,3, 1,2,3,0, 1,3,0,2, 1,3,2,0
 db 2,0,1,3, 2,0,3,1, 2,1,0,3, 2,1,3,0, 2,3,0,1, 2,3,1,0
 db 3,0,1,2, 3,0,2,1, 3,1,0,2, 3,1,2,0, 3,2,0,1, 3,2,1,0
 hash_map:
+output_buf:
 end start
 
