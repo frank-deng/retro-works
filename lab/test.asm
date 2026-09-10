@@ -14,11 +14,13 @@ extrn atoi:cPType
 .code
 org 100h
 start:
-lea di,[buf]
-mov si,di
-mov dx,di
+mov ax,cs
+mov ds,ax
+mov es,ax
 
 ;Enumerate 0x0-0xffff
+lea di,[buf]
+mov si,di
 xor bx,bx
 test_nums_cycle:
 mov ax,bx
@@ -48,6 +50,8 @@ jnz test_nums_cycle
 ;Test U16
 lea bx,[test_u16_list]
 test_u16_cycle:
+memset ES [buf] 0 BUFLEN/2
+lea di,[buf]
 clc
 mov ax,[bx].VAL
 call uitoa
@@ -56,6 +60,7 @@ jnc test_u16_uitoa_ok
 jmp test_failed
 test_u16_uitoa_ok:
 not ax
+mov si,di
 call atoui
 call check_res
 jnc test_u16_atoui_ok
@@ -68,6 +73,9 @@ jb test_u16_cycle
 ;Test S16
 lea bx,[test_s16_list]
 test_s16_cycle:
+memset ES [buf] 0 BUFLEN/2
+lea di,[buf]
+mov si,di
 clc
 mov ax,[bx].VAL
 call itoa
@@ -182,7 +190,7 @@ TestCase<5,"65535",0>
 TestCase<6,"-32769",0>
 TestCase<6,"-65535",0>
 test_s16_abnormal_end:
-buf db BUFLEN DUP(?)
+buf db BUFLEN DUP(0)
 
 end start
 

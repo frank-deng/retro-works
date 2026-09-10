@@ -9,15 +9,13 @@ push cx
 push dx
 push si
 push di
-push ds
 mov di,10
-mov ax,es
-mov ds,ax
 xor ax,ax
 xor bx,bx
+cld
 atoui_loop:
 xchg bx,ax
-lodsb
+db 26h,0ach ;es:lodsb
 sub al,'0'
 cmp al,9
 ja atoui_error
@@ -29,7 +27,6 @@ jc atoui_error
 loop atoui_loop
 clc
 atoui_finish:
-pop ds
 pop di
 pop si
 pop dx

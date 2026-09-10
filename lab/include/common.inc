@@ -6,6 +6,10 @@ MACRO_COMMON_INC=1
 ;         count=填充字数(装入 CX, 字节数为 count*2)
 ;   无返回值; 不保护寄存器(破坏 CX, 并改写 ES/DI/AX)
 memset MACRO dstseg, off, val, count
+    push ax
+    push cx
+    push di
+    push es
     mov ax, dstseg
     mov es, ax
     mov ax, val
@@ -13,6 +17,10 @@ memset MACRO dstseg, off, val, count
     mov cx, count
     cld
     rep stosw
+    pop es
+    pop di
+    pop cx
+    pop ax
 ENDM
 
 ; cPType —— 按当前内存模型选择代码指针距离(near/far)
