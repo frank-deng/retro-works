@@ -32,6 +32,7 @@
     public itoa
 
 itoa proc cPType
+    pushf
     push ax
     push si
     push di
@@ -52,6 +53,7 @@ finish:
     pop di
     pop si
     pop ax
+    popf
     ret
 itoa endp
 

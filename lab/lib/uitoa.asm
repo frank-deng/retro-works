@@ -32,6 +32,7 @@
     public uitoa
 
 uitoa proc cPType
+    pushf
     push ax
     push bx
     push dx
@@ -95,6 +96,7 @@ emit_units:                    ; 0..9
     pop  dx
     pop  bx
     pop  ax
+    popf
     ret
 uitoa endp
 
