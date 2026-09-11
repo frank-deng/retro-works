@@ -39,6 +39,7 @@ uitoa proc cPType
     push si
     push di
 
+    cld
     mov  si, di                ; SI = buffer start, used for the length count
 
     cmp  ax, 10
@@ -62,7 +63,7 @@ emit_thousands:                ; 1000..9999
     xor  dx, dx
     mov  bx, 100
     div  bx
-    aam
+    aam                        ; AH = AL/10 (tens), AL = AL%10 (units)
     or  ax, 03030h
     xchg ah,al
     stosw
@@ -73,7 +74,7 @@ emit_hundreds:                 ; 100..999
     xor  dx, dx
     mov  bx, 100
     div  bx
-    add  al, '0'
+    or  al, '0'
     stosb
     mov  ax, dx
 

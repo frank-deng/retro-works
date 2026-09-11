@@ -471,6 +471,7 @@ push cx
 push dx
 push si
 push di
+cld
 lea bx,[bp+4]
 format_str_loop:
 lodsb
