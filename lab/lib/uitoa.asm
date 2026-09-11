@@ -54,40 +54,41 @@ uitoa proc cPType
     xor  dx, dx                ; AX is non-negative here, so clear DX
     mov  bx, 10000
     div  bx
-    add  al, '0'
-    mov  byte ptr es:[di], al
-    inc  di
+    or  al, '0'
+    stosb
     mov  ax, dx
 
 emit_thousands:                ; 1000..9999
     xor  dx, dx
-    mov  bx, 1000
+    mov  bx, 100
     div  bx
-    add  al, '0'
-    mov  byte ptr es:[di], al
-    inc  di
+    aam
+    or  ax, 03030h
+    xchg ah,al
+    stosw
     mov  ax, dx
+    jmp emit_tens
 
 emit_hundreds:                 ; 100..999
     xor  dx, dx
     mov  bx, 100
     div  bx
     add  al, '0'
-    mov  byte ptr es:[di], al
-    inc  di
+    stosb
     mov  ax, dx
 
 emit_tens:                     ; 10..99
     aam                        ; AH = AL/10 (tens), AL = AL%10 (units)
-    add  ah, '0'
-    mov  byte ptr es:[di], ah  ; tens digit
-    inc  di
+    or  ax, 03030h
+    xchg ah,al
+    stosw
+    jmp uitoa_end
 
 emit_units:                    ; 0..9
-    add  al, '0'
-    mov  byte ptr es:[di], al  ; units digit
-    inc  di
+    or  al, '0'
+    stosb
 
+uitoa_end:
     mov  cx, di
     sub  cx, si                ; CX = characters written
 
