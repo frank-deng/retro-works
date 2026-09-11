@@ -52,7 +52,7 @@ mov cx,HASH_MAP_SIZE/2
 cld
 rep stosw
 
-;Enumerate perm x24 and oper
+;Enumerate perm and oper
 xor bx,bx
 loop_perm:
 xor dx,dx
@@ -96,22 +96,20 @@ shr dx,1
 mov ax,dx
 push ax
 call enum_expr
-jc do_exit
+jc found_answer
 loop loop_oper
 skip_perm:
 add sp,8
 add bx,4
 cmp bx,96
 jb loop_perm
-
 mov ah,09h
 lea dx,[no_answer_str]
 int 21h
-
+found_answer:
 do_exit:
 mov ax, 4C00h
 int 21h
-
 parsecmd_fail:
 help_info:
 mov ah,09h
@@ -186,25 +184,49 @@ num2str_end:
 pop ax
 ret
 
-show_num:
+proc_hash:
 push bp
 mov bp,sp
-sub sp,2
 push ax
 push bx
 push cx
 push dx
-push di
-lea di,[bp-2]
-call num2str
-mov ah,40h
-mov bx,1
-mov dx,di
-int 21h
-mov ah,09h
-lea dx,[new_line_str]
-int 21h
-pop di
+mov ax,[bp+4]
+mov bx,[bp+6]
+sub ax,bx
+add ax,15
+mov dx,[bp+8]
+sub bx,dx
+add bx,15
+sub dx,[bp+10]
+add dx,15
+shl bx,1
+shl bx,1
+shl bx,1
+shl bx,1
+shl bx,1
+or bx,ax
+shl bx,1
+mov ch,dl
+shr ch,1
+shr ch,1
+shr ch,1
+shr ch,1
+or bl,ch
+shl bx,1
+mov cl,dl
+and cl,0fh
+mov ax,08000h
+ror ax,cl
+mov cx,word ptr[bx+hash_map]
+and cx,ax
+jnz proc_hash_skip
+or word ptr[bx+hash_map],ax
+clc
+jmp proc_hash_end
+proc_hash_skip:
+stc
+proc_hash_end:
 pop dx
 pop cx
 pop bx
@@ -213,7 +235,7 @@ mov sp,bp
 pop bp
 ret
 
-check_res:
+print_expr:
 test bx,bx
 jz check_res_fail
 cwd
@@ -222,6 +244,20 @@ test dx,dx
 jnz check_res_fail
 cmp ax,[goal]
 jne check_res_fail
+push [goal]
+push [bp+10]
+push [bp+4]
+push [bp+12]
+push [bp+6]
+push [bp+14]
+push [bp+8]
+push [bp+16]
+lea di,[output_buf]
+call format_str
+add sp,16
+mov dx,di
+mov ah,09h
+int 21h
 stc
 ret
 check_res_fail:
@@ -239,19 +275,14 @@ push dx
 push si
 push di
 call expr_abcdsss
-call write_abcdsss
 jc enum_expr_finish
 call expr_abcsdss
-call check_res
 jc enum_expr_finish
 call expr_abcssds
-call check_res
 jc enum_expr_finish
 call expr_abscsds
-call check_res
 jc enum_expr_finish
 call expr_abscdss
-call check_res
 enum_expr_finish:
 pop di
 pop si
@@ -263,12 +294,12 @@ mov sp,bp
 pop bp
 ret 6
 
-expr_abcdsss:
+expr_abcdsss: ;n#(n#(n#n))
 mov ax,word ptr[bp+12]
 mov bx,1
 mov cx,word ptr[bp+10]
 mov dx,1
-mov si,word ptr[bp+8]
+mov si,word ptr[bp+4]
 call frac_oper
 mov cx,ax
 mov dx,bx
@@ -280,103 +311,52 @@ mov cx,ax
 mov dx,bx
 mov ax,word ptr[bp+16]
 mov bx,1
-mov si,word ptr[bp+4]
+mov si,word ptr[bp+8]
 call frac_oper
-ret
+lea si,[expr_str_abcdsss]
+jmp print_expr
 
-;a#(b#(c#d))
-write_abcdsss:
-call check_res
-jc continue_abcdsss
-ret
-continue_abcdsss:
-lea bx,[opers_str]
-lea di,[output_buf]
-mov dx,di
-mov ax,[bp+16]
-call num2str
-add di,cx
-mov ax,word ptr[bp+4]
-xlat
-mov byte ptr[di],al
-inc di
-mov byte ptr[di],'('
-inc di
-mov ax,[bp+14]
-call num2str
-add di,cx
-mov ax,word ptr[bp+6]
-xlat
-mov byte ptr[di],al
-inc di
-mov byte ptr[di],'('
-inc di
-mov ax,[bp+12]
-call num2str
-add di,cx
-mov ax,word ptr[bp+8]
-xlat
-mov byte ptr[di],al
-inc di
-mov ax,[bp+10]
-call num2str
-add di,cx
-mov byte ptr[di],')'
-inc di
-mov byte ptr[di],')'
-inc di
-mov byte ptr[di],'='
-inc di
-mov ax,[goal]
-call num2str
-add di,cx
-mov ah,40h
-mov bx,1
-mov cx,di
-sub cx,dx
-int 21h
-stc
-ret
-
-expr_abcsdss:
+expr_abcsdss: ;n#((n#n)#n)
 mov ax,word ptr[bp+14]
 mov bx,1
 mov cx,word ptr[bp+12]
 mov dx,1
-mov si,word ptr[bp+8]
-call frac_oper
-mov cx,word ptr[bp+10]
-mov dx,1
-mov si,word ptr[bp+6]
-call frac_oper
-mov cx,ax
-mov dx,bx
-mov ax,word ptr[bp+16]
-mov bx,1
-mov si,word ptr[bp+4]
-call frac_oper
-ret
-
-expr_abcssds:
-mov ax,word ptr[bp+14]
-mov bx,1
-mov cx,word ptr[bp+12]
-mov dx,1
-mov si,word ptr[bp+8]
-call frac_oper
-mov cx,ax
-mov dx,bx
-mov ax,word ptr[bp+16]
-mov bx,1
 mov si,word ptr[bp+6]
 call frac_oper
 mov cx,word ptr[bp+10]
 mov dx,1
 mov si,word ptr[bp+4]
 call frac_oper
-ret
+mov cx,ax
+mov dx,bx
+mov ax,word ptr[bp+16]
+mov bx,1
+mov si,word ptr[bp+8]
+call frac_oper
+lea si,[expr_str_abcsdss]
+jmp print_expr
 
-expr_abscsds:
+expr_abcssds: ;(n#(n#n))#n
+mov ax,word ptr[bp+14]
+mov bx,1
+mov cx,word ptr[bp+12]
+mov dx,1
+mov si,word ptr[bp+6]
+call frac_oper
+mov cx,ax
+mov dx,bx
+mov ax,word ptr[bp+16]
+mov bx,1
+mov si,word ptr[bp+8]
+call frac_oper
+mov cx,word ptr[bp+10]
+mov dx,1
+mov si,word ptr[bp+4]
+call frac_oper
+lea si,[expr_str_abcssds]
+jmp print_expr
+
+expr_abscsds: ;((n#n)#n)#n
 mov ax,word ptr[bp+16]
 mov bx,1
 mov cx,word ptr[bp+14]
@@ -391,14 +371,15 @@ mov cx,word ptr[bp+10]
 mov dx,1
 mov si,word ptr[bp+4]
 call frac_oper
-ret
+lea si,[expr_str_abscsds]
+jmp print_expr
 
-expr_abscdss:
+expr_abscdss: ;(n#n)#(n#n)
 mov ax,word ptr[bp+12]
 mov bx,1
 mov cx,word ptr[bp+10]
 mov dx,1
-mov si,word ptr[bp+6]
+mov si,word ptr[bp+8]
 call frac_oper
 push ax
 push bx
@@ -406,13 +387,14 @@ mov ax,word ptr[bp+16]
 mov bx,1
 mov cx,word ptr[bp+14]
 mov dx,1
-mov si,word ptr[bp+8]
+mov si,word ptr[bp+4]
 call frac_oper
 pop dx
 pop cx
-mov si,word ptr[bp+4]
+mov si,word ptr[bp+6]
 call frac_oper
-ret
+lea si,[expr_str_abscdss]
+jmp print_expr
 
 frac_oper:
 test bx,bx
@@ -471,49 +453,46 @@ imul di
 sub ax,cx
 ret
 
-proc_hash:
+format_str:
 push bp
 mov bp,sp
 push ax
 push bx
 push cx
 push dx
-mov ax,[bp+4]
-mov bx,[bp+6]
-sub ax,bx
-add ax,15
-mov dx,[bp+8]
-sub bx,dx
-add bx,15
-sub dx,[bp+10]
-add dx,15
-shl bx,1
-shl bx,1
-shl bx,1
-shl bx,1
-shl bx,1
-or bx,ax
-shl bx,1
-mov ch,dl
-shr ch,1
-shr ch,1
-shr ch,1
-shr ch,1
-or bl,ch
-shl bx,1
-mov cl,dl
-and cl,0fh
-mov ax,08000h
-ror ax,cl
-mov cx,word ptr[bx+hash_map]
-and cx,ax
-jnz proc_hash_skip
-or word ptr[bx+hash_map],ax
-clc
-jmp proc_hash_end
-proc_hash_skip:
-stc
-proc_hash_end:
+push si
+push di
+lea bx,[bp+4]
+format_str_loop:
+lodsb
+cmp al,'n'
+je format_str_num
+cmp al,'#'
+je format_str_oper
+stosb
+cmp al,'$'
+jne format_str_loop
+jmp format_str_end
+format_str_oper:
+mov ax,ss:[bx]
+inc bx
+inc bx
+push bx
+lea bx,[opers_str]
+xlat
+pop bx
+stosb
+jmp format_str_loop
+format_str_num:
+mov ax,ss:[bx]
+inc bx
+inc bx
+call num2str
+add di,cx
+jmp format_str_loop
+format_str_end:
+pop di
+pop si
 pop dx
 pop cx
 pop bx
@@ -528,8 +507,12 @@ goal dw 24
 help_info_str db "Usage: 24SOLVE a b c d [Goal]",0dh,0ah
 db "    Goal defaults to 24 if not provided",0dh,0ah,'$'
 no_answer_str db "No answer.",0dh,0ah,'$'
-new_line_str db 0dh,0ah,'$'
 opers_str db "+-*/"
+expr_str_abcdsss db "n#(n#(n#n))=n",0dh,0ah,'$'
+expr_str_abcsdss db "n#((n#n)#n)=n",0dh,0ah,'$'
+expr_str_abcssds db "(n#(n#n))#n=n",0dh,0ah,'$'
+expr_str_abscsds db "((n#n)#n)#n=n",0dh,0ah,'$'
+expr_str_abscdss db "(n#n)#(n#n)=n",0dh,0ah,'$'
 frac_oper_table dw frac_add,frac_sub,frac_mul,frac_div
 perm:
 db 0,1,2,3, 0,1,3,2, 0,2,1,3, 0,2,3,1, 0,3,1,2, 0,3,2,1
