@@ -1,3 +1,5 @@
+;tasm 24solve.asm, 24solve.obj
+;tlink /t 24solve.obj, 24solve.com
 .8086
 HASH_MAP_SIZE EQU 4096
 MAX_GOAL EQU 99
@@ -244,13 +246,20 @@ test dx,dx
 jnz check_res_fail
 cmp ax,[goal]
 jne check_res_fail
+lea bx,[opers_str]
 push [goal]
 push [bp+10]
-push [bp+4]
+mov ax,[bp+4]
+xlat
+push ax
 push [bp+12]
-push [bp+6]
+mov ax,[bp+6]
+xlat
+push ax
 push [bp+14]
-push [bp+8]
+mov ax,[bp+8]
+xlat
+push ax
 push [bp+16]
 lea di,[output_buf]
 call format_str
@@ -468,19 +477,15 @@ lodsb
 cmp al,'n'
 je format_str_num
 cmp al,'#'
-je format_str_oper
+je format_str_char
 stosb
 cmp al,'$'
 jne format_str_loop
 jmp format_str_end
-format_str_oper:
+format_str_char:
 mov ax,ss:[bx]
 inc bx
 inc bx
-push bx
-lea bx,[opers_str]
-xlat
-pop bx
 stosb
 jmp format_str_loop
 format_str_num:
