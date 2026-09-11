@@ -176,12 +176,13 @@ jz num2str_onedigit
 xchg ah,al
 or ax,03030h
 mov word ptr[di],ax
-mov cx,2
+inc di
+inc di
 jmp num2str_end
 num2str_onedigit:
 or al,30h
 mov byte ptr[di],al
-mov cx,1
+inc di
 num2str_end:
 pop ax
 ret
@@ -494,7 +495,6 @@ mov ax,ss:[bx]
 inc bx
 inc bx
 call num2str
-add di,cx
 jmp format_str_loop
 format_str_end:
 pop di
