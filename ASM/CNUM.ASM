@@ -34,9 +34,11 @@ stosb
 skip_digit:
 loop loop_str
 mov cx,bx
+cmp cx,16
+ja parsecmd_fail
+jcxz just_zero
 
 lea si,[src_buf]
-
 cmp cx,8
 jbe val_1e8
 sub cx,8
@@ -48,6 +50,7 @@ mov cx,8
 val_1e8:
 call proc_1e8
 
+do_exit:
 lea dx,[newline_str]
 mov ah,40h
 mov bx,1
@@ -58,6 +61,11 @@ int 21h
 parsecmd_fail:
 mov ax, 4C01h
 int 21h
+
+just_zero:
+xor ax,ax
+call disp_val
+jmp do_exit
 
 getcmditem:
 push ax
@@ -142,62 +150,31 @@ proc_1e4:
 push ax
 push bx
 push cx
-push dx
 push si
 push di
-mov di,si
+mov ah,0ffh
+proc_digits_1e4:
+lodsb
+mov bh,al
+test al,al
+jz skip_digit_1e4
+test ah,ah
+jnz no_prefix_zero_1e4
 xor al,al
-cld
-repe scasb
-je no_disp_1e4
-inc cx
-dec di
-xor ax,ax
-cmp byte ptr[si],0
-jne no_leading_zero_1e4
 call disp_val
-no_leading_zero_1e4:
-mov si,di
-cmp cx,4
-je disp_1e3
-cmp cx,3
-je disp_1e2
-cmp cx,2
-je disp_1e1
-jmp disp_1e0
-disp_1e3:
-lodsb
+mov al,bh
+no_prefix_zero_1e4:
 call disp_val
-mov ax,12
+cmp cx,1
+jz skip_digit_1e4
+mov al,8
+add al,cl
 call disp_val
-disp_1e2:
-lodsb
-test al,al
-jz disp_1e1
-call disp_val
-mov ax,11
-call disp_val
-mov ah,al
-disp_1e1:
-lodsb
-test ax,ax
-jz disp_1e0
-test al,al
-jnz skip_zero_1e1
-call disp_val
-skip_zero_1e1:
-call disp_val
-mov ax,10
-call disp_val
-disp_1e0:
-lodsb
-test al,al
-jz no_disp_1e4
-call disp_val
-no_disp_1e4:
+skip_digit_1e4:
+mov ah,bh
+loop proc_digits_1e4
 pop di
 pop si
-pop dx
 pop cx
 pop bx
 pop ax
