@@ -30,23 +30,32 @@ test bx,bx
 jz skip_digit
 normal_num:
 inc bx
-;add al,'0'
 stosb
 skip_digit:
 loop loop_str
 mov cx,bx
 
+lea si,[src_buf]
+
+cmp cx,8
+jbe val_1e8
+sub cx,8
+call proc_1e8
+mov ax,14
+call disp_val
+add si,cx
+mov cx,8
+val_1e8:
+call proc_1e8
+
+lea dx,[newline_str]
 mov ah,40h
 mov bx,1
-lea dx,[src_buf]
+mov cx,2
 int 21h
-
 mov ax, 4C00h
 int 21h
 parsecmd_fail:
-mov ah,09h
-lea dx,[invalid_input_str]
-int 21h
 mov ax, 4C01h
 int 21h
 
@@ -71,8 +80,131 @@ getcmditem_empty:
 mov si,di
 jmp getcmditem_end
 
+disp_val:
+push ax
+push bx
+push cx
+push dx
+mov dl,al
+xor dh,dh
+shl dx,1
+add dx,offset num_str
+mov ah,40h
+mov bx,1
+mov cx,2
+int 21h
+pop dx
+pop cx
+pop bx
+pop ax
+ret
+
+proc_1e8:
+push ax
+push bx
+push cx
+push dx
+push si
+push di
+mov di,si
+xor al,al
+cld
+repe scasb
+je no_disp_1e8
+inc cx
+dec di
+cmp byte ptr[si],0
+jne no_leading_zero_1e8
+xor ax,ax
+call disp_val
+no_leading_zero_1e8:
+mov si,di
+cmp cx,4
+jbe val_1e4
+sub cx,4
+call proc_1e4
+mov ax,13
+call disp_val
+add si,cx
+mov cx,4
+val_1e4:
+call proc_1e4
+no_disp_1e8:
+pop di
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+ret
+
+proc_1e4:
+push ax
+push bx
+push cx
+push dx
+push si
+push di
+mov di,si
+xor al,al
+cld
+repe scasb
+je no_disp_1e4
+inc cx
+dec di
+xor ax,ax
+cmp byte ptr[si],0
+jne no_leading_zero_1e4
+call disp_val
+no_leading_zero_1e4:
+mov si,di
+cmp cx,4
+je disp_1e3
+cmp cx,3
+je disp_1e2
+cmp cx,2
+je disp_1e1
+jmp disp_1e0
+disp_1e3:
+lodsb
+call disp_val
+mov ax,12
+call disp_val
+disp_1e2:
+lodsb
+test al,al
+jz disp_1e1
+call disp_val
+mov ax,11
+call disp_val
+mov ah,al
+disp_1e1:
+lodsb
+test ax,ax
+jz disp_1e0
+test al,al
+jnz skip_zero_1e1
+call disp_val
+skip_zero_1e1:
+call disp_val
+mov ax,10
+call disp_val
+disp_1e0:
+lodsb
+test al,al
+jz no_disp_1e4
+call disp_val
+no_disp_1e4:
+pop di
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+ret
+
 num_str db "¡„“º∑°»˛À¡ŒÈ¬Ω∆‚∞∆æ¡ ∞∞€«™ÕÚ“⁄"
-invalid_input_str db "Invalid input$"
+newline_str db 0dh,0ah
 src_buf:
 end start
 
