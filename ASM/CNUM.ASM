@@ -1,3 +1,5 @@
+;tasm cnum.asm, cnum.obj
+;tlink /t cnum.obj, cnum.com
 .8086
 MAX_LEN EQU 16
 .model tiny
