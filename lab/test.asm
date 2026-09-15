@@ -6,11 +6,16 @@ TestCase STRUC
   NSTR DB BUFLEN DUP(?)
   VAL DW ?
 TestCase ENDS
+TestCaseCTZ STRUC
+  NUM DW ?
+  RES DW ?
+TestCaseCTZ ENDS
 include common.inc
 extrn uitoa:cPType
 extrn itoa:cPType
 extrn atoui:cPType
 extrn atoi:cPType
+extrn ctz:cPType
 .code
 org 100h
 start:
@@ -125,6 +130,27 @@ add bx,SIZE TestCase
 cmp bx,offset test_s16_abnormal_end
 jb test_s16_abnormal_cycle
 
+;Test CTZ
+lea bx,[test_ctz]
+test_ctz_cycle:
+mov ax,[bx].NUM
+call ctz
+jnc test_ctz_call_ok
+jmp test_failed
+test_ctz_call_ok:
+cmp ax,[bx].RES
+je test_ctz_res_ok
+jmp test_failed
+test_ctz_res_ok:
+add bx,SIZE TestCaseCTZ
+cmp bx,offset test_ctz_end
+jb test_ctz_cycle
+xor ax,ax
+call ctz
+jc test_ctx_zero_ok
+jmp test_failed
+test_ctx_zero_ok:
+
 test_finish:
 mov ah,09h
 lea dx,[test_succeed_str]
@@ -161,6 +187,41 @@ check_res_failed:
 stc
 jmp check_res_finish
 
+print_val:
+push bp
+mov bp,sp
+sub sp,8
+push ax
+push bx
+push cx
+push dx
+push di
+push ds
+push es
+mov dx,ss
+mov es,dx
+mov ds,dx
+lea dx,[bp-8]
+mov di,dx
+call uitoa
+add di,cx
+mov es:[di],0a0dh
+mov ah,40h
+mov bx,1
+inc cx
+inc cx
+int 21h
+pop es
+pop ds
+pop di
+pop dx
+pop cx
+pop bx
+pop ax
+mov sp,bp
+pop bp
+ret
+
 test_failed_str db "Failed",0dh,0ah,"$"
 test_succeed_str db "Succeed",0dh,0ah,"$"
 test_u16_list:
@@ -190,6 +251,16 @@ TestCase<5,"65535",0>
 TestCase<6,"-32769",0>
 TestCase<6,"-65535",0>
 test_s16_abnormal_end:
+test_ctz:
+TestCaseCTZ<1,0>
+TestCaseCTZ<9,0>
+TestCaseCTZ<2,1>
+TestCaseCTZ<0ah,1>
+TestCaseCTZ<4,2>
+TestCaseCTZ<8,3>
+TestCaseCTZ<080h,7>
+TestCaseCTZ<0800h,11>
+test_ctz_end:
 buf db BUFLEN DUP(0)
 
 end start
