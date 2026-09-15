@@ -15,8 +15,17 @@ org 100h
 start:
 call init_map
 jc error_dupnum
+call solve1
+jc no_answer
 call print_map
+
 mov ax,04c00h
+int 21h
+no_answer:
+mov ah,09h
+lea dx,[noans_str]
+int 21h
+mov ax,04c01h
 int 21h
 error_dupnum:
 mov ah,09h
@@ -91,6 +100,29 @@ mov sp,bp
 pop bp
 ret
 
+ctz:
+test ax,ax
+jz ctz_all_zero
+push cx
+xor cl,cl
+test al,al
+jnz ctz8
+mov cl,8
+mov al,ah
+ctz8:
+inc cl
+shr al,1
+jnc ctz8
+dec cl
+xor ah,ah
+mov al,cl
+pop cx
+clc
+ret
+ctz_all_zero:
+stc
+ret
+
 init_map:
 push bp
 mov bp,sp
@@ -127,6 +159,7 @@ and dx,word ptr[bx+ymap]
 jnz init_map_dup
 or word ptr[bx+ymap],di
 mov dx,di
+mov bl,al
 shl bx,1
 and dx,word ptr[bx+xmap]
 jnz init_map_dup
@@ -138,22 +171,21 @@ and dx,word ptr[bx+gmap]
 jnz init_map_dup
 or word ptr[bx+gmap],di
 pop di
-inc si
 jmp init_map_next
 init_map_zero_cell:
-mov word ptr[di].MAP,0
 mov byte ptr[di].X,al
 mov byte ptr[di].Y,ah
 mov byte ptr[di].GRP,ch
 add di,SIZE CellInfo
 inc word ptr[cell_info_count]
 init_map_next:
+inc si
 inc al
 cmp al,9
-jbe init_map_loop_x
+jb init_map_loop_x
 inc ah
 cmp ah,9
-jbe init_map_loop_y
+jb init_map_loop_y
 clc
 init_map_end:
 pop di
@@ -179,7 +211,6 @@ push cx
 push dx
 push si
 push di
-
 solve1_proc:
 xor dl,dl
 mov cx,[cell_info_count]
@@ -188,21 +219,7 @@ mov [cell_info_count],0
 lea si,[cell_info]
 mov di,si
 solve1_loop:
-xor bh,bh
-mov bl,[si].Y
-shl bx,1
-mov [bp-2],bx
-mov ax,[bx+ymap]
-mov bl,[si].X
-shl bx,1
-mov [bp-4],bx
-or ax,[bx+xmap]
-mov bl,[si].GRP
-shl bx,1
-mov [bp-6],bx
-or ax,[bx+gmap]
-not ax
-and ax,03feh
+call solve1_get_candidate
 jz solve1_noans
 mov bx,ax
 dec bx
@@ -220,9 +237,12 @@ shl bl,1
 shl bl,1
 shl bl,1
 add bl,bh
-mov bh,[si].X
-add bl,bh
+add bl,[si].X
+xor bh,bh
+call ctz
+mov byte ptr[board+bx],al
 add si,SIZE CellInfo
+mov dl,1
 jmp solve1_loop_next
 update_cellinfo:
 mov ax,[si]
@@ -233,8 +253,11 @@ mov ax,[si+4]
 mov [di+4],ax
 add si,SIZE CellInfo
 add di,SIZE CellInfo
+inc [cell_info_count]
 solve1_loop_next:
 loop solve1_loop
+test dl,dl
+jnz solve1_proc
 solve1_proc_end:
 cld
 solve1_exit:
@@ -248,10 +271,29 @@ mov sp,bp
 pop bp
 ret
 solve1_noans:
-std
+stc
 jmp solve1_exit
 
+solve1_get_candidate:
+xor bh,bh
+mov bl,[si].Y
+shl bx,1
+mov [bp-2],bx
+mov ax,[bx+ymap]
+mov bl,[si].X
+shl bx,1
+mov [bp-4],bx
+or ax,[bx+xmap]
+mov bl,[si].GRP
+shl bx,1
+mov [bp-6],bx
+or ax,[bx+gmap]
+not ax
+and ax,03feh
+ret
+
 dupnum_str db "Duplicated number detected.",0dh,0ah,'$'
+noans_str db "No answer.",0dh,0ah,'$'
 ALIGN 2
 group_map:
 db 0,0,0,1,1,1,2,2,2
