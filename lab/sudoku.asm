@@ -14,6 +14,7 @@ CellInfo ENDS
 org 100h
 start:
 call init_map
+jc error_dupnum
 call print_map
 mov ax,04c00h
 int 21h
@@ -104,6 +105,8 @@ mov cx,27
 xor ax,ax
 cld
 rep stosw
+mov word ptr[cell_info_count],0
+lea di,[cell_info]
 xor si,si
 xor bx,bx
 xor ah,ah
@@ -114,16 +117,16 @@ mov ch,byte ptr[group_map+si]
 mov cl,byte ptr[board+si]
 test cl,cl
 jz init_map_zero_cell
-mov di,1
-shl di,cl
-mov dx,di
+push di
+mov dx,1
+shl dx,cl
+mov di,dx
 mov bl,ah
 shl bx,1
 and dx,word ptr[bx+ymap]
 jnz init_map_dup
 or word ptr[bx+ymap],di
 mov dx,di
-mov bl,al
 shl bx,1
 and dx,word ptr[bx+xmap]
 jnz init_map_dup
@@ -134,8 +137,17 @@ shl bx,1
 and dx,word ptr[bx+gmap]
 jnz init_map_dup
 or word ptr[bx+gmap],di
+pop di
 inc si
+jmp init_map_next
 init_map_zero_cell:
+mov word ptr[di].MAP,0
+mov byte ptr[di].X,al
+mov byte ptr[di].Y,ah
+mov byte ptr[di].GRP,ch
+add di,SIZE CellInfo
+inc word ptr[cell_info_count]
+init_map_next:
 inc al
 cmp al,9
 jbe init_map_loop_x
@@ -160,6 +172,7 @@ jmp init_map_end
 solve1:
 push bp
 mov bp,sp
+sub sp,6
 push ax
 push bx
 push cx
@@ -168,7 +181,63 @@ push si
 push di
 
 solve1_proc:
-
+xor dl,dl
+mov cx,[cell_info_count]
+jcxz solve1_proc_end
+mov [cell_info_count],0
+lea si,[cell_info]
+mov di,si
+solve1_loop:
+xor bh,bh
+mov bl,[si].Y
+shl bx,1
+mov [bp-2],bx
+mov ax,[bx+ymap]
+mov bl,[si].X
+shl bx,1
+mov [bp-4],bx
+or ax,[bx+xmap]
+mov bl,[si].GRP
+shl bx,1
+mov [bp-6],bx
+or ax,[bx+gmap]
+not ax
+and ax,03feh
+jz solve1_noans
+mov bx,ax
+dec bx
+and bx,ax
+jnz update_cellinfo
+mov bx,[bp-2]
+or [bx+ymap],ax
+mov bx,[bp-4]
+or [bx+xmap],ax
+mov bx,[bp-6]
+or [bx+gmap],ax
+mov bl,[si].Y
+mov bh,bl
+shl bl,1
+shl bl,1
+shl bl,1
+add bl,bh
+mov bh,[si].X
+add bl,bh
+add si,SIZE CellInfo
+jmp solve1_loop_next
+update_cellinfo:
+mov ax,[si]
+mov [di],ax
+mov ax,[si+2]
+mov [di+2],ax
+mov ax,[si+4]
+mov [di+4],ax
+add si,SIZE CellInfo
+add di,SIZE CellInfo
+solve1_loop_next:
+loop solve1_loop
+solve1_proc_end:
+cld
+solve1_exit:
 pop di
 pop si
 pop dx
@@ -178,6 +247,9 @@ pop ax
 mov sp,bp
 pop bp
 ret
+solve1_noans:
+std
+jmp solve1_exit
 
 dupnum_str db "Duplicated number detected.",0dh,0ah,'$'
 ALIGN 2
@@ -207,6 +279,7 @@ xygmaps:
 xmap dw 9 dup(?)
 ymap dw 9 dup(?)
 gmap dw 9 dup(?)
+cell_info_count dw ?
 cell_info:
 end start
 
