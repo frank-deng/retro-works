@@ -3,11 +3,11 @@
 .8086
 PRINT_MAP_BUF_SIZE EQU 200
 CellInfo STRUC
+  PMAPX DW ?
+  PMAPY DW ?
+  PMAPGRP DW ?
+  PBOARD DW ?
   MAP DW ?
-  GRP DB ?
-  X DB ?
-  Y DB ?
-  ALIGN 2
 CellInfo ENDS
 .model tiny
 .code
@@ -19,7 +19,7 @@ call solve1
 jc no_answer
 cmp [cell_info_count],0
 je sudoku_finished
-call solve2
+;call solve2
 sudoku_finished:
 call print_map
 
@@ -141,7 +141,6 @@ mov cx,(xygmaps_end-xygmaps)/2
 xor ax,ax
 cld
 rep stosw
-mov word ptr[cell_info_count],0
 lea di,[cell_info]
 xor si,si
 xor bx,bx
@@ -154,6 +153,7 @@ mov cl,byte ptr[board+si]
 test cl,cl
 jz init_map_zero_cell
 push di
+xor bh,bh
 mov dx,1
 shl dx,cl
 mov di,dx
@@ -177,19 +177,37 @@ or word ptr[bx+gmap],di
 pop di
 jmp init_map_next
 init_map_zero_cell:
-mov byte ptr[di].X,al
-mov byte ptr[di].Y,ah
-mov byte ptr[di].GRP,ch
+lea bx,[board+si]
+mov [di].PBOARD,bx
+xor bh,bh
+mov bl,al
+shl bl,1
+lea bx,[bx+xmap]
+mov [di].PMAPX,bx
+xor bh,bh
+mov bl,ah
+shl bl,1
+lea bx,[bx+ymap]
+mov [di].PMAPY,bx
+xor bh,bh
+mov bl,ch
+shl bl,1
+lea bx,[bx+gmap]
+mov [di].PMAPGRP,bx
 add di,SIZE CellInfo
 inc word ptr[cell_info_count]
 init_map_next:
 inc si
 inc al
 cmp al,9
-jb init_map_loop_x
+jae init_map_loop_x_exit
+jmp init_map_loop_x
+init_map_loop_x_exit:
 inc ah
 cmp ah,9
-jb init_map_loop_y
+jae init_map_loop_y_exit
+jmp init_map_loop_y
+init_map_loop_y_exit:
 clc
 init_map_end:
 pop di
@@ -208,61 +226,66 @@ jmp init_map_end
 solve1:
 push bp
 mov bp,sp
-sub sp,6
 push ax
 push bx
 push cx
 push dx
 push si
 push di
+xor ch,ch
+mov dx,[cell_info_count]
 solve1_proc:
-xor dl,dl
-mov cx,[cell_info_count]
+mov cl,dl
+xor dx,dx
 jcxz solve1_proc_end
-mov [cell_info_count],0
 lea si,[cell_info]
 mov di,si
 solve1_loop:
-call solve1_get_candidate
+mov bx,[si].PMAPY
+mov ax,[bx]
+mov bx,[si].PMAPX
+or ax,[bx]
+mov bx,[si].PMAPGRP
+or ax,[bx]
+not ax
+and ax,03feh
 jz solve1_noans
 mov bx,ax
 dec bx
 and bx,ax
 jnz update_cellinfo
-mov bx,[bp-2]
-or [bx+ymap],ax
-mov bx,[bp-4]
-or [bx+xmap],ax
-mov bx,[bp-6]
-or [bx+gmap],ax
-mov bl,[si].Y
-mov bh,bl
-shl bl,1
-shl bl,1
-shl bl,1
-add bl,bh
-add bl,[si].X
-xor bh,bh
+mov bx,[si].PMAPY
+or [bx],ax
+mov bx,[si].PMAPX
+or [bx],ax
+mov bx,[si].PMAPGRP
+or [bx],ax
 call ctz
-mov byte ptr[board+bx],al
+mov bx,[si].PBOARD
+mov byte ptr[bx],al
 add si,SIZE CellInfo
-mov dl,1
+mov dh,1
 jmp solve1_loop_next
 update_cellinfo:
-mov ax,[si]
-mov [di],ax
-mov ax,[si+2]
-mov [di+2],ax
-mov ax,[si+4]
-mov [di+4],ax
+mov ax,[si].PMAPX
+mov [di].PMAPX,ax
+mov ax,[si].PMAPY
+mov [di].PMAPY,ax
+mov ax,[si].PMAPGRP
+mov [di].PMAPGRP,ax
+mov ax,[si].PBOARD
+mov [di].PBOARD,ax
 add si,SIZE CellInfo
 add di,SIZE CellInfo
-inc [cell_info_count]
+inc dl
 solve1_loop_next:
 loop solve1_loop
-test dl,dl
-jnz solve1_proc
+test dh,dh
+jz solve1_proc_end
+jmp solve1_proc
 solve1_proc_end:
+xor dh,dh
+mov [cell_info_count],dx
 cld
 solve1_exit:
 pop di
@@ -278,186 +301,10 @@ solve1_noans:
 stc
 jmp solve1_exit
 
-solve1_get_candidate:
-xor bh,bh
-mov bl,[si].Y
-shl bx,1
-mov [bp-2],bx
-mov ax,[bx+ymap]
-mov bl,[si].X
-shl bx,1
-mov [bp-4],bx
-or ax,[bx+xmap]
-mov bl,[si].GRP
-shl bx,1
-mov [bp-6],bx
-or ax,[bx+gmap]
-not ax
-and ax,03feh
-ret
-
-solve2:
-push bp
-mov bp,sp
-push ax
-push bx
-push cx
-push dx
-push si
-push di
-mov cx,[cell_info_count]
-lea si,[cell_info]
-init_solve2_loop:
-xor bh,bh
-mov bl,byte ptr[si].X
-shl bl,1
-mov ax,[xmap+bx]
-mov bl,byte ptr[si].Y
-shl bl,1
-or ax,[ymap+bx]
-mov bl,byte ptr[si].GRP
-shl bl,1
-or ax,[gmap+bx]
-not ax
-and ax,03feh
-mov word ptr[si].MAP,ax
-add si,SIZE CellInfo
-loop init_solve2_loop
-lea di,[xygmaps]
-mov cx,(xygmaps_end-xygmaps)/2
-xor ax,ax
-cld
-rep stosw
-
-mov ax,[cell_info_count]
-mov bx,SIZE CellInfo
-mul bx
-mov di,ax
-solve2_proc:
-call get_min_cell
-jc solve2_skip_push
-dec di
-dec di
-mov [di],bx
-solve2_skip_push:
-xor ax,ax
-solve2_proc_inner:
-mov bx,[di]
-mov ah,[bx+cell_info].Y
-mov al,[bx+cell_info].X
-mov ch,[bx+cell_info].GRP
-xor bh,bh
-mov bl,ah
-shl bl,1
-shl bl,1
-shl bl,1
-add bl,ah
-add bl,al
-mov cl,byte ptr[board+bx]
-test cl,cl
-jz solve2_skip_wmap1
-mov dx,1
-shl dx,cl
-not dx
-xor bh,bh
-mov bl,al
-shl bl,1
-and [bx+xmap],dx
-mov bl,ah
-shl bl,1
-and [bx+ymap],dx
-mov bl,ch
-shl bl,1
-and [bx+gmap],dx
-solve2_skip_wmap1:
-
-jmp solve2_proc_inner
-cmp di,0
-jle solve2_proc
-solve2_proc_end:
-cld
-solve2_exit:
-pop di
-pop si
-pop dx
-pop cx
-pop bx
-pop ax
-mov sp,bp
-pop bp
-ret
-solve2_noans:
-stc
-jmp solve2_exit
-
-get_min_cell:
-push bp
-mov bp,sp
-sub sp,4
-push ax
-push cx
-push dx
-push si
-lea si,[cell_info]
-mov [bp-4],si
-mov cx,[cell_info_count]
-mov word ptr[bp-2],0ffh
-get_min_cell_loop:
-mov al,byte ptr[si].X
-mov ah,byte ptr[si].Y
-xor bh,bh
-mov bl,ah
-shl bl,1
-shl bl,1
-shl bl,1
-add bl,ah
-add bl,al
-mov bl,byte ptr[board+bx]
-test bl,bl
-jz get_min_cell_continue
-xor bh,bh
-mov bl,al
-shl bl,1
-mov dx,[xmap+bx]
-mov bl,ah
-shl bl,1
-or dx,[ymap+bx]
-mov bl,byte ptr[si].GRP
-shl bl,1
-or dx,[gmap+bx]
-not dx
-and dx,word ptr[si].MAP
-jz get_min_cell_fail
-xor al,al
-get_min_cell_count_elem:
-inc al
-mov bx,dx
-dec bx
-and dx,bx
-jnz get_min_cell_count_elem
-cmp al,[bp-2]
-jge get_min_cell_continue
-mov [bp-2],al
-mov [bp-4],si
-get_min_cell_continue:
-add si,SIZE CellInfo
-loop get_min_cell_loop
-mov bx,[bp-4]
-clc
-get_min_cell_end:
-pop si
-pop dx
-pop cx
-pop ax
-mov sp,bp
-pop bp
-ret
-get_min_cell_fail:
-stc
-jmp get_min_cell_end
-
 dupnum_str db "Duplicated number detected.",0dh,0ah,'$'
 noans_str db "No answer.",0dh,0ah,'$'
+ALIGN 2
+cell_info_count dw 0
 group_map:
 db 0,0,0,1,1,1,2,2,2
 db 0,0,0,1,1,1,2,2,2
@@ -469,31 +316,31 @@ db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
 board:
-;b 0,1,0,0,0,5,3,9,0
-;b 5,0,2,0,0,0,0,0,8
-;b 9,0,0,1,3,0,0,5,0
-;b 8,0,0,0,4,0,5,0,0
-;b 0,0,3,5,6,8,7,0,0
-;b 0,0,1,0,2,0,0,0,9
-;b 0,8,0,0,5,7,0,0,4
-;b 1,0,0,0,0,0,2,0,3
-;b 0,7,9,3,0,0,0,8,0
-db 0,8,5,0,0,0,0,0,0
-db 0,0,4,0,7,0,0,0,9
-db 0,0,0,0,0,0,0,0,0
-db 3,0,0,0,0,0,0,2,0
-db 7,0,0,0,4,0,0,0,0
-db 0,0,0,1,0,0,0,8,0
-db 0,0,0,2,0,0,0,0,0
-db 9,0,3,0,0,0,0,0,7
-db 0,0,0,8,0,5,0,0,0
+db 0,1,0,0,0,5,3,9,0
+db 5,0,2,0,0,0,0,0,8
+db 9,0,0,1,3,0,0,5,0
+db 8,0,0,0,4,0,5,0,0
+db 0,0,3,5,6,8,7,0,0
+db 0,0,1,0,2,0,0,0,9
+db 0,8,0,0,5,7,0,0,4
+db 1,0,0,0,0,0,2,0,3
+db 0,7,9,3,0,0,0,8,0
+
+;b 0,8,5,0,0,0,0,0,0
+;b 0,0,4,0,7,0,0,0,9
+;b 0,0,0,0,0,0,0,0,0
+;b 3,0,0,0,0,0,0,2,0
+;b 7,0,0,0,4,0,0,0,0
+;b 0,0,0,1,0,0,0,8,0
+;b 0,0,0,2,0,0,0,0,0
+;b 9,0,3,0,0,0,0,0,7
+;b 0,0,0,8,0,5,0,0,0
 ALIGN 2
 xygmaps:
 xmap dw 9 dup(?)
 ymap dw 9 dup(?)
 gmap dw 9 dup(?)
 xygmaps_end:
-cell_info_count dw ?
 cell_info db 81*(SIZE CellInfo) dup(?)
 stack_area dw 81 dup(?)
 end start 
