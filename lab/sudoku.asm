@@ -130,6 +130,7 @@ ret
 init_map:
 push bp
 mov bp,sp
+sub sp,6
 push ax
 push bx
 push cx
@@ -148,51 +149,50 @@ xor ah,ah
 init_map_loop_y:
 xor al,al
 init_map_loop_x:
-mov ch,byte ptr[group_map+si]
+xor dx,dx
+mov bx,ax
+shl bx,1
+xchg bh,dl
+add bx,offset xmap
+add dx,offset ymap
+mov [bp-2],bx
+mov [bp-4],dx
+xor bh,bh
+mov bl,byte ptr[group_map+si]
+shl bl,1
+add bx,offset gmap
+mov [bp-6],bx
 mov cl,byte ptr[board+si]
 test cl,cl
 jz init_map_zero_cell
 push di
-xor bh,bh
 mov dx,1
 shl dx,cl
 mov di,dx
-mov bl,ah
-shl bx,1
-and dx,word ptr[bx+ymap]
+mov bx,[bp-2]
+and dx,[bx]
 jnz init_map_dup
-or word ptr[bx+ymap],di
+or [bx],di
 mov dx,di
-mov bl,al
-shl bx,1
-and dx,word ptr[bx+xmap]
+mov bx,[bp-4]
+and dx,[bx]
 jnz init_map_dup
-or word ptr[bx+xmap],di
+or [bx],di
 mov dx,di
-mov bl,ch
-shl bx,1
-and dx,word ptr[bx+gmap]
+mov bx,[bp-6]
+and dx,[bx]
 jnz init_map_dup
-or word ptr[bx+gmap],di
+or [bx],di
 pop di
 jmp init_map_next
 init_map_zero_cell:
 lea bx,[board+si]
 mov [di].PBOARD,bx
-xor bh,bh
-mov bl,al
-shl bl,1
-lea bx,[bx+xmap]
+mov bx,[bp-2]
 mov [di].PMAPX,bx
-xor bh,bh
-mov bl,ah
-shl bl,1
-lea bx,[bx+ymap]
+mov bx,[bp-4]
 mov [di].PMAPY,bx
-xor bh,bh
-mov bl,ch
-shl bl,1
-lea bx,[bx+gmap]
+mov bx,[bp-6]
 mov [di].PMAPGRP,bx
 add di,SIZE CellInfo
 inc word ptr[cell_info_count]
@@ -200,9 +200,7 @@ init_map_next:
 inc si
 inc al
 cmp al,9
-jae init_map_loop_x_exit
-jmp init_map_loop_x
-init_map_loop_x_exit:
+jb init_map_loop_x
 inc ah
 cmp ah,9
 jae init_map_loop_y_exit
