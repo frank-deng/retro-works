@@ -1,5 +1,5 @@
-;tasm 24solve.asm, 24solve.obj
-;tlink /t 24solve.obj, 24solve.com
+;tasm sudoku.asm, sudoku.obj
+;tlink /t sudoku.obj, sudoku.com
 .8086
 PRINT_MAP_BUF_SIZE EQU 200
 CellInfo STRUC
@@ -19,8 +19,23 @@ mov di,81h
 call getcmditem
 cmp si,di
 je error_file
+lea bx,[board]
+push bx
 call read_sudoku_file
 jc error_file
+
+call getcmditem
+cmp si,di
+je skip_jigsaw
+lea bx,[group_map]
+push bx
+call read_sudoku_file
+jc error_file
+call init_jigsaw
+jc error_jigsaw
+inc byte ptr[jigsaw_enabled]
+skip_jigsaw:
+
 call init_map
 jc error_dupnum
 call solve1
@@ -31,6 +46,7 @@ call init_solve2
 call solve2
 jc no_answer
 sudoku_finished:
+lea si,[board]
 call print_map
 mov ax,04c00h
 int 21h
@@ -39,6 +55,9 @@ lea dx,[noans_str]
 jmp error_exit
 error_dupnum:
 lea dx,[dupnum_str]
+jmp error_exit
+error_jigsaw:
+lea dx,[jigsaw_error_str]
 jmp error_exit
 error_file:
 lea dx,[file_error_str]
@@ -81,7 +100,6 @@ push si
 push di
 cld
 lea di,[bp-PRINT_MAP_BUF_SIZE]
-lea si,[board]
 xor dx,dx
 print_map_loop_y:
 xor dl,dl
@@ -96,9 +114,10 @@ stosb
 cmp dl,2
 je print_map_extra_space
 cmp dl,5
-je print_map_extra_space
-jmp print_map_no_space
+jne print_map_no_space
 print_map_extra_space:
+cmp byte ptr[jigsaw_enabled],0
+jne print_map_no_space
 stosb
 print_map_no_space:
 inc dl
@@ -109,9 +128,10 @@ stosw
 cmp dh,2
 je print_map_extra_line
 cmp dh,5
-je print_map_extra_line
-jmp print_map_no_extra_line
+jne print_map_no_extra_line
 print_map_extra_line:
+cmp byte ptr[jigsaw_enabled],0
+jne print_map_no_extra_line
 stosw
 print_map_no_extra_line:
 inc dh
@@ -133,7 +153,7 @@ pop bx
 pop ax
 mov sp,bp
 pop bp
-ret
+ret 2
 
 ctz:
 push ax
@@ -281,7 +301,7 @@ mov byte ptr[bx],cl
 mov cl,ch
 xor ch,ch
 add si,SIZE CellInfo
-mov dh,1
+inc dh
 jmp solve1_loop_next
 update_cellinfo:
 mov ax,[si].PMAPX
@@ -516,7 +536,7 @@ mov cx,ax
 mov ah,3eh
 int 21h
 lea si,[file_buf]
-lea di,[board]
+mov di,[bp+4]
 xor dx,dx
 read_sudoku_loop:
 cmp dx,0909h
@@ -556,14 +576,63 @@ pop bx
 pop ax
 mov sp,bp
 pop bp
-ret
+ret 2
 read_sudoku_file_error:
 mov ah,3eh
 int 21h
 stc
 jmp read_sudoku_file_exit
 
+init_jigsaw:
+push bp
+mov bp,sp
+sub sp,10
+push ax
+push bx
+push cx
+push dx
+push si
+push di
+lea di,[bp-10]
+mov cx,5
+xor ax,ax
+cld
+rep stosw
+lea si,[group_map]
+mov cx,81
+xor ah,ah
+cld
+init_jigsaw_loop:
+dec byte ptr[si]
+lodsb
+cmp al,8
+ja init_jigsaw_fail
+mov di,ax
+inc byte ptr[bp+di-10]
+loop init_jigsaw_loop
+lea si,[bp-10]
+mov cx,9
+mov al,9
+cld
+repe scasb
+jz init_jigsaw_fail
+clc
+init_jigsaw_exit:
+pop di
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+mov sp,bp
+pop bp
+ret
+init_jigsaw_fail:
+stc
+jmp init_jigsaw_exit
+
 file_error_str db "Failed to read file.",0dh,0ah,'$'
+jigsaw_error_str db "Invalid jigsaw data.",0dh,0ah,'$'
 dupnum_str db "Duplicated number detected.",0dh,0ah,'$'
 noans_str db "No answer.",0dh,0ah,'$'
 ALIGN 2
@@ -578,6 +647,7 @@ db 3,3,3,4,4,4,5,5,5
 db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
+jigsaw_enabled db 0
 board db 81 dup(?)
 ALIGN 2
 file_buf:
