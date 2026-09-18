@@ -471,7 +471,7 @@ cmp byte ptr[bx],0
 jnz get_min_cell_continue
 mov bx,[si].PMAPX
 mov ax,[bx]
-mov bx,[si].PMAPX
+mov bx,[si].PMAPY
 or ax,[bx]
 mov bx,[si].PMAPGRP
 or ax,[bx]
