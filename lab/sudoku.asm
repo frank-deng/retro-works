@@ -13,6 +13,14 @@ CellInfo ENDS
 .code
 org 100h
 start:
+xor ch,ch
+mov cl,es:[80h]
+mov di,81h
+call getcmditem
+cmp si,di
+je error_file
+call read_sudoku_file
+jc error_file
 call init_map
 jc error_dupnum
 call solve1
@@ -24,21 +32,42 @@ call solve2
 jc no_answer
 sudoku_finished:
 call print_map
-
 mov ax,04c00h
 int 21h
 no_answer:
-mov ah,09h
 lea dx,[noans_str]
-int 21h
-mov ax,04c01h
-int 21h
+jmp error_exit
 error_dupnum:
-mov ah,09h
 lea dx,[dupnum_str]
+jmp error_exit
+error_file:
+lea dx,[file_error_str]
+error_exit:
+mov ah,09h
 int 21h
 mov ax,04c01h
 int 21h
+
+getcmditem:
+push ax
+jcxz getcmditem_empty
+mov al,' '
+cld
+repe scasb
+je getcmditem_empty
+dec di
+inc cx
+mov si,di
+repne scasb
+jne getcmditem_end
+dec di
+inc cx
+getcmditem_end:
+pop ax
+ret
+getcmditem_empty:
+mov si,di
+jmp getcmditem_end
 
 print_map:
 push bp
@@ -459,6 +488,82 @@ get_min_cell_fail:
 stc
 jmp get_min_cell_end
 
+read_sudoku_file:
+push bp
+mov bp,sp
+push ax
+push bx
+push cx
+push dx
+push si
+push di
+mov cx,di
+sub cx,si
+lea di,[file_buf]
+mov dx,di
+cld
+rep movsb
+mov byte ptr[di],0
+mov ax,03d00h
+int 21h
+jc read_sudoku_file_exit
+mov bx,ax
+mov ah,3fh
+mov cx,512
+int 21h
+jc read_sudoku_file_error
+mov cx,ax
+mov ah,3eh
+int 21h
+lea si,[file_buf]
+lea di,[board]
+xor dx,dx
+read_sudoku_loop:
+cmp dx,0909h
+jae read_sudoku_finish
+lodsb
+cmp al,0ah
+je read_sudoku_next_line
+cmp dl,9
+jae read_sudoku_loop_continue
+cmp al,'.'
+jne read_sudoku_solid_cell
+xor al,al
+jmp read_sudoku_write
+read_sudoku_solid_cell:
+sub al,'0'
+cmp al,9
+ja read_sudoku_loop_continue
+read_sudoku_write:
+stosb
+inc dl
+jmp read_sudoku_loop_continue
+read_sudoku_next_line:
+test dl,dl
+jz read_sudoku_loop_continue
+xor dl,dl
+inc dh
+read_sudoku_loop_continue:
+loop read_sudoku_loop
+read_sudoku_finish:
+clc
+read_sudoku_file_exit:
+pop di
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+mov sp,bp
+pop bp
+ret
+read_sudoku_file_error:
+mov ah,3eh
+int 21h
+stc
+jmp read_sudoku_file_exit
+
+file_error_str db "Failed to read file.",0dh,0ah,'$'
 dupnum_str db "Duplicated number detected.",0dh,0ah,'$'
 noans_str db "No answer.",0dh,0ah,'$'
 ALIGN 2
@@ -473,27 +578,9 @@ db 3,3,3,4,4,4,5,5,5
 db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
-board2:
-db 0,1,0,0,0,5,3,9,0
-db 5,0,2,0,0,0,0,0,8
-db 9,0,0,1,3,0,0,5,0
-db 8,0,0,0,4,0,5,0,0
-db 0,0,3,5,6,8,7,0,0
-db 0,0,1,0,2,0,0,0,9
-db 0,8,0,0,5,7,0,0,4
-db 1,0,0,0,0,0,2,0,3
-db 0,7,9,3,0,0,0,8,0
-board:
-db 0,8,5,0,0,0,0,0,0
-db 0,0,4,0,7,0,0,0,9
-db 0,0,0,0,0,0,0,0,0
-db 3,0,0,0,0,0,0,2,0
-db 7,0,0,0,4,0,0,0,0
-db 0,0,0,1,0,0,0,8,0
-db 0,0,0,2,0,0,0,0,0
-db 9,0,3,0,0,0,0,0,7
-db 0,0,0,8,0,5,0,0,0
+board db 81 dup(?)
 ALIGN 2
+file_buf:
 xygmaps:
 xmap dw 9 dup(?)
 ymap dw 9 dup(?)

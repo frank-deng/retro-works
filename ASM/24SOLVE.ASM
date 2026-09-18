@@ -12,6 +12,7 @@ GOAL_MIN EQU 0
 org 100h
 start:
 ;Parse cmdline
+xor ch,ch
 mov cl,es:[80h]
 mov di,81h
 lea bx,[nums]
