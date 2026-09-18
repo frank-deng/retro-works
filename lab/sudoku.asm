@@ -130,7 +130,6 @@ ret
 init_map:
 push bp
 mov bp,sp
-sub sp,6
 push ax
 push bx
 push cx
@@ -155,45 +154,40 @@ shl bx,1
 xchg bh,dl
 add bx,offset xmap
 add dx,offset ymap
-mov [bp-2],bx
-mov [bp-4],dx
+push bx
+push dx
 xor bh,bh
 mov bl,byte ptr[group_map+si]
 shl bl,1
 add bx,offset gmap
-mov [bp-6],bx
+push bx
 mov cl,byte ptr[board+si]
 test cl,cl
 jz init_map_zero_cell
-push di
 mov dx,1
 shl dx,cl
-mov di,dx
-mov bx,[bp-2]
+mov cx,dx
+pop bx
 and dx,[bx]
 jnz init_map_dup
-or [bx],di
-mov dx,di
-mov bx,[bp-4]
+or [bx],cx
+mov dx,cx
+pop bx
 and dx,[bx]
 jnz init_map_dup
-or [bx],di
-mov dx,di
-mov bx,[bp-6]
+or [bx],cx
+mov dx,cx
+pop bx
 and dx,[bx]
 jnz init_map_dup
-or [bx],di
-pop di
+or [bx],cx
 jmp init_map_next
 init_map_zero_cell:
 lea bx,[board+si]
 mov [di].PBOARD,bx
-mov bx,[bp-2]
-mov [di].PMAPX,bx
-mov bx,[bp-4]
-mov [di].PMAPY,bx
-mov bx,[bp-6]
-mov [di].PMAPGRP,bx
+pop [di].PMAPGRP
+pop [di].PMAPY
+pop [di].PMAPX
 add di,SIZE CellInfo
 inc word ptr[cell_info_count]
 init_map_next:
@@ -203,9 +197,7 @@ cmp al,9
 jb init_map_loop_x
 inc ah
 cmp ah,9
-jae init_map_loop_y_exit
-jmp init_map_loop_y
-init_map_loop_y_exit:
+jb init_map_loop_y
 clc
 init_map_end:
 pop di
@@ -298,6 +290,121 @@ ret
 solve1_noans:
 stc
 jmp solve1_exit
+
+
+solve2:
+push bp
+mov bp,sp
+sub sp,2
+push ax
+push bx
+push cx
+push dx
+push si
+push di
+mov cx,[cell_info_count]
+lea si,[cell_info]
+init_solve2_loop:
+mov bx,[si].PMAPX
+mov ax,[bx]
+mov bx,[si].PMAPY
+or ax,[bx]
+mov bx,[si].PMAPGRP
+or ax,[bx]
+not ax
+and ax,03feh
+mov word ptr[si].MAP,ax
+add si,SIZE CellInfo
+loop init_solve2_loop
+lea di,[xygmaps]
+mov cx,(xygmaps_end-xygmaps)/2
+xor ax,ax
+cld
+rep stosw
+
+mov di,[cell_info_count]
+shl di,1
+add di,offset stack_area
+mov [bp-2],di
+solve2_proc:
+call get_min_cell
+jc solve2_skip_push
+push di
+solve2_skip_push:
+
+solve2_proc_inner:
+
+jmp solve2_proc_inner
+cmp di,0
+jle solve2_proc
+solve2_proc_end:
+cld
+solve2_exit:
+pop di
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+pop bp
+ret
+solve2_noans:
+stc
+jmp solve2_exit
+
+get_min_cell:
+push bp
+mov bp,sp
+push ax
+push bx
+push cx
+push dx
+push si
+lea si,[cell_info]
+mov cl,byte ptr[cell_info_count]
+mov ch,0ffh
+get_min_cell_loop:
+mov bx,[si].PBOARD
+cmp byte ptr[bx],0
+jnz get_min_cell_continue
+mov bx,[si].PMAPX
+mov ax,[bx]
+mov bx,[si].PMAPX
+or ax,[bx]
+mov bx,[si].PMAPGRP
+or ax,[bx]
+not ax
+and ax,[si].MAP
+jz get_min_cell_fail
+xor bl,bl
+get_min_cell_count_elem:
+inc bl
+mov dx,ax
+dec dx
+and ax,dx
+jnz get_min_cell_count_elem
+cmp bl,ch
+jge get_min_cell_continue
+mov ch,bl
+mov di,si
+get_min_cell_continue:
+add si,SIZE CellInfo
+dec cl
+jnz get_min_cell_loop
+clc
+get_min_cell_end:
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+mov sp,bp
+pop bp
+ret
+get_min_cell_fail:
+stc
+jmp get_min_cell_end
+
 
 dupnum_str db "Duplicated number detected.",0dh,0ah,'$'
 noans_str db "No answer.",0dh,0ah,'$'
