@@ -107,8 +107,6 @@ pop bp
 ret
 
 ctz:
-test ax,ax
-jz ctz_all_zero
 push ax
 xor cl,cl
 test al,al
@@ -122,10 +120,6 @@ inc cl
 jmp ctz8
 ctz8_end:
 pop ax
-clc
-ret
-ctz_all_zero:
-stc
 ret
 
 init_map:
@@ -338,7 +332,6 @@ push bp
 solve2_proc:
 call get_min_cell
 jc solve2_skip_push
-test di,di
 jz solve2_proc_end
 push di
 solve2_skip_push:
@@ -465,32 +458,6 @@ ret
 get_min_cell_fail:
 stc
 jmp get_min_cell_end
-
-pnum:
-push bp
-mov bp,sp
-sub sp,10
-push ax
-push dx
-push di
-lea dx,[bp-10]
-mov di,dx
-aam
-add ax,03030h
-xchg ah,al
-cld
-stosw
-mov al,' '
-mov ah,'$'
-stosw
-mov ah,09h
-int 21h
-pop di
-pop dx
-pop ax
-mov sp,bp
-pop bp
-ret
 
 dupnum_str db "Duplicated number detected.",0dh,0ah,'$'
 noans_str db "No answer.",0dh,0ah,'$'
