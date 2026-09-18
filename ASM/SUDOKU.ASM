@@ -648,8 +648,7 @@ db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
 db 6,6,6,7,7,7,8,8,8
 jigsaw_enabled db 0
-board db 81 dup(?)
-ALIGN 2
+board db 82 dup(?)
 file_buf:
 xygmaps:
 xmap dw 9 dup(?)
