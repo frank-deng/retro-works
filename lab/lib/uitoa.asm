@@ -60,27 +60,26 @@ uitoa proc cPType
     mov  ax, dx
 
 emit_thousands:                ; 1000..9999
-    xor  dx, dx
-    mov  bx, 100
-    div  bx
+    mov bl,100
+    div bl
+    mov bl,ah
     aam                        ; AH = AL/10 (tens), AL = AL%10 (units)
-    or  ax, 03030h
+    or ax,03030h
     xchg ah,al
     stosw
-    mov  ax, dx
+    mov al,bl
     jmp emit_tens
 
 emit_hundreds:                 ; 100..999
-    xor  dx, dx
-    mov  bx, 100
-    div  bx
-    or  al, '0'
+    mov bl, 100
+    div bl
+    or al, '0'
     stosb
-    mov  ax, dx
+    mov al,ah
 
 emit_tens:                     ; 10..99
     aam                        ; AH = AL/10 (tens), AL = AL%10 (units)
-    or  ax, 03030h
+    or ax,03030h
     xchg ah,al
     stosw
     jmp uitoa_end

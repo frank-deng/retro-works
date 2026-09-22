@@ -4,16 +4,12 @@ include common.inc
 .code
 public cmdparse
 cmdparse proc cPType
-mov si,di
-jcxz empty_str
 push ax
-push ds
-mov ax,es
-mov ds,ax
+jcxz cmdparse_empty
 mov al,' '
 cld
 repe scasb
-je cmdparse_end
+je cmdparse_empty
 dec di
 inc cx
 mov si,di
@@ -22,10 +18,12 @@ jne cmdparse_end
 dec di
 inc cx
 cmdparse_end:
-pop ds
+test si,di
 pop ax
-empty_str:
 ret
+cmdparse_empty:
+mov si,di
+jmp cmdparse_end
 cmdparse endp
 end
 
