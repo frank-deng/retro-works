@@ -29,6 +29,7 @@ xchg ah,al
 xlat
 mov es:[di],ax
 mov es:[di+2],cx
+add di,4
 pop ds
 pop cx
 pop bx

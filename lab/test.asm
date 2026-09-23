@@ -29,6 +29,7 @@ mov si,di
 xor bx,bx
 test_nums_cycle:
 mov ax,bx
+mov di,si
 call uitoa
 not ax
 call atoui
@@ -39,6 +40,7 @@ cmp ax,bx
 je test_nums_u16_equal
 jmp test_failed
 test_nums_u16_equal:
+mov di,si
 call itoa
 not ax
 call atoi
@@ -57,6 +59,7 @@ lea bx,[test_u16_list]
 test_u16_cycle:
 memset ES [buf] 0 BUFLEN/2
 lea di,[buf]
+mov si,di
 clc
 mov ax,[bx].VAL
 call uitoa
@@ -65,7 +68,6 @@ jnc test_u16_uitoa_ok
 jmp test_failed
 test_u16_uitoa_ok:
 not ax
-mov si,di
 call atoui
 call check_res
 jnc test_u16_atoui_ok
@@ -174,6 +176,7 @@ cmp ax,[bx].VAL
 jne check_res_failed
 cmp cx,[bx].LEN
 jne check_res_failed
+lea di,[buf]
 lea si,[bx].NSTR
 cld
 repe cmpsb

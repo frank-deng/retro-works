@@ -32,29 +32,19 @@
     public itoa
 
 itoa proc cPType
+    or ax,ax
+    jns positive_value
     pushf
     push ax
-    push si
-    push di
-
-    mov  si, di                ; SI = buffer start, used for the length count
-
-    or   ax, ax
-    jns  positive              ; AX >= 0
     neg  ax                    ; AX = |AX|
     mov  byte ptr es:[di], '-' ; emit sign
     inc  di
-positive:
     call uitoa
-    cmp si,di
-    je finish
     inc cx
-finish:
-    pop di
-    pop si
     pop ax
     popf
     ret
+positive_value:
+    jmp uitoa
 itoa endp
-
     end

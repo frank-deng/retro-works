@@ -37,7 +37,6 @@ uitoa proc cPType
     push bx
     push dx
     push si
-    push di
 
     cld
     mov  si, di                ; SI = buffer start, used for the length count
@@ -92,7 +91,6 @@ uitoa_end:
     mov  cx, di
     sub  cx, si                ; CX = characters written
 
-    pop  di
     pop  si
     pop  dx
     pop  bx
