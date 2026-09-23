@@ -1,5 +1,5 @@
-;tasm 24solve.asm, 24solve.obj
-;tlink /t 24solve.obj, 24solve.com
+;tasm 24solve.asm
+;tlink /t 24solve.obj
 .8086
 HASH_MAP_SIZE EQU 4096
 MAX_GOAL EQU 99
@@ -144,10 +144,11 @@ jmp getcmditem_end
 
 str2num:
 jcxz str2num_fail
+cld
 cmp cx,2
 ja str2num_fail
 jb str2num_onedigit
-mov ax,word ptr[si]
+lodsw
 sub ax,03030h
 cmp ah,9
 ja str2num_fail
@@ -157,7 +158,7 @@ xchg ah,al
 aad
 jmp str2num_fin
 str2num_onedigit:
-mov al,byte ptr[si]
+lodsb
 sub al,030h
 cmp al,9
 ja str2num_fail
@@ -170,20 +171,18 @@ stc
 ret
 
 num2str:
+cld
 push ax
 aam
 test ah,ah
 jz num2str_onedigit
 xchg ah,al
 or ax,03030h
-mov word ptr[di],ax
-inc di
-inc di
+stosw
 jmp num2str_end
 num2str_onedigit:
 or al,30h
-mov byte ptr[di],al
-inc di
+stosb
 num2str_end:
 pop ax
 ret
