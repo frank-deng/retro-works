@@ -19,9 +19,7 @@ extrn ctz:cPType
 .code
 org 100h
 start:
-mov ax,cs
-mov ds,ax
-mov es,ax
+clc
 
 ;Enumerate 0x0-0xffff
 lea di,[buf]
@@ -40,7 +38,8 @@ cmp ax,bx
 je test_nums_u16_equal
 jmp test_failed
 test_nums_u16_equal:
-mov di,si
+lea di,[buf]
+mov si,di
 call itoa
 not ax
 call atoi

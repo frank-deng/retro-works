@@ -6,7 +6,6 @@ extrn atoui:cPType
 public atoi
 atoi proc cPType
 push cx
-push si
 cmp byte ptr es:[si],'-'
 je atoi_neg
 call atoui
@@ -25,7 +24,6 @@ ja atoi_error
 neg ax
 clc
 atoi_finish:
-pop si
 pop cx
 ret
 atoi_error:

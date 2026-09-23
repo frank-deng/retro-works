@@ -7,7 +7,6 @@ atoui proc cPType
 push bx
 push cx
 push dx
-push si
 push di
 mov di,10
 xor ax,ax
@@ -28,7 +27,6 @@ loop atoui_loop
 clc
 atoui_finish:
 pop di
-pop si
 pop dx
 pop cx
 pop bx
