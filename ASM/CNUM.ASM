@@ -2,8 +2,8 @@
 ; CNUM.ASM  --  Convert a decimal number to Chinese financial uppercase
 ;               numerals (ÁãÒ¼·¡ÈþËÁÎéÂ½Æâ°Æ¾ÁÊ°°ÛÇªÍòÒÚ).
 ;
-;   Build : tasm cnum.asm, cnum.obj
-;           tlink /t cnum.obj, cnum.com
+;   Build : tasm cnum.asm
+;           tlink /t cnum.obj
 ;   Usage : cnum 123456789  ->  Ò¼ÒÚ·¡ÇªÈþ°ÛËÁÊ°ÎéÍòÂ½ÇªÆâ°Û°ÆÊ°¾Á
 ;
 ;   Note  : num_str is stored as raw GBK bytes below, so the source file
@@ -36,8 +36,7 @@ start:
     mov  cl, es:[80h]        ; cl = command tail length
     mov  di, 81h             ; command tail buffer
     call getcmditem          ; -> si = token start, di = token end
-    cmp  si, di
-    je   fail                ; no argument
+    jz   fail                ; no argument
 
     ;--- length check ---
     mov  cx, di
@@ -124,6 +123,7 @@ getcmditem:
     inc  cx
 getcmditem_end:
     pop  ax
+    cmp  si,di
     ret
 getcmditem_empty:
     mov  si, di
