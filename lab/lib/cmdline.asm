@@ -18,8 +18,8 @@ jne cmdparse_end
 dec di
 inc cx
 cmdparse_end:
-test si,di
 pop ax
+cmp si,di
 ret
 cmdparse_empty:
 mov si,di
