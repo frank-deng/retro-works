@@ -18,8 +18,7 @@ mov di,81h
 lea bx,[nums]
 parsecmd_loop_nums:
 call getcmditem
-cmp si,di
-jne parsecmd_found_item
+jnz parsecmd_found_item
 jmp parsecmd_fail
 parsecmd_found_item:
 push cx
@@ -37,8 +36,7 @@ cmp bx,offset nums_end
 jb parsecmd_loop_nums
 
 call getcmditem
-cmp si,di
-je parsecmd_defgoal
+jz parsecmd_defgoal
 mov cx,di
 sub cx,si
 call str2num
@@ -137,6 +135,7 @@ dec di
 inc cx
 getcmditem_end:
 pop ax
+cmp si,di
 ret
 getcmditem_empty:
 mov si,di

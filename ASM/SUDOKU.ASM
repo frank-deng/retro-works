@@ -1,5 +1,5 @@
-;tasm sudoku.asm, sudoku.obj
-;tlink /t sudoku.obj, sudoku.com
+;tasm sudoku.asm
+;tlink /t sudoku.obj
 .8086
 PRINT_MAP_BUF_SIZE EQU 200
 CellInfo STRUC
@@ -17,16 +17,14 @@ xor ch,ch
 mov cl,es:[80h]
 mov di,81h
 call getcmditem
-cmp si,di
-je error_file
+jz error_file
 lea bx,[board]
 push bx
 call read_sudoku_file
 jc error_file
 
 call getcmditem
-cmp si,di
-je skip_jigsaw
+jz skip_jigsaw
 lea bx,[group_map]
 push bx
 call read_sudoku_file
@@ -83,6 +81,7 @@ dec di
 inc cx
 getcmditem_end:
 pop ax
+cmp si,di
 ret
 getcmditem_empty:
 mov si,di
