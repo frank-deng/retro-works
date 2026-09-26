@@ -170,7 +170,7 @@ Linux主机端DNSmasq可使用以下配置：
 
 ### 配置
 
-* CPU: 8088 4.77MHz
+* CPU: 8088 8MHz
 * RAM: 640k
 * Floppy Drive A: 5.25" 360k Double Side
 * Floppy Drive B: 5.25" 360k Double Side
