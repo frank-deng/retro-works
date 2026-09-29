@@ -2,7 +2,7 @@ import asyncio
 import asyncssh
 from ..util import Logger,ServerGroup
 from ..util.iconv import IConvWrapper
-from .util import TelnetServer
+from .common import TelnetServer,DialinServer
 
 
 class SSHHandler(Logger):
@@ -113,7 +113,25 @@ class TelnetServerSSHInstance(TelnetServer):
         super().__init__(config)
         self._config=config
 
-    async def handler(self,reader,writer,username,password):
+    async def on_session(self,reader,writer,username,password):
+        try:
+            readerIconv,writerIconv=IConvWrapper(reader,writer,
+                self._config.get('client_encoding','utf-8'),
+                self._config.get('server_encoding','utf-8'))
+            async with SSHHandler(readerIconv,writerIconv,self._config,
+                                  username,password):
+                pass
+            return True
+        except (asyncssh.misc.PermissionDenied,ConnectionRefusedError,OSError):
+            return False
+
+
+class DialinServerSSHInstance(DialinServer):
+    def __init__(self,config):
+        super().__init__(config)
+        self._config=config
+
+    async def on_session(self,reader,writer,username,password):
         try:
             readerIconv,writerIconv=IConvWrapper(reader,writer,
                 self._config.get('client_encoding','utf-8'),
@@ -130,4 +148,9 @@ class TelnetServerSSH(ServerGroup):
     def __init__(self,config):
         super().__init__(config[self.__class__.__name__],
                          TelnetServerSSHInstance)
+
+class DialinServerSSH(ServerGroup):
+    def __init__(self,config):
+        super().__init__(config[self.__class__.__name__],
+                         DialinServerSSHInstance)
 

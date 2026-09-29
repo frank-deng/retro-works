@@ -3,11 +3,11 @@ import os
 import pty
 import fcntl
 import termios
-import struct
 import hashlib
+import struct
 from ..util import Logger
 from ..util.iconv import IConvWrapper
-from .util import TelnetServer
+from .common import TelnetServer,DialinServer
 
 
 class ProcessHandler(Logger):
@@ -159,7 +159,24 @@ class TelnetServerTermux(TelnetServer):
         self._config=config[self.__class__.__name__]
         super().__init__(self._config)
 
-    async def handler(self,reader,writer,username,password):
+    async def on_session(self,reader,writer,username,password):
+        if username!=self._config['username'] or \
+            hashlib.sha256(password.encode()).hexdigest()!=self._config['password']:
+            return False
+        readerIconv,writerIconv=IConvWrapper(reader,writer,
+            self._config.get('client_encoding',None),
+            self._config.get('server_encoding','utf-8'))
+        async with TermuxHandler(readerIconv,writerIconv,self._config):
+            pass
+        return True
+
+
+class DialinServerTermux(DialinServer):
+    def __init__(self,config):
+        self._config=config[self.__class__.__name__]
+        super().__init__(self._config)
+
+    async def on_session(self,reader,writer,username,password):
         if username!=self._config['username'] or \
             hashlib.sha256(password.encode()).hexdigest()!=self._config['password']:
             return False

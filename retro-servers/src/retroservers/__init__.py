@@ -2,9 +2,9 @@ from .mailcenter.mailcenter import MailCenter
 from .pop3 import POP3Server
 from .smtp import SMTPServer
 from .ftp2sftp import FTP2SFTPBridgeServer
-from .telnet.ssh import TelnetServerSSH
 from .ftptermux import FTPTermuxServer
-from .telnet.termux import TelnetServerTermux
 from .web import WebServer
 from .httpfileserver import HTTPFileServer
+from .terminal.termux import TelnetServerTermux,DialinServerTermux
+from .terminal.ssh import TelnetServerSSH,DialinServerSSH
 
