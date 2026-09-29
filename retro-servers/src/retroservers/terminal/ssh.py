@@ -108,7 +108,7 @@ class SSHHandler(Logger):
             await self._channel.wait_closed()
 
 
-class TelnetServerSSHInstance(TelnetServer):
+class SSHSessionMixin:
     def __init__(self,config):
         super().__init__(config)
         self._config=config
@@ -126,22 +126,12 @@ class TelnetServerSSHInstance(TelnetServer):
             return False
 
 
-class DialinServerSSHInstance(DialinServer):
-    def __init__(self,config):
-        super().__init__(config)
-        self._config=config
+class TelnetServerSSHInstance(SSHSessionMixin,TelnetServer):
+    pass
 
-    async def on_session(self,reader,writer,username,password):
-        try:
-            readerIconv,writerIconv=IConvWrapper(reader,writer,
-                self._config.get('client_encoding','utf-8'),
-                self._config.get('server_encoding','utf-8'))
-            async with SSHHandler(readerIconv,writerIconv,self._config,
-                                  username,password):
-                pass
-            return True
-        except (asyncssh.misc.PermissionDenied,ConnectionRefusedError,OSError):
-            return False
+
+class DialinServerSSHInstance(SSHSessionMixin,DialinServer):
+    pass
 
 
 class TelnetServerSSH(ServerGroup):

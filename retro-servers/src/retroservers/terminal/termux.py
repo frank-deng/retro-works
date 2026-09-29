@@ -154,7 +154,7 @@ class TermuxHandler(ProcessHandler):
             os._exit(1)
 
 
-class TelnetServerTermux(TelnetServer):
+class TermuxSessionMixin:
     def __init__(self,config):
         self._config=config[self.__class__.__name__]
         super().__init__(self._config)
@@ -171,19 +171,10 @@ class TelnetServerTermux(TelnetServer):
         return True
 
 
-class DialinServerTermux(DialinServer):
-    def __init__(self,config):
-        self._config=config[self.__class__.__name__]
-        super().__init__(self._config)
+class TelnetServerTermux(TermuxSessionMixin,TelnetServer):
+    pass
 
-    async def on_session(self,reader,writer,username,password):
-        if username!=self._config['username'] or \
-            hashlib.sha256(password.encode()).hexdigest()!=self._config['password']:
-            return False
-        readerIconv,writerIconv=IConvWrapper(reader,writer,
-            self._config.get('client_encoding',None),
-            self._config.get('server_encoding','utf-8'))
-        async with TermuxHandler(readerIconv,writerIconv,self._config):
-            pass
-        return True
+
+class DialinServerTermux(TermuxSessionMixin,DialinServer):
+    pass
 
