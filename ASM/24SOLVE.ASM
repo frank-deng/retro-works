@@ -1,5 +1,6 @@
 ;tasm 24solve.asm
 ;tlink /t 24solve.obj
+;Note: The same .com is also runnable on NEC PC9800 Series
 .8086
 HASH_MAP_SIZE EQU 4096
 MAX_GOAL EQU 99

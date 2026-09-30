@@ -1,5 +1,6 @@
 ;tasm sudoku.asm
 ;tlink /t sudoku.obj
+;Note: The same .com is also runnable on NEC PC9800 Series
 .8086
 PRINT_MAP_BUF_SIZE EQU 200
 CellInfo STRUC
