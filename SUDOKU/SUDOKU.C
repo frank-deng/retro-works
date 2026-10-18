@@ -1,4 +1,4 @@
-// wcl -0 -d0 -ox -mt -fe=sudoku.com sudoku.c
+// wcl -cc -0 -d0 -ox -mt -fe=sudoku.com SUDOKU.C
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
