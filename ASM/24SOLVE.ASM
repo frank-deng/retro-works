@@ -248,7 +248,7 @@ jnz check_res_fail
 cmp ax,[goal]
 jne check_res_fail
 lea bx,[opers_str]
-push [goal]
+push word ptr [goal]
 push [bp+10]
 mov ax,[bp+4]
 xlat
