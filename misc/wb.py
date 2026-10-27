@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 MB_HEADER="""[Description]
 Name=五笔字形
 MaxCodes=4
 UsedCodes=abcdefghijklmnopqrstuvwxy
 WildChar=z
-Sort=1
+Sort=0
 [TEXT]
 """
 
@@ -23,8 +24,6 @@ def loadmb(fpath):
             code=items[0]
             for hz in items[1:]:
                 hz=re.sub(r'[\x00-\x7f]','',hz)
-                if len(hz)>1:
-                    continue
                 mb_single.append((hz,code))
                 if len(mb_base.get(hz,''))<len(code):
                     mb_base[hz]=code
