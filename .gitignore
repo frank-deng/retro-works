@@ -10,7 +10,6 @@ __test__
 *.OBJ
 *.com
 *.EXE
-*.BIN
 *.MAP
 *.exe
 *.err

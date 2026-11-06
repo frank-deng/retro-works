@@ -1,53 +1,76 @@
-DECLARE FUNCTION nd$ (A#)
-DECLARE FUNCTION percent$ (A#)
-
 DEFINT A-Z: DEFDBL P
 COMMON PI
 DECLARE SUB DRAWPIE(X AS INTEGER, Y AS INTEGER, R AS INTEGER, S AS DOUBLE, E AS DOUBLE, CL AS INTEGER)
+COMMON SHARED L AS INTEGER,LT AS INTEGER,S#,M#
+DIM SHARED LABEL$(30),VALUE#(30)
 PI=3.141592654
 
-DIM LABEL$(31),VALUE#(31)
-
 L=0:LT=0:S#=0:M#=0:Y=1
-INPUT "Filename: ", F$
-OPEN F$ FOR INPUT AS #1
-INPUT #1,T$,D#
-WHILE NOT EOF(1)
-  INPUT #1,T$,D#: L=L+1
-  S#=S#+D#: IF D#>M# THEN M#=D#
-  K=LEN(T$)+LEN(percent$(D#/M#))+3: IF K>LT THEN LT=K
-  LABEL$(L)=T$:VALUE#(L)=D#
-WEND
-CLOSE #1
+
+INPUT "Load from file? (Y/N)",F$
+IF F$="y" OR F$="Y" THEN CALL FILEINPUT ELSE CALL MANUALINPUT
+IF L<2 THEN PRINT "Minimum 1 item required":END
 
 SCREEN 12:COLOR 15:CLS
-LT=LT*8:W=638-LT
+W=638-LT*8
 
-FOR I=1 TO L
+FOR I=0 TO L-1
   T$=LABEL$(I):D#=VALUE#(I)
-  LOCATE Y,1,0:PRINT T$;" (";percent$(D#/S#);")";
-  K!=D#/M#:LINE (LT+1,(Y-1)*16)-(K!*W+LT+1,(Y-1)*16+14),,BF
+  LOCATE Y,1,0:PRINT T$;:LOCATE ,LT-7:PRINT USING "(##.##%)";D#/S#*100;
+  K!=D#/M#:LINE (LT*8+1,(Y-1)*16)-(K!*W+LT*8+1,(Y-1)*16+14),,BF
   Y=Y+1
 NEXT I
 WHILE INPUT$(1)="":WEND:CLS
 
-Y=(30-L)/2: K1#=0: K2#=VALUE#(1)
-FOR I=1 TO L
+Y=(30-L)/2: K1#=0: K2#=VALUE#(0)
+FOR I=0 TO L-1
   T$=LABEL$(I):D#=VALUE#(I)
-  IF I = L THEN
+  IF I = L-1 THEN
     COL = 1
     CALL DRAWPIE(430, 240, 200, FIX(K1#/S#*360), 360, 1)
   ELSE
-    COL = ((I-1) mod 13)+2
+    COL = (I mod 13)+2
     CALL DRAWPIE(430, 240, 200, FIX(K1#/S#*360), FIX(K2#/S#*360), COL)
     K1#=K1#+VALUE#(I):K2#=K2#+VALUE#(I+1)
   END IF
-  LOCATE Y+1,3,0:PRINT T$+" ("+percent$(D#/S#)+")";
+  LOCATE Y+1,3,0:PRINT T$;:LOCATE ,LT-5:PRINT USING "(##.##%)";D#/S#*100;
   LINE (0,Y*16+1)-(12,Y*16+1+12),COL,BF
   LINE (0,Y*16+1)-(12,Y*16+1+12),15,B
   Y=Y+1
 NEXT I
 WHILE INPUT$(1)="":WEND:CLS:SCREEN 0:END
+
+SUB FILEINPUT
+  STATIC F$
+  INPUT "Filename: ", F$
+  OPEN F$ FOR INPUT AS #1
+  WHILE NOT EOF(1)
+    INPUT #1,T$,D#
+    S#=S#+D#: IF D#>M# THEN M#=D#
+    K=LEN(T$)+8: IF K>LT THEN LT=K
+    LABEL$(L)=T$:VALUE#(L)=D#:L=L+1
+  WEND
+  CLOSE #1
+END SUB
+
+SUB MANUALINPUT
+  PRINT "Hint: Input a single comma to end."
+  DO
+    INPUT "Label,Value: ",T$,D#
+    IF T$<>"" AND D#>=0 THEN
+      S#=S#+D#: IF D#>M# THEN M#=D#
+      K=LEN(T$)+8: IF K>LT THEN LT=K
+      LABEL$(L)=T$:VALUE#(L)=D#:L=L+1
+    END IF
+  LOOP WHILE L<30 AND T$<>"" AND D#>=0
+  INPUT "Save to file? (Y/N)",F$
+  IF F$="y" OR F$="Y" THEN
+    INPUT "Filename:",F$
+    OPEN F$ FOR OUTPUT AS #1:FOR I=0 TO L-1
+    PRINT#1,LABEL$(I);",";VALUE#(I):NEXT I
+    CLOSE #1
+  END IF
+END SUB
 
 SUB DRAWPIE(X AS INTEGER, Y AS INTEGER, R AS INTEGER, S AS DOUBLE, E AS DOUBLE, CL AS INTEGER)
   SHARED PI
@@ -59,13 +82,3 @@ SUB DRAWPIE(X AS INTEGER, Y AS INTEGER, R AS INTEGER, S AS DOUBLE, E AS DOUBLE, 
   PAINT (XP,YP),CL
 END SUB
 
-FUNCTION nd$ (A AS DOUBLE)
-  nd$ = LTRIM$(RTRIM$(STR$(A)))
-END FUNCTION
-
-FUNCTION percent$(A AS DOUBLE)
-  STATIC P AS DOUBLE
-  P = FIX(A * 10000 + 0.5) / 100
-  pn$ = nd$(p#):if P<1 and P>0 then pn$ = "0"+pn$
-  percent$ = mid$(pn$, 1, len(str$(fix(p#)))+3) + "%"
-END FUNCTION
