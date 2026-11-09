@@ -26,7 +26,6 @@ Retro Programming Works 怀旧编程作品
 
 #### 单机
 
-* BASIC编程
 * 小游戏（2048、俄罗斯方块、纸牌、扫雷、DOS Mario）
 * 英汉字典
 * 文字处理
@@ -46,8 +45,6 @@ Retro Programming Works 怀旧编程作品
 
 DOS下推荐安装以下软件：
 
-* UCDOS 98b+宋体简、仿宋简、黑体简、楷体简轮廓字库
-* CCED（简单数值计算）
 * SEA（看图软件，支持高彩色、真彩色，可灵活切换分辨率和色深）
 
 Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
@@ -69,7 +66,6 @@ Windows 3.2推荐安装以下软件：
 * Microsoft Musical Instruments（多媒体光盘）
 * 震撼——古典音乐鉴赏（多媒体光盘）
 * ACDSee 2.2 16位版本
-* Microsoft Scenes中的所有JPG图片
 * LView Pro 1.B（可用于转换图片格式）
 * WinZip（2037年之后不可用）
 * Microsoft Office 4.2（需要精选要安装的组件，详细见“Microsoft Office 4.2安装说明”）
@@ -143,21 +139,14 @@ Linux主机端DNSmasq可使用以下配置：
 	address=/mysite.com/10.0.2.2
 	address=/www.mysite.com/10.0.2.2
 
-### 程序开发相关说明
-
-* 该机暂定只支持MS-DOS自带的`QBASIC`和`MASM`/`TASM`汇编器。不准备作为C/C++等语言的开发机，除`MASM`/`TASM`以外，不额外安装任何IDE或编程工具。
-* 为保证可维护性，DOS自带的QBASIC建议将代码规模控制在600行以内。
-* 该机随时接受任何来自可信外部机器构建的程序，一般通过浏览器或FTP下载。
-* Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
-
 ### 补充说明
 
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
-* UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
-* UCDOS配合西文软件（比如QBasic、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 * Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 * `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Tera Term等软件对接。
+* 该机随时接受任何来自可信外部机器构建的程序，一般通过浏览器或FTP下载。
+* Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
 
 ### AI时代的新用法
@@ -263,4 +252,8 @@ Linux主机端DNSmasq可使用以下配置：
 * GW-BASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量。因此开发前需仔细评估程序复杂度以决定是否移植到GW-BASIC上，开发时需严格控制`GOTO`的使用以保证一定程度的可维护性。
 * WPS打开的文件包含GB2312不支持的字符时，极易出现死机。
 * 该机纯展示向，暂定只保留现有软件阵容，不上线更多软件/程序。
+
+------------------------------------------------------------------------------------
+
+其它PC的配置和部署细节见[286_386.md](286_386.md)
 
