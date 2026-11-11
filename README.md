@@ -250,7 +250,70 @@ Linux主机端DNSmasq可使用以下配置：
 
 * GW-BASIC限制较多，不支持结构化编程，只能使用行号，所有变量皆全局变量。因此开发前需仔细评估程序复杂度以决定是否移植到GW-BASIC上，开发时需严格控制`GOTO`的使用以保证一定程度的可维护性。
 * WPS打开的文件包含GB2312不支持的字符时，极易出现死机。
+* 本机使用Hercules显卡，此时GW-BASIC只支持文本模式，不支持任何图形模式。
 * 该机纯展示向，暂定只保留现有软件阵容，不上线更多软件/程序。
 
-------------------------------------------------------------------------------------
+
+1990s PC开发者版
+----------------
+
+1990s PC基础上构建的C、汇编开发机，进行C语言开发的最小配置。配置与1990s PC相同。
+
+### 主要用途
+
+* C语言开发
+* 汇编语言开发
+* WPS中英文文字处理
+
+### 所用软盘说明
+
+#### MS-DOS 3.3系统软盘
+
+与1990s PC相同。
+
+#### CCDOS软盘
+
+与1990s PC相同。
+
+#### Turbo C 1.0软盘
+
+放入以下文件
+
+	C0S.OBJ
+	CS.LIB
+	EMU.LIB
+	INC/ALLOC.H
+	INC/ASSERT.H
+	INC/BIOS.H
+	INC/CONIO.H
+	INC/CTYPE.H
+	INC/DIR.H
+	INC/DOS.H
+	INC/ERRNO.H
+	INC/FCNTL.H
+	INC/FLOAT.H
+	INC/IO.H
+	INC/LIMITS.H
+	INC/MATH.H
+	INC/MEM.H
+	INC/PROCESS.H
+	INC/SETJMP.H
+	INC/SHARE.H
+	INC/SIGNAL.H
+	INC/STDARG.H
+	INC/STDDEF.H
+	INC/STDIO.H
+	INC/STDLIB.H
+	INC/STRING.H
+	INC/SYS/STAT.H
+	INC/TIME.H
+	INC/VALUES.H
+	MATHS.LIB
+	TCC.EXE
+	TLINK.EXE
+
+#### TASM 1.0软盘
+
+待配置
+
 
