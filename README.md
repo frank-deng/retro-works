@@ -167,7 +167,7 @@ Linux主机端DNSmasq可使用以下配置：
 * RAM: 640k
 * Floppy Drive A: 5.25" 360k Double Side
 * Floppy Drive B: 5.25" 360k Double Side
-* Display: CGA with green monochrome monitor
+* Display: Hercules Graphic Adapter with green monochrome monitor
 * ISA RTC
 
 ### 主要用途
@@ -242,7 +242,6 @@ Linux主机端DNSmasq可使用以下配置：
 	WPS2.OVL   （WPS依赖文件）
 	TETRIS.COM （俄罗斯方块游戏）
 
-
 * 所有BASIC程序文件及其依赖数据可在本仓`BASIC`目录中找到。
 * 所有WPS文档可在本仓`BASIC/DOC`目录中找到。
 
@@ -254,6 +253,4 @@ Linux主机端DNSmasq可使用以下配置：
 * 该机纯展示向，暂定只保留现有软件阵容，不上线更多软件/程序。
 
 ------------------------------------------------------------------------------------
-
-其它PC的配置和部署细节见[286_386.md](286_386.md)
 
