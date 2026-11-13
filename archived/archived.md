@@ -123,3 +123,16 @@ TODO：基于VGA的BMP、PCX图片浏览程序待开发
 * 不建议使用Windows 3.2 Tera Term的TEK绘图功能，极易导致系统卡死。建议使用DOS下的MS-DOS Kermit的TEK绘图功能。
 * TEK40xx绘图功能，基准分辨率为1024x780，Y轴方向为从下往上，与一般屏幕Y轴方向相反。
 
+-------
+
+#### Microsoft Office 4.2安装说明
+
+Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、稳定性差、实用价值低等问题，推荐安装的组件如下：
+
+* Word除本体外，只安装“联机帮助、示例”中的“Word帮助”、“示例”
+* Excel除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”
+* Microsoft PowerPoint、Microsoft Office管理器、共享应用程序不安装
+* “转换程序、过滤程序和数据存取”中，安装所有文字转换程序和图形过滤程序，“数据存取”不安装
+* 工具中只安装“MS Info”
+* 长城全真中文字体
+
