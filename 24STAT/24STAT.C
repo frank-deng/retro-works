@@ -173,8 +173,7 @@ int main(void)
                 vals[2] = c;
                 for (d = c; d <= NVAL; d++) {
                     vals[3] = d;
-                    printf("\rProcessed: %4d/%4d %3d%%", idx + 1, NCOUNT,
-                           (idx + 1) * 100 / NCOUNT);
+                    printf("\rProcessed: %4d/%4d", idx + 1, NCOUNT);
                     bit = (unsigned int)1 << (idx & 15);
                     for (p = 0; p < NPERM; p++)
                         calc24(p, idx >> 4, bit);
