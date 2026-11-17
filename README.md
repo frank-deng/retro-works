@@ -44,10 +44,13 @@ Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装
 
 Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
 
+Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
+
 Windows 3.2推荐安装以下软件：
 
-* 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
 * WPS 97
+* 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
+* Microsoft Office 4.2（详细说明见“Microsoft Office 4.2安装说明”）
 
 Windows 3.2连网场景推荐安装以下软件：
 
@@ -56,6 +59,17 @@ Windows 3.2连网场景推荐安装以下软件：
 * Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
 * WS FTP16LE（FTP客户端）
 * FoxMail（邮件客户端）
+
+#### Microsoft Office 4.2安装说明
+
+Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、稳定性差、实用价值低等问题，推荐安装的组件如下：
+
+* Word除本体外，只安装“联机帮助、示例”中的“Word帮助”、“示例”
+* Excel除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”
+* Microsoft PowerPoint、Microsoft Office管理器、共享应用程序不安装
+* “转换程序、过滤程序和数据存取”中，安装所有文字转换程序和图形过滤程序，“数据存取”不安装
+* 工具中只安装“MS Info”
+* 长城全真中文字体
 
 #### 五笔字形输入法安装说明
 
@@ -112,6 +126,8 @@ Linux主机端DNSmasq可使用以下配置：
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Tera Term等软件对接。
 * 该机随时接受任何来自可信外部机器构建的程序，一般通过浏览器或FTP下载。
+* Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
+* 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * WinZip实测2037年之后不可用，如无压缩解压需要可不安装。
 * Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
@@ -221,119 +237,49 @@ Linux主机端DNSmasq可使用以下配置：
 * 该机纯展示向，暂定只保留现有软件阵容，不上线更多软件/程序。
 
 
-1990s PC开发者版
-----------------
-
-“没条件就创造条件”——1990s PC基础上的C、汇编开发机，进行C语言开发的最小配置。配置与1990s PC相同。
-
-<!--硬件不变，软盘、软件阵容，乱点就乱点，想用啥就用啥-->
-
-### 主要用途
-
-* C语言开发
-* 汇编语言开发
-* WPS中英文文字处理
-* BASIC编程
-
-### 所用软盘说明
-
-#### MS-DOS 3.3系统软盘
-
-与1990s PC相同。
-
-#### CCDOS软盘
-
-与1990s PC相同。
-
-#### Turbo C 1.0软盘
-
-放入以下文件
-
-	C0S.OBJ
-	CS.LIB
-	EMU.LIB
-	INC/*.H  （Turbo C 1.0的所有.H文件）
-	INC/SYS/STAT.H
-	MATHS.LIB
-	TCC.EXE
-	TLINK.EXE
-
-#### TASM 1.0软盘
-
-待补充
-
-### 补充说明
-
-* 该机GW-BASIC仅用于运行猜数字游戏的作弊/自动玩版本。
-* 代码、`.OBJ`之类的中间文件、最终`.EXE`产物，必须能被单张360k软盘容纳；须确保程序规模不超过此限制，否则不用该机开发。
-* 汇编开发时`.ASM`源文件及生成的`.OBJ`、`.COM`均放数据盘，系统盘只留工具。
-* CCDOS事实上支持VGA，但默认只能检测到EGA模式，需要在`VDKEY.COM`启动时加上`/VGA`参数开启VGA模式支持。
-* CCDOS的`VDKEY.COM`启动时可以加上`/T`参数关闭右下角时钟显示，增强稳定性。
-
-
-1997s PC
+1996s PC
 ---------
 
-从1993年的纯办公机一路升级成为家用多媒体电脑。
+国内90年代一台典型的386机。
+
+<!--除非绝对必要，不再新加任何软件，改动任何文件-->
 
 ### 配置
 
 * 386 SX-33MHz CPU
-* 4M RAM
+* 2M RAM
 * SVGA-Compatible Graphics Adapter with 512k VRAM（支持640x480 256色）
 * 64M Hard Disk
 * 3.5 Inch Floppy Drive x1
 * 5.25 Inch Floppy Drive x1
-* CD-ROM
-* Sound Blaster 16（兼容卡）
-* Mouse
 
 ### 主要用途
 
 * WPS打字
 * CCED制表、计算
-* 浏览图片
+* 汇编语言编程（仅限QBASIC程序依赖的汇编模块以及少数汇编程序）
 * BASIC编程
 * 英汉字典
 * 图片浏览
-* 听CD、MIDI
-* 多媒体光盘浏览（《微软乐器大百科》）
-* 俄罗斯方块、2048等小游戏
+* 俄罗斯方块、2048、贪吃蛇等小游戏
 
 ### 安装说明
 
 推荐安装以下软件：
 
 * UCDOS+宋体简、仿宋简、黑体简、楷体简轮廓字库和24点阵字库，外加12点阵宋体字库
-* UCDICT（UCDOS和Windowa 3.x环境下均可用）
+* UCDICT（希望辞海，UCDOS和Windowa 3.x环境下均可用）
 * CCED（简单数值计算、表格处理）
 * SEA/PictView（看图软件）
 * DAZZLE.EXE（DOS下的屏幕保护程序）
-* TASM+TLINK（只用于编译QBASIC程序依赖的汇编模块）
-* DOS下用的CD、MIDI、WAV播放器
+* TASM+TLINK（汇编器+连接器）
 * Microsoft Scenes中的所有JPG图片
-* Windows 3.x版俄罗斯方块
-* 《微软乐器大百科》（需要在Windows 3.x环境下运行）
-* LView Pro 1.B（可用于转换图片格式）
 
-Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
-
-* 对象包装程序及其帮助
-* 记录器及其帮助
-* 造字程序及其帮助
-* 终端仿真程序及其帮助
-
-Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
-
-Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
-
-本机部署`BASIC`、`BASIC/DOC`、`QB`目录中所有文件。
+本机部署`BASIC`、`BASIC/DOC`、`QB`、`ASM`目录中所有文件。
 
 ### 补充说明
 
 * 为保证可维护性，QBASIC建议将代码规模控制在600行以内。
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
-* UCDOS配合西文软件（比如QBasic、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
-* Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
-* 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
+* UCDOS配合西文软件（比如QBASIC、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
 
