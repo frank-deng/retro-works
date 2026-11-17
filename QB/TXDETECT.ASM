@@ -1,7 +1,6 @@
 ;How to compile:
-;TASM UTIL
-;TLINK /t /x UTIL
-;REN UTIL.COM UTIL.BIN
+;TASM TXDETECT
+;TLINK /t TXDETECT
 code segment
 org 100h
 assume cs:code
