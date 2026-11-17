@@ -6,11 +6,6 @@ code segment
 org 100h
 assume cs:code
 start:
-db 0fdh
-dw 0
-dw 100h
-dw codeend-codestart
-codestart:
 push bp
 mov bp,sp
 mov si,[bp+6]
@@ -45,8 +40,6 @@ envtestend:
 mov sp,bp
 pop bp
 retf 2
-codeend:
-db 1ah
 code ends
 end start
 
