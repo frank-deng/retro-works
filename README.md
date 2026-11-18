@@ -125,8 +125,8 @@ Linux主机端DNSmasq可使用以下配置：
 
 * Microsoft Word 6.0中可使用EQ域代码写公式，相比使用公式编辑器更可靠，现代Microsoft Word亦支持同款功能。
 * `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Tera Term等软件对接。
+* `retro-servers`中的自制服务，使用1024以下端口前需要执行`sudo setcap 'cap_net_bind_service=+ep' /usr/bin/python3`开启相关权限；`/usr/bin/python3`必要时需顺着软链接找到真正的可执行文件本身。
 * 该机随时接受任何来自可信外部机器构建的程序，一般通过浏览器或FTP下载。
-* Windows 3.2的日历程序建议只用于查看特定年份和月份的日历；卡片盒程序可当备忘录用。
 * 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * WinZip实测2037年之后不可用，如无压缩解压需要可不安装。
