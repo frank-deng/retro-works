@@ -1,4 +1,4 @@
-"""把图片转成 8bpp 256 色索引图, 前 16 色保留给系统 (Windows/VGA 标准 16 色).
+"""把图片转成 8bpp 256 色索引图, 前 16 色保留给系统 (VGA 默认 16 色).
 
     im  = imgproc("BG.JPG")      # P 模式, 索引 16..255, 可直接 ImageDraw 绘图
     imgsave(im, "BG.BMP")
@@ -9,19 +9,20 @@
     d.fontmode = "1"
     d.text((100, 100), gb("石头"), font=f, fill=15)
 
-调色板布局: 0..15 标准 16 色(图像不使用, 留给 UI/文字/光标) + 16..255 自适应色.
+调色板布局: 0..15 标准 VGA 16 色(图像不使用, 留给 UI/文字/光标) + 16..255 自适应色.
 抖动为 Floyd-Steinberg, 可选目标里不含 0..15.
 """
 import io
+import math
 import struct
 
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 
 STD16 = [
-    (0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0),
-    (0, 0, 128), (128, 0, 128), (0, 128, 128), (192, 192, 192),
-    (128, 128, 128), (255, 0, 0), (0, 255, 0), (255, 255, 0),
-    (0, 0, 255), (255, 0, 255), (0, 255, 255), (255, 255, 255),
+    (0, 0, 0), (0, 0, 170), (0, 170, 0), (0, 170, 170),
+    (170, 0, 0), (170, 0, 170), (170, 85, 0), (170, 170, 170),
+    (85, 85, 85), (85, 85, 255), (85, 255, 85), (85, 255, 255),
+    (255, 85, 85), (255, 85, 255), (255, 255, 85), (255, 255, 255),
 ]
 RESERVED = len(STD16)
 
@@ -103,7 +104,7 @@ def gb(s):
 
 
 if __name__=='__main__':
-    im = imgproc('BG.JPG')
+    im = imgproc('love.jpg')
     d = ImageDraw.Draw(im)
     d.fontmode = "1"                        # 无抗锯齿
 
@@ -111,13 +112,26 @@ if __name__=='__main__':
     RIGHTX = 638 - X0 - FONTSIZE * 2        # 右侧"春婷"的起点, 右边缘对齐 638-X0
     font = open_gbk_font("SKAITI.TTF", FONTSIZE)
 
-    # 主色 VGA 11(亮青) -> 本调色板 14, 描边 VGA 3(青) -> 6, 八向各偏移 1 像素
+    # 主色 11(亮青) + 描边 3(青), 八向各偏移 1 像素
     for s, x in (("石头", X0), ("春婷", RIGHTX)):
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
                 if dx or dy:
-                    d.text((x + dx, Y0 + dy), gb(s), font=font, fill=6)
-        d.text((x, Y0), gb(s), font=font, fill=14)
+                    d.text((x + dx, Y0 + dy), gb(s), font=font, fill=3)
+        d.text((x, Y0), gb(s), font=font, fill=11)
 
-    im.save('BG.BMP', format="BMP")
+    # 爱心: 上半两个半径 50 的半圆 + 下半按余弦收尖, 内部色 13, 轮廓色 5
+    HEARTX, HEARTY, HEARTW, HEARTH = 320, 10, 50, 150
+    for cx in (HEARTX - HEARTW, HEARTX + HEARTW):
+        cy = HEARTY + HEARTW
+        box = (cx - HEARTW, cy - HEARTW, cx + HEARTW, cy + HEARTW)
+        d.pieslice(box, 180, 360, fill=13)      # 半圆盘(心形的两个凸起)
+        d.arc(box, 180, 360, fill=5)            # 再压一条 1px 弧线做轮廓
+    for i in range(1, HEARTH + 1):
+        x = int(HEARTW * 2 * math.cos(math.pi * i / 2 / HEARTH) + .5)
+        y = HEARTY + HEARTW + i
+        d.line([(HEARTX - x, y), (HEARTX + x, y)], fill=13)
+        d.point((HEARTX - x, y), fill=5)
+        d.point((HEARTX + x, y), fill=5)
 
+    im.save('love.bmp', format="BMP")
