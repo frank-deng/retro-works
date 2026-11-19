@@ -276,7 +276,7 @@ Linux主机端DNSmasq可使用以下配置：
 * TASM+TLINK（汇编器+连接器）
 * Microsoft Scenes中的所有JPG图片
 
-本机部署`BASIC`、`BASIC/DOC`、`QB`、`ASM`目录中所有文件。
+本机部署`BASIC`、`QB/DOC`、`QB`、`ASM`目录中所有文件。
 
 ### 补充说明
 
