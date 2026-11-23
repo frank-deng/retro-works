@@ -6,7 +6,7 @@ Retro Programming Works 怀旧编程作品
 
 “旧瓶装新酒”——一台想跟上时代，不想做孤岛的古董电脑。
 
-<!--硬盘、文件、软件阵容，乱点就乱点，想用啥就用啥，想上啥硬件就上啥硬件，只要符合90年代到千禧年国情-->
+<!--尽可能发挥Windows 3.2的潜力-->
 
 ### 配置
 
@@ -22,9 +22,8 @@ Retro Programming Works 怀旧编程作品
 
 ### 主要用途
 
-* 小游戏
 * 文字处理（WPS 97、Word 6.0）
-* 电子表格（Excel 4.2）
+* 电子表格（Excel 5.0）
 * 上网看新闻
 * 收发邮件
 * 连接远端UNIX机器
@@ -32,33 +31,29 @@ Retro Programming Works 怀旧编程作品
 
 ### 安装说明
 
-DOS下推荐安装以下软件：
-
-* DOS Mario
-
-Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
-
-* 对象包装程序及其帮助
-* 记录器及其帮助
-* 造字程序及其帮助
-
-Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
-
-Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
+Windows 3.2的部署（附加组件取舍、声卡驱动）见“Windows 3.2部署说明”。
 
 Windows 3.2推荐安装以下软件：
 
 * WPS 97
-* 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
 * Microsoft Office 4.2（详细说明见“Microsoft Office 4.2安装说明”）
-
-Windows 3.2连网场景推荐安装以下软件：
-
+* 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
 * Trumpet Winsock
 * Internet Explorer 3.0（仅安装浏览器）
 * Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
 * WS FTP16LE（FTP客户端）
 * FoxMail（邮件客户端）
+
+#### Windows 3.2部署说明
+
+Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
+
+* 对象包装程序及其帮助
+* 记录器及其帮助
+* 录音机及其帮助
+* 造字程序及其帮助
+
+Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
 
 #### Microsoft Office 4.2安装说明
 
@@ -78,7 +73,7 @@ Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中
 
 * 打开码表生成器
 * 加载并编译五笔码表文件（`misc/WB.TXT`）
-* 在控制面板中的输入法设置中安装“通用码表输入法”即可
+* 在控制面板中的输入法设置中安装“通用码表输入法”，之后在输入法设置中选择“五笔字形”即可
 
 ### NE2000配置
 
@@ -128,7 +123,6 @@ Linux主机端DNSmasq可使用以下配置：
 * `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Tera Term等软件对接。
 * `retro-servers`中的自制服务，使用1024以下端口前需要执行`sudo setcap 'cap_net_bind_service=+ep' /usr/bin/python3`开启相关权限；`/usr/bin/python3`必要时需顺着软链接找到真正的可执行文件本身。
 * 该机随时接受任何来自可信外部机器构建的程序，一般通过浏览器或FTP下载。
-* 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * WinZip实测2037年之后不可用，如无压缩解压需要可不安装。
 * Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
@@ -284,4 +278,58 @@ Linux主机端DNSmasq可使用以下配置：
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * UCDOS WPS模拟显示功能可使用Pause键暂停显示，然后按任意键继续模拟显示。
 * UCDOS配合西文软件（比如QBASIC、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
+
+1998s Multimedia PC
+-------------------
+
+1998年左右，国内典型的多媒体电脑。
+
+<!--不连网，尽量贴合当年的国情-->
+
+### 配置
+
+* 486 DX2-66MHz CPU
+* 8M RAM
+* 512M HDD
+* S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持640x480高彩色）
+* 3.5 Inch Floppy Drive x1
+* 5.25 Inch Floppy Drive x1
+* CD-ROM
+* Sound Blaster 16
+* Mouse
+
+### 主要用途
+
+* 文字处理（Word 6.0）
+* 电子表格（Excel 5.0）
+* 英汉辞典
+* 图片浏览
+* 听CD、MIDI
+* 多媒体光盘浏览
+* 小游戏
+
+### 安装说明
+
+DOS下推荐安装以下软件：
+
+* DOS Mario
+
+Windows 3.2的部署（附加组件取舍、声卡驱动）见前文“Windows 3.2部署说明”；本机另不推荐安装“终端仿真程序及其帮助”。
+
+Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
+
+Windows 3.2推荐安装以下软件：
+
+* 金山词霸1.0
+* ACDSee
+* LView Pro 1.B
+* Microsoft Tetris for Windows 2.00
+* 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
+* Microsoft Office 4.2（详细说明见前文“Microsoft Office 4.2安装说明”）
+* 微软乐器大百科
+* Microsoft Scenes中的所有JPG图片
+
+### 补充说明
+
+* 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 
