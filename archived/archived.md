@@ -125,4 +125,17 @@ TODO：基于VGA的BMP、PCX图片浏览程序待开发
 
 * CCDOS事实上支持VGA，但默认只能检测到EGA模式，需要在`VDKEY.COM`启动时加上`/VGA`参数开启VGA模式支持。
 * CCDOS的`VDKEY.COM`启动时可以加上`/T`参数关闭右下角时钟显示，增强稳定性。
+* 公式排版以Office 4.2自带的公式编辑器为主，因其需OLE，8M内存下建议将Windows 3.2永久交换文件开到16M以上；少量简单公式可用EQ域代码，现代Microsoft Word亦支持同款功能，但排版能力弱于公式编辑器。
+
+#### Microsoft Office 4.2安装说明
+
+Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、稳定性差、实用价值低等问题，推荐安装的组件如下：
+
+* Word除本体外，只安装“联机帮助、示例”中的“Word帮助”、“示例”
+* Excel除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”
+* Microsoft PowerPoint、Microsoft Office管理器不安装
+* 共享应用程序中只安装“公式编辑器”
+* “转换程序、过滤程序和数据存取”中，安装所有文字转换程序和图形过滤程序，“数据存取”不安装
+* 工具中只安装“MS Info”
+* 可选装长城全真中文字体
 

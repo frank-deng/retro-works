@@ -35,8 +35,8 @@ Windows 3.2的部署（附加组件取舍、声卡驱动）见“Windows 3.2部�
 
 Windows 3.2推荐安装以下软件：
 
-* WPS 97
-* Microsoft Office 4.2（详细说明见“Microsoft Office 4.2安装说明”）
+* WPS 97（只安装WPS 97本体和“中文校对”、“帮助文件”，不安装其它附加组件和字体）
+* Microsoft Excel 5.0（除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”）
 * 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
 * Trumpet Winsock
 * Internet Explorer 3.0（仅安装浏览器）
@@ -54,18 +54,6 @@ Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装
 * 造字程序及其帮助
 
 Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
-
-#### Microsoft Office 4.2安装说明
-
-Microsoft Office 4.2可选组件非常多，部分组件存在功能冗余、中文乱码、稳定性差、实用价值低等问题，推荐安装的组件如下：
-
-* Word除本体外，只安装“联机帮助、示例”中的“Word帮助”、“示例”
-* Excel除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”
-* Microsoft PowerPoint、Microsoft Office管理器不安装
-* 共享应用程序中只安装“公式编辑器”
-* “转换程序、过滤程序和数据存取”中，安装所有文字转换程序和图形过滤程序，“数据存取”不安装
-* 工具中只安装“MS Info”
-* 可选装长城全真中文字体
 
 #### 五笔字形输入法安装说明
 
@@ -119,7 +107,6 @@ Linux主机端DNSmasq可使用以下配置：
 
 ### 补充说明
 
-* 公式排版以Office 4.2自带的公式编辑器为主，因其需OLE，8M内存下建议将Windows 3.2永久交换文件开到16M以上；少量简单公式可用EQ域代码，现代Microsoft Word亦支持同款功能，但排版能力弱于公式编辑器。
 * `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Tera Term等软件对接。
 * `retro-servers`中的自制服务，使用1024以下端口前需要执行`sudo setcap 'cap_net_bind_service=+ep' /usr/bin/python3`开启相关权限；`/usr/bin/python3`必要时需顺着软链接找到真正的可执行文件本身。
 * 该机随时接受任何来自可信外部机器构建的程序，一般通过浏览器或FTP下载。
@@ -325,8 +312,9 @@ Windows 3.2推荐安装以下软件：
 * LView Pro 1.B
 * Microsoft Tetris for Windows 2.00
 * 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
-* Microsoft Office 4.2（详细说明见前文“Microsoft Office 4.2安装说明”）
+* WPS 97（只安装WPS 97本体和“中文校对”、“帮助文件”，不安装其它附加组件和字体）
 * 微软乐器大百科
+* 震撼——古典音乐鉴赏
 * Microsoft Scenes中的所有JPG图片
 
 ### 补充说明
