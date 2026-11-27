@@ -277,5 +277,5 @@ Linux主机端DNSmasq可使用以下配置：
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * UCDOS WPS模拟显示功能可使用Pause键暂停显示，然后按任意键继续模拟显示。
 * UCDOS配合西文软件（比如QBASIC、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
-* `ASM`目录中的`CNUM.TXT`是`CNUM.ASM`的DEBUG直录稿：没有TASM时，在DOS下执行`DEBUG < CNUM.TXT`即可生成`CNUM.COM`（336字节），与汇编结果逐字节一致。
+* `QB/TOOLS`目录中，`CNUM.TXT`是`CNUM.ASM`的DEBUG直录稿：没有汇编器时，在DOS下执行`DEBUG < CNUM.TXT`即可生成`CNUM.COM`（336字节），与汇编结果逐字节一致。
 
