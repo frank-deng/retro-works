@@ -18,18 +18,27 @@ Retro Programming Works 怀旧编程作品
 * CD-ROM
 * Sound Blaster 16
 * Mouse
-* NE2000
+* NE2000（2002年添加）
 
 ### 主要用途
 
-* BASIC编程（少量）
-* 汇编语言编程（仅限QBASIC程序依赖的汇编模块以及少数汇编程序）
+多媒体版（2002年前）：
+
+* BASIC编程（仅限`QB486`目录中的BASIC程序）
+* 汇编语言编程（仅限QBASIC程序依赖的汇编模块以及`QB486`目录中的汇编程序）
 * 文字处理（WPS 97）
+* 电子表格（Excel 5.0）
 * 英汉辞典（金山词霸听发音，UCDICT随时查）
 * 图片浏览
 * 听CD、MIDI
 * 多媒体光盘浏览
-* 俄罗斯方块、2048、贪吃蛇、DOS Mario等小游戏
+* DOS Mario等小游戏
+
+网络版（2002年后）：
+
+* 文字处理（WPS 97）
+* 图片浏览
+* DOS Mario等小游戏
 * 上网看新闻
 * 收发邮件
 * FTP上传下载文件
@@ -37,9 +46,7 @@ Retro Programming Works 怀旧编程作品
 
 ### 安装说明
 
-DOS下推荐安装以下软件：
-
-* DOS Mario
+DOS下安装*DOS Mario*、TASM（限多媒体版）。
 
 Windows 3.2安装时：
 
@@ -51,7 +58,7 @@ Windows 3.2安装时：
 * Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
 * 如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
 
-Windows 3.2推荐安装以下软件：
+Windows 3.2多媒体版推荐安装以下软件：
 
 * UCDICT（希望辞海，UCDOS和Windowa 3.x环境下均可用）
 * 金山词霸1.0
@@ -63,6 +70,11 @@ Windows 3.2推荐安装以下软件：
 * 微软乐器大百科
 * 震撼——古典音乐鉴赏
 * Microsoft Excel 5.0（除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”）
+
+Windows 3.2网络版推荐安装以下软件：
+
+* 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
+* WPS 97（只安装WPS 97本体、“帮助文件”，不安装其它附加组件和字体）
 * Trumpet Winsock
 * Internet Explorer 3.0（仅安装浏览器）
 * Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
@@ -223,7 +235,6 @@ Linux主机端DNSmasq可使用以下配置：
 
 * 所有BASIC程序文件及其依赖数据可在本仓`BASIC`目录中找到。
 * 所有WPS文档可在本仓`BASIC/DOC`目录中找到。
-
 
 ### 补充说明
 
