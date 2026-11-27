@@ -25,7 +25,7 @@ Retro Programming Works 怀旧编程作品
 * BASIC编程（少量）
 * 汇编语言编程（仅限QBASIC程序依赖的汇编模块以及少数汇编程序）
 * 文字处理（WPS 97）
-* 英汉辞典
+* 英汉辞典（金山词霸听发音，UCDICT随时查）
 * 图片浏览
 * 听CD、MIDI
 * 多媒体光盘浏览
@@ -40,17 +40,20 @@ Retro Programming Works 怀旧编程作品
 DOS下推荐安装以下软件：
 
 * DOS Mario
-* UCDICT（希望辞海，UCDOS和Windowa 3.x环境下均可用）
-* TASM+TLINK（汇编器+连接器）
 
-Windows 3.2安装时，安装所有附加组件。
+Windows 3.2安装时：
 
-Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
-
-Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
+* 安装所有附加组件，但以下组件不安装：
+  - 对象包装程序及其帮助
+  - 记录器及其帮助
+  - 录音机及其帮助
+  - 造字程序及其帮助
+* Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
+* 如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
 
 Windows 3.2推荐安装以下软件：
 
+* UCDICT（希望辞海，UCDOS和Windowa 3.x环境下均可用）
 * 金山词霸1.0
 * ACDSee
 * LView Pro 1.B
@@ -59,24 +62,12 @@ Windows 3.2推荐安装以下软件：
 * WPS 97（只安装WPS 97本体和“中文校对”、“帮助文件”，不安装其它附加组件和字体）
 * 微软乐器大百科
 * 震撼——古典音乐鉴赏
-* WPS 97（只安装WPS 97本体和“中文校对”、“帮助文件”，不安装其它附加组件和字体）
 * Microsoft Excel 5.0（除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”）
 * Trumpet Winsock
 * Internet Explorer 3.0（仅安装浏览器）
 * Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
 * WS FTP16LE（FTP客户端）
 * FoxMail（邮件客户端）
-
-#### Windows 3.2部署说明
-
-Windows 3.2安装时，安装所有附加组件，但以下附件不推荐安装：
-
-* 对象包装程序及其帮助
-* 记录器及其帮助
-* 录音机及其帮助
-* 造字程序及其帮助
-
-Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
 
 #### 五笔字形输入法安装说明
 
@@ -273,12 +264,12 @@ Linux主机端DNSmasq可使用以下配置：
 
 * UCDOS+宋体简、仿宋简、黑体简、楷体简轮廓字库和24点阵字库，外加12点阵宋体字库
 * UCDICT（希望辞海，UCDOS和Windowa 3.x环境下均可用）
-* CCED（简单数值计算、表格处理）
+* CCED 5.0（简单数值计算、表格处理）
 * SEA/PictView（看图软件）
 * DAZZLE.EXE（DOS下的屏幕保护程序）
 * Microsoft Scenes中的所有JPG图片
 
-本机部署`BASIC`、`QB/DOC`、`QB`、`ASM`目录中所有文件。
+本机部署`BASIC`、`QB/DOC`、`QB`目录中所有文件。
 
 ### 补充说明
 
@@ -286,4 +277,5 @@ Linux主机端DNSmasq可使用以下配置：
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * UCDOS WPS模拟显示功能可使用Pause键暂停显示，然后按任意键继续模拟显示。
 * UCDOS配合西文软件（比如QBASIC、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
+* `ASM`目录中的`CNUM.TXT`是`CNUM.ASM`的DEBUG直录稿：没有TASM时，在DOS下执行`DEBUG < CNUM.TXT`即可生成`CNUM.COM`（336字节），与汇编结果逐字节一致。
 
