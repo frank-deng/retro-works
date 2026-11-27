@@ -18,26 +18,49 @@ Retro Programming Works 怀旧编程作品
 * CD-ROM
 * Sound Blaster 16
 * Mouse
-* NE2000（后期加装）
+* NE2000
 
 ### 主要用途
 
-* 文字处理（WPS 97、Word 6.0）
-* 电子表格（Excel 5.0）
+* BASIC编程（少量）
+* 汇编语言编程（仅限QBASIC程序依赖的汇编模块以及少数汇编程序）
+* 文字处理（WPS 97）
+* 英汉辞典
+* 图片浏览
+* 听CD、MIDI
+* 多媒体光盘浏览
+* 俄罗斯方块、2048、贪吃蛇、DOS Mario等小游戏
 * 上网看新闻
 * 收发邮件
-* 连接远端UNIX机器
 * FTP上传下载文件
+* Telnet连接
 
 ### 安装说明
 
-Windows 3.2的部署（附加组件取舍、声卡驱动）见“Windows 3.2部署说明”。
+DOS下推荐安装以下软件：
+
+* DOS Mario
+* UCDICT（希望辞海，UCDOS和Windowa 3.x环境下均可用）
+* TASM+TLINK（汇编器+连接器）
+
+Windows 3.2安装时，安装所有附加组件。
+
+Windows 3.2用的Sound Blaster 16驱动推荐安装精简版的，不带播放器和其它工具。
+
+Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
 
 Windows 3.2推荐安装以下软件：
 
+* 金山词霸1.0
+* ACDSee
+* LView Pro 1.B
+* Microsoft Tetris for Windows 2.00
+* 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
+* WPS 97（只安装WPS 97本体和“中文校对”、“帮助文件”，不安装其它附加组件和字体）
+* 微软乐器大百科
+* 震撼——古典音乐鉴赏
 * WPS 97（只安装WPS 97本体和“中文校对”、“帮助文件”，不安装其它附加组件和字体）
 * Microsoft Excel 5.0（除本体外，“联机帮助和教程”中只安装“Microsoft Excel帮助”，加载宏中只安装“自动保存”）
-* 五笔字形输入法（绿色安装方案见“五笔字形输入法安装说明”）
 * Trumpet Winsock
 * Internet Explorer 3.0（仅安装浏览器）
 * Tera Term/SimpTerm/Mocha Telnet/EWAN（通过Telnet连接远端站点）
@@ -107,9 +130,9 @@ Linux主机端DNSmasq可使用以下配置：
 
 ### 补充说明
 
-* `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Tera Term等软件对接。
+* 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
+* `retro-servers`目录中包含多个自制服务，用于和Windows 3.2中的Internet Explorer 3.0、FoxMail、WS\_FTP、Telnet客户端等软件对接。
 * `retro-servers`中的自制服务，使用1024以下端口前需要执行`sudo setcap 'cap_net_bind_service=+ep' /usr/bin/python3`开启相关权限；`/usr/bin/python3`必要时需顺着软链接找到真正的可执行文件本身。
-* 该机随时接受任何来自可信外部机器构建的程序，一般通过浏览器或FTP下载。
 * Programmer's File Editor在Windows 3.2上无法输入中文，故不予安装。
 * WinZip实测2037年之后不可用，如无压缩解压需要可不安装。
 * Windows 3.2可实现拨号上网功能，详情请见[PPP\_Network.md](PPP_Network.md)
@@ -239,7 +262,6 @@ Linux主机端DNSmasq可使用以下配置：
 
 * WPS打字
 * CCED制表、计算
-* 汇编语言编程（仅限QBASIC程序依赖的汇编模块以及少数汇编程序）
 * BASIC编程
 * 英汉字典
 * 图片浏览
@@ -254,7 +276,6 @@ Linux主机端DNSmasq可使用以下配置：
 * CCED（简单数值计算、表格处理）
 * SEA/PictView（看图软件）
 * DAZZLE.EXE（DOS下的屏幕保护程序）
-* TASM+TLINK（汇编器+连接器）
 * Microsoft Scenes中的所有JPG图片
 
 本机部署`BASIC`、`QB/DOC`、`QB`、`ASM`目录中所有文件。
@@ -265,59 +286,4 @@ Linux主机端DNSmasq可使用以下配置：
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * UCDOS WPS模拟显示功能可使用Pause键暂停显示，然后按任意键继续模拟显示。
 * UCDOS配合西文软件（比如QBASIC、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
-
-1998s Multimedia PC
--------------------
-
-1998年左右，国内典型的多媒体电脑。
-
-<!--不连网，尽量贴合当年的国情-->
-
-### 配置
-
-* 486 DX2-66MHz CPU
-* 8M RAM
-* 512M HDD
-* S3 Graphics Adapter with 1M VRAM（Windows 3.2下支持640x480高彩色）
-* 3.5 Inch Floppy Drive x1
-* 5.25 Inch Floppy Drive x1
-* CD-ROM
-* Sound Blaster 16
-* Mouse
-
-### 主要用途
-
-* 文字处理（Word 6.0）
-* 电子表格（Excel 5.0）
-* 英汉辞典
-* 图片浏览
-* 听CD、MIDI
-* 多媒体光盘浏览
-* 小游戏
-
-### 安装说明
-
-DOS下推荐安装以下软件：
-
-* DOS Mario
-
-Windows 3.2的部署（附加组件取舍、声卡驱动）见前文“Windows 3.2部署说明”；本机另不推荐安装“终端仿真程序及其帮助”。
-
-Windows 3.2下如需播放音乐CD，则需安装`[MCI] CD Audio`驱动。
-
-Windows 3.2推荐安装以下软件：
-
-* 金山词霸1.0
-* ACDSee
-* LView Pro 1.B
-* Microsoft Tetris for Windows 2.00
-* 五笔字形输入法（绿色安装方案见前文“五笔字形输入法安装说明”）
-* WPS 97（只安装WPS 97本体和“中文校对”、“帮助文件”，不安装其它附加组件和字体）
-* 微软乐器大百科
-* 震撼——古典音乐鉴赏
-* Microsoft Scenes中的所有JPG图片
-
-### 补充说明
-
-* 制作模拟器使用的BIN+CUE格式的音乐CD镜像可使用`shntool`的`cue`和`join`功能。
 
