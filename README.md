@@ -25,7 +25,6 @@ Retro Programming Works 怀旧编程作品
 多媒体版（2002年前）：
 
 * BASIC编程（仅限`QB486`目录中的BASIC程序）
-* 汇编语言编程（仅限QBASIC程序依赖的汇编模块以及`QB486`目录中的汇编程序）
 * 文字处理（WPS 97）
 * 电子表格（Excel 5.0）
 * 英汉辞典（金山词霸听发音，UCDICT随时查）
@@ -265,6 +264,7 @@ Linux主机端DNSmasq可使用以下配置：
 * WPS打字
 * CCED制表、计算
 * BASIC编程
+* 汇编语言编程
 * 英汉字典
 * 图片浏览
 * 俄罗斯方块、2048、贪吃蛇等小游戏
@@ -278,6 +278,7 @@ Linux主机端DNSmasq可使用以下配置：
 * CCED 5.0（简单数值计算、表格处理）
 * SEA/PictView（看图软件）
 * DAZZLE.EXE（DOS下的屏幕保护程序）
+* TASM+TLINK（汇编器+连接器）
 * Microsoft Scenes中的所有JPG图片
 
 本机部署`BASIC`、`QB/DOC`、`QB`目录中所有文件。
@@ -288,5 +289,4 @@ Linux主机端DNSmasq可使用以下配置：
 * UCDOS WPS默认的蓝底绿字难以看清，可用`WPS /FE /S`命令改为更清楚的蓝底黄字。用`WPS /?`获取命令行帮助信息。
 * UCDOS WPS模拟显示功能可使用Pause键暂停显示，然后按任意键继续模拟显示。
 * UCDOS配合西文软件（比如QBASIC、Telix、MS-DOS Kermit）使用时，UCDOS需要关闭西文制表符识别才能保证所有汉字被正确显示，此时西文制表符绘制的边框会显示成乱码（比如“哪哪哪哪哪”）。
-* `QB/TOOLS`目录中，`CNUM.TXT`是`CNUM.ASM`的DEBUG直录稿：没有汇编器时，在DOS下执行`DEBUG < CNUM.TXT`即可生成`CNUM.COM`（336字节），与汇编结果逐字节一致。
 
